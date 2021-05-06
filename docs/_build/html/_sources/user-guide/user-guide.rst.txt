@@ -1,6 +1,7 @@
 .. _user-guide-doc:
 
 
+
 STIG Manager User Guide 
 ############################################
 
@@ -258,14 +259,13 @@ From the Checklist menu in the Menu Bar, the User can:
 
 When a .ckl or XCCDF file is imported, any Reviews that meet the :term:`Workflow` criteria will be set to a Submitted state.
 
-
-.. todo::
-   Issue about Result column label? (not showing up in columns list either)
-
 The menu bar also supports a variety of status and Title filters.
 
 .. note::
    STIG Manager does not retain the .ckl or XCCDF files that are imported. The files are parsed and the Reviews stored in STIG Manager's Database. STIG Manager can produce a new .ckl representation of its Reviews on demand. 
+
+.. note::
+   STIG Manager will import and export .ckl files differently depending on the values of certain .ckl elements and Asset metadata. See :ref:`ckl-processing` for more information.    
 
 Rule Info Panel
 -------------------
@@ -361,8 +361,6 @@ Information about the Asset, Rule, Action, Last Modified Date, and applicable ST
 
 This section of the Report can be exported on its own.
 
-.. todo::
-   This export button doesn't seem to do anything. create issue.
 
 ===========================================
 
@@ -381,8 +379,6 @@ This report consists of the total number of Checks associated with each Asset or
 
 This report can be exported as a .csv using the Down-Arrow button at the botom of the panel.
 
-.. todo::
-   This export does not seem to be working. also still uses "returned" as a column header. make issue!
 
 .. thumbnail:: /assets/images/status-report.png
       :width: 50% 
@@ -403,11 +399,12 @@ Allows a Collection Manager or Owner to Manage their Collection.
 From this Workspace, the User can:
 
    * Alter the Name, Workflow, and Metadata associated with the Collection
-   * Start a bulk import of .ckl or XCCDF files to automatically populate  or add to their Collection.
+   * Batch import CKL or XCCDF files to automatically scaffold or add to their Collection
+   * Batch export CKL files for external tools such as eMASS
    * Add/Modify/Remove Assets in the Collection 
-   * Add or remove STIGs from the Collection (STIGs must be assigned to at least 1 Asset to be associated with a Collection). 
-   * Add/Modify/Remove User Grants in the Collection.
-   * Delete the Collection (If Collection Owner).
+   * Add or remove STIGs from the Collection (STIGs must be assigned to at least 1 Asset to be associated with a Collection)
+   * Add/Modify/Remove User Grants in the Collection
+   * Delete the Collection (if Collection Owner)
 
 .. thumbnail:: /assets/images/manage-collection-workspace.png
       :width: 50% 
@@ -420,7 +417,7 @@ From this Workspace, the User can:
 
 Collection Properties Panel
 --------------------------------
-This Panel allows Collection Managers and Owners to change the name of the Asset, it's workflow, and any associated Metadata.  Collection Owners can also delete this Collection. 
+This Panel allows Collection Managers and Owners to change the name of the Asset, its workflow, and any associated Metadata.  Collection Owners can also delete this Collection. 
 
 .. thumbnail:: /assets/images/collection-properties.png
       :width: 50% 
@@ -430,10 +427,14 @@ This Panel allows Collection Managers and Owners to change the name of the Asset
 
 -------------------------------
 
+.. _grants-panel:
+
+
 Grants Panel
 -------------------
 This Panel displays all the Users who have access to some portion of this Collection.
-Users and their level of Access to the Collection can be can be added, or removed with the buttons at the top of this Panel. Double-clicking on a User Grant will allow you to alter an existing Grant. A Restricted User's access can be further configured with the "Restricted User access list..." button.
+
+User Grants can be added or removed using toolbar buttons at the top of this Panel. Double-clicking a Grant will allow you to modify the Grant. When creating or modifying a Grant, typing into the Username field will display a filtered droplist of the available users. 
 
 See :term:`User` for more info about these Access Levels.
 
@@ -445,8 +446,7 @@ See :term:`User` for more info about these Access Levels.
 
 -------------------------------
 
-Typing into the Username field will start filtering the known users. 
-If a User with a Restricted Access Level is selected, the "Restricted User access list..." button is activated. 
+When a User with a Restricted Grant is selected, the "User access..." button is enabled. Restricted Users must be given access to specific Asset-STIG pairs. 
 
 .. thumbnail:: /assets/images/restricted-access-list.png
       :width: 50% 
@@ -456,21 +456,18 @@ If a User with a Restricted Access Level is selected, the "Restricted User acces
 
 -------------------------------
 
-.. todo::
-   double-click on a grant. click on another grant(or anywhere else on screen) w/o cancelling or saving. originally selected grant staays in a modifacation state, even if . 
-         
-
+       
 Assets Panel
 ------------------
-This panel lists the Assets that are a part of this Collection. The columns list the Asset Name, Description, IP, computing status, number of STIGs assigned, the number of STIGs that are not assigned to a user, and the total number of Rules that apply to the Asset. These properties can be altered by double-clicking on the Asset row.
+This panel lists the Assets that are a part of this Collection. An Asset's properties can be modified by double-clicking on the Asset row or by choosing "Change Asset Properties..." from the toolbar.
 
 The menu bar provides several functions, allowing the User to Create, Delete, and Change Assets in the Collection.
 The :ref:`Collection Builder` option allows the User to create many Assets and their STIG Assignments at once. 
 
-.. thumbnail:: /assets/images/assets-panel-menu.png
+.. thumbnail:: /assets/images/assets-panel-toolbar.png
       :width: 50% 
       :show_caption: True
-      :title: Assets Panel Menu Bar
+      :title: Collection -> Manage -> Assets toolbar
 
 
 -------------------------------
@@ -493,12 +490,16 @@ Click the Create Asset button to create an Asset manually. Enter relevant Asset 
 
 .. _Collection Builder:
 
-Import CKL or SCAP / Collection Builder
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Import CKL or SCAP to Build or Update Your Collection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 STIG Manager lets you populate your entire Collection from scratch or add to an existing Collection with a bulk import of .ckl and XCCDF files. This feature will create any new Assets you submit files for, and assign them the STIGs specified in the imported files.  If the Asset already exists, the newly imported STIGs will be assigned to them. The User can also choose whether or not to import the Reviews in the imported files, or just create the Assets and STIG Assignments.
 
-The Asset Name must match exactly.
+The Asset Name must match exactly. Check the :term:`ckl` and :term:`XCCDF` glossary entries for how their individual fields map to STIG Manager fields. 
+
+.. note::
+   When STIG Manager creates an Asset from an imported file, it will populate the Name, FQDN, IP, and MAC fields if they are present in the file. If the asset is already created, those fields are NOT updated when a file is imported. 
+
 
 .. note::
    STIG Manager does not retain the .ckl or XCCDF files that are imported. The files are parsed and the Reviews stored in STIG Manager's Database. STIG Manager can produce a new .ckl representation of its Reviews on demand. 
@@ -571,8 +572,35 @@ The user is presented with the log of the import.
 .. note::
    STIG Manager does not retain the .ckl or XCCDF files that are imported. The files are parsed and the Reviews stored in STIG Manager's Database. STIG Manager can produce a new .ckl representation of its Reviews on demand. 
 
+.. note::
+   STIG Manager will import and export .ckl files differently depending on the values of certain .ckl elements and Asset metadata. See :ref:`ckl-processing` for more information.    
+
 -------------------------------
 
+
+.. _export-by-asset:
+
+Export CKLs by Asset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The "Export CKLs..." button in the Assets Panel Toolbar will open a pop-up interface with a checkbox selection tree.  Selections can be made for any combination in the tree, from the individual STIG-Asset level, whole Asset level, or every Asset in the Collection. 
+
+One multi-STIG .ckl file will be generated for every unique Asset selected. The package of .ckl files will be presented as a .zip file.  Check the :term:`ckl` glossary entry for exact mappings of fields from STIG Manger to .ckl file.
+
+
+.. thumbnail:: /assets/images/checklist-archive-export-asset.png
+      :width: 50% 
+      :show_caption: True
+      :title: Checklist Archive Export by Asset
+
+
+.. thumbnail:: /assets/images/checklist-archive-export-log.png
+      :width: 50% 
+      :show_caption: True
+      :title: Checklist Archive Export log
+
+
+--------------------------
 
 Delete Asset
 ~~~~~~~~~~~~~~~~~~~~
@@ -621,5 +649,77 @@ Change Assigned Assets
 Select "Change assigned Assets..." or double-click a STIG to change what Assets are assigned this STIG in this Collection.
 
 
+.. _export-by-stig:
+
+
+Export CKLs by STIG
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The "Export CKLs..." button in the STIGs Panel Toolbar will open a pop-up interface with a checkbox selection tree.  Selections can be made for any combination in the tree, from the individual STIG-Asset level, whole STIG level, or every STIG in the Collection. 
+
+One multi-STIG .ckl file will be generated for every unique Asset selected. The package of :term:`ckl` files will be presented as a .zip file.  Check the :term:`ckl` glossary entry for exact mappings of fields from STIG Manger to .ckl file.
+
+
+.. thumbnail:: /assets/images/checklist-archive-export-stig.png
+      :width: 50% 
+      :show_caption: True
+      :title: Checklist Archive Export by STIG
+
+
+
+.. thumbnail:: /assets/images/checklist-archive-export-log.png
+      :width: 50% 
+      :show_caption: True
+      :title: Checklist Archive Export log
+
+
+|
+
+
+.. _ckl-processing:
+
+A Note on .CKL Processing
+=================================
+
+When the STIG Manager Client imports data from :term:`.ckl files <ckl>`, in the simplest case it will attempt to match (and, in some instances, create) the Asset specified in the .ckl's ``<HOST_NAME>`` element.  However, if the ``<ASSET><WEB_OR_DATABASE>`` element in the .ckl has a value of ``true``, special processing is invoked. This processing will attempt to match the ``<HOST_NAME>``, ``<WEB_DB_SITE>`` and ``<WEB_DB_INSTANCE>`` values in the .ckl with Asset metadata when identifying the Asset.  When the STIG Manager Client creates Assets from .ckls with these elements populated, it will populate the same Asset metadata according to the table below. 
+
+Conversely, when STIG Manager produces a .ckl file from an Asset that has the below metadata values set, it will populate the appropriate .ckl elements. 
+
+The following metadata properties are used when the value of ``<ASSET><WEB_OR_DATABASE>``  is ``true``:
+
+.. list-table:: **CKL elements map to STIG Manager Asset metadata**
+   :widths: 20 20 60
+   :header-rows: 1
+   :class: tight-table
+
+   * - ``<ASSET>`` Child Element
+     - Asset metadata
+     - Note
+   * - ``<WEB_OR_DATABASE>``
+     - ``cklWebOrDatabase``    
+     - When set to true, invokes additional processing using the below elements and metadata     
+   * - ``<HOST_NAME>``
+     - ``cklHostName``    
+     - This value will populate the ``<HOST_NAME>`` element of a ckl, as opposed to the Asset name in other cases.
+   * - ``<WEB_DB_SITE>``
+     - ``cklWebDbSite``
+     - No specific purpose for STIG Manager, other than contributing to Asset identification 
+   * - ``<WEB_DB_INSTANCE>``
+     - ``cklWebDbInstance``          
+     - No specific purpose for STIG Manager, other than contributing to Asset identification 
+
+   
+If the importer needs to create an Asset, it will set this metadata and set the initial Asset name to ``<HOST_NAME>-[<WEB_DB_SITE> | "NA"]-[<WEB_DB_INSTANCE> | "NA"]``. The Asset name is not meaningful (to STIG Manager) and it can be changed by the user later, if required.
+
+
+.. thumbnail:: /assets/images/asset-metadata-and-ckl-elements.png
+      :width: 75% 
+      :show_caption: True
+      :title: Corresponding Asset Metadata and .ckl elements
+
+
+
+
+|
 
 

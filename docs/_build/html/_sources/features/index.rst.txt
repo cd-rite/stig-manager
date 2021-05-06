@@ -19,7 +19,7 @@ Our Project incorporates software developed since 2012 by the `U.S. Naval Unders
 The Single Source of Truth throughout Steps 3 and 4 of the RMF Process
 ===========================================================================================
 
-Throughout the RMF process, STIG Manager serves as the single source of truth for users, evaluators, managers, RMF Package reviewers, ISSEs, NQVs, and automated tools about Assets, STIGs, and their current assessment status.  By allowing everyone involved in the process to refer to the same set of data and reports, the RMF process can be executed efficiently and it's progress monitored effectively.  STIG Managers API allows automated tools to submit scan results, as well as access data for direction on what STIGs they should scan.
+Throughout the RMF process, STIG Manager serves as the single source of truth for users, evaluators, managers, RMF Package reviewers, ISSEs, NQVs, and automated tools about Assets, STIGs, and their current assessment status.  By allowing everyone involved in the process to refer to the same set of data and reports, the RMF process can be executed efficiently and its progress monitored effectively.  STIG Managers API allows automated tools to submit scan results, as well as access data for direction on what STIGs they should scan.
 
 STIG Manager provides data structures, assessment workspaces, and Reports for managing these Steps of the RMF process.  
 
@@ -36,6 +36,14 @@ STIG Manager provides data structures, assessment workspaces, and Reports for ma
 
 Features and Capabilities Overview
 ====================================
+
+
+STIG Evaluation Data, Freed From .CKL Files
+----------------------------------------------------
+
+STIG Manager maintains a canonical set of STIGs as published by DISA, and relates all Reviews to that set. Working with this data directly in STIGMan, rather than passing .ckl files around, eliminates the possibility of STIG Evaluators using the wrong STIG revision, changing severity, creating malformed .ckls, and other issues that can hamper the efficient flow of Evaluations to Validators.  STIG Manager will import .ckl files and create Reviews that match their contents. Any remaining Evaluation gaps can be reviewed manually in the STIGMan interface, or added to with additional imports. STIGMan provide a unified view of overall Evaluation progress, and are not tied to any specific .ckl file.  
+
+Instead of relying on .CKL files that could be altered, overridden, or have missing fields, properly formed .CKLs are generated from the current Evaluation state of Assets. Once Validators verify that all reviews are as they want them, they can create an archive of .CKLs on demand for import into eMASS. 
 
 
 RMF Package data represented as Collections, Assets, STIGs, and Reviews
@@ -59,12 +67,6 @@ Migrating to STIG Manager is easy because it can use your existing artifacts to 
 .. note::
   STIG Manager does not maintain a repository of uploaded checklists. Instead, it maintains a current state of evaluations for an asset, and will create new .ckls for you on demand with the most current results.
 
-.. raw:: html
-
-  <video width="480"  controls>
-    <source src="../_static/videos/Collections.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-  </video>
 
 -------------------------
 
@@ -117,111 +119,119 @@ STIG Manager is (almost) ready to support a life-cycle approach to RMF. With the
 
 
 
+..
+  Collaborate on Steps 3 and 4 of the RMF Process
+  ===================================================
 
-.. _features-doc:
+  STIGMan separates your evaluation data from the .ckls that previously contained them. 
+  Instead of sending .ckls around ahving to check that they are in order, perfect .ckls are generated on demand.
+  STIG Manager produces .ckls that represent 
 
-
-
-
-
-
-Collaborate on Steps 3 and 4 of the RMF Process
-===================================================
-
-
-Collaborate on STIG Evaluation and management. Make use of others expertise.
-
-Collaboratively manage your STIG assessments.
-
-Single source of truth for all parties to reference. 
-
-Multiple workspaces for different user approaches and responsibilitiies.
-
-Multiple workspaces for each 
-
-organize and perform STIG evaluations
-Collection Management
-Asset
-STIG Evaluations
-Approve evaluations
-Report on Status, Progress, and Findings.
-Analyze Evaluation progress.
-
-Complete API
-
-Role and Assignmnet based access controls
-
-combine inputs from individuals and automated results
+  Based off a canonical STIG, so you don't have to worry if the .ckl STIG is altered.
 
 
+  Collaborate on STIG Evaluation and management. Make use of others expertise.
 
-STIG Manager serves as a central reference for current STIG Assignments, Evaluations, and progress for all parties involved in Package creation. 
+  Collaboratively manage your STIG assessments.
 
+  Single source of truth for all parties to reference. 
 
-Rather than passing .ckl files around, which, by their nature, are instantly out of date, STIG Manager provides the authoritative source for current STIG Evaluations and Package progress. 
+  Multiple workspaces for different user approaches and responsibilitiies.
 
+  Multiple workspaces for each 
 
-Evaluate, validate, and check status of an entire Package at once. Track exactly when an Evaluation was last performed, both from automated, imported results and manual entries. 
+  organize and perform STIG evaluations
+  Collection Management
+  Asset
+  STIG Evaluations
+  Approve evaluations
+  Report on Status, Progress, and Findings.
+  Analyze Evaluation progress.
 
+  Complete API
 
-Import SCAP results or .ckl files using STIG Manager's convenient interface to build a Collection of Assets, and get a handle on their current Evaluation Status. 
+  Role and Assignmnet based access controls
 
-
-Manual STIGs, and STIGs with incomplete automation can be completed right in STIG Manager's UI, either individually or as a group. Convenient references, such as Evaluations for other Assets in the Collection and a history of Rule Evaluations are easily accesible. IF applicable, Reviews for other Assets can be dragged and dropped right into another Assets Evaluation. 
-
-Work as a team. Stig Manager can show Evaluations you or your team have provided for other Assets in your Collection. 
+  combine inputs from individuals and automated results
 
 
 
-STIG Manager tracks Reviews at the Rule level, so that When STIGs are updated, all Rules with unchanged RuleIds are carried forward to the new STIG. 
+  STIG Manager serves as a central reference for current STIG Assignments, Evaluations, and progress for all parties involved in Package creation. 
 
 
-Enhance STIG Manager with utilities and clients of your own. STIG Manager was built with a well-documented RESTful API to enable convenient integration with other tools. 
+  Rather than passing .ckl files around, which, by their nature, are instantly out of date, STIG Manager provides the authoritative source for current STIG Evaluations and Package progress. 
 
 
-* Single source of truth for Evaluations and STIG Status.
+  Evaluate, validate, and check status of an entire Package at once. Track exactly when an Evaluation was last performed, both from automated, imported results and manual entries. 
 
 
-Targeted Remediation Efforts
-Use provided tools to target specific high value Vulnerabilities across all Assets in your Collection. Stigman does not remediate vulnerabilities, it represents accumulated data from manual evaluations and automated scans. 
+  Import SCAP results or .ckl files using STIG Manager's convenient interface to build a Collection of Assets, and get a handle on their current Evaluation Status. 
 
 
-Targeted Evaluation Efforts
+  Manual STIGs, and STIGs with incomplete automation can be completed right in STIG Manager's UI, either individually or as a group. Convenient references, such as Evaluations for other Assets in the Collection and a history of Rule Evaluations are easily accesible. IF applicable, Reviews for other Assets can be dragged and dropped right into another Assets Evaluation. 
 
-
-Track Evaluations at the Rule level. When a STIG updates, if the RuleId does not change, that result persists to the new version. 
+  Work as a team. Stig Manager can show Evaluations you or your team have provided for other Assets in your Collection. 
 
 
 
-* Automatically create a collection of Assets from your existing .ckl files.
-* Review all your assets at once with the Collection Review workspace.
-* Provide a workspace for viewing manual and automated STIG evaluations together.
-* Enforce a workflow for your Collection.
-* Reports for Findings.
-* Status reports, showing STIG Evaluation completeness
-* Generate POAM from your findings.
-* Single source of truth for Evaluations and STIG Status.
+  STIG Manager tracks Reviews at the Rule level, so that When STIGs are updated, all Rules with unchanged RuleIds are carried forward to the new STIG. 
 
-Workspaces
-----------------
 
-Collection Builder
-----------------------
+  Enhance STIG Manager with utilities and clients of your own. STIG Manager was built with a well-documented RESTful API to enable convenient integration with other tools. 
 
-Workflow Tracking
-----------------------
 
-Reporting
------------------
+  * Single source of truth for Evaluations and STIG Status.
 
+
+  Targeted Remediation Efforts
+  Use provided tools to target specific high value Vulnerabilities across all Assets in your Collection. Stigman does not remediate vulnerabilities, it represents accumulated data from manual evaluations and automated scans. 
+
+
+  Targeted Evaluation Efforts
+
+
+  Track Evaluations at the Rule level. When a STIG updates, if the RuleId does not change, that result persists to the new version. 
+
+
+
+  * Automatically create a collection of Assets from your existing .ckl files.
+  * Review all your assets at once with the Collection Review workspace.
+  * Provide a workspace for viewing manual and automated STIG evaluations together.
+  * Enforce a workflow for your Collection.
+  * Reports for Findings.
+  * Status reports, showing STIG Evaluation completeness
+  * Generate POAM from your findings.
+  * Single source of truth for Evaluations and STIG Status.
+
+  Workspaces
+  ----------------
+
+  Collection Builder
+  ----------------------
+
+  Workflow Tracking
+  ----------------------
+
+  Reporting
+  -----------------
 
 
 
 
+---------------------
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Common Tasks:
+
+   common-tasks
 
 
 
 
+---------------------
 
+|
 
 

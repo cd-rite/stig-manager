@@ -1,6 +1,5 @@
 'use strict';
 const writer = require('../../utils/writer.js')
-const parsers = require('../../utils/parsers.js')
 const dbUtils = require('./utils')
 
 let _this = this
@@ -481,26 +480,29 @@ exports.patchReviewByAssetRule = async function(projection, assetId, ruleId, bod
     let values = {
       userId: userObject.userId
     }
-    if (body.result != undefined) {
+    if (body.result !== undefined) {
       values.resultId = dbUtils.REVIEW_RESULT_API[body.result]
     }
-    if (body.resultComment != undefined) {
+    if (body.resultComment !== undefined) {
       values.resultComment = body.resultComment
     }
-    if (body.action != undefined) {
+    if (body.action !== undefined) {
       values.actionId = dbUtils.REVIEW_ACTION_API[body.action]
     }
-    if (body.actionComment != undefined) {
+    if (body.actionComment !== undefined) {
       values.actionComment = body.actionComment
     }
-    if (body.status != undefined) {
+    if (body.status !== undefined) {
       values.statusId = dbUtils.REVIEW_STATUS_API[body.status]
     }
-    if (body.autoResult != undefined) {
+    if (body.autoResult !== undefined) {
       values.autoResult = body.autoResult ? 1 : 0
     }
-    if (body.rejectText != undefined) {
+    if (body.rejectText !== undefined) {
       values.rejectText = body.rejectText
+    }
+    if (body.rejectUserId != undefined) {
+      values.rejectUserId = body.rejectUserId
     }
 
     let binds = {
@@ -588,4 +590,65 @@ exports.patchReviewByAssetRule = async function(projection, assetId, ruleId, bod
       await connection.release()
     }
   }
+}
+
+// Returns a Set of ruleIds
+exports.getRulesByAssetUser = async function ( assetId, userObject ) {
+  try {
+    const binds = []
+    let sql = `
+      select
+        distinct rgr.ruleId 
+      from 
+        asset a
+        left join collection_grant cg on a.collectionId = cg.collectionId
+        left join stig_asset_map sa using (assetId)
+        left join user_stig_asset_map usa on sa.saId = usa.saId
+        left join revision rev using (benchmarkId)
+        left join rev_group_map rg using (revId)
+        left join rev_group_rule_map rgr using (rgId)
+      where 
+        a.assetid = ?`
+    binds.push(assetId)
+    if (!userObject.privileges.globalAccess) {
+      sql += `
+      and cg.userId = ?
+      and CASE WHEN cg.accessLevel = 1 THEN usa.userId = cg.userId ELSE TRUE END`
+      binds.push(userObject.userId)
+    }
+    let [rows] = await dbUtils.pool.query(sql, binds)
+    return new Set(rows.map( row => row.ruleId ))
+  }
+  finally { }
+}
+
+// Returns a Boolean
+exports.checkRuleByAssetUser = async function (ruleId, assetId, userObject) {
+  try {
+    const binds = []
+    let sql = `
+      select
+        distinct rgr.ruleId 
+      from 
+        asset a
+        left join collection_grant cg on a.collectionId = cg.collectionId
+        left join stig_asset_map sa using (assetId)
+        left join user_stig_asset_map usa on sa.saId = usa.saId
+        left join revision rev using (benchmarkId)
+        left join rev_group_map rg using (revId)
+        left join rev_group_rule_map rgr using (rgId)
+      where 
+        a.assetId = ?
+        and rgr.ruleId = ?`
+    binds.push(assetId, ruleId)
+    if (!userObject.privileges.globalAccess) {
+      sql += `
+      and cg.userId = ?
+      and CASE WHEN cg.accessLevel = 1 THEN usa.userId = cg.userId ELSE TRUE END`
+      binds.push(userObject.userId)
+    }    
+    let [rows] = await dbUtils.pool.query(sql, binds)
+    return rows.length > 0
+  }
+  finally { }
 }

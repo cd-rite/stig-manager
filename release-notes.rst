@@ -1,3 +1,86 @@
+1.0.0-beta.31
+-----------------------
+- fix #275: handle rule-result without check (#290)
+- feat: Drag from Review History (#288)
+- fix #145: Review vetting for all users (#285)
+- feat: Endpoint updates (#284)
+- docs: Added default_group to prevent guid generation, removed doctrees, added a bit of info to Contributing doc. (#281)
+- chore: remove obsolete docker dir (#278)
+- fix #276: remove reference to database 'stigman'
+
+1.0.0-beta.30
+-----------------------
+- fix #270: ROLE element default value 'None' (#272)
+- fix #266: sanitize exported filenames (#273)
+- ironbank => development sign+image
+
+1.0.0-beta.29
+-----------------------
+- fix #256: CKL site/instance handling; UI refactor (#268)
+
+1.0.0-beta.28
+-----------------------
+- fix #264: Display feedback for rejected reviews (#265)
+- fix: Filter members only on .xml extension  (#260)
+- fix: New/Delete => Assign/Unassign (#261)
+- fix: SET NAME to utf8mb4 encoding (#262)
+- feat: format roles claim with bracket notation and optional chaining (#190)
+- fix: cast userId as char (#249)
+- fix: handle property chains with hyphens (#257)
+- fix: create date is not ISO8601 UTC (#189)
+- fix: response schema for /opt/configuration (#147)
+- fix: Attach => Assign STIG (#118)
+- fix: log servicename if present (#198)
+
+1.0.0-beta.27
+-----------------------
+Migrates MySQL
+Migration notes included in #251 
+
+- feat: Ext.LoadMask looks for store.smMaskDelay (#254)
+- fix: batch import continues on error, refreshes grids (#252)
+- fix: increased length of asset name,ip,mac,fqdn and allow more nulls  (#251)
+
+1.0.0-beta.26
+-----------------------
+- fix: sticky bit for world-writable dirs created by npm (#245)
+- feat: mercury-medium color is more blue (#243)
+- feat: Tooltips for Review labels and headers (#240) (#242)
+- doc: updates regarding ckl -> stigman field mappings, clients folder when running from source (#241)
+- build(deps): bump urllib3 from 1.26.3 to 1.26.4 in /docs (#238)
+- feat: Manage Assets -> multi-delete (#232), columns (#236)
+
+1.0.0-beta.25
+-----------------------
+- chore: remove unused oracledb dependency (#229)
+- Multiple fix and features (#228)
+- fix: fetch STIG/SCAP if configured at bootstrap (#227)
+
+1.0.0-beta.24
+-----------------------
+- Multiple fixes and features (#225)
+- fix: Exports on multiple reports (#224)
+- doc: Added a little more about .ckl and data handling (#223)
+- build(deps): bump y18n from 3.2.1 to 3.2.2 in /api/source
+- fix: reduce deadlock potential (#216)
+
+1.0.0-beta.23
+-----------------------
+- fix: remove hard-coded reference to schema (#211)
+- feat: UI shows collectionId (#210)
+- feat: progress bar styling (#209)
+- Common tasks elaboration, other edits (#208)
+- feat: case-sensitive collation for benchmarkId in MySQL (#206)
+- feat: name-match params and duplicate handling (#204)
+- doc: Added some documentation about new .ckl archive export feature. (#203)
+- adjust path to docker readme (#196)
+
+1.0.0-beta.22
+-----------------------
+- fix: Improved output when importing STIG XML (#192)
+- fix: case-insensitive filename matching (#192)
+- feat: Collection export management (#169)
+- docs: Build documentation with Sphinx (#188)
 
 1.0.0-beta.21
 -----------------------
