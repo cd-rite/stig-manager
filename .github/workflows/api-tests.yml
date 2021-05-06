@@ -71,6 +71,7 @@ jobs:
       -
         name: Run Newman Collection GETS
         id: newman-run-gets
+        continue-on-error: true
         if: steps.newman-run-loadTestData.conclusion == 'success'
         working-directory: ./test/api
         run: |
@@ -79,6 +80,7 @@ jobs:
       -
         name: Run Newman Collection Posts, Puts, Patches, Deletes
         id: newman-run-pppd
+        continue-on-error: true
         if: steps.newman-run-loadTestData.conclusion == 'success'
         working-directory: ./test/api
         run: |
@@ -87,6 +89,7 @@ jobs:
       -
         name: Run Newman Collection STIGS
         id: newman-run-stigs
+        continue-on-error: true
         if: steps.newman-run-loadTestData.conclusion == 'success'
         working-directory: ./test/api
         run: |
@@ -95,6 +98,7 @@ jobs:
       -
         name: Run Newman Collection LVL1 Cross-Boundary Tests
         id: newman-run-lvl1-cross-boundary
+        continue-on-error: true
         if: steps.newman-run-loadTestData.conclusion == 'success'
         working-directory: ./test/api
         run: |
