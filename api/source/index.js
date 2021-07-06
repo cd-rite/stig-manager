@@ -5,7 +5,7 @@ const http = require('http')
 const express = require('express')
 const cors = require('cors');
 const morgan = require('morgan')
-const oasTools = require('oas-tools')
+// const oasTools = require('oas-tools')
 const config = require('./utils/config')
 const auth = require('./utils/auth')
 const swaggerUi = require('swagger-ui-express')
@@ -16,6 +16,11 @@ const writer = require('./utils/writer.js')
 const OperationSvc = require(`./service/${config.database.type}/OperationService`)
 const compression = require('compression')
 const smFetch = require('./utils/fetchStigs')
+const {
+  middleware: openApiMiddleware,
+  resolvers,
+} = require('express-openapi-validator');
+
 
 console.log(`Starting STIG Manager ${config.version}`)
 
@@ -86,11 +91,88 @@ for (const path in oasDoc.paths) {
 oasDoc.servers[0].url = config.swaggerUi.server
 oasDoc.components.securitySchemes.oauth.flows.implicit.authorizationUrl = `${config.swaggerUi.authority}/protocol/openid-connect/auth`
 
+const apiSpec = path.join(__dirname, './specification/stig-manager.yaml');
+
 // Initialize the Swagger middleware
-oasTools.configure(options)
-oasTools.initialize(oasDoc, app, function () {
-  run()
-})
+// oasTools.configure(options)
+// oasTools.initialize(oasDoc, app, function () {
+//   run()
+// })
+
+var moveQueryToSwaggerParams = function (req, res, next) {
+  req.swagger = {
+    get params() {
+      let aggParams = {...req.query, ...req.params, ...req.headers}
+      aggParams.body = req.body
+      return aggParams
+    }
+  }
+  // req.swagger.params.body = req.body
+  next()
+}
+
+app.use(moveQueryToSwaggerParams)
+
+
+//  2. Install the OpenApiValidator middleware
+app.use(
+  openApiMiddleware({
+    apiSpec,
+    validateRequests: {
+      coerceTypes: true,
+      allowUnknownQueryParameters: false,
+    },    // validateResponses: true, // default false
+    // validateResponses: {
+    //   removeAdditional: 'failing',
+    // },
+    validateResponses: {
+      onError: (error, body, req) => {
+        console.log(`Response body fails validation: `, error);
+        console.log(`Emitted from:`, req.originalUrl);
+        console.debug(body);
+      }
+    },
+    validateApiSpec: true,
+    $refParser: {
+      mode: 'dereference',
+    },
+    operationHandlers: {
+      // 3. Provide the path to the controllers directory
+      basePath: path.join(__dirname, 'controllers'),
+      // 4. Provide a function responsible for resolving an Express RequestHandler
+      //    function from the current OpenAPI Route object.
+      resolver: modulePathResolver1,
+    },
+    validateSecurity: {
+      handlers:{
+        oauth: auth.verifyRequest 
+      }
+    },
+    fileUploader: { 
+      storage: storage,
+      limits: {
+        fileSize: parseInt(config.http.maxUpload)
+      }
+     }
+  }),
+);
+
+
+app.use((err, req, res, next) => {
+  // 7. Customize errors
+  console.error(err); // dump error to console for debug
+  res.status(err.status || 500).json({
+    message: err.message,
+    errors: err.errors,
+    code: err.code
+  });
+});
+
+
+
+run()
+
+
 
 async function run() {
   try {
@@ -109,14 +191,14 @@ async function run() {
           res.send(oasDoc);
       })
     }
-    app.use((err, req, res, next) => {
-      if (err) {
-        console.log('Invalid Request data')
-        writer.writeJson(res, writer.respondWithCode ( 400, {message: err.message} ))
-      } else {
-        next()
-      }
-    })
+    // app.use((err, req, res, next) => {
+    //   if (err) {
+    //     console.log('Invalid Request data')
+    //     writer.writeJson(res, writer.respondWithCode ( 400, {message: err.message} ))
+    //   } else {
+    //     next()
+    //   }
+    // })
     startServer(app)
   }
   catch (err) {
@@ -228,3 +310,26 @@ async function startServer(app) {
   }
 }
 
+
+
+
+function modulePathResolver1(
+  handlersPath,
+  route,
+  apiDoc
+)
+{
+  const pathKey = route.openApiRoute.substring(route.basePath.length);
+  const schema = apiDoc.paths[pathKey][route.method.toLowerCase()];
+  // const [controller, method] = schema['operationId'].split('.');
+  const controller = schema.tags[0]
+  const method = schema['operationId']
+  const modulePath = path.join(handlersPath, controller);
+  const handler = require(modulePath);
+  if (handler[method] === undefined) {
+    throw new Error(
+      `Could not find a [${method}] function in ${modulePath} when trying to route [${route.method} ${route.expressRoute}].`,
+    );
+  }
+  return handler[method];
+}

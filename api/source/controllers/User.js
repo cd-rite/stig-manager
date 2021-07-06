@@ -8,10 +8,10 @@ const Collection = require(`../service/${config.database.type}/CollectionService
 
 module.exports.createUser = async function createUser (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
+    let elevate = req.swagger.params['elevate']
     if (elevate) {
-      let body = req.swagger.params['body'].value
-      let projection = req.swagger.params['projection'].value
+      let body = req.swagger.params['body']
+      let projection = req.swagger.params['projection']
 
       if (body.hasOwnProperty('collectionGrants') ) {
         // Verify each grant for a valid collectionId
@@ -54,10 +54,10 @@ module.exports.createUser = async function createUser (req, res, next) {
 
 module.exports.deleteUser = async function deleteUser (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
+    let elevate = req.swagger.params['elevate']
     if (elevate) {
-      let userId = req.swagger.params['userId'].value
-      let projection = req.swagger.params['projection'].value
+      let userId = req.swagger.params['userId']
+      let projection = req.swagger.params['projection']
       let response = await User.deleteUser(userId, projection, elevate, req.userObject)
       writer.writeJson(res, response)
     }
@@ -95,10 +95,10 @@ module.exports.getUserObject = async function getUserObject (req, res, next) {
 
 module.exports.getUserByUserId = async function getUserByUserId (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
+    let elevate = req.swagger.params['elevate']
     if ( elevate ) {
-      let userId = req.swagger.params['userId'].value
-      let projection = req.swagger.params['projection'].value
+      let userId = req.swagger.params['userId']
+      let projection = req.swagger.params['projection']
       let response = await User.getUserByUserId(userId, projection, elevate, req.userObject)
       writer.writeJson(res, response)
     }
@@ -113,10 +113,10 @@ module.exports.getUserByUserId = async function getUserByUserId (req, res, next)
 
 module.exports.getUsers = async function getUsers (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
-    let username = req.swagger.params['username'].value
-    let usernameMatch = req.swagger.params['username-match'].value
-    let projection = req.swagger.params['projection'].value
+    let elevate = req.swagger.params['elevate']
+    let username = req.swagger.params['username']
+    let usernameMatch = req.swagger.params['username-match']
+    let projection = req.swagger.params['projection']
     if ( !elevate && projection && projection.length > 0) {
       throw( writer.respondWithCode ( 403, {message: `User has insufficient privilege to complete this request.`} ) )
     }
@@ -130,11 +130,11 @@ module.exports.getUsers = async function getUsers (req, res, next) {
 
 module.exports.replaceUser = async function replaceUser (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
-    let userId = req.swagger.params['userId'].value
+    let elevate = req.swagger.params['elevate']
+    let userId = req.swagger.params['userId']
     if (elevate) {
-      let body = req.swagger.params['body'].value
-      let projection = req.swagger.params['projection'].value
+      let body = req.swagger.params['body']
+      let projection = req.swagger.params['projection']
 
       if (body.hasOwnProperty('collectionGrants') ) {
         // Verify each grant for a valid collectionId
@@ -160,11 +160,11 @@ module.exports.replaceUser = async function replaceUser (req, res, next) {
 
 module.exports.updateUser = async function updateUser (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
-    let userId = req.swagger.params['userId'].value
+    let elevate = req.swagger.params['elevate']
+    let userId = req.swagger.params['userId']
     if (elevate) {
-      let body = req.swagger.params['body'].value
-      let projection = req.swagger.params['projection'].value
+      let body = req.swagger.params['body']
+      let projection = req.swagger.params['projection']
 
       if (body.hasOwnProperty('collectionGrants') ) {
         // Verify each grant for a valid collectionId

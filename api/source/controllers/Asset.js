@@ -11,9 +11,9 @@ const he = require('he');
 
 module.exports.createAsset = async function createAsset (req, res, next) {
   try {
-    const elevate = req.swagger.params['elevate'].value
-    let projection = req.swagger.params['projection'].value
-    const body = req.swagger.params['body'].value
+    const elevate = req.swagger.params['elevate']
+    let projection = req.swagger.params['projection']
+    const body = req.swagger.params['body']
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === body.collectionId )
 
     if ( elevate || (collectionGrant && collectionGrant.accessLevel >= 3) ) {
@@ -50,9 +50,9 @@ module.exports.createAsset = async function createAsset (req, res, next) {
 
 module.exports.deleteAsset = async function deleteAsset (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
-    let assetId = req.swagger.params['assetId'].value
-    let projection = req.swagger.params['projection'].value
+    let elevate = req.swagger.params['elevate']
+    let assetId = req.swagger.params['assetId']
+    let projection = req.swagger.params['projection']
 
     // fetch the Asset for access control checks and the response
     let assetToAffect = await Asset.getAsset(assetId, projection, elevate, req.userObject)
@@ -77,9 +77,9 @@ module.exports.deleteAsset = async function deleteAsset (req, res, next) {
 
 module.exports.removeStigFromAsset = async function removeStigFromAsset (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let elevate = req.swagger.params['elevate']
 
     // fetch the Asset for access control checks
     let assetToAffect = await Asset.getAsset(assetId, [], elevate, req.userObject)
@@ -104,8 +104,8 @@ module.exports.removeStigFromAsset = async function removeStigFromAsset (req, re
 
 module.exports.removeStigsFromAsset = async function removeStigsFromAsset (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let elevate = req.swagger.params['elevate']
 
     // fetch the Asset for access control checks
     let assetToAffect = await Asset.getAsset(assetId, undefined, elevate, req.userObject)
@@ -130,10 +130,10 @@ module.exports.removeStigsFromAsset = async function removeStigsFromAsset (req, 
 
 module.exports.removeUserFromAssetStig = async function removeUserFromAssetStig (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let userId = req.swagger.params['userId'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let userId = req.swagger.params['userId']
+    let elevate = req.swagger.params['elevate']
 
     // fetch the Asset for access control checks
     let assetToAffect = await Asset.getAsset(assetId, [], elevate, req.userObject)
@@ -158,9 +158,9 @@ module.exports.removeUserFromAssetStig = async function removeUserFromAssetStig 
 
 module.exports.removeUsersFromAssetStig = async function removeUsersFromAssetStig (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let elevate = req.swagger.params['elevate']
 
     // fetch the Asset for access control checks
     let assetToAffect = await Asset.getAsset(assetId, [], elevate, req.userObject)
@@ -195,9 +195,9 @@ module.exports.exportAssets = async function exportAssets (projection, elevate, 
 
 module.exports.getAsset = async function getAsset (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let projection = req.swagger.params['projection'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let projection = req.swagger.params['projection']
+    let elevate = req.swagger.params['elevate']
     
     // If this user has no grants permitting access to the asset, the response will be undefined
     let response = await Asset.getAsset(assetId, projection, elevate, req.userObject )
@@ -227,13 +227,13 @@ module.exports.getAssets = async function getAssets (req, res, next) {
     const predicates = {
 
     }
-    let collectionId = req.swagger.params['collectionId'].value
-    let name = req.swagger.params['name'].value
-    let nameMatch = req.swagger.params['name-match'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let metadata = req.swagger.params['metadata'].value
-    let projection = req.swagger.params['projection'].value
-    let elevate = req.swagger.params['elevate'].value
+    let collectionId = req.swagger.params['collectionId']
+    let name = req.swagger.params['name']
+    let nameMatch = req.swagger.params['name-match']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let metadata = req.swagger.params['metadata']
+    let projection = req.swagger.params['projection']
+    let elevate = req.swagger.params['elevate']
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
 
     if ( collectionGrant || req.userObject.privileges.globalAccess || elevate ) {
@@ -260,8 +260,8 @@ module.exports.getAssets = async function getAssets (req, res, next) {
 
 module.exports.getStigsByAsset = async function getStigsByAsset (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let elevate = req.swagger.params['elevate']
     let response = await Asset.getStigsByAsset(assetId, elevate, req.userObject )
     writer.writeJson(res, response)
   }
@@ -272,9 +272,9 @@ module.exports.getStigsByAsset = async function getStigsByAsset (req, res, next)
 
 module.exports.getUsersByAssetStig = async function getUsersByAssetStig (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let elevate = req.swagger.params['elevate']
     let response = await Asset.getUsersByAssetStig(assetId, benchmarkId, elevate, req.userObject )
     writer.writeJson(res, response)
   }
@@ -285,10 +285,10 @@ module.exports.getUsersByAssetStig = async function getUsersByAssetStig (req, re
 
 module.exports.getChecklistByAssetStig = async function getChecklistByAssetStig (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let revisionStr = req.swagger.params['revisionStr'].value
-    let format = req.swagger.params['format'].value || 'json'
+    let assetId = req.swagger.params['assetId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let revisionStr = req.swagger.params['revisionStr']
+    let format = req.swagger.params['format'] || 'json'
     if (await dbUtils.userHasAssetStigs(assetId, [benchmarkId], false, req.userObject)) {
       let response = await Asset.getChecklistByAssetStig(assetId, benchmarkId, revisionStr, format, false, req.userObject )
       if (format === 'json') {
@@ -327,8 +327,8 @@ module.exports.getChecklistByAssetStig = async function getChecklistByAssetStig 
 
 module.exports.getChecklistByAsset = async function getChecklistByAssetStig (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let requestedBenchmarkIds = req.swagger.params['benchmarkId'].value
+    let assetId = req.swagger.params['assetId']
+    let requestedBenchmarkIds = req.swagger.params['benchmarkId']
 
     // If this user has no grants permitting access to the asset, the response will be undefined
     let assetResponse = await Asset.getAsset(assetId, ['stigs'], false, req.userObject )
@@ -380,10 +380,10 @@ module.exports.getChecklistByAsset = async function getChecklistByAssetStig (req
 
 module.exports.getAssetsByStig = async function getAssetsByStig (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
-    let collectionId = req.swagger.params['collectionId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let projection = req.swagger.params['projection'].value
+    let elevate = req.swagger.params['elevate']
+    let collectionId = req.swagger.params['collectionId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let projection = req.swagger.params['projection']
 
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( elevate || req.userObject.privileges.globalAccess || collectionGrant ) {
@@ -401,10 +401,10 @@ module.exports.getAssetsByStig = async function getAssetsByStig (req, res, next)
 
 module.exports.replaceAsset = async function replaceAsset (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
-    let assetId = req.swagger.params['assetId'].value
-    let projection = req.swagger.params['projection'].value
-    let body = req.swagger.params['body'].value
+    let elevate = req.swagger.params['elevate']
+    let assetId = req.swagger.params['assetId']
+    let projection = req.swagger.params['projection']
+    let body = req.swagger.params['body']
 
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === body.collectionId )
     if ( elevate || (collectionGrant && collectionGrant.accessLevel >= 3) ) {
@@ -422,11 +422,11 @@ module.exports.replaceAsset = async function replaceAsset (req, res, next) {
 
 module.exports.attachAssetsToStig = async function attachAssetsToStig (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
-    let collectionId = req.swagger.params['collectionId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let assetIds = req.swagger.params['body'].value
-    let projection = req.swagger.params['projection'].value
+    let elevate = req.swagger.params['elevate']
+    let collectionId = req.swagger.params['collectionId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let assetIds = req.swagger.params['body']
+    let projection = req.swagger.params['projection']
 
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( elevate || (collectionGrant && collectionGrant.accessLevel >= 3) ) {
@@ -452,9 +452,9 @@ module.exports.attachAssetsToStig = async function attachAssetsToStig (req, res,
 
 module.exports.attachStigToAsset = async function attachStigToAsset (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let elevate = req.swagger.params['elevate']
 
     // fetch the Asset for access control checks
     let assetToAffect = await Asset.getAsset(assetId, [], elevate, req.userObject)
@@ -479,9 +479,9 @@ module.exports.attachStigToAsset = async function attachStigToAsset (req, res, n
 
 module.exports.attachStigsToAsset = async function attachStigsToAsset (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let elevate = req.swagger.params['elevate'].value
-    let body = req.swagger.params['body'].value
+    let assetId = req.swagger.params['assetId']
+    let elevate = req.swagger.params['elevate']
+    let body = req.swagger.params['body']
 
     // fetch the Asset for access control checks
     let assetToAffect = await Asset.getAsset(assetId, [], elevate, req.userObject)
@@ -506,10 +506,10 @@ module.exports.attachStigsToAsset = async function attachStigsToAsset (req, res,
 
 module.exports.setAssetStigGrant = async function setAssetStigGrant (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let userId = req.swagger.params['userId'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let userId = req.swagger.params['userId']
+    let elevate = req.swagger.params['elevate']
 
     // fetch the Asset for access control checks
     let assetToAffect = await Asset.getAsset(assetId, projection, elevate, req.userObject)
@@ -545,10 +545,10 @@ module.exports.setAssetStigGrant = async function setAssetStigGrant (req, res, n
 
 module.exports.setAssetStigGrants = async function setAssetStigGrants (req, res, next) {
   try {
-    let assetId = req.swagger.params['assetId'].value
-    let benchmarkId = req.swagger.params['benchmarkId'].value
-    let body = req.swagger.params['body'].value
-    let elevate = req.swagger.params['elevate'].value
+    let assetId = req.swagger.params['assetId']
+    let benchmarkId = req.swagger.params['benchmarkId']
+    let body = req.swagger.params['body']
+    let elevate = req.swagger.params['elevate']
 
     // fetch the Asset for access control checks
     let assetToAffect = await Asset.getAsset(assetId, projection, elevate, req.userObject)
@@ -587,10 +587,10 @@ module.exports.setAssetStigGrants = async function setAssetStigGrants (req, res,
 
 module.exports.updateAsset = async function updateAsset (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate'].value
-    let assetId = req.swagger.params['assetId'].value
-    let projection = req.swagger.params['projection'].value
-    let body = req.swagger.params['body'].value
+    let elevate = req.swagger.params['elevate']
+    let assetId = req.swagger.params['assetId']
+    let projection = req.swagger.params['projection']
+    let body = req.swagger.params['body']
 
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === body.collectionId )
     if ( elevate || (collectionGrant && collectionGrant.accessLevel >= 3) ) {
