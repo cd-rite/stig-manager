@@ -35,8 +35,8 @@ module.exports.importBenchmark = async function importManualBenchmark (req, res,
 
 
 module.exports.deleteRevisionByString = async function deleteRevisionByString (req, res, next) {
-  let benchmarkId = req.swagger.params['benchmarkId']
-  let revisionStr = req.swagger.params['revisionStr']
+  let benchmarkId = req.params.benchmarkId
+  let revisionStr = req.params.revisionStr
   try {
     let response = await STIG.deleteRevisionByString(benchmarkId, revisionStr, req.userObject)
     writer.writeJson(res, response)
@@ -49,7 +49,7 @@ module.exports.deleteRevisionByString = async function deleteRevisionByString (r
 module.exports.deleteStigById = async function deleteStigById (req, res, next) {
   if ( req.userObject.privileges.canAdmin ) {
     try {
-      let benchmarkId = req.swagger.params['benchmarkId']
+      let benchmarkId = req.params.benchmarkId
       let response = await STIG.deleteStigById(benchmarkId, req.userObject)
       writer.writeJson(res, response)
     }
@@ -63,7 +63,7 @@ module.exports.deleteStigById = async function deleteStigById (req, res, next) {
 }
 
 module.exports.getCci = async function getCci (req, res, next) {
-  let cci = req.swagger.params['cci']
+  let cci = req.params.cci
   try {
     let response = await STIG.getCci(cci, req.userObject)
     writer.writeJson(res, response)
@@ -74,8 +74,8 @@ module.exports.getCci = async function getCci (req, res, next) {
 }
 
 module.exports.getCcisByRevision = async function getCcisByRevision (req, res, next) {
-  let benchmarkId = req.swagger.params['benchmarkId']
-  let revisionStr = req.swagger.params['revisionStr']
+  let benchmarkId = req.params.benchmarkId
+  let revisionStr = req.params.revisionStr
   try {
     let response = await STIG.getCcisByRevision(benchmarkId, revisionStr, req.userObject)
     writer.writeJson(res, response)
@@ -86,10 +86,10 @@ module.exports.getCcisByRevision = async function getCcisByRevision (req, res, n
 }
 
 module.exports.getGroupByRevision = async function getGroupByRevision (req, res, next) {
-  let projection = req.swagger.params['projection']
-  let benchmarkId = req.swagger.params['benchmarkId']
-  let revisionStr = req.swagger.params['revisionStr']
-  let groupId = req.swagger.params['groupId']
+  let projection = req.query.projection
+  let benchmarkId = req.params.benchmarkId
+  let revisionStr = req.params.revisionStr
+  let groupId = req.params.groupId
   try {
     let response = await STIG.getGroupByRevision(benchmarkId, revisionStr, groupId, projection, req.userObject)
     writer.writeJson(res, response)
@@ -100,9 +100,9 @@ module.exports.getGroupByRevision = async function getGroupByRevision (req, res,
 }
 
 module.exports.getGroupsByRevision = async function getGroupsByRevision (req, res, next) {
-  let projection = req.swagger.params['projection']
-  let benchmarkId = req.swagger.params['benchmarkId']
-  let revisionStr = req.swagger.params['revisionStr']
+  let projection = req.query.projection
+  let benchmarkId = req.params.benchmarkId
+  let revisionStr = req.params.revisionStr
   try {
     let response = await STIG.getGroupsByRevision(benchmarkId, revisionStr, projection, req.userObject)
     writer.writeJson(res, response)
@@ -113,8 +113,8 @@ module.exports.getGroupsByRevision = async function getGroupsByRevision (req, re
 }
 
 module.exports.getRevisionByString = async function getRevisionByString (req, res, next) {
-  let benchmarkId = req.swagger.params['benchmarkId']
-  let revisionStr = req.swagger.params['revisionStr']
+  let benchmarkId = req.params.benchmarkId
+  let revisionStr = req.params.revisionStr
   try {
     let response = await STIG.getRevisionByString(benchmarkId, revisionStr, req.userObject)
     writer.writeJson(res, response)
@@ -125,7 +125,7 @@ module.exports.getRevisionByString = async function getRevisionByString (req, re
 }
 
 module.exports.getRevisionsByBenchmarkId = async function getRevisionsByBenchmarkId (req, res, next) {
-  let benchmarkId = req.swagger.params['benchmarkId']
+  let benchmarkId = req.params.benchmarkId
   try {
     let response = await STIG.getRevisionsByBenchmarkId(benchmarkId, req.userObject)
     writer.writeJson(res, response)
@@ -136,8 +136,8 @@ module.exports.getRevisionsByBenchmarkId = async function getRevisionsByBenchmar
 }
 
 module.exports.getRuleByRuleId = async function getRuleByRuleId (req, res, next) {
-  let projection = req.swagger.params['projection']
-  let ruleId = req.swagger.params['ruleId']
+  let projection = req.query.projection
+  let ruleId = req.params.ruleId
   try {
     let response = await STIG.getRuleByRuleId(ruleId, projection, req.userObject)
     writer.writeJson(res, response)
@@ -148,10 +148,10 @@ module.exports.getRuleByRuleId = async function getRuleByRuleId (req, res, next)
 }
 
 module.exports.getRuleByRevision = async function getRulesByRevision (req, res, next) {
-  let projection = req.swagger.params['projection']
-  let benchmarkId = req.swagger.params['benchmarkId']
-  let revisionStr = req.swagger.params['revisionStr']
-  let ruleId = req.swagger.params['ruleId']
+  let projection = req.query.projection
+  let benchmarkId = req.params.benchmarkId
+  let revisionStr = req.params.revisionStr
+  let ruleId = req.params.ruleId
   try {
     let response = await STIG.getRuleByRevision(benchmarkId, revisionStr, ruleId, projection, req.userObject)
     writer.writeJson(res, response)
@@ -162,9 +162,9 @@ module.exports.getRuleByRevision = async function getRulesByRevision (req, res, 
 }
 
 module.exports.getRulesByRevision = async function getRulesByRevision (req, res, next) {
-  let projection = req.swagger.params['projection']
-  let benchmarkId = req.swagger.params['benchmarkId']
-  let revisionStr = req.swagger.params['revisionStr']
+  let projection = req.query.projection
+  let benchmarkId = req.params.benchmarkId
+  let revisionStr = req.params.revisionStr
   try {
     let response = await STIG.getRulesByRevision(benchmarkId, revisionStr, projection, req.userObject)
     writer.writeJson(res, response)
@@ -175,7 +175,7 @@ module.exports.getRulesByRevision = async function getRulesByRevision (req, res,
 }
 
 module.exports.getSTIGs = async function getSTIGs (req, res, next) {
-  let title = req.swagger.params['title']
+  let title = req.query.title
   try {
     let response = await STIG.getSTIGs(title, req.userObject)
     writer.writeJson(res, response)
@@ -186,7 +186,7 @@ module.exports.getSTIGs = async function getSTIGs (req, res, next) {
 }
 
 module.exports.getStigById = async function getStigById (req, res, next) {
-  let benchmarkId = req.swagger.params['benchmarkId']
+  let benchmarkId = req.params.benchmarkId
   try {
     let response = await STIG.getStigById(benchmarkId, req.userObject)
     writer.writeJson(res, response)

@@ -7,9 +7,9 @@ const Review = require(`../service/${config.database.type}/ReviewService`)
 
 module.exports.postReviewsByAsset = async function postReviewsByAsset (req, res, next) {
   try {
-    let collectionId = req.swagger.params['collectionId']
-    let assetId = req.swagger.params['assetId']
-    let reviewsRequested = req.swagger.params['body']
+    let collectionId = req.params.collectionId
+    let assetId = req.params.assetId
+    let reviewsRequested = req.body
 
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant || req.userObject.privileges.globalAccess ) {
@@ -45,10 +45,10 @@ module.exports.postReviewsByAsset = async function postReviewsByAsset (req, res,
 
 module.exports.deleteReviewByAssetRule = async function deleteReviewByAssetRule (req, res, next) {
 try {
-    let collectionId = req.swagger.params['collectionId']
-    let assetId = req.swagger.params['assetId']
-    let ruleId = req.swagger.params['ruleId']
-    let projection = req.swagger.params['projection']
+    let collectionId = req.params.collectionId
+    let assetId = req.params.assetId
+    let ruleId = req.params.ruleId
+    let projection = req.query.projection
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant || req.userObject.privileges.globalAccess ) {
       const userHasRule = await Review.checkRuleByAssetUser( ruleId, assetId, req.userObject )
@@ -80,10 +80,10 @@ module.exports.exportReviews = async function exportReviews (projection, userObj
 
 module.exports.getReviewByAssetRule = async function (req, res, next) {
   try {
-    let collectionId = req.swagger.params['collectionId']
-    let assetId = req.swagger.params['assetId']
-    let ruleId = req.swagger.params['ruleId']
-    let projection = req.swagger.params['projection']
+    let collectionId = req.params.collectionId
+    let assetId = req.params.assetId
+    let ruleId = req.params.ruleId
+    let projection = req.query.projection
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant || req.userObject.privileges.globalAccess ) {
       let response = await Review.getReviews( projection, {
@@ -104,22 +104,22 @@ module.exports.getReviewByAssetRule = async function (req, res, next) {
 
 module.exports.getReviewsByCollection = async function getReviewsByCollection (req, res, next) {
   try {
-    let projection = req.swagger.params['projection']
-    let collectionId = req.swagger.params['collectionId']
+    let projection = req.query.projection
+    let collectionId = req.params.collectionId
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant || req.userObject.privileges.globalAccess ) {
       let response = await Review.getReviews( projection, {
         collectionId: collectionId,
-        result: req.swagger.params['result'],
-        action: req.swagger.params['action'],
-        status: req.swagger.params['status'],
-        rules: req.swagger.params['rules'] || 'current-mapped',
-        ruleId: req.swagger.params['ruleId'],
-        groupId: req.swagger.params['groupId'],
-        cci: req.swagger.params['cci'],
-        userId: req.swagger.params['userId'],
-        assetId: req.swagger.params['assetId'],
-        benchmarkId: req.swagger.params['benchmarkId']
+        result: req.query.result,
+        action: req.query.action,
+        status: req.query.status,
+        rules: req.query.rules || 'current-mapped',
+        ruleId: req.query.ruleId,
+        groupId: req.query.groupId,
+        cci: req.query.cci,
+        userId: req.query.userId,
+        assetId: req.query.assetId,
+        benchmarkId: req.query.benchmarkId
       }, req.userObject)
       writer.writeJson(res, response)
     }
@@ -134,19 +134,19 @@ module.exports.getReviewsByCollection = async function getReviewsByCollection (r
 
 module.exports.getReviewsByAsset = async function (req, res, next) {
   try {
-    let collectionId = req.swagger.params['collectionId']
-    let assetId = req.swagger.params['assetId']
-    let projection = req.swagger.params['projection']
+    let collectionId = req.params.collectionId
+    let assetId = req.params.assetId
+    let projection = req.query.projection
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant || req.userObject.privileges.globalAccess ) {
       let response = await Review.getReviews( projection, {
         collectionId: collectionId,
         assetId: assetId,
-        rules: req.swagger.params['rules'] || 'current-mapped',
-        result: req.swagger.params['result'],
-        action: req.swagger.params['action'],
-        status: req.swagger.params['status'],
-        benchmarkId: req.swagger.params['benchmarkId']
+        rules: req.query.rules || 'current-mapped',
+        result: req.query.result,
+        action: req.query.action,
+        status: req.query.status,
+        benchmarkId: req.query.benchmarkId
       }, req.userObject )
       writer.writeJson(res, response)
     }
@@ -161,11 +161,11 @@ module.exports.getReviewsByAsset = async function (req, res, next) {
 
 module.exports.putReviewByAssetRule = async function (req, res, next) {
   try {
-    let collectionId = req.swagger.params['collectionId']
-    let assetId = req.swagger.params['assetId']
-    let ruleId = req.swagger.params['ruleId']
-    let body = req.swagger.params['body']
-    let projection = req.swagger.params['projection']
+    let collectionId = req.params.collectionId
+    let assetId = req.params.assetId
+    let ruleId = req.params.ruleId
+    let body = req.body
+    let projection = req.query.projection
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant || req.userObject.privileges.globalAccess ) {
       const userHasRule = await Review.checkRuleByAssetUser( ruleId, assetId, req.userObject )
@@ -192,11 +192,11 @@ module.exports.putReviewByAssetRule = async function (req, res, next) {
 
 module.exports.patchReviewByAssetRule = async function (req, res, next) {
   try {
-    let collectionId = req.swagger.params['collectionId']
-    let assetId = req.swagger.params['assetId']
-    let ruleId = req.swagger.params['ruleId']
-    let body = req.swagger.params['body']
-    let projection = req.swagger.params['projection']
+    let collectionId = req.params.collectionId
+    let assetId = req.params.assetId
+    let ruleId = req.params.ruleId
+    let body = req.body
+    let projection = req.query.projection
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant || req.userObject.privileges.globalAccess ) {
       const userHasRule = await Review.checkRuleByAssetUser( ruleId, assetId, req.userObject )
