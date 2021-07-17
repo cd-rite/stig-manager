@@ -560,7 +560,7 @@ paths:
   /collections:
     parameters:
       - $ref: '#/components/parameters/ElevateQuery'
-      - $ref: '#/components/parameters/CollectionsProjectionQuery'
+      # - $ref: '#/components/parameters/CollectionsProjectionQuery'
     get:
       tags:
         - Collection
@@ -572,6 +572,7 @@ paths:
         - $ref: '#/components/parameters/NameMatchQuery'
         - $ref: '#/components/parameters/CollectionWorkflowQuery'
         - $ref: '#/components/parameters/MetadataQuery'
+        - $ref: '#/components/parameters/CollectionsProjectionQuery'
       responses:
         '200':
           description: CollectionProjected response
@@ -1368,8 +1369,6 @@ paths:
           multipart/form-data:
             schema:
               type: object
-              required:
-                - replace
               properties:
                 replace:
                   type: string

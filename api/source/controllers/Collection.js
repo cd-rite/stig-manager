@@ -7,9 +7,9 @@ var Serialize = require(`../utils/serializers`)
 
 module.exports.createCollection = async function createCollection (req, res, next) {
   try {
-    const projection = req.swagger.params['projection']
-    const elevate = req.swagger.params['elevate']
-    const body = req.swagger.params['body']
+    const projection = req.query.projection
+    const elevate = req.query.elevate
+    const body = req.body
     if ( elevate || req.userObject.privileges.canCreateCollection ) {
       try {
         const response = await Collection.createCollection( body, projection, req.userObject)
@@ -45,9 +45,9 @@ module.exports.createCollection = async function createCollection (req, res, nex
 
 module.exports.deleteCollection = async function deleteCollection (req, res, next) {
   try {
-    const elevate = req.swagger.params['elevate']
-    const collectionId = req.swagger.params['collectionId']
-    const projection = req.swagger.params['projection']
+    const elevate = req.query.elevate
+    const collectionId = req.params.collectionId
+    const projection = req.query.projection
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if (elevate || (collectionGrant && collectionGrant.accessLevel === 4)) {
       const response = await Collection.deleteCollection(collectionId, projection, elevate, req.userObject)
@@ -73,9 +73,9 @@ module.exports.exportCollections = async function exportCollections (projection,
 
 module.exports.getChecklistByCollectionStig = async function getChecklistByCollectionStig (req, res, next) {
   try {
-    const collectionId = req.swagger.params['collectionId']
-    const benchmarkId = req.swagger.params['benchmarkId']
-    const revisionStr = req.swagger.params['revisionStr']
+    const collectionId = req.params.collectionId
+    const benchmarkId = req.params.benchmarkId
+    const revisionStr = req.params.revisionStr
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant || req.userObject.privileges.globalAccess ) {
       const response = await Collection.getChecklistByCollectionStig(collectionId, benchmarkId, revisionStr, req.userObject )
@@ -92,9 +92,9 @@ module.exports.getChecklistByCollectionStig = async function getChecklistByColle
 
 module.exports.getCollection = async function getCollection (req, res, next) {
   try {
-    const collectionId = req.swagger.params['collectionId']
-    const projection = req.swagger.params['projection']
-    const elevate = req.swagger.params['elevate']
+    const collectionId = req.params.collectionId
+    const projection = req.query.projection
+    const elevate = req.query.elevate
     
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if (collectionGrant || req.userObject.privileges.globalAccess || elevate ) {
@@ -112,12 +112,12 @@ module.exports.getCollection = async function getCollection (req, res, next) {
 
 module.exports.getCollections = async function getCollections (req, res, next) {
   try {
-    const projection = req.swagger.params['projection']
-    const elevate = req.swagger.params['elevate']
-    const name = req.swagger.params['name']
-    const nameMatch = req.swagger.params['name-match']
-    const workflow = req.swagger.params['workflow']
-    const metadata = req.swagger.params['metadata']
+    const projection = req.query.projection
+    const elevate = req.query.elevate
+    const name = req.query.name
+    const nameMatch = req.query['name-match']
+    const workflow = req.query.workflow
+    const metadata = req.query.metadata
     const response = await Collection.getCollections({
       name: name,
       nameMatch: nameMatch,
@@ -133,12 +133,12 @@ module.exports.getCollections = async function getCollections (req, res, next) {
 
 module.exports.getFindingsByCollection = async function getFindingsByCollection (req, res, next) {
   try {
-    const collectionId = req.swagger.params['collectionId']
-    const aggregator = req.swagger.params['aggregator']
-    const benchmarkId = req.swagger.params['benchmarkId']
-    const assetId = req.swagger.params['assetId']
-    const acceptedOnly = req.swagger.params['acceptedOnly']
-    const projection = req.swagger.params['projection']
+    const collectionId = req.params.collectionId
+    const aggregator = req.query.aggregator
+    const benchmarkId = req.query.benchmarkId
+    const assetId = req.query.assetId
+    const acceptedOnly = req.query.acceptedOnly
+    const projection = req.query.projection
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if (collectionGrant || req.userObject.privileges.globalAccess ) {
       const response = await Collection.getFindingsByCollection( collectionId, aggregator, benchmarkId, assetId, acceptedOnly, projection, req.userObject )
@@ -155,15 +155,15 @@ module.exports.getFindingsByCollection = async function getFindingsByCollection 
 
 module.exports.getPoamByCollection = async function getFindingsByCollection (req, res, next) {
   try {
-    const collectionId = req.swagger.params['collectionId']
-    const aggregator = req.swagger.params['aggregator']
-    const benchmarkId = req.swagger.params['benchmarkId']
-    const assetId = req.swagger.params['assetId']
-    const acceptedOnly = req.swagger.params['acceptedOnly']
+    const collectionId = req.params.collectionId
+    const aggregator = req.query.aggregator
+    const benchmarkId = req.query.benchmarkId
+    const assetId = req.query.assetId
+    const acceptedOnly = req.query.acceptedOnly
     const defaults = {
-      date: req.swagger.params['date'],
-      office: req.swagger.params['office'],
-      status: req.swagger.params['status']
+      date: req.query.date,
+      office: req.query.office,
+      status: req.query.status
     }
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if (collectionGrant || req.userObject.privileges.globalAccess ) {
@@ -199,9 +199,9 @@ module.exports.getPoamByCollection = async function getFindingsByCollection (req
 
 module.exports.getStatusByCollection = async function getStatusByCollection (req, res, next) {
   try {
-    const collectionId = req.swagger.params['collectionId']
-    const benchmarkId = req.swagger.params['benchmarkId']
-    const assetId = req.swagger.params['assetId']
+    const collectionId = req.params.collectionId
+    const benchmarkId = req.query.benchmarkId
+    const assetId = req.query.assetId
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if (collectionGrant || req.userObject.privileges.globalAccess ) {
       const response = await Collection.getStatusByCollection( collectionId, assetId, benchmarkId, req.userObject )
@@ -218,8 +218,8 @@ module.exports.getStatusByCollection = async function getStatusByCollection (req
 
 module.exports.getStigAssetsByCollectionUser = async function getStigAssetsByCollectionUser (req, res, next) {
   try {
-    const collectionId = req.swagger.params['collectionId']
-    const userId = req.swagger.params['userId']
+    const collectionId = req.params.collectionId
+    const userId = req.params.userId
     
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant && collectionGrant.accessLevel >= 3 ) {
@@ -237,7 +237,7 @@ module.exports.getStigAssetsByCollectionUser = async function getStigAssetsByCol
 
 module.exports.getStigsByCollection = async function getStigsByCollection (req, res, next) {
   try {
-    const collectionId = req.swagger.params['collectionId']
+    const collectionId = req.params.collectionId
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if (collectionGrant || req.userObject.privileges.globalAccess ) {
       const response = await Collection.getStigsByCollection( collectionId, false, req.userObject )
@@ -254,9 +254,9 @@ module.exports.getStigsByCollection = async function getStigsByCollection (req, 
 
 module.exports.replaceCollection = async function updateCollection (req, res, next) {
   try {
-    const elevate = req.swagger.params['elevate']
-    const collectionId = req.swagger.params['collectionId']
-    const projection = req.swagger.params['projection']
+    const elevate = req.query.elevate
+    const collectionId = req.params.collectionId
+    const projection = req.query.projection
     const body = req.body
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( elevate || (collectionGrant && collectionGrant.accessLevel >= 3) ) {
@@ -274,9 +274,9 @@ module.exports.replaceCollection = async function updateCollection (req, res, ne
 
 module.exports.setStigAssetsByCollectionUser = async function setStigAssetsByCollectionUser (req, res) {
   try {
-    const collectionId = req.swagger.params['collectionId']
-    const userId = req.swagger.params['userId']
-    const stigAssets = req.swagger.params['body']
+    const collectionId = req.params.collectionId
+    const userId = req.query.userId
+    const stigAssets = req.body
     
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant && collectionGrant.accessLevel >= 3 ) {
@@ -301,9 +301,9 @@ module.exports.setStigAssetsByCollectionUser = async function setStigAssetsByCol
 
 module.exports.updateCollection = async function updateCollection (req, res, next) {
   try {
-    const elevate = req.swagger.params['elevate']
-    const collectionId = req.swagger.params['collectionId']
-    const projection = req.swagger.params['projection']
+    const elevate = req.query.elevate
+    const collectionId = req.params.collectionId
+    const projection = req.query.projection
     const body = req.body
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( elevate || (collectionGrant && collectionGrant.accessLevel >= 3) ) {
