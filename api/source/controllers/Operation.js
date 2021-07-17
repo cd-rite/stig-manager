@@ -32,7 +32,7 @@ module.exports.setConfigurationItem = async function setConfigurationItem (req, 
 
 module.exports.getAppData = async function getAppData (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate']
+    let elevate = req.query.elevate
     if ( elevate ) {
       let collections = await Collection.exportCollections( ['grants'], elevate, req.userObject )
       for (const collection of collections) {
@@ -84,7 +84,7 @@ module.exports.getAppData = async function getAppData (req, res, next) {
 
 module.exports.replaceAppData = async function replaceAppData (req, res, next) {
   try {
-    let elevate = req.swagger.params['elevate']
+    let elevate = req.query.elevate
     let appdata
     if ( elevate ) {
       if (req.file && (req.file.mimetype === 'application/json' || req.file.mimetype === 'application/zip' || req.file.mimetype === 'application/x-zip-compressed') ) {
@@ -102,7 +102,7 @@ module.exports.replaceAppData = async function replaceAppData (req, res, next) {
         appdata = JSON.parse(data)
       }
       else {
-        appdata = req.swagger.params['body']
+        appdata = req.body
       }
       let options = []
       let response = await Operation.replaceAppData(options, appdata, req.userObject, res )
