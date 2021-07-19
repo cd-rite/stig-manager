@@ -4,9 +4,9 @@ module.exports = class SmError extends Error {
       super(...params)
   
       // Maintains proper stack trace for where our error was thrown (only available on V8)
-      if (Error.captureStackTrace) {
-        Error.captureStackTrace(this, SmError)
-      }
+      // if (Error.captureStackTrace) {
+      //   Error.captureStackTrace(this, SmError)
+      // }
   
       this.name = 'SmError'
       // Custom debugging information

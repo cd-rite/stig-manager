@@ -611,9 +611,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CollectionProjected'
+                $ref: '#/components/schemas/CollectionProjected'
         '400':
           description: Client Error
           content:
@@ -761,7 +759,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChecklistCollectionStig'
+                $ref: '#/components/schemas/ChecklistCollectionStigArray'
         default:
           description: unexpected error
           content:
@@ -2432,8 +2430,12 @@ components:
                           type: string
                         SEVERITY_JUSTIFICATION:
                           type: string
+    ChecklistCollectionStigArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChecklistCollectionStig'      
     ChecklistCollectionStig:
-      type: object
+      type: object      
       properties:
         ruleId:
           type: string
@@ -2786,7 +2788,7 @@ components:
         - completed
     Error:
       required:
-        - code
+        # - code
         - message
       type: object
       properties:

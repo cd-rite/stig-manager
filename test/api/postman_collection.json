@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "24294ed2-7273-49c1-93e1-e753c6aecd12",
-		"name": "stig-manager",
+		"_postman_id": "cb0d68ca-3f94-4254-8fd0-f5567e33429e",
+		"name": "stig-manager - DEV",
 		"description": "An API for managing evaluations of Security Technical Implementation Guide (STIG) assessments.\n\nContact Support:\n Name: Carl Smigielski\n Email: carl.a.smigielski@saic.com",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -725,7 +725,7 @@
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{baseUrl}}/collections/:collectionId/grants/:userId/access?elevate={{elevated}}",
+													"raw": "{{baseUrl}}/collections/:collectionId/grants/:userId/access",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -739,7 +739,8 @@
 													"query": [
 														{
 															"key": "elevate",
-															"value": "{{elevated}}"
+															"value": "{{elevated}}",
+															"disabled": true
 														}
 													],
 													"variable": [
@@ -1557,7 +1558,7 @@
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{baseUrl}}/collections/:collectionId/poam?aggregator=groupId&date=01/01/1970&office=MyOffice&status=Ongoing&acceptedOnly=true",
+													"raw": "{{baseUrl}}/collections/:collectionId/poam?aggregator=groupId&date=01%2F01%2F1970&office=MyOffice&status=Ongoing&acceptedOnly=true",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1574,7 +1575,7 @@
 														},
 														{
 															"key": "date",
-															"value": "01/01/1970"
+															"value": "01%2F01%2F1970"
 														},
 														{
 															"key": "office",
@@ -1621,7 +1622,7 @@
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{baseUrl}}/collections/:collectionId/poam?aggregator=ruleId&date=01/01/1970&office=MyOffice&status=Ongoing",
+													"raw": "{{baseUrl}}/collections/:collectionId/poam?aggregator=ruleId&date=01%2F01%2F1970&office=MyOffice&status=Ongoing",
 													"host": [
 														"{{baseUrl}}"
 													],
@@ -1637,7 +1638,7 @@
 														},
 														{
 															"key": "date",
-															"value": "01/01/1970"
+															"value": "01%2F01%2F1970"
 														},
 														{
 															"key": "office",
@@ -2212,7 +2213,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}/collections?metadata={{metadataKey}}:{{metadataValue}}&elevate={{elevated}}&projection=owners&projection=statistics",
+											"raw": "{{baseUrl}}/collections?metadata={{metadataKey}}%3A{{metadataValue}}&elevate={{elevated}}&projection=owners&projection=statistics",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -2234,7 +2235,7 @@
 												},
 												{
 													"key": "metadata",
-													"value": "{{metadataKey}}:{{metadataValue}}",
+													"value": "{{metadataKey}}%3A{{metadataValue}}",
 													"description": "A query parameter that specifies metadata key:value pairs to select matching Collections"
 												},
 												{
@@ -2966,9 +2967,9 @@
 											],
 											"variable": [
 												{
+													"description": "(Required) A path parameter that indentifies an Asset",
 													"key": "assetId",
-													"value": "{{testAsset-NoStigs}}",
-													"description": "(Required) A path parameter that indentifies an Asset"
+													"value": "{{testAsset-NoStigs}}"
 												}
 											]
 										}
@@ -3364,9 +3365,9 @@
 											],
 											"variable": [
 												{
+													"description": "(Required) A path parameter that indentifies an Asset",
 													"key": "assetId",
-													"value": "{{testAsset-NoStigs}}",
-													"description": "(Required) A path parameter that indentifies an Asset"
+													"value": "{{testAsset-NoStigs}}"
 												}
 											]
 										}
@@ -9756,6 +9757,86 @@
 									"response": []
 								},
 								{
+									"name": "Import and overwrite application data ZIP Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let user = pm.environment.get(\"user\");\r",
+													"console.log(\"user: \" + user);\r",
+													"\r",
+													"if (pm.request.url.getQueryString().match(/elevate=true/)) {\r",
+													"    user = \"elevated\";\r",
+													"    console.log(\"setting user to 'elevated'\");\r",
+													"}\r",
+													"\r",
+													"if (user == \"elevated\") { //placeholder for \"users\" that should fail\r",
+													"    pm.test(\"Status should be is 200 for elevated stigmanadmin user\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"}\r",
+													"else {\r",
+													"    pm.test(\"Status code is 403\", function () {\r",
+													"        pm.response.to.have.status(403);\r",
+													"    });\r",
+													"    return;\r",
+													"}\r",
+													"if (pm.response.code !== 200) {\r",
+													"    return;\r",
+													"}\r",
+													"\r",
+													"\r",
+													"let response = pm.response.text();\r",
+													"console.log(response)\r",
+													"\r",
+													"pm.test(\"Body contains string\",() => {\r",
+													"  pm.expect(response).to.include(\"Commit successful\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "importFile",
+													"type": "file",
+													"src": "form-data-files/appdata.zip"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{baseUrl}}/op/appdata?elevate={{elevated}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"op",
+												"appdata"
+											],
+											"query": [
+												{
+													"key": "elevate",
+													"value": "{{elevated}}",
+													"description": "Elevate the user context for this request if user is permitted (canAdmin)"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Import and overwrite application data JSON BODY",
 									"event": [
 										{
@@ -14263,19 +14344,19 @@
 									],
 									"variable": [
 										{
+											"description": "(Required) A path parameter that indentifies a Collection",
 											"key": "collectionId",
-											"value": "21",
-											"description": "(Required) A path parameter that indentifies a Collection"
+											"value": "21"
 										},
 										{
+											"description": "(Required) A path parameter that indentifies an Asset",
 											"key": "assetId",
-											"value": "42",
-											"description": "(Required) A path parameter that indentifies an Asset"
+											"value": "42"
 										},
 										{
+											"description": "(Required) A path parameter that indentifies a Rule",
 											"key": "ruleId",
-											"value": "SV-106179r1_rule",
-											"description": "(Required) A path parameter that indentifies a Rule"
+											"value": "SV-106179r1_rule"
 										}
 									]
 								}
@@ -14524,19 +14605,19 @@
 									],
 									"variable": [
 										{
+											"description": "(Required) A path parameter that indentifies a Collection",
 											"key": "collectionId",
-											"value": "21",
-											"description": "(Required) A path parameter that indentifies a Collection"
+											"value": "21"
 										},
 										{
+											"description": "(Required) A path parameter that indentifies an Asset",
 											"key": "assetId",
-											"value": "42",
-											"description": "(Required) A path parameter that indentifies an Asset"
+											"value": "42"
 										},
 										{
+											"description": "(Required) A path parameter that indentifies a Rule",
 											"key": "ruleId",
-											"value": "SV-106179r1_rule",
-											"description": "(Required) A path parameter that indentifies a Rule"
+											"value": "SV-106179r1_rule"
 										}
 									]
 								}
@@ -14544,6 +14625,1199 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "Change Asset Collection",
+					"item": [],
+					"description": "verify that user has appropriate grants in both source and destination collections.\r\nAvailable to only Manage/Owner grants.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Check API Validation",
+					"item": [
+						{
+							"name": "Return a list of Collections accessible to the requester - bad workflow",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/collections?workflow=1&projection=owners&projection=statistics",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"collections"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "{{collectionMatchString}}",
+											"description": "Matches a string anywhere in the object name",
+											"disabled": true
+										},
+										{
+											"key": "workflow",
+											"value": "1",
+											"description": "Match Collections having a specific workflow."
+										},
+										{
+											"key": "metadata",
+											"value": "{{metadataKey}}:{{metadataValue}}",
+											"description": "A query parameter that specifies metadata key:value pairs to select matching Collections",
+											"disabled": true
+										},
+										{
+											"key": "elevate",
+											"value": "{{elevated}}",
+											"description": "Elevate the user context for this request if user is permitted (canAdmin)",
+											"disabled": true
+										},
+										{
+											"key": "projection",
+											"value": "owners",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "statistics",
+											"description": "Additional properties to include in the response.\n"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Return a Collection - test",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let user = pm.environment.get(\"user\");\r",
+											"console.log(\"user: \" + user);\r",
+											"\r",
+											"if (pm.request.url.getQueryString().match(/elevate=true/)) {\r",
+											"    user = \"elevated\";\r",
+											"    console.log(\"setting user to 'elevated'\");\r",
+											"}\r",
+											"\r",
+											"if (user == \"collectioncreator\" || user == \"bizarroLvl1\" ) {\r",
+											"    pm.test(\"Status should be is 403 for user collectioncreator, bizarroLvl1\", function () {\r",
+											"        pm.response.to.have.status(403);\r",
+											"    });\r",
+											"    return;\r",
+											"}\r",
+											"else {\r",
+											"    pm.test(\"Status code is 200\", function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    });\r",
+											"}\r",
+											"if (pm.response.code !== 200) {\r",
+											"    return;\r",
+											"}\r",
+											"\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Response JSON is an object\", function () {\r",
+											"    pm.expect(jsonData).to.be.an('object');\r",
+											"});\r",
+											"\r",
+											"let collectionKeys = [\r",
+											"    \"collectionId\",\r",
+											"    \"name\",\r",
+											"    \"workflow\",\r",
+											"    \"description\",\r",
+											"    \"metadata\"\r",
+											"]\r",
+											"\r",
+											"let grantKeys = [\r",
+											"    \"user\",\r",
+											"    \"accessLevel\",\r",
+											"    // \"userId\",\r",
+											"    // \"username\"\r",
+											"]\r",
+											"\r",
+											"// START AZDO #151\r",
+											"let userBasicKeys = [\r",
+											"    // \"user\",\r",
+											"    // \"accessLevel\",\r",
+											"    \"userId\",\r",
+											"    \"username\"\r",
+											"     // ,\r",
+											"    // \"display\",\r",
+											"    // \"email\"   \r",
+											"]\r",
+											"// END AZDO #151\r",
+											"\r",
+											"\r",
+											"let stigKeys = [\r",
+											"    \"title\",\r",
+											"    \"ruleCount\",\r",
+											"    \"benchmarkId\",\r",
+											"    \"lastRevisionDate\",\r",
+											"    \"lastRevisionStr\"\r",
+											"]\r",
+											"\r",
+											"let statisticsKeys = [\r",
+											"    \"created\",\r",
+											"    \"assetCount\",\r",
+											"    \"grantCount\",\r",
+											"    \"checklistCount\"\r",
+											"]\r",
+											"\r",
+											"if (pm.request.url.getQueryString().match(/projection=assets/)) {\r",
+											"    collectionKeys.push(\"assets\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=grants/)) {\r",
+											"    collectionKeys.push(\"grants\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=stigs/)) {\r",
+											"    collectionKeys.push(\"stigs\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=owners/)) {\r",
+											"    collectionKeys.push(\"owners\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=statistics/)) {\r",
+											"    collectionKeys.push(\"statistics\")\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Check if object contains all provided keys\", function () {\r",
+											"    pm.expect(jsonData).to.have.all.keys(collectionKeys);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response has requested properties and values\", function () {\r",
+											"    // for (let item of jsonData){\r",
+											"    let collectionMatchString = pm.environment.get(\"collectionMatchString\");\r",
+											"    var regex = new RegExp(collectionMatchString);\r",
+											"    pm.test(\"Check that proper Collections are returned\", function () {\r",
+											"        pm.expect(jsonData.name).to.match(regex);\r",
+											"    });\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/workflow=emass/)) {\r",
+											"        pm.expect(jsonData.workflow).to.eql(\"emass\");\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/workflow=continuous/)) {\r",
+											"        pm.expect(jsonData.workflow).to.eql(\"continuous\");\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=assets/)) {\r",
+											"        let assetMatchString = pm.environment.get(\"assetMatchString\");\r",
+											"        var assetRegex = new RegExp(assetMatchString);\r",
+											"        for (let asset of jsonData.assets){\r",
+											"            pm.expect(asset).to.have.property('name');\r",
+											"            pm.expect(asset).to.have.property('assetId');\r",
+											"            pm.expect(asset.name).to.match(assetRegex);\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=grants/)) {\r",
+											"        for (let grant of jsonData.grants){\r",
+											"            pm.expect(grant).to.have.all.keys(grantKeys);\r",
+											"            pm.expect(grant.user).to.have.all.keys(userBasicKeys);\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=stigs/)) {\r",
+											"        let validStigs = JSON.parse(pm.environment.get(\"stigs.valid\"));\r",
+											"\r",
+											"        for (let stig of jsonData.stigs){\r",
+											"            pm.expect(stig).to.have.all.keys(stigKeys);\r",
+											"            pm.expect(stig.benchmarkId).to.be.oneOf(validStigs);\r",
+											"\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=owners/)) {\r",
+											"        // console.log(\"checking owners projection\");\r",
+											"        for (let owner of jsonData.owners){\r",
+											"            pm.expect(owner).to.have.all.keys(userBasicKeys);\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=statistics/)) {\r",
+											"        // console.log(\"checking statistics projection\");\r",
+											"        pm.expect(jsonData.statistics).to.have.all.keys(statisticsKeys);\r",
+											"    }\r",
+											"\r",
+											"    // };\r",
+											"\r",
+											"});\r",
+											"\r",
+											"\r",
+											"// let collectionMatchString = pm.environment.get(\"collectionMatchString\");\r",
+											"// // console.log(\"collection string = \" + collectionMatchString);\r",
+											"// var regex = new RegExp(collectionMatchString);\r",
+											"// // let collectionNames = _.map(jsonData, 'name');\r",
+											"// // console.log(jsonData.name);\r",
+											"\r",
+											"// pm.test(\"Check that proper Collections are returned\", function () {\r",
+											"//     pm.expect(jsonData.name).to.match(regex);\r",
+											"//     // console.log(\"checking \" + jsonData.name + \" against regex \" + collectionMatchString + \".\" ); \r",
+											"// });\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token.stigmanadmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/collections/:collectionId?elevate={{elevated}}&projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"collections",
+										":collectionId"
+									],
+									"query": [
+										{
+											"key": "elevate",
+											"value": "{{elevated}}",
+											"description": "Elevate the user context for this request if user is permitted (canAdmin)"
+										},
+										{
+											"key": "projection",
+											"value": "assets",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "grants",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "owners"
+										},
+										{
+											"key": "projection",
+											"value": "statistics"
+										},
+										{
+											"key": "projection",
+											"value": "stigs"
+										}
+									],
+									"variable": [
+										{
+											"description": "(Required) A path parameter that indentifies a Collection",
+											"key": "collectionId",
+											"value": "{{testCollection}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Return a Collection - test Copy 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let user = pm.environment.get(\"user\");\r",
+											"console.log(\"user: \" + user);\r",
+											"\r",
+											"if (pm.request.url.getQueryString().match(/elevate=true/)) {\r",
+											"    user = \"elevated\";\r",
+											"    console.log(\"setting user to 'elevated'\");\r",
+											"}\r",
+											"\r",
+											"if (user == \"collectioncreator\" || user == \"bizarroLvl1\" ) {\r",
+											"    pm.test(\"Status should be is 403 for user collectioncreator, bizarroLvl1\", function () {\r",
+											"        pm.response.to.have.status(403);\r",
+											"    });\r",
+											"    return;\r",
+											"}\r",
+											"else {\r",
+											"    pm.test(\"Status code is 200\", function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    });\r",
+											"}\r",
+											"if (pm.response.code !== 200) {\r",
+											"    return;\r",
+											"}\r",
+											"\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Response JSON is an object\", function () {\r",
+											"    pm.expect(jsonData).to.be.an('object');\r",
+											"});\r",
+											"\r",
+											"let collectionKeys = [\r",
+											"    \"collectionId\",\r",
+											"    \"name\",\r",
+											"    \"workflow\",\r",
+											"    \"description\",\r",
+											"    \"metadata\"\r",
+											"]\r",
+											"\r",
+											"let grantKeys = [\r",
+											"    \"user\",\r",
+											"    \"accessLevel\",\r",
+											"    // \"userId\",\r",
+											"    // \"username\"\r",
+											"]\r",
+											"\r",
+											"// START AZDO #151\r",
+											"let userBasicKeys = [\r",
+											"    // \"user\",\r",
+											"    // \"accessLevel\",\r",
+											"    \"userId\",\r",
+											"    \"username\"\r",
+											"     // ,\r",
+											"    // \"display\",\r",
+											"    // \"email\"   \r",
+											"]\r",
+											"// END AZDO #151\r",
+											"\r",
+											"\r",
+											"let stigKeys = [\r",
+											"    \"title\",\r",
+											"    \"ruleCount\",\r",
+											"    \"benchmarkId\",\r",
+											"    \"lastRevisionDate\",\r",
+											"    \"lastRevisionStr\"\r",
+											"]\r",
+											"\r",
+											"let statisticsKeys = [\r",
+											"    \"created\",\r",
+											"    \"assetCount\",\r",
+											"    \"grantCount\",\r",
+											"    \"checklistCount\"\r",
+											"]\r",
+											"\r",
+											"if (pm.request.url.getQueryString().match(/projection=assets/)) {\r",
+											"    collectionKeys.push(\"assets\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=grants/)) {\r",
+											"    collectionKeys.push(\"grants\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=stigs/)) {\r",
+											"    collectionKeys.push(\"stigs\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=owners/)) {\r",
+											"    collectionKeys.push(\"owners\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=statistics/)) {\r",
+											"    collectionKeys.push(\"statistics\")\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Check if object contains all provided keys\", function () {\r",
+											"    pm.expect(jsonData).to.have.all.keys(collectionKeys);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response has requested properties and values\", function () {\r",
+											"    // for (let item of jsonData){\r",
+											"    let collectionMatchString = pm.environment.get(\"collectionMatchString\");\r",
+											"    var regex = new RegExp(collectionMatchString);\r",
+											"    pm.test(\"Check that proper Collections are returned\", function () {\r",
+											"        pm.expect(jsonData.name).to.match(regex);\r",
+											"    });\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/workflow=emass/)) {\r",
+											"        pm.expect(jsonData.workflow).to.eql(\"emass\");\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/workflow=continuous/)) {\r",
+											"        pm.expect(jsonData.workflow).to.eql(\"continuous\");\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=assets/)) {\r",
+											"        let assetMatchString = pm.environment.get(\"assetMatchString\");\r",
+											"        var assetRegex = new RegExp(assetMatchString);\r",
+											"        for (let asset of jsonData.assets){\r",
+											"            pm.expect(asset).to.have.property('name');\r",
+											"            pm.expect(asset).to.have.property('assetId');\r",
+											"            pm.expect(asset.name).to.match(assetRegex);\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=grants/)) {\r",
+											"        for (let grant of jsonData.grants){\r",
+											"            pm.expect(grant).to.have.all.keys(grantKeys);\r",
+											"            pm.expect(grant.user).to.have.all.keys(userBasicKeys);\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=stigs/)) {\r",
+											"        let validStigs = JSON.parse(pm.environment.get(\"stigs.valid\"));\r",
+											"\r",
+											"        for (let stig of jsonData.stigs){\r",
+											"            pm.expect(stig).to.have.all.keys(stigKeys);\r",
+											"            pm.expect(stig.benchmarkId).to.be.oneOf(validStigs);\r",
+											"\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=owners/)) {\r",
+											"        // console.log(\"checking owners projection\");\r",
+											"        for (let owner of jsonData.owners){\r",
+											"            pm.expect(owner).to.have.all.keys(userBasicKeys);\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=statistics/)) {\r",
+											"        // console.log(\"checking statistics projection\");\r",
+											"        pm.expect(jsonData.statistics).to.have.all.keys(statisticsKeys);\r",
+											"    }\r",
+											"\r",
+											"    // };\r",
+											"\r",
+											"});\r",
+											"\r",
+											"\r",
+											"// let collectionMatchString = pm.environment.get(\"collectionMatchString\");\r",
+											"// // console.log(\"collection string = \" + collectionMatchString);\r",
+											"// var regex = new RegExp(collectionMatchString);\r",
+											"// // let collectionNames = _.map(jsonData, 'name');\r",
+											"// // console.log(jsonData.name);\r",
+											"\r",
+											"// pm.test(\"Check that proper Collections are returned\", function () {\r",
+											"//     pm.expect(jsonData.name).to.match(regex);\r",
+											"//     // console.log(\"checking \" + jsonData.name + \" against regex \" + collectionMatchString + \".\" ); \r",
+											"// });\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token.stigmanadmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/collections/:collectionId?elevate={{elevated}}&projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"collections",
+										":collectionId"
+									],
+									"query": [
+										{
+											"key": "elevate",
+											"value": "{{elevated}}",
+											"description": "Elevate the user context for this request if user is permitted (canAdmin)"
+										},
+										{
+											"key": "projection",
+											"value": "assets",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "grants",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "owners"
+										},
+										{
+											"key": "projection",
+											"value": "statistics"
+										},
+										{
+											"key": "projection",
+											"value": "stigs"
+										}
+									],
+									"variable": [
+										{
+											"description": "(Required) A path parameter that indentifies a Collection",
+											"key": "collectionId",
+											"value": "{{testCollection}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Return a Collection - test Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let user = pm.environment.get(\"user\");\r",
+											"console.log(\"user: \" + user);\r",
+											"\r",
+											"if (pm.request.url.getQueryString().match(/elevate=true/)) {\r",
+											"    user = \"elevated\";\r",
+											"    console.log(\"setting user to 'elevated'\");\r",
+											"}\r",
+											"\r",
+											"if (user == \"collectioncreator\" || user == \"bizarroLvl1\" ) {\r",
+											"    pm.test(\"Status should be is 403 for user collectioncreator, bizarroLvl1\", function () {\r",
+											"        pm.response.to.have.status(403);\r",
+											"    });\r",
+											"    return;\r",
+											"}\r",
+											"else {\r",
+											"    pm.test(\"Status code is 200\", function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    });\r",
+											"}\r",
+											"if (pm.response.code !== 200) {\r",
+											"    return;\r",
+											"}\r",
+											"\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Response JSON is an object\", function () {\r",
+											"    pm.expect(jsonData).to.be.an('object');\r",
+											"});\r",
+											"\r",
+											"let collectionKeys = [\r",
+											"    \"collectionId\",\r",
+											"    \"name\",\r",
+											"    \"workflow\",\r",
+											"    \"description\",\r",
+											"    \"metadata\"\r",
+											"]\r",
+											"\r",
+											"let grantKeys = [\r",
+											"    \"user\",\r",
+											"    \"accessLevel\",\r",
+											"    // \"userId\",\r",
+											"    // \"username\"\r",
+											"]\r",
+											"\r",
+											"// START AZDO #151\r",
+											"let userBasicKeys = [\r",
+											"    // \"user\",\r",
+											"    // \"accessLevel\",\r",
+											"    \"userId\",\r",
+											"    \"username\"\r",
+											"     // ,\r",
+											"    // \"display\",\r",
+											"    // \"email\"   \r",
+											"]\r",
+											"// END AZDO #151\r",
+											"\r",
+											"\r",
+											"let stigKeys = [\r",
+											"    \"title\",\r",
+											"    \"ruleCount\",\r",
+											"    \"benchmarkId\",\r",
+											"    \"lastRevisionDate\",\r",
+											"    \"lastRevisionStr\"\r",
+											"]\r",
+											"\r",
+											"let statisticsKeys = [\r",
+											"    \"created\",\r",
+											"    \"assetCount\",\r",
+											"    \"grantCount\",\r",
+											"    \"checklistCount\"\r",
+											"]\r",
+											"\r",
+											"if (pm.request.url.getQueryString().match(/projection=assets/)) {\r",
+											"    collectionKeys.push(\"assets\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=grants/)) {\r",
+											"    collectionKeys.push(\"grants\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=stigs/)) {\r",
+											"    collectionKeys.push(\"stigs\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=owners/)) {\r",
+											"    collectionKeys.push(\"owners\")\r",
+											"}\r",
+											"if (pm.request.url.getQueryString().match(/projection=statistics/)) {\r",
+											"    collectionKeys.push(\"statistics\")\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Check if object contains all provided keys\", function () {\r",
+											"    pm.expect(jsonData).to.have.all.keys(collectionKeys);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response has requested properties and values\", function () {\r",
+											"    // for (let item of jsonData){\r",
+											"    let collectionMatchString = pm.environment.get(\"collectionMatchString\");\r",
+											"    var regex = new RegExp(collectionMatchString);\r",
+											"    pm.test(\"Check that proper Collections are returned\", function () {\r",
+											"        pm.expect(jsonData.name).to.match(regex);\r",
+											"    });\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/workflow=emass/)) {\r",
+											"        pm.expect(jsonData.workflow).to.eql(\"emass\");\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/workflow=continuous/)) {\r",
+											"        pm.expect(jsonData.workflow).to.eql(\"continuous\");\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=assets/)) {\r",
+											"        let assetMatchString = pm.environment.get(\"assetMatchString\");\r",
+											"        var assetRegex = new RegExp(assetMatchString);\r",
+											"        for (let asset of jsonData.assets){\r",
+											"            pm.expect(asset).to.have.property('name');\r",
+											"            pm.expect(asset).to.have.property('assetId');\r",
+											"            pm.expect(asset.name).to.match(assetRegex);\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=grants/)) {\r",
+											"        for (let grant of jsonData.grants){\r",
+											"            pm.expect(grant).to.have.all.keys(grantKeys);\r",
+											"            pm.expect(grant.user).to.have.all.keys(userBasicKeys);\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=stigs/)) {\r",
+											"        let validStigs = JSON.parse(pm.environment.get(\"stigs.valid\"));\r",
+											"\r",
+											"        for (let stig of jsonData.stigs){\r",
+											"            pm.expect(stig).to.have.all.keys(stigKeys);\r",
+											"            pm.expect(stig.benchmarkId).to.be.oneOf(validStigs);\r",
+											"\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=owners/)) {\r",
+											"        // console.log(\"checking owners projection\");\r",
+											"        for (let owner of jsonData.owners){\r",
+											"            pm.expect(owner).to.have.all.keys(userBasicKeys);\r",
+											"        }\r",
+											"    }\r",
+											"\r",
+											"    if (pm.request.url.getQueryString().match(/projection=statistics/)) {\r",
+											"        // console.log(\"checking statistics projection\");\r",
+											"        pm.expect(jsonData.statistics).to.have.all.keys(statisticsKeys);\r",
+											"    }\r",
+											"\r",
+											"    // };\r",
+											"\r",
+											"});\r",
+											"\r",
+											"\r",
+											"// let collectionMatchString = pm.environment.get(\"collectionMatchString\");\r",
+											"// // console.log(\"collection string = \" + collectionMatchString);\r",
+											"// var regex = new RegExp(collectionMatchString);\r",
+											"// // let collectionNames = _.map(jsonData, 'name');\r",
+											"// // console.log(jsonData.name);\r",
+											"\r",
+											"// pm.test(\"Check that proper Collections are returned\", function () {\r",
+											"//     pm.expect(jsonData.name).to.match(regex);\r",
+											"//     // console.log(\"checking \" + jsonData.name + \" against regex \" + collectionMatchString + \".\" ); \r",
+											"// });\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token.stigmanadmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/collections/:collectionId?elevate={{elevated}}&projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"collections",
+										":collectionId"
+									],
+									"query": [
+										{
+											"key": "elevate",
+											"value": "{{elevated}}",
+											"description": "Elevate the user context for this request if user is permitted (canAdmin)"
+										},
+										{
+											"key": "projection",
+											"value": "assets",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "grants",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "owners"
+										},
+										{
+											"key": "projection",
+											"value": "statistics"
+										},
+										{
+											"key": "projection",
+											"value": "stigs"
+										}
+									],
+									"variable": [
+										{
+											"description": "(Required) A path parameter that indentifies a Collection",
+											"key": "collectionId",
+											"value": "{{testCollection}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create a Collection Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let user = pm.environment.get(\"user\");\r",
+											"console.log(\"user: \" + user);\r",
+											"\r",
+											"if (pm.request.url.getQueryString().match(/elevate=true/)) {\r",
+											"    user = \"elevated\";\r",
+											"    console.log(\"setting user to 'elevated'\");\r",
+											"}\r",
+											"\r",
+											"if (user != \"stigmanadmin\" && user != \"elevated\" && user != \"collectioncreator\") { //placeholder for \"users\" that should fail\r",
+											"    pm.test(\"Status should be is 403 for all users except stigmanAdmin(elevated), and collectioncreator\", function () {\r",
+											"        pm.response.to.have.status(403);\r",
+											"    });\r",
+											"    return;\r",
+											"}\r",
+											"else {\r",
+											"    pm.test(\"Status code is 200\", function () {\r",
+											"        pm.response.to.have.status(200); //AZDO #157 status should be 201\r",
+											"    });\r",
+											"}\r",
+											"if (pm.response.code !== 200) {\r",
+											"    return;\r",
+											"}\r",
+											"\r",
+											"\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response JSON is an object\", function () {\r",
+											"    pm.expect(jsonData).to.be.an('object');\r",
+											"    // pm.expect(jsonData).to.have.lengthOf.at.least(1);\r",
+											"    // pm.expect(jsonData).to.have.lengthOf(1);\r",
+											"\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"TEST_{{$randomNoun}}-{{$randomJobType}}\",\n  \"description\": \"Collection TEST description\",\n  \"workflow\": \"continuous\",\n  \"metadata\": {\n  \"pocName\": \"poc2Put\",\n  \"pocEmail\": \"pocEmailPut@email.com\",\n  \"pocPhone\": \"12342\",\n  \"reqRar\": \"true\"\n  },\n    \"grants\": [\n\n        {\n                \"userId\": \"1\",\n            \"accessLevel\": 4\n        }\n    ]\n}\n"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/collections?elevate={{elevated}}&projection=assets&projection=grants&projection=owners&projection=statistics",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"collections"
+									],
+									"query": [
+										{
+											"key": "elevate",
+											"value": "{{elevated}}",
+											"description": "Elevate the user context for this request if user is permitted (canAdmin)"
+										},
+										{
+											"key": "projection",
+											"value": "assets",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "grants",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "owners"
+										},
+										{
+											"key": "projection",
+											"value": "statistics"
+										},
+										{
+											"key": "projection",
+											"value": "grants",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Return a list of Collections accessible to the requester - test",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/collections?projection=owners&projection=statistics",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"collections"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "{{collectionMatchString}}",
+											"description": "Matches a string anywhere in the object name",
+											"disabled": true
+										},
+										{
+											"key": "workflow",
+											"value": "emass",
+											"description": "Match Collections having a specific workflow.",
+											"disabled": true
+										},
+										{
+											"key": "metadata",
+											"value": "{{metadataKey}}:{{metadataValue}}",
+											"description": "A query parameter that specifies metadata key:value pairs to select matching Collections",
+											"disabled": true
+										},
+										{
+											"key": "elevate",
+											"value": "{{elevated}}",
+											"description": "Elevate the user context for this request if user is permitted (canAdmin)",
+											"disabled": true
+										},
+										{
+											"key": "projection",
+											"value": "owners",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "projection",
+											"value": "statistics",
+											"description": "Additional properties to include in the response.\n"
+										},
+										{
+											"key": "name-match",
+											"value": "endsWith",
+											"disabled": true
+										},
+										{
+											"key": "metadata",
+											"value": null,
+											"disabled": true
+										},
+										{
+											"key": "elevate",
+											"value": "true",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Return the requester's user information Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let user = pm.environment.get(\"user\");\r",
+											"console.log(\"user: \" + user);\r",
+											"\r",
+											"if (pm.request.url.getQueryString().match(/elevate=true/)) {\r",
+											"    user = \"elevated\";\r",
+											"    console.log(\"setting user to 'elevated'\");\r",
+											"}\r",
+											"\r",
+											"if (user == \"xxxxx\") { //placeholder for \"users\" that should fail\r",
+											"    pm.test(\"Status should be is 403 for user xxxxx\", function () {\r",
+											"        pm.response.to.have.status(403);\r",
+											"    });\r",
+											"    return;\r",
+											"}\r",
+											"else {\r",
+											"    pm.test(\"Status code is 200\", function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    });\r",
+											"}\r",
+											"if (pm.response.code !== 200) {\r",
+											"    return;\r",
+											"}\r",
+											"\r",
+											"\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response JSON is an object\", function () {\r",
+											"    pm.expect(jsonData).to.be.an('object');\r",
+											"});\r",
+											"\r",
+											"let userKeys = [\r",
+											"    \"userId\",\r",
+											"    \"username\",\r",
+											"    // \"display\",\r",
+											"    // \"email\",\r",
+											"    // \"metadata\",\r",
+											"    // \"privileges\",\r",
+											"    \"collectionGrants\",\r",
+											"    \"statistics\"\r",
+											"]\r",
+											"let collectionGrantKeys = [\r",
+											"    \"collection\",\r",
+											"    \"accessLevel\",\r",
+											"    // \"userId\",\r",
+											"    // \"username\"\r",
+											"]\r",
+											"let collectionKeys = [\r",
+											"    \"name\",\r",
+											"    \"collectionId\",\r",
+											"    // \"userId\",\r",
+											"    // \"username\"\r",
+											"]\r",
+											"let statisticsKeys = [\r",
+											"    \"created\",\r",
+											"    \"lastAccess\",\r",
+											"    \"collectionGrantCount\",\r",
+											"    \"lastClaims\"\r",
+											"]\r",
+											"let privilegesKeys = [\r",
+											"    \"canAdmin\",\r",
+											"    \"globalAccess\",\r",
+											"    \"canCreateCollection\"\r",
+											"]\r",
+											"\r",
+											"// START AZDO #151\r",
+											"// pm.test(\"Check if object contains all required keys\", function () {\r",
+											"//     pm.expect(jsonData).to.have.all.keys(userKeys);\r",
+											"// });\r",
+											"\r",
+											"// for (let grant of jsonData.collectionGrants){\r",
+											"//     pm.expect(grant).to.have.all.keys(collectionGrantKeys);\r",
+											"//     pm.expect(grant.collection).to.have.all.keys(collectionKeys);\r",
+											"// }\r",
+											"\r",
+											"// pm.test(\"Check if object contains all required privileges keys\", function () {\r",
+											"//     pm.expect(jsonData.privileges).to.have.all.keys(privilegesKeys);\r",
+											"// });\r",
+											"\r",
+											"// pm.test(\"Check if object contains all required statistics keys\", function () {\r",
+											"//     pm.expect(jsonData.statistics).to.have.all.keys(statisticsKeys);\r",
+											"// });\r",
+											"// STOP AZDO #151\r",
+											"\r",
+											"pm.test(\"Check if object contains info for expected user\", function () {\r",
+											"    pm.expect(jsonData.username).to.eql(user);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "tests that send requests that will not pass api validation"
+				},
+				{
+					"name": "Return a list of Reviews for an Asset Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/collections/:collectionId/reviews/:assetId?projection=rule&projection=stigs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"collections",
+								":collectionId",
+								"reviews",
+								":assetId"
+							],
+							"query": [
+								{
+									"key": "result",
+									"value": "<string>",
+									"disabled": true
+								},
+								{
+									"key": "action",
+									"value": "<string>",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "<string>",
+									"disabled": true
+								},
+								{
+									"key": "benchmarkId",
+									"value": "<string>",
+									"description": "A query parameter that indentifies a STIG",
+									"disabled": true
+								},
+								{
+									"key": "projection",
+									"value": "rule",
+									"description": "Additional properties to include in the response.\n"
+								},
+								{
+									"key": "projection",
+									"value": "stigs",
+									"description": "Additional properties to include in the response.\n"
+								}
+							],
+							"variable": [
+								{
+									"key": "collectionId",
+									"value": "{{testCollection}}",
+									"description": "(Required) A path parameter that indentifies a Collection"
+								},
+								{
+									"key": "assetId",
+									"value": "{{testAsset}}",
+									"description": "(Required) A path parameter that indentifies an Asset"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"description": "These tests should be self contained, provide their own authorization, and repopulate test data if required.",

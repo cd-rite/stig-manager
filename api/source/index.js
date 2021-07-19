@@ -76,16 +76,16 @@ oasDoc.info.version = config.version
 // oas-tools uses x-name property of requestBody to set name of the body parameter
 // oas-tools uses x-swagger-router-controller property to determine the controller
 // Set x-swagger-router-controller based on the first tag of each path/method
-for (const path in oasDoc.paths) {
-  for (const method in oasDoc.paths[path]) {
-    if (Array.isArray(oasDoc.paths[path][method].tags)) {
-      oasDoc.paths[path][method]['x-swagger-router-controller'] = oasDoc.paths[path][method].tags[0]
-    }  
-    if (oasDoc.paths[path][method].requestBody) {
-      oasDoc.paths[path][method].requestBody['x-name'] = 'body'
-    }
-  }
-}
+// for (const path in oasDoc.paths) {
+//   for (const method in oasDoc.paths[path]) {
+//     if (Array.isArray(oasDoc.paths[path][method].tags)) {
+//       oasDoc.paths[path][method]['x-swagger-router-controller'] = oasDoc.paths[path][method].tags[0]
+//     }  
+//     if (oasDoc.paths[path][method].requestBody) {
+//       oasDoc.paths[path][method].requestBody['x-name'] = 'body'
+//     }
+//   }
+// }
 
 // Replace host with environmental values
 oasDoc.servers[0].url = config.swaggerUi.server
@@ -99,19 +99,19 @@ const apiSpec = path.join(__dirname, './specification/stig-manager.yaml');
 //   run()
 // })
 
-var moveQueryToSwaggerParams = function (req, res, next) {
-  req.swagger = {
-    get params() {
-      let aggParams = {...req.query, ...req.params, ...req.headers}
-      aggParams.body = req.body
-      return aggParams
-    }
-  }
-  // req.swagger.params.body = req.body
-  next()
-}
+// var moveQueryToSwaggerParams = function (req, res, next) {
+//   req.swagger = {
+//     get params() {
+//       let aggParams = {...req.query, ...req.params, ...req.headers}
+//       aggParams.body = req.body
+//       return aggParams
+//     }
+//   }
+//   // req.swagger.params.body = req.body
+//   next()
+// }
 
-app.use(moveQueryToSwaggerParams)
+// app.use(moveQueryToSwaggerParams)
 
 
 //  2. Install the OpenApiValidator middleware
@@ -141,7 +141,7 @@ app.use(
       basePath: path.join(__dirname, 'controllers'),
       // 4. Provide a function responsible for resolving an Express RequestHandler
       //    function from the current OpenAPI Route object.
-      resolver: modulePathResolver1,
+      resolver: modulePathResolver,
     },
     validateSecurity: {
       handlers:{
@@ -313,7 +313,7 @@ async function startServer(app) {
 
 
 
-function modulePathResolver1(
+function modulePathResolver(
   handlersPath,
   route,
   apiDoc
