@@ -19,16 +19,16 @@ module.exports.createCollection = async function createCollection (req, res, nex
       catch (err) {
         // This is MySQL specific, should abstract with an SmError
         if (err.code === 'ER_DUP_ENTRY') {
-          try {
+          // try {
             let response = await Collection.getCollections({
               name: body.name
             }, projection, elevate, req.userObject )
             throw ({
               status: 400,
               message: `Duplicate name`,
-              data: response[0]
+              data: response[0] ?? null
             })
-          } finally {}
+          // } finally {}
         }
         else {
           throw err
@@ -52,14 +52,14 @@ module.exports.deleteCollection = async function deleteCollection (req, res, nex
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if (elevate || (collectionGrant && collectionGrant.accessLevel === 4)) {
       const response = await Collection.deleteCollection(collectionId, projection, elevate, req.userObject)
-      writer.writeJson (res, response)
+      res.json(response)
     }
     else {
       throw( {status: 403, message: "User has insufficient privilege to complete this request."} )
     }
   }
   catch (err) {
-    writer.writeJson(res, err)
+    next(err)
   }
 }
 
@@ -100,7 +100,13 @@ module.exports.getCollection = async function getCollection (req, res, next) {
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if (collectionGrant || req.userObject.privileges.globalAccess || elevate ) {
       const response = await Collection.getCollection(collectionId, projection, elevate, req.userObject )
-      res.status(200).json(response)
+      // res.status(200).json(response)
+      // if (response === undefined){
+          res.status(typeof response === 'undefined' ? 204 : 200).json(response)
+      // }
+      // else{
+      //   res.json(response)
+      // }
     }
     else {
       throw({status: 403, message: 'User has insufficient privilege to complete this request.'})

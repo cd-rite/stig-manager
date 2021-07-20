@@ -161,11 +161,13 @@ app.use(
 app.use((err, req, res, next) => {
   // 7. Customize errors
   console.error(err); // dump error to console for debug
-  res.status(err.status || 500).json({
-    message: err.message,
-    errors: err.errors,
-    code: err.code
-  });
+  // res.status(err.status || 500).json({
+  //   message: err.message,
+  //   errors: err.errors,
+  //   code: err.code
+  // });
+  //Perhaps only return the whole error object when in a "Dev" mode?
+  res.status(err.status || 500).json(err);
 });
 
 

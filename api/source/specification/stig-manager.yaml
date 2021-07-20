@@ -582,6 +582,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CollectionsProjected'
+        # '204':
+        #   description: Collection does not exist
         default:
           description: unexpected error
           content:
@@ -645,6 +647,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectionProjected'
+        '204':
+          description: No Content
         default:
           description: unexpected error
           content:
@@ -759,7 +763,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChecklistCollectionStigArray'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChecklistCollectionStig'
         default:
           description: unexpected error
           content:
@@ -1368,11 +1374,6 @@ paths:
             schema:
               type: object
               properties:
-                replace:
-                  type: string
-                  enum:
-                    - 'true'
-                    - 'false'
                 importFile:
                   type: string
                   format: binary
@@ -2430,10 +2431,6 @@ components:
                           type: string
                         SEVERITY_JUSTIFICATION:
                           type: string
-    ChecklistCollectionStigArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/ChecklistCollectionStig'      
     ChecklistCollectionStig:
       type: object      
       properties:
@@ -2787,9 +2784,8 @@ components:
         - ongoing
         - completed
     Error:
-      required:
-        # - code
-        - message
+      # required:
+      #   - message
       type: object
       properties:
         message:
