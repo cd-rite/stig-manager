@@ -575,15 +575,13 @@ paths:
         - $ref: '#/components/parameters/CollectionsProjectionQuery'
       responses:
         '200':
-          description: CollectionProjected response
+          description: CollectionsProjected response
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/CollectionsProjected'
-        # '204':
-        #   description: Collection does not exist
         default:
           description: unexpected error
           content:
@@ -3226,10 +3224,16 @@ components:
               type: string
             username:
               type: string
+          required:
+            - userId
+            - username
         accessLevel:
           type: integer
           minimum: 1
           maximum: 4
+      required:
+        - user          
+        - accessLevel
     UserProjected:
       allOf:
         - $ref: '#/components/schemas/User'
