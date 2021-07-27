@@ -23,7 +23,7 @@ exports.getConfiguration = async function() {
     return (config)
   }
   catch(err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -34,7 +34,7 @@ exports.setConfigurationItem = async function (key, value) {
     return (true)
   }
   catch(err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 
 }

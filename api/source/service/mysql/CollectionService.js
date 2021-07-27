@@ -10,6 +10,7 @@ Generalized queries for collection(s).
 **/
 exports.queryCollections = async function (inProjection = [], inPredicates = {}, elevate = false, userObject) { 
   try {
+    // throw ({status: 500, message: "test!"})
     let context
     if (userObject.privileges.globalAccess || elevate) {
       context = dbUtils.CONTEXT_ALL
@@ -187,9 +188,10 @@ exports.queryCollections = async function (inProjection = [], inPredicates = {},
     let [rows] = await dbUtils.pool.query(sql, predicates.binds)
     return (rows)
   }
-  catch (err) {
-    throw err
-  }
+  // catch (err) {
+  //   throw err
+  // }
+  finally{}  
 }
 
 exports.queryFindings = async function (aggregator, inProjection = [], inPredicates = {}, userObject) {
@@ -348,12 +350,10 @@ exports.queryFindings = async function (aggregator, inProjection = [], inPredica
     let [rows] = await dbUtils.pool.query(sql, predicates.binds)
     return (rows)
   }
-  catch (err) {
-    throw err
-  }
-  // finally {
-
+  // catch (err) {
+  //   throw err
   // }
+  finally {}
 }
 
 exports.queryStatus = async function (inPredicates = {}, userObject) {
@@ -443,9 +443,10 @@ exports.queryStatus = async function (inPredicates = {}, userObject) {
     let [rows] = await dbUtils.pool.query(sql, predicates.binds)
     return (rows)
   }
-  catch (err) {
-    throw err
-  }
+  // catch (err) {
+  //   throw err
+  // }
+  finally{}
 }
 
 exports.queryStigAssets = async function (inProjection = [], inPredicates = {}, userObject) {
@@ -471,7 +472,9 @@ exports.queryStigAssets = async function (inProjection = [], inPredicates = {}, 
       predicates.statements.push('c.collectionId = ?')
       predicates.binds.push( inPredicates.collectionId )
     } else {
-      throw ('Missing required predicate: collectionId')
+      throw ( {status: 400, message: 'Missing required predicate: collectionId'} )
+
+      // throw ('Missing required predicate: collectionId')
     }
     if ( inPredicates.userId ) {
       joins.push('left join user_stig_asset_map usa on sa.saId = usa.saId')
@@ -493,9 +496,10 @@ exports.queryStigAssets = async function (inProjection = [], inPredicates = {}, 
     return (rows)
 
   }
-  catch (err) {
-    throw err
-  }
+  // catch (err) {
+  //   throw err
+  // }
+  finally{}
 }
 
 exports.updateOrReplaceUserStigAssets = async function(writeAction, collectionId, userId, stigAssets, projection, userObject) {
@@ -534,7 +538,10 @@ exports.updateOrReplaceUserStigAssets = async function(writeAction, collectionId
     if (typeof connection !== 'undefined') {
       await connection.rollback()
     }
-    throw err
+    // throw err
+    throw ( {status: 500, message: 'Database transaction issue.', stack: err.stack} )
+
+    
   }
   finally {
     if (typeof connection !== 'undefined') {
@@ -586,7 +593,7 @@ exports.addOrUpdateCollection = async function(writeAction, collectionId, body, 
       }
     }
     else {
-      throw('Invalid writeAction')
+      throw ( {status: 500, message: 'Invalid writeAction'} )
     }
 
     // Process grants
@@ -625,7 +632,7 @@ exports.addOrUpdateCollection = async function(writeAction, collectionId, body, 
     return row
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -658,7 +665,7 @@ exports.deleteCollection = async function(collectionId, projection, elevate, use
     return (row[0])
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -790,7 +797,7 @@ exports.getChecklistByCollectionStig = async function (collectionId, benchmarkId
     return (rows.length > 0 ? rows : null)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, { message: err.message, stack: err.stack }))
+    throw ( {status: 500,  message: err.message, stack: err.stack })
   }
   finally {
     if (typeof connection !== 'undefined') {
@@ -813,9 +820,10 @@ exports.getCollection = async function(collectionId, projection, elevate, userOb
     }, elevate, userObject)
   return (rows[0])
   }
-  catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
-  }
+  // catch (err) {
+  //   throw (err)
+  // }
+  finally{}
 }
 
 
@@ -830,7 +838,7 @@ exports.getCollections = async function(predicates, projection, elevate, userObj
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -845,7 +853,7 @@ exports.getFindingsByCollection = async function( collectionId, aggregator, benc
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 
 }
@@ -860,7 +868,7 @@ exports.getStatusByCollection = async function( collectionId, assetId, benchmark
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -873,7 +881,7 @@ exports.getStigAssetsByCollectionUser = async function (collectionId, userId, el
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 
 }
@@ -941,7 +949,7 @@ exports.getStigsByCollection = async function( collectionId, elevate, userObject
     // return (rows[0].stigs)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 
 }
@@ -959,7 +967,7 @@ exports.replaceCollection = async function( collectionId, body, projection, user
     return (row)
   } 
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -969,7 +977,7 @@ exports.setStigAssetsByCollectionUser = async function (collectionId, userId, st
     return (row)
   } 
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -986,7 +994,7 @@ exports.updateCollection = async function( collectionId, body, projection, userO
     return (row)
   } 
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 

@@ -414,7 +414,7 @@ exports.addOrUpdateAsset = async function (writeAction, assetId, body, projectio
     return row
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }  
 }
 
@@ -910,7 +910,7 @@ exports.deleteAsset = async function(assetId, projection, elevate, userObject) {
     return (rows[0])
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -924,7 +924,7 @@ exports.attachStigToAsset = async function (assetId, benchmarkId, elevate, userO
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -938,7 +938,7 @@ exports.removeStigFromAsset = async function (assetId, benchmarkId, elevate, use
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -950,7 +950,7 @@ exports.removeStigsFromAsset = async function (assetId, elevate, userObject ) {
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -959,7 +959,7 @@ exports.deleteAssetStigGrant = async function (assetId, benchmarkId, userId, ele
     // TODO
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -977,7 +977,7 @@ exports.getAsset = async function(assetId, projection, elevate, userObject) {
   return (rows[0])
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -1002,7 +1002,7 @@ exports.getAssets = async function(collectionId, name, nameMatch, benchmarkId, m
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -1014,7 +1014,7 @@ exports.getStigsByAsset = async function (assetId, elevate, userObject ) {
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 
 }
@@ -1028,7 +1028,7 @@ exports.getUsersByAssetStig = async function (assetId, benchmarkId, elevate, use
     return (rows)
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -1049,7 +1049,7 @@ exports.getChecklistByAssetStig = async function(assetId, benchmarkId, revisionS
     }
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -1062,7 +1062,7 @@ exports.getChecklistByAsset = async function(assetId, benchmarks, format, elevat
     }
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -1077,7 +1077,7 @@ exports.getAssetsByStig = async function( collectionId, benchmarkId, projection,
 
   }
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -1146,7 +1146,7 @@ exports.updateAsset = async function( assetId, body, projection, elevate, userOb
     return (row)
   } 
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }
 
@@ -1164,6 +1164,6 @@ exports.replaceAsset = async function( assetId, body, projection, elevate, userO
     return (row)
   } 
   catch (err) {
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
 }

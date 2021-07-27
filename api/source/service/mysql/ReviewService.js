@@ -269,7 +269,7 @@ exports.deleteReviewByAssetRule = async function(assetId, ruleId, projection, us
     if (typeof connection !== 'undefined') {
       await connection.rollback()
     }    
-    throw ( writer.respondWithCode ( 500, {message: err.message, stack: err.stack} ) );
+    throw ( {status: 500, message: err.message, stack: err.stack} ) ;
   }
   finally {
     if (typeof connection !== 'undefined') {
@@ -391,7 +391,7 @@ exports.putReviewByAssetRule = async function(projection, assetId, ruleId, body,
     if (typeof connection !== 'undefined') {
       await connection.rollback()
     }
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
   finally {
     if (typeof connection !== 'undefined') {
@@ -495,7 +495,7 @@ exports.putReviewsByAsset = async function( assetId, reviews, userObject) {
     if (typeof connection !== 'undefined') {
       await connection.rollback()
     }
-    throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+    throw ( {status: 500, message: err.message, stack: err.stack} )
   }
   finally {
     if (typeof connection !== 'undefined') {
@@ -626,7 +626,7 @@ exports.patchReviewByAssetRule = async function(projection, assetId, ruleId, bod
       throw(err)
     }
     else {
-      throw ( writer.respondWithCode ( 500, {message: err.message,stack: err.stack} ) )
+      throw ( {status: 500, message: err.message, stack: err.stack} )
     }
   }
   finally {

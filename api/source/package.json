@@ -20,6 +20,7 @@
     "connect": "^3.7.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-openapi-validator": "^4.12.14",
     "fast-xml-parser": "^3.17.4",
     "got": "^11.8.2",
     "he": "^1.2.0",
