@@ -16,7 +16,8 @@ module.exports.testConnection = async function () {
     return result[0].version
   }
   catch (err) {
-    // console.log(err.message)
+    console.log(err.message)
+    console.log(err.stack)
     throw (err)
   }
 }
@@ -62,6 +63,7 @@ module.exports.initializeDatabase = async function () {
 
     // Create the connection pool
     const poolConfig = getPoolConfig()
+    console.log(poolConfig)
     _this.pool = mysql.createPool(poolConfig)
     // Set common session variables
     _this.pool.on('connection', function (connection) {
@@ -78,6 +80,7 @@ module.exports.initializeDatabase = async function () {
         process.exit(0);
       } catch(err) {
         console.error(err.message);
+        console.log(err.message);
         process.exit(1);
       }
     }   
@@ -92,7 +95,7 @@ module.exports.initializeDatabase = async function () {
       minTimeout: 5 * 1000,
       maxTimeout: 5 * 1000,
       onRetry: (error) => {
-        console.log(`[DB] ${error.message}`)
+        console.log(`[DB] ${error.message} ${error.stack}`)
       }
     })
     console.log('[DB] Preflight connection succeeded.')
@@ -143,6 +146,8 @@ module.exports.initializeDatabase = async function () {
 
   }
   catch (err) {
+    console.log(err.message);
+    console.log(err.stack);
     throw (err)
   }  
 }
