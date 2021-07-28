@@ -28,6 +28,7 @@ USER node
 
 # Install app dependencies
 COPY --chown=node:node ./api/source .
+RUN npm install -g npm      
 RUN npm ci
 
 RUN mkdir client

@@ -53,11 +53,6 @@ jobs:
           -e STIGMAN_API_AUTHORITY=http://localhost:8080/auth/realms/stigman \
           stig-manager
       -
-        name: update npm
-        id: npm-update
-        run: |
-          sudo npm install -g npm@latest      
-      -
         name: Install Newman reporter
         id: newman-reporter-install
         run: |
