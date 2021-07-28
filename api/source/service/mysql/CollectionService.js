@@ -9,8 +9,6 @@ const _this = this
 Generalized queries for collection(s).
 **/
 exports.queryCollections = async function (inProjection = [], inPredicates = {}, elevate = false, userObject) { 
-  try {
-    // throw ({status: 500, message: "test!"})
     let context
     if (userObject.privileges.globalAccess || elevate) {
       context = dbUtils.CONTEXT_ALL
@@ -187,173 +185,162 @@ exports.queryCollections = async function (inProjection = [], inPredicates = {},
     
     let [rows] = await dbUtils.pool.query(sql, predicates.binds)
     return (rows)
-  }
-  // catch (err) {
-  //   throw err
-  // }
-  finally{}  
 }
 
 exports.queryFindings = async function (aggregator, inProjection = [], inPredicates = {}, userObject) {
-  try {
-    let context
-    if (userObject.privileges.globalAccess) {
-      context = dbUtils.CONTEXT_ALL
-    } else {
-      context = dbUtils.CONTEXT_USER
-    }
-
-    let columns, groupBy, orderBy
-    switch (aggregator) {
-      case 'ruleId':
-        columns = [
-          'ru.ruleId',
-          'ru.title',
-          'ru.severity',
-          'count(distinct a.assetId) as assetCount'
-        ]
-        groupBy = [
-          'ru.ruleId',
-          'ru.title',
-          'ru.severity'
-        ]
-        orderBy = 'ru.ruleId'
-        break
-      case 'groupId':
-        columns = [
-          'g.groupId',
-          'g.title',
-          'g.severity',
-          'count(distinct a.assetId) as assetCount'
-        ]
-        groupBy = [
-          'g.groupId',
-          'g.title',
-          'g.severity'
-        ]
-        orderBy = 'substring(g.groupId from 3) + 0'
-        break
-      case 'cci':
-        columns = [
-          'cci.cci',
-          'cci.definition',
-          'cci.apAcronym',
-          'count(distinct a.assetId) as assetCount'
-        ]
-        groupBy = [
-          'cci.cci',
-          'cci.definition',
-          'cci.apAcronym'
-        ]
-        orderBy = 'cci.cci'
-        break
-    }
-    let joins = [
-      'collection c',
-      'left join collection_grant cg on c.collectionId = cg.collectionId',
-      'left join asset a on c.collectionId = a.collectionId',
-      'inner join stig_asset_map sa on a.assetId = sa.assetId',
-      'left join user_stig_asset_map usa on sa.saId = usa.saId',
-      'inner join current_group_rule cgr on sa.benchmarkId = cgr.benchmarkId',
-      'inner join current_rev cr on sa.benchmarkId = cr.benchmarkId',
-      'inner join review rv on (cgr.ruleId = rv.ruleId and a.assetId = rv.assetId and rv.resultId = 4)',
-      'inner join `group` g on cgr.groupId = g.groupId',
-      'inner join rule ru on rv.ruleId = ru.ruleId',
-      'left join rule_cci_map rulecci on ru.ruleId = rulecci.ruleId',
-      'left join cci on rulecci.cci = cci.cci'
-    ]
-
-    // PROJECTIONS
-    
-    // Not exposed in API, used internally
-    if (inProjection.includes('rulesWithDiscussion')) {
-      columns.push(`cast(concat('[', group_concat(distinct json_object (
-        'ruleId', ru.ruleId,
-        'title', ru.title,
-        'severity', ru.severity,
-        'vulnDiscussion', ru.vulnDiscussion) order by ru.ruleId), ']') as json) as "rules"`)
-    }
-    // Not exposed in API, used internally
-    if (inProjection.includes('stigsInfo')) {
-      columns.push(`cast( concat( '[', group_concat(distinct json_object (
-        'benchmarkId', cr.benchmarkId,
-        'version', cr.version,
-        'release', cr.release,
-        'benchmarkDate', cr.benchmarkDate) order by cr.benchmarkId), ']') as json) as "stigsInfo"`)
-    }
-    if (inProjection.includes('rules')) {
-      columns.push(`cast(concat('[', group_concat(distinct json_object (
-        'ruleId', ru.ruleId,
-        'title', ru.title,
-        'severity', ru.severity) order by ru.ruleId), ']') as json) as "rules"`)
-    }
-    if (inProjection.includes('groups')) {
-      columns.push(`cast(concat('[', group_concat(distinct json_object (
-        'groupId', g.groupId,
-        'title', g.title,
-        'severity', g.severity) order by g.groupId), ']') as json) as "groups"`)
-    }
-    if (inProjection.includes('assets')) {
-      columns.push(`cast(concat('[', group_concat(distinct json_object (
-        'assetId', CAST(a.assetId as char),
-        'name', a.name) order by a.name), ']') as json) as "assets"`)
-    }
-    if (inProjection.includes('stigs')) {
-      columns.push(`cast( concat( '[', group_concat(distinct concat('"',cgr.benchmarkId,'"')), ']' ) as json ) as "stigs"`)
-    }
-    if (inProjection.includes('ccis')) {
-      columns.push(`cast(concat('[', group_concat(distinct json_object (
-        'cci', rulecci.cci,
-        'definition', cci.definition,
-        'apAcronym', cci.apAcronym) order by rulecci.cci), ']') as json) as "ccis"`)
-    }
-
-
-    // PREDICATES
-    let predicates = {
-      statements: [],
-      binds: []
-    }
-    
-    // collectionId predicate is mandatory per API spec
-    if ( inPredicates.collectionId ) {
-      predicates.statements.push('c.collectionId = ?')
-      predicates.binds.push( inPredicates.collectionId )
-    }
-    if ( inPredicates.assetId ) {
-      predicates.statements.push('a.assetId = ?')
-      predicates.binds.push( inPredicates.assetId )
-    }
-    if ( inPredicates.acceptedOnly ) {
-      predicates.statements.push('rv.statusId = ?')
-      predicates.binds.push( 3 )
-    }
-    if ( inPredicates.benchmarkId ) {
-      predicates.statements.push('cgr.benchmarkId = ?')
-      predicates.binds.push( inPredicates.benchmarkId )
-    }
-    if (context == dbUtils.CONTEXT_USER) {
-      predicates.statements.push('(cg.userId = ? AND CASE WHEN cg.accessLevel = 1 THEN usa.userId = cg.userId ELSE TRUE END)')
-      predicates.binds.push( userObject.userId, userObject.userId )
-    }
-    // CONSTRUCT MAIN QUERY
-    let sql = 'SELECT '
-    sql+= columns.join(",\n")
-    sql += '\nFROM '
-    sql+= joins.join(" \n")
-    if (predicates.statements.length > 0) {
-      sql += "\nWHERE " + predicates.statements.join(" and ")
-    }
-    sql += '\ngroup by ' + groupBy.join(',')
-    sql += '\norder by ' + orderBy
-    
-    let [rows] = await dbUtils.pool.query(sql, predicates.binds)
-    return (rows)
+  let context
+  if (userObject.privileges.globalAccess) {
+    context = dbUtils.CONTEXT_ALL
+  } else {
+    context = dbUtils.CONTEXT_USER
   }
-  // catch (err) {
-  //   throw err
-  // }
-  finally {}
+
+  let columns, groupBy, orderBy
+  switch (aggregator) {
+    case 'ruleId':
+      columns = [
+        'ru.ruleId',
+        'ru.title',
+        'ru.severity',
+        'count(distinct a.assetId) as assetCount'
+      ]
+      groupBy = [
+        'ru.ruleId',
+        'ru.title',
+        'ru.severity'
+      ]
+      orderBy = 'ru.ruleId'
+      break
+    case 'groupId':
+      columns = [
+        'g.groupId',
+        'g.title',
+        'g.severity',
+        'count(distinct a.assetId) as assetCount'
+      ]
+      groupBy = [
+        'g.groupId',
+        'g.title',
+        'g.severity'
+      ]
+      orderBy = 'substring(g.groupId from 3) + 0'
+      break
+    case 'cci':
+      columns = [
+        'cci.cci',
+        'cci.definition',
+        'cci.apAcronym',
+        'count(distinct a.assetId) as assetCount'
+      ]
+      groupBy = [
+        'cci.cci',
+        'cci.definition',
+        'cci.apAcronym'
+      ]
+      orderBy = 'cci.cci'
+      break
+  }
+  let joins = [
+    'collection c',
+    'left join collection_grant cg on c.collectionId = cg.collectionId',
+    'left join asset a on c.collectionId = a.collectionId',
+    'inner join stig_asset_map sa on a.assetId = sa.assetId',
+    'left join user_stig_asset_map usa on sa.saId = usa.saId',
+    'inner join current_group_rule cgr on sa.benchmarkId = cgr.benchmarkId',
+    'inner join current_rev cr on sa.benchmarkId = cr.benchmarkId',
+    'inner join review rv on (cgr.ruleId = rv.ruleId and a.assetId = rv.assetId and rv.resultId = 4)',
+    'inner join `group` g on cgr.groupId = g.groupId',
+    'inner join rule ru on rv.ruleId = ru.ruleId',
+    'left join rule_cci_map rulecci on ru.ruleId = rulecci.ruleId',
+    'left join cci on rulecci.cci = cci.cci'
+  ]
+
+  // PROJECTIONS
+  
+  // Not exposed in API, used internally
+  if (inProjection.includes('rulesWithDiscussion')) {
+    columns.push(`cast(concat('[', group_concat(distinct json_object (
+      'ruleId', ru.ruleId,
+      'title', ru.title,
+      'severity', ru.severity,
+      'vulnDiscussion', ru.vulnDiscussion) order by ru.ruleId), ']') as json) as "rules"`)
+  }
+  // Not exposed in API, used internally
+  if (inProjection.includes('stigsInfo')) {
+    columns.push(`cast( concat( '[', group_concat(distinct json_object (
+      'benchmarkId', cr.benchmarkId,
+      'version', cr.version,
+      'release', cr.release,
+      'benchmarkDate', cr.benchmarkDate) order by cr.benchmarkId), ']') as json) as "stigsInfo"`)
+  }
+  if (inProjection.includes('rules')) {
+    columns.push(`cast(concat('[', group_concat(distinct json_object (
+      'ruleId', ru.ruleId,
+      'title', ru.title,
+      'severity', ru.severity) order by ru.ruleId), ']') as json) as "rules"`)
+  }
+  if (inProjection.includes('groups')) {
+    columns.push(`cast(concat('[', group_concat(distinct json_object (
+      'groupId', g.groupId,
+      'title', g.title,
+      'severity', g.severity) order by g.groupId), ']') as json) as "groups"`)
+  }
+  if (inProjection.includes('assets')) {
+    columns.push(`cast(concat('[', group_concat(distinct json_object (
+      'assetId', CAST(a.assetId as char),
+      'name', a.name) order by a.name), ']') as json) as "assets"`)
+  }
+  if (inProjection.includes('stigs')) {
+    columns.push(`cast( concat( '[', group_concat(distinct concat('"',cgr.benchmarkId,'"')), ']' ) as json ) as "stigs"`)
+  }
+  if (inProjection.includes('ccis')) {
+    columns.push(`cast(concat('[', group_concat(distinct json_object (
+      'cci', rulecci.cci,
+      'definition', cci.definition,
+      'apAcronym', cci.apAcronym) order by rulecci.cci), ']') as json) as "ccis"`)
+  }
+
+
+  // PREDICATES
+  let predicates = {
+    statements: [],
+    binds: []
+  }
+  
+  // collectionId predicate is mandatory per API spec
+  if ( inPredicates.collectionId ) {
+    predicates.statements.push('c.collectionId = ?')
+    predicates.binds.push( inPredicates.collectionId )
+  }
+  if ( inPredicates.assetId ) {
+    predicates.statements.push('a.assetId = ?')
+    predicates.binds.push( inPredicates.assetId )
+  }
+  if ( inPredicates.acceptedOnly ) {
+    predicates.statements.push('rv.statusId = ?')
+    predicates.binds.push( 3 )
+  }
+  if ( inPredicates.benchmarkId ) {
+    predicates.statements.push('cgr.benchmarkId = ?')
+    predicates.binds.push( inPredicates.benchmarkId )
+  }
+  if (context == dbUtils.CONTEXT_USER) {
+    predicates.statements.push('(cg.userId = ? AND CASE WHEN cg.accessLevel = 1 THEN usa.userId = cg.userId ELSE TRUE END)')
+    predicates.binds.push( userObject.userId, userObject.userId )
+  }
+  // CONSTRUCT MAIN QUERY
+  let sql = 'SELECT '
+  sql+= columns.join(",\n")
+  sql += '\nFROM '
+  sql+= joins.join(" \n")
+  if (predicates.statements.length > 0) {
+    sql += "\nWHERE " + predicates.statements.join(" and ")
+  }
+  sql += '\ngroup by ' + groupBy.join(',')
+  sql += '\norder by ' + orderBy
+  
+  let [rows] = await dbUtils.pool.query(sql, predicates.binds)
+  return (rows)
 }
 
 exports.queryStatus = async function (inPredicates = {}, userObject) {
@@ -473,8 +460,6 @@ exports.queryStigAssets = async function (inProjection = [], inPredicates = {}, 
       predicates.binds.push( inPredicates.collectionId )
     } else {
       throw ( {status: 400, message: 'Missing required predicate: collectionId'} )
-
-      // throw ('Missing required predicate: collectionId')
     }
     if ( inPredicates.userId ) {
       joins.push('left join user_stig_asset_map usa on sa.saId = usa.saId')
@@ -794,7 +779,7 @@ exports.getChecklistByCollectionStig = async function (collectionId, benchmarkId
     // for (const row of rows) {
     //   row.autoCheckAvailable = row.autoCheckAvailable === 1 ? true : false
     // }
-    return (rows.length > 0 ? rows : null)
+    return (rows)
   }
   catch (err) {
     throw ( {status: 500,  message: err.message, stack: err.stack })

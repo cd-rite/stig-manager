@@ -12,8 +12,8 @@ var client
 
 const roleGetter = new Function("obj", "return obj?." + config.oauth.claims.roles + " || [];");
 
-const verifyRequest = async function (req, requiredScopes, securityDefinition, cb) {
-    try {
+const verifyRequest = async function (req, requiredScopes, securityDefinition) {
+    // try {
         let token = getBearerToken(req)
         if (!token) {
             throw({status: 401, message: 'OIDC bearer token must be provided'})
@@ -81,7 +81,7 @@ const verifyRequest = async function (req, requiredScopes, securityDefinition, c
             // cb()
             return true;
         }
-    }
+    // }
     // catch (err) {
     //     if (err.name === 'SmError') {
     //         writer.writeJson(req.res, { status: err.httpStatus, message: err.message }, err.httpStatus)
@@ -90,12 +90,9 @@ const verifyRequest = async function (req, requiredScopes, securityDefinition, c
     //         writer.writeJson(req.res, { status: 500, message: err.message }, 500)
     //     }
     // }
-    finally{}
+    // finally{}
 }
 
-async function refreshUserData (userId, token) {
-
-}
 
 const verifyAndDecodeToken = promisify(jwt.verify)
 

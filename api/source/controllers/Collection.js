@@ -79,9 +79,7 @@ module.exports.getChecklistByCollectionStig = async function getChecklistByColle
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
     if ( collectionGrant || req.userObject.privileges.globalAccess ) {
       const response = await Collection.getChecklistByCollectionStig(collectionId, benchmarkId, revisionStr, req.userObject )
-      // res.json(response)
-      //204 or 403 for lvl1 with no access, here?
-      res.status(response == null ? 204 : 200).json(response)
+      res.json(response)
     }
     else {
       throw({status: 403, message: 'User has insufficient privilege to complete this request.'})

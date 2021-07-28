@@ -73,51 +73,17 @@ let options = {
 let spec = fs.readFileSync(path.join(__dirname,'./specification/stig-manager.yaml'), 'utf8')
 let oasDoc = jsyaml.safeLoad(spec)
 oasDoc.info.version = config.version
-// oas-tools uses x-name property of requestBody to set name of the body parameter
-// oas-tools uses x-swagger-router-controller property to determine the controller
-// Set x-swagger-router-controller based on the first tag of each path/method
-// for (const path in oasDoc.paths) {
-//   for (const method in oasDoc.paths[path]) {
-//     if (Array.isArray(oasDoc.paths[path][method].tags)) {
-//       oasDoc.paths[path][method]['x-swagger-router-controller'] = oasDoc.paths[path][method].tags[0]
-//     }  
-//     if (oasDoc.paths[path][method].requestBody) {
-//       oasDoc.paths[path][method].requestBody['x-name'] = 'body'
-//     }
-//   }
-// }
 
-// Replace host with environmental values
+// Replace host with config values
 oasDoc.servers[0].url = config.swaggerUi.server
 oasDoc.components.securitySchemes.oauth.flows.implicit.authorizationUrl = `${config.swaggerUi.authority}/protocol/openid-connect/auth`
 
-const apiSpec = path.join(__dirname, './specification/stig-manager.yaml');
-
-// Initialize the Swagger middleware
-// oasTools.configure(options)
-// oasTools.initialize(oasDoc, app, function () {
-//   run()
-// })
-
-// var moveQueryToSwaggerParams = function (req, res, next) {
-//   req.swagger = {
-//     get params() {
-//       let aggParams = {...req.query, ...req.params, ...req.headers}
-//       aggParams.body = req.body
-//       return aggParams
-//     }
-//   }
-//   // req.swagger.params.body = req.body
-//   next()
-// }
-
-// app.use(moveQueryToSwaggerParams)
-
+const apiSpecPath = path.join(__dirname, './specification/stig-manager.yaml');
 
 //  2. Install the OpenApiValidator middleware
 app.use(
   openApiMiddleware({
-    apiSpec,
+    apiSpec: apiSpecPath,
     validateRequests: {
       coerceTypes: true,
       allowUnknownQueryParameters: false,
@@ -148,12 +114,14 @@ app.use(
         oauth: auth.verifyRequest 
       }
     },
-    fileUploader: { 
-      storage: storage,
-      limits: {
-        fileSize: parseInt(config.http.maxUpload)
-      }
-     }
+    fileUploader: false
+    //   fileUploader: { 
+    //     storage: storage,
+    //   limits: {
+    //     fileSize: parseInt(config.http.maxUpload),
+    //     files: 1
+    //   }
+    //  }
   }),
 );
 
@@ -193,14 +161,6 @@ async function run() {
           res.send(oasDoc);
       })
     }
-    // app.use((err, req, res, next) => {
-    //   if (err) {
-    //     console.log('Invalid Request data')
-    //     writer.writeJson(res, writer.respondWithCode ( 400, {message: err.message} ))
-    //   } else {
-    //     next()
-    //   }
-    // })
     startServer(app)
   }
   catch (err) {
