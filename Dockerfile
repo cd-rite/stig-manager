@@ -24,11 +24,12 @@ LABEL commit-tag=${COMMIT_TAG}
 LABEL commit-describe=${COMMIT_DESCRIBE}
 
 WORKDIR /home/node
+USER root
+RUN npm install -g npm@latest      
 USER node
 
 # Install app dependencies
 COPY --chown=node:node ./api/source .
-RUN npm install -g npm      
 RUN npm ci
 
 RUN mkdir client
