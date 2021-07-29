@@ -5,7 +5,6 @@ const http = require('http')
 const express = require('express')
 const cors = require('cors');
 const morgan = require('morgan')
-// const oasTools = require('oas-tools')
 const config = require('./utils/config')
 const auth = require('./utils/auth')
 const swaggerUi = require('swagger-ui-express')
@@ -23,6 +22,11 @@ const {
 
 
 console.log(`Starting STIG Manager ${config.version}`)
+
+//Catch unhandled errors. (Specicially here to address mysql2 startup issue where additional error is thrown  due to uncleared timer when trying to connect during mysql container startup)
+process.on('uncaughtException', (err, origin) => {
+  console.log(`Uncaught ${err} from ${origin}`)
+})
 
 // Express config
 const app = express();
