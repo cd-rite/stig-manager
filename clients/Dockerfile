@@ -1,4 +1,4 @@
-FROM nginx:1.16.1
+FROM nginx:1.20
 LABEL maintainer="carl.a.smigielski@saic.com"
 ARG COMMIT_BRANCH="master"
 ARG COMMIT_SHA=""
