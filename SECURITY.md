@@ -18,4 +18,6 @@ We are grateful for anyone reporting a vulnerability, helping us to make STIG Ma
 - If you want to report a non-critical bug, write to  xxxxxxxxxxx@xxxx.com or open an issue on github.
 - This is an open source project. If you discover a bug and fix it, you are very welcome to submit a PR. You will be rewarded with the everlasting gratitude of the STIGMan team and the community!
 
-Thanks for managing your STIGs with STIG Manager!
+## Securing STIG Manager
+
+Please see the Security page in our Documentation: 
