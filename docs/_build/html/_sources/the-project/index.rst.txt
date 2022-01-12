@@ -26,6 +26,8 @@ These pages describe the STIG Manager project.
 	requirements-and-dependencies
 	clients
 	related-repos
+	api-docs
+	api-redoc
 	DockerHub_Readme.md
 
 

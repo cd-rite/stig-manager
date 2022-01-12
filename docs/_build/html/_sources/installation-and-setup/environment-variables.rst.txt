@@ -23,8 +23,8 @@ STIG Manager is configured via its Environment Variables:
      - **Default** ``0.0.0.0`` The IP address on which the the API server will listen 
      - API
    * - STIGMAN_API_AUTHORITY
-     - **Deprecated** and will be removed soon. Use ``STIGMAN_OIDC_PROVIDER`` 
-     - Deprecated
+     - **Removed**  Use ``STIGMAN_OIDC_PROVIDER`` 
+     - Removed
    * - STIGMAN_API_MAX_JSON_BODY
      - **Default** ``5242880``   The maximum size in bytes of the request body when Content-Type is application/json
      - API
@@ -53,14 +53,14 @@ STIG Manager is configured via its Environment Variables:
      - **Default** ``stig-manager`` The OIDC clientId of the web client
      - Client
    * - STIGMAN_CLIENT_KEYCLOAK_AUTH
-     - **Deprecated** and will be removed soon. Use ``STIGMAN_CLIENT_OIDC_PROVIDER``
-     - Deprecated
+     - **Removed**  Use ``STIGMAN_CLIENT_OIDC_PROVIDER``
+     - Removed
    * - STIGMAN_CLIENT_KEYCLOAK_CLIENTID
-     - **Deprecated** and will be removed soon. Use ``STIGMAN_CLIENT_ID`` 
-     - Deprecated
+     - **Removed**  Use ``STIGMAN_CLIENT_ID`` 
+     - Removed
    * - STIGMAN_CLIENT_KEYCLOAK_REALM
-     - **Deprecated** and will be removed soon. Use ``STIGMAN_CLIENT_OIDC_PROVIDER`` 
-     - Deprecated
+     - **Removed**  Use ``STIGMAN_CLIENT_OIDC_PROVIDER`` 
+     - Removed
    * - STIGMAN_CLIENT_OIDC_PROVIDER
      - **Default** Value of ``STIGMAN_OIDC_PROVIDER`` Client override of the base URL of the OIDC provider issuing signed JWTs for the API.  The string ``/.well-known/openid-configuration`` will be appended by the client when fetching metadata.
      - Client 
@@ -119,8 +119,8 @@ STIG Manager is configured via its Environment Variables:
      - **Default** ``realm_access.roles`` The access token claim whose value is the user’s privileges 
      - API, Client
    * - STIGMAN_JWT_ROLES_CLAIM
-     - **Deprecated** and will be removed soon. Use ``STIGMAN_JWT_PRIVILEGES_CLAIM`` 
-     - Deprecated
+     - **Removed**  Use ``STIGMAN_JWT_PRIVILEGES_CLAIM`` 
+     - Removed
    * - STIGMAN_JWT_SERVICENAME_CLAIM
      - **Default** ``clientId`` The access token claim whose value is the user's client
      - API, Client
@@ -140,8 +140,8 @@ STIG Manager is configured via its Environment Variables:
      - **Default** ``http://localhost:8080/auth/realms/stigman``  The base URL of the OIDC provider issuing signed JWTs for the API.  The string ``/.well-known/openid-configuration`` will be appended when fetching metadata.
      - API, Client     
    * - STIGMAN_SWAGGER_AUTHORITY
-     - **Deprecated** and will be removed soon. Use STIGMAN_SWAGGER_OIDC_PROVIDER 
-     - Deprecated
+     - **Removed**  Use STIGMAN_SWAGGER_OIDC_PROVIDER 
+     - Removed
    * - STIGMAN_SWAGGER_ENABLED
      - **Default** ``false`` Whether to enable the SwaggerUI SPA at /api-docs 
      - API

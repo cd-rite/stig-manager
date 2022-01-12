@@ -1,0 +1,2221 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>STIG Manager API Definition &mdash; STIG Manager  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinxcontrib-images\LightBox2\lightbox2\dist\css\lightbox.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinxcontrib-images\LightBox2\lightbox2\dist\js\lightbox-plus-jquery.min.js"></script>
+        <script src="../_static/sphinxcontrib-images\LightBox2\lightbox2-customize\jquery-noconflict.js"></script>
+        <script src="../_static/js/custom.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="STIG Manager API Redoc" href="api-redoc.html" />
+    <link rel="prev" title="STIG Manager Accessories" href="related-repos.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> STIG Manager
+          
+
+          
+            
+            <img src="../_static/shield-green-check.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../features/index.html">Introduction and Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation-and-setup/index.html">Setup and Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user-guide/index.html">For Users</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin-guide/index.html">For Admins</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">The STIG Manager Project</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">STIG Manager Contribution Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html">STIG Manager Testing Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">STIG Manager Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples and Sample Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="requirements-and-dependencies.html">STIG Manager Requirements and Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clients.html">STIG Manager Clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="related-repos.html">STIG Manager Accessories</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">STIG Manager API Definition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api-redoc.html">STIG Manager API Redoc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DockerHub_Readme.html">STIG Manager OSS on Docker Hub</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#stig-manager-is-an-active-open-source-project-maintained-by-nuwcdivnpt">STIG Manager is an active, Open Source project maintained by NUWCDIVNPT</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Terminology and Concepts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Common Tasks:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html">Build A Collection with .ckl or XCCDF Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#review-a-stig-on-an-asset">Review a STIG on an Asset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#review-an-entire-collection-at-once">Review an entire Collection at once</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#accept-and-reject-stig-reviews">Accept and Reject STIG Reviews</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#analyze-findings-and-generate-a-poa-m">Analyze Findings and Generate a POA&amp;M</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#check-evaluation-progress">Check Evaluation Progress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#add-users">Add Users</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#export-accepted-results">Export Accepted Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#transfer-assets-to-another-collection">Transfer Assets to Another Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#update-stigs">Update STIGs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features/common-tasks.html#having-a-problem-let-us-know-and-submit-an-issue-on-github">Having a problem? Let us know and submit an issue on GitHub!</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">STIG Manager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">The STIG Manager Project</a> &raquo;</li>
+        
+      <li>STIG Manager API Definition</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/the-project/api-docs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="api-redoc.html" class="btn btn-neutral float-right" title="STIG Manager API Redoc" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+      
+      
+        <a href="related-repos.html" class="btn btn-neutral float-left" title="STIG Manager Accessories" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="stig-manager-api-definition">
+<span id="api-docs"></span><h1>STIG Manager API Definition<a class="headerlink" href="#stig-manager-api-definition" title="Permalink to this headline">¶</a></h1>
+<p>STIG Manager implements the OpenAPI 3.0.1 Definition shown here. Check the repository for more details: <a class="reference external" href="https://github.com/NUWCDIVNPT/stig-manager/blob/main/api/source/specification/stig-manager.yaml">STIG Manager OSS OpenAPI definition</a> .</p>
+<dl class="http get">
+<dt class="sig sig-object http" id="get--assets">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/assets</span></span><a class="headerlink" href="#get--assets" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a list of Assets accessible to the requester</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – Selects Assets mapped to a Collection
+(Required)</p></li>
+<li><p><strong>name</strong> (<em>string</em>) – Matches against the name according to the <cite>name-match</cite> parameter</p></li>
+<li><p><strong>name-match</strong> (<em>string</em>) – How to match against the <cite>name</cite> parameter</p></li>
+<li><p><strong>metadata</strong> (<em>array</em>) – A query parameter that specifies metadata key:value pairs to select matching Objects</p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – Selects Assets mapped to a STIG</p></li>
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – AssetProjected array response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--assets">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/assets</span></span><a class="headerlink" href="#post--assets" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Create an Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2">201 Created</a></span> – AssetProjected response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Client Error</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--assets-assetId">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}</span></span><a class="headerlink" href="#get--assets-assetId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return an Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – AssetProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http patch">
+<dt class="sig sig-object http" id="patch--assets-assetId">
+<span class="sig-name descname"><span class="pre">PATCH</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}</span></span><a class="headerlink" href="#patch--assets-assetId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Merge provided properties with an Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – AssetProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--assets-assetId">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}</span></span><a class="headerlink" href="#put--assets-assetId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set all properties of an Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – AssetProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--assets-assetId">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}</span></span><a class="headerlink" href="#delete--assets-assetId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Delete an Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – AssetProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--assets-assetId-checklists">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/checklists</span></span><a class="headerlink" href="#get--assets-assetId-checklists" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a multi-STIG CKL for an Asset and its mapped STIGs</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>array</em>) – Identifies a STIG. Default is all mapped STIGs.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Review response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--assets-assetId-checklists-benchmarkId-revisionStr">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/checklists/{benchmarkId}/{revisionStr}</span></span><a class="headerlink" href="#get--assets-assetId-checklists-benchmarkId-revisionStr" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return JSON or a CKL file for an Asset and STIG</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+<li><p><strong>revisionStr</strong> (<em>string</em>) – A path parameter that identifies a STIG revision [ V{version_num}R{release_num} | ‘latest’ ]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>format</strong> (<em>string</em>) – The format of the response. Default if missing is ‘json’</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Review response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--assets-assetId-metadata">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/metadata</span></span><a class="headerlink" href="#get--assets-assetId-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the metadata for Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Metadata response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http patch">
+<dt class="sig sig-object http" id="patch--assets-assetId-metadata">
+<span class="sig-name descname"><span class="pre">PATCH</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/metadata</span></span><a class="headerlink" href="#patch--assets-assetId-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Merge the provided object to a Assetmetadata</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Metadata response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--assets-assetId-metadata">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/metadata</span></span><a class="headerlink" href="#put--assets-assetId-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set a Asset metadata to the provided object</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Metadata response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--assets-assetId-metadata-keys">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/metadata/keys</span></span><a class="headerlink" href="#get--assets-assetId-metadata-keys" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the keys of the provided Asset’s metadata</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – MetadataKeys response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--assets-assetId-metadata-keys-key">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/metadata/keys/{key}</span></span><a class="headerlink" href="#get--assets-assetId-metadata-keys-key" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the value of the provided Asset metadata key</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – A path parameter that specifies a metadata key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – MetadataValue response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--assets-assetId-metadata-keys-key">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/metadata/keys/{key}</span></span><a class="headerlink" href="#put--assets-assetId-metadata-keys-key" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set the value of the provided Asset metadata key to the provided string</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – A path parameter that specifies a metadata key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.5">204 No Content</a></span> – Empty to avoid large response after putting key with large value</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--assets-assetId-metadata-keys-key">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/metadata/keys/{key}</span></span><a class="headerlink" href="#delete--assets-assetId-metadata-keys-key" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Remove the provided Asset metadata key</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – A path parameter that specifies a metadata key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.5">204 No Content</a></span> – Empty to avoid large response after deleteing key with large value</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--assets-assetId-stigs">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/stigs</span></span><a class="headerlink" href="#get--assets-assetId-stigs" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return an Asset’s STIG assignments</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – STIG array response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--assets-assetId-stigs">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/stigs</span></span><a class="headerlink" href="#delete--assets-assetId-stigs" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Delete all STIG assignments to an Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – STIG array response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--assets-assetId-stigs-benchmarkId">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/stigs/{benchmarkId}</span></span><a class="headerlink" href="#put--assets-assetId-stigs-benchmarkId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Assign a STIG to an Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – STIG array response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--assets-assetId-stigs-benchmarkId">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/assets/{assetId}/stigs/{benchmarkId}</span></span><a class="headerlink" href="#delete--assets-assetId-stigs-benchmarkId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Delete a STIG assignment to an Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – STIG array response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections</span></span><a class="headerlink" href="#get--collections" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a list of Collections accessible to the requester</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>string</em>) – Matches against the name according to the <cite>name-match</cite> parameter</p></li>
+<li><p><strong>name-match</strong> (<em>string</em>) – How to match against the <cite>name</cite> parameter</p></li>
+<li><p><strong>workflow</strong> (<em>string</em>) – Match Collections having a specific workflow.</p></li>
+<li><p><strong>metadata</strong> (<em>array</em>) – A query parameter that specifies metadata key:value pairs to select matching Objects</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CollectionsProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--collections">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/collections</span></span><a class="headerlink" href="#post--collections" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Create a Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2">201 Created</a></span> – CollectionProjected response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Client Error</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}</span></span><a class="headerlink" href="#get--collections-collectionId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CollectionProjected response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.5">204 No Content</a></span> – No Content</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http patch">
+<dt class="sig sig-object http" id="patch--collections-collectionId">
+<span class="sig-name descname"><span class="pre">PATCH</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}</span></span><a class="headerlink" href="#patch--collections-collectionId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Merge provided properties with a Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CollectionProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--collections-collectionId">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}</span></span><a class="headerlink" href="#put--collections-collectionId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set all properties of a Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CollectionProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--collections-collectionId">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}</span></span><a class="headerlink" href="#delete--collections-collectionId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Delete a Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CollectionProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-checklists-benchmarkId-revisionStr">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/checklists/{benchmarkId}/{revisionStr}</span></span><a class="headerlink" href="#get--collections-collectionId-checklists-benchmarkId-revisionStr" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the Checklist for the supplied Collection and STIG</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+<li><p><strong>revisionStr</strong> (<em>string</em>) – A path parameter that identifies a STIG revision [ V{version_num}R{release_num} | ‘latest’ ]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – ChecklistCollectionStig response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-findings">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/findings</span></span><a class="headerlink" href="#get--collections-collectionId-findings" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the Findings for the specified Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>aggregator</strong> (<em>string</em>) – Aggregate the findings on this property
+(Required)</p></li>
+<li><p><strong>acceptedOnly</strong> (<em>boolean</em>) – </p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A query parameter that identifies a STIG</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A query parameter that identifies an Asset</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Optional properties to return</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CollectionFinding response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-grants-userId-access">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/grants/{userId}/access</span></span><a class="headerlink" href="#get--collections-collectionId-grants-userId-access" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return an accessLevel = 1 User’s access to the specified Collection. Request must be made by a User with accessLevel &gt;= 3 to the Collection.</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>userId</strong> (<em>string</em>) – A path parameter that identifies a User</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Collection STIGAssetProjected array response</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – The requesting User does not have access rights to the content</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--collections-collectionId-grants-userId-access">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/grants/{userId}/access</span></span><a class="headerlink" href="#put--collections-collectionId-grants-userId-access" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set an accessLevel = 1 User’s access to the specified Collection. Request must be made by a User with accessLevel &gt;= 3 to the Collection.</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>userId</strong> (<em>string</em>) – A path parameter that identifies a User</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – StigAssetProjected array response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-poam">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/poam</span></span><a class="headerlink" href="#get--collections-collectionId-poam" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a POAM-like spreadsheet for the specified Collection aggregated by groupId</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>aggregator</strong> (<em>string</em>) – Aggregate the findings on this property
+(Required)</p></li>
+<li><p><strong>acceptedOnly</strong> (<em>boolean</em>) – </p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A query parameter that identifies a STIG</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A query parameter that identifies an Asset</p></li>
+<li><p><strong>date</strong> (<em>string</em>) – Value for columns Scheduled Completion Date, Milestone With Completion Dates, Milestone Changes</p></li>
+<li><p><strong>office</strong> (<em>string</em>) – Value for column Office/Org</p></li>
+<li><p><strong>status</strong> (<em>string</em>) – Value for column Status</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CollectionFinding response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-reviews">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews</span></span><a class="headerlink" href="#get--collections-collectionId-reviews" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a list of Reviews accessible to the requester</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>rules</strong> (<em>string</em>) – </p></li>
+<li><p><strong>result</strong> (<em>string</em>) – </p></li>
+<li><p><strong>status</strong> (<em>string</em>) – </p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – Selects Reviews of a Rule</p></li>
+<li><p><strong>groupId</strong> (<em>string</em>) – A query parameter that identifies a Group</p></li>
+<li><p><strong>cci</strong> (<em>string</em>) – A query parameter that identifies a CCI</p></li>
+<li><p><strong>userId</strong> (<em>string</em>) – A path parameter that identifies a User</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A query parameter that identifies an Asset</p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A query parameter that identifies a STIG</p></li>
+<li><p><strong>metadata</strong> (<em>array</em>) – A query parameter that specifies metadata key:value pairs to select matching Objects</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Review response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-reviews-assetId">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}</span></span><a class="headerlink" href="#get--collections-collectionId-reviews-assetId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a list of Reviews for an Asset</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>rules</strong> (<em>string</em>) – </p></li>
+<li><p><strong>result</strong> (<em>string</em>) – </p></li>
+<li><p><strong>status</strong> (<em>string</em>) – </p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A query parameter that identifies a STIG</p></li>
+<li><p><strong>metadata</strong> (<em>array</em>) – A query parameter that specifies metadata key:value pairs to select matching Objects</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – ReviewAssetProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--collections-collectionId-reviews-assetId">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}</span></span><a class="headerlink" href="#post--collections-collectionId-reviews-assetId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Post one or more Reviews</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – ReviewPostResponse response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-reviews-assetId-ruleId">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}</span></span><a class="headerlink" href="#get--collections-collectionId-reviews-assetId-ruleId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the Review for an Asset and Rule</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – ReviewAssetRuleRead response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http patch">
+<dt class="sig sig-object http" id="patch--collections-collectionId-reviews-assetId-ruleId">
+<span class="sig-name descname"><span class="pre">PATCH</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}</span></span><a class="headerlink" href="#patch--collections-collectionId-reviews-assetId-ruleId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Merge provided properties with a Review</strong></p>
+<p>Update the given properties of a Review, if it exists</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – ReviewProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--collections-collectionId-reviews-assetId-ruleId">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}</span></span><a class="headerlink" href="#put--collections-collectionId-reviews-assetId-ruleId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set all properties of a Review</strong></p>
+<p>Create a new Review, or update all properties of an existing Review, setting missing properties to null</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – ReviewProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--collections-collectionId-reviews-assetId-ruleId">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}</span></span><a class="headerlink" href="#delete--collections-collectionId-reviews-assetId-ruleId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Delete a Review</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – ReviewProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-reviews-assetId-ruleId-metadata">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata</span></span><a class="headerlink" href="#get--collections-collectionId-reviews-assetId-ruleId-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the metadata for Review</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Metadata response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http patch">
+<dt class="sig sig-object http" id="patch--collections-collectionId-reviews-assetId-ruleId-metadata">
+<span class="sig-name descname"><span class="pre">PATCH</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata</span></span><a class="headerlink" href="#patch--collections-collectionId-reviews-assetId-ruleId-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Merge the provided object to a Review metadata</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Metadata response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--collections-collectionId-reviews-assetId-ruleId-metadata">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata</span></span><a class="headerlink" href="#put--collections-collectionId-reviews-assetId-ruleId-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set a Review metadata to the provided object</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Metadata response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-reviews-assetId-ruleId-metadata-keys">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys</span></span><a class="headerlink" href="#get--collections-collectionId-reviews-assetId-ruleId-metadata-keys" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the keys of the provided Review’s metadata</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – MetadataKeys response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-reviews-assetId-ruleId-metadata-keys-key">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys/{key}</span></span><a class="headerlink" href="#get--collections-collectionId-reviews-assetId-ruleId-metadata-keys-key" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the value of the provided Review metadata key</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – A path parameter that specifies a metadata key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – MetadataValue response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--collections-collectionId-reviews-assetId-ruleId-metadata-keys-key">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys/{key}</span></span><a class="headerlink" href="#put--collections-collectionId-reviews-assetId-ruleId-metadata-keys-key" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set the value of the provided Review metadata key to the provided string</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – A path parameter that specifies a metadata key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.5">204 No Content</a></span> – Empty to avoid large response after putting key with large value</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--collections-collectionId-reviews-assetId-ruleId-metadata-keys-key">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys/{key}</span></span><a class="headerlink" href="#delete--collections-collectionId-reviews-assetId-ruleId-metadata-keys-key" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Remove the provided Review metadata key</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A path parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – A path parameter that specifies a metadata key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.5">204 No Content</a></span> – Empty to avoid large response after deleteing key with large value</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-metadata">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/metadata</span></span><a class="headerlink" href="#get--collections-collectionId-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the metadata for Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Metadata response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http patch">
+<dt class="sig sig-object http" id="patch--collections-collectionId-metadata">
+<span class="sig-name descname"><span class="pre">PATCH</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/metadata</span></span><a class="headerlink" href="#patch--collections-collectionId-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Merge the provided object to a Collection metadata</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Metadata response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--collections-collectionId-metadata">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/metadata</span></span><a class="headerlink" href="#put--collections-collectionId-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set a Collection metadata to the provided object</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Metadata response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-metadata-keys">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/metadata/keys</span></span><a class="headerlink" href="#get--collections-collectionId-metadata-keys" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the keys of the provided Collection metadata</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – MetadataKeys response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-metadata-keys-key">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/metadata/keys/{key}</span></span><a class="headerlink" href="#get--collections-collectionId-metadata-keys-key" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the value of the provided Collection metadata key</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – A path parameter that specifies a metadata key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – MetadataValue response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--collections-collectionId-metadata-keys-key">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/metadata/keys/{key}</span></span><a class="headerlink" href="#put--collections-collectionId-metadata-keys-key" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set the value of the provided Collection metadata key to the provided string</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – A path parameter that specifies a metadata key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.5">204 No Content</a></span> – Empty to avoid large response after putting key with large value</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--collections-collectionId-metadata-keys-key">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/metadata/keys/{key}</span></span><a class="headerlink" href="#delete--collections-collectionId-metadata-keys-key" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Remove the provided Collection metadata key</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – A path parameter that specifies a metadata key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.5">204 No Content</a></span> – Empty to avoid large response after deleteing key with large value</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-review-history">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/review-history</span></span><a class="headerlink" href="#get--collections-collectionId-review-history" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return history records for the specified Collection that meet the specified criteria</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>startDate</strong> (<em>string</em>) – History entries with a timestamp before the specified start date.</p></li>
+<li><p><strong>endDate</strong> (<em>string</em>) – History entries with a timestamp after the specified end date.</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A query parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – Selects Reviews of a Rule</p></li>
+<li><p><strong>status</strong> (<em>string</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – ReviewHistory response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--collections-collectionId-review-history">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/review-history</span></span><a class="headerlink" href="#delete--collections-collectionId-review-history" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Remove history records that meet specified criteria</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>retentionDate</strong> (<em>string</em>) – Delete history entries with a timestamp earlier than the specified retention date.
+(Required)</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A query parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Number of history records deleted.</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-review-history-stats">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/review-history/stats</span></span><a class="headerlink" href="#get--collections-collectionId-review-history-stats" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return history statistics for the specified Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>startDate</strong> (<em>string</em>) – History entries with a timestamp before the specified start date.</p></li>
+<li><p><strong>endDate</strong> (<em>string</em>) – History entries with a timestamp after the specified end date.</p></li>
+<li><p><strong>assetId</strong> (<em>string</em>) – A query parameter that identifies an Asset</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – Selects Reviews of a Rule</p></li>
+<li><p><strong>status</strong> (<em>string</em>) – </p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Return review history statistics with the specified level of granularity.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – ReviewHistoryStats response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-status">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/status</span></span><a class="headerlink" href="#get--collections-collectionId-status" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the status statistics for the specified Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>array</em>) – A query parameter that identifies a STIG</p></li>
+<li><p><strong>assetId</strong> (<em>array</em>) – A query parameter that identifies an Asset</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CollectionStatus response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-stigs">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/stigs</span></span><a class="headerlink" href="#get--collections-collectionId-stigs" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the STIGs mapped in the specified Collection</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Collection STIGs array response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--collections-collectionId-stigs-benchmarkId-assets">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/stigs/{benchmarkId}/assets</span></span><a class="headerlink" href="#get--collections-collectionId-stigs-benchmarkId-assets" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Get the Assets in a Collection attached to a STIG</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – AssetBasicProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--collections-collectionId-stigs-benchmarkId-assets">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/collections/{collectionId}/stigs/{benchmarkId}/assets</span></span><a class="headerlink" href="#put--collections-collectionId-stigs-benchmarkId-assets" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set the Assets mapped to a STIG</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collectionId</strong> (<em>string</em>) – A path parameter that identifies a Collection</p></li>
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – AssetBasicProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--op-appdata">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/op/appdata</span></span><a class="headerlink" href="#get--op-appdata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Export application data</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Exported data</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--op-appdata">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/op/appdata</span></span><a class="headerlink" href="#post--op-appdata" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Import and overwrite application data</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Import successful</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--op-configuration">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/op/configuration</span></span><a class="headerlink" href="#get--op-configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return API version and configuration information</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Configuration response</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--op-cors-proxy-oidc-.well-known-openid-configuration">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/op/cors-proxy/oidc/.well-known/openid-configuration</span></span><a class="headerlink" href="#get--op-cors-proxy-oidc-.well-known-openid-configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Proxy a request to the OIDC provider’s openid-configuration endpoint</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Configuration response</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--op-cors-proxy-oidc-token">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/op/cors-proxy/oidc/token</span></span><a class="headerlink" href="#post--op-cors-proxy-oidc-token" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Proxy a request to the OIDC provider’s token_endpoint</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Token response</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--op-definition">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/op/definition</span></span><a class="headerlink" href="#get--op-definition" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the API definition</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>jsonpath</strong> (<em>string</em>) – A JSONPath expression</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Definition response</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs</span></span><a class="headerlink" href="#get--stigs" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a list of available STIGs</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>string</em>) – A string found anywhere in a STIG title</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – STIG response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--stigs">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/stigs</span></span><a class="headerlink" href="#post--stigs" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Import a STIG or SCAP Benchmark</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – The added STIG</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-ccis-cci">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/ccis/{cci}</span></span><a class="headerlink" href="#get--stigs-ccis-cci" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return data for the specified CCI</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cci</strong> (<em>string</em>) – A path parameter that identifies a CCI</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CCI response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-rules-ruleId">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/rules/{ruleId}</span></span><a class="headerlink" href="#get--stigs-rules-ruleId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the defintion and associated checks and fixes for the specified Rule</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Rule response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-scap-maps">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/scap-maps</span></span><a class="headerlink" href="#get--stigs-scap-maps" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a list of SCAP benchmarkIds mapped to Manual benchmarkIds</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – SCAP Map response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-benchmarkId">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}</span></span><a class="headerlink" href="#get--stigs-benchmarkId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return properties of the specified STIG</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – STIG response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--stigs-benchmarkId">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}</span></span><a class="headerlink" href="#delete--stigs-benchmarkId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Deletes a STIG (*</strong> and all revisions <strong>*)</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – The deleted STIG</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-benchmarkId-revisions">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}/revisions</span></span><a class="headerlink" href="#get--stigs-benchmarkId-revisions" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a list of revisions for the specified STIG</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Revision response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-benchmarkId-revisions-revisionStr">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}/revisions/{revisionStr}</span></span><a class="headerlink" href="#get--stigs-benchmarkId-revisions-revisionStr" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return metadata for the specified revision of a STIG</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+<li><p><strong>revisionStr</strong> (<em>string</em>) – A path parameter that identifies a STIG revision [ V{version_num}R{release_num} | ‘latest’ ]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Revision response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--stigs-benchmarkId-revisions-revisionStr">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}/revisions/{revisionStr}</span></span><a class="headerlink" href="#delete--stigs-benchmarkId-revisions-revisionStr" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Deletes the specified revision of a STIG</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+<li><p><strong>revisionStr</strong> (<em>string</em>) – A path parameter that identifies a STIG revision [ V{version_num}R{release_num} ]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – The deleted Revision</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-benchmarkId-revisions-revisionStr-ccis">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}/revisions/{revisionStr}/ccis</span></span><a class="headerlink" href="#get--stigs-benchmarkId-revisions-revisionStr-ccis" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a list of CCIs from a STIG revision</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+<li><p><strong>revisionStr</strong> (<em>string</em>) – A path parameter that identifies a STIG revision [ V{version_num}R{release_num} | ‘latest’ ]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – CCI response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-benchmarkId-revisions-revisionStr-groups">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}/revisions/{revisionStr}/groups</span></span><a class="headerlink" href="#get--stigs-benchmarkId-revisions-revisionStr-groups" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the list of groups for the specified revision of a STIG.</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+<li><p><strong>revisionStr</strong> (<em>string</em>) – A path parameter that identifies a STIG revision [ V{version_num}R{release_num} | ‘latest’ ]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – GroupProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-benchmarkId-revisions-revisionStr-groups-groupId">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}/revisions/{revisionStr}/groups/{groupId}</span></span><a class="headerlink" href="#get--stigs-benchmarkId-revisions-revisionStr-groups-groupId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the rules, checks and fixes for a Group from a specified revision of a STIG.</strong></p>
+<p>None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+<li><p><strong>revisionStr</strong> (<em>string</em>) – A path parameter that identifies a STIG revision [ V{version_num}R{release_num} | ‘latest’ ]</p></li>
+<li><p><strong>groupId</strong> (<em>string</em>) – A path parameter that identifies a Group</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Group response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-benchmarkId-revisions-revisionStr-rules">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}/revisions/{revisionStr}/rules</span></span><a class="headerlink" href="#get--stigs-benchmarkId-revisions-revisionStr-rules" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return rule data for the specified revision of a STIG.</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+<li><p><strong>revisionStr</strong> (<em>string</em>) – A path parameter that identifies a STIG revision [ V{version_num}R{release_num} | ‘latest’ ]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Rule response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--stigs-benchmarkId-revisions-revisionStr-rules-ruleId">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/stigs/{benchmarkId}/revisions/{revisionStr}/rules/{ruleId}</span></span><a class="headerlink" href="#get--stigs-benchmarkId-revisions-revisionStr-rules-ruleId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return rule data for the specified Rule in a revision of a STIG.</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchmarkId</strong> (<em>string</em>) – A path parameter that identifies a STIG</p></li>
+<li><p><strong>revisionStr</strong> (<em>string</em>) – A path parameter that identifies a STIG revision [ V{version_num}R{release_num} | ‘latest’ ]</p></li>
+<li><p><strong>ruleId</strong> (<em>string</em>) – A path parameter that identifies a Rule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – RuleProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user</span></span><a class="headerlink" href="#get--user" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return the requester’s user information</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – UserProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--users">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/users</span></span><a class="headerlink" href="#get--users" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a list of Users accessible to the requester</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>username</strong> (<em>string</em>) – Matches against the username according to the <cite>username-match</cite> parameter</p></li>
+<li><p><strong>username-match</strong> (<em>string</em>) – How to match against the <cite>username</cite> parameter</p></li>
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – UserProjected array response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--users">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/users</span></span><a class="headerlink" href="#post--users" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Create a User</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2">201 Created</a></span> – UserProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--users-userId">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/users/{userId}</span></span><a class="headerlink" href="#get--users-userId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Return a User</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>userId</strong> (<em>string</em>) – A path parameter that identifies a User</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – UserProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http patch">
+<dt class="sig sig-object http" id="patch--users-userId">
+<span class="sig-name descname"><span class="pre">PATCH</span> </span><span class="sig-name descname"><span class="pre">/users/{userId}</span></span><a class="headerlink" href="#patch--users-userId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Merge provided properties with a User</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>userId</strong> (<em>string</em>) – A path parameter that identifies a User</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – UserProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http put">
+<dt class="sig sig-object http" id="put--users-userId">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/users/{userId}</span></span><a class="headerlink" href="#put--users-userId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Set all properties of a User</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>userId</strong> (<em>string</em>) – A path parameter that identifies a User</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – UserProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--users-userId">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/users/{userId}</span></span><a class="headerlink" href="#delete--users-userId" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Delete a User</strong></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>userId</strong> (<em>string</em>) – A path parameter that identifies a User</p></li>
+</ul>
+</dd>
+<dt class="field-even">Query Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>elevate</strong> (<em>boolean</em>) – Elevate the user context for this request if user is permitted (canAdmin)</p></li>
+<li><p><strong>projection</strong> (<em>array</em>) – Additional properties to include in the response.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – UserProjected response</p></li>
+<li><p><span><span class="problematic">default</span></span> – unexpected error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="api-redoc.html" class="btn btn-neutral float-right" title="STIG Manager API Redoc" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="related-repos.html" class="btn btn-neutral float-left" title="STIG Manager Accessories" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021 U.S. Federal Government (in countries where recognized).
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -35,9 +35,30 @@ extensions = [
     'sphinxcontrib.images',
     'sphinx.ext.todo',
     'recommonmark',
-    'sphinx_tabs.tabs'
+    'sphinx_tabs.tabs',
+    # 'sphinxcontrib.httpdomain',
+    'sphinxcontrib.openapi',
+    'sphinxcontrib.redoc',
     # ,
     # 'sphinx_markdown_tables',
+]
+
+redoc = [
+    {
+        'name': 'STIGMan API',
+        'page': 'api',
+        'spec': '../api/source/specification/stig-manager.yaml',
+        'embed': True,
+        'opts': {
+            'lazy-rendering': True,
+            'suppress-warnings': True,
+            'hide-hostname': True,
+            'required-props-first': True,
+            'expand-responses': ["200", "201"],
+            'native-scrollbars': True
+        }
+    },
+
 ]
 
 todo_include_todos = True
