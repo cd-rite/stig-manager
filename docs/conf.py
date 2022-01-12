@@ -36,13 +36,11 @@ extensions = [
     'sphinx.ext.todo',
     'recommonmark',
     'sphinx_tabs.tabs',
-    'sphinxcontrib.openapi',
     # ,
     # 'sphinx_markdown_tables',
 ]
 
 
-openapi_default_renderer='httpdomain'
 
 todo_include_todos = True
 
