@@ -42,6 +42,8 @@ extensions = [
 ]
 
 
+openapi_default_renderer='httpdomain'
+
 todo_include_todos = True
 
 

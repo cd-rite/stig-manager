@@ -9,8 +9,8 @@ The STIG Manager open-source project provides an API and Web Client. The project
 Several deployment approaches are described in this document:
 
 - :ref:`Deploy our sample Docker Compose orchestration<deploy-docker-compose>`
-- :ref:`Deploy with Individual Containers <deploy-container>`
-- :ref:`Deploy from Source Code in Node.js runtime environment <deploy-from-source>`
+- :ref:`Deploy with individual containers <deploy-container>`
+- :ref:`Deploy from source code in Node.js runtime environment <deploy-from-source>`
 - :ref:`Deploy with executable binaries <deploy-binaries>`
 
 A STIG Manager deployment requires at least two other mandatory services, which are freely available but must be provided and configured by the those deploying the STIG Manager instance:

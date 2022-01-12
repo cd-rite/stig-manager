@@ -98,10 +98,11 @@ If you are using a service account to connect to the STIGMan API, the ``STIGMAN_
 Scopes, and Privileges
 ---------------------------------
 
-The **Scopes** specified in the scope claim of the JWT control overall access to API endpoints as specified in the `OpenAPI specification <https://github.com/NUWCDIVNPT/stig-manager/blob/main/api/source/specification/stig-manager.yaml>`_ .   
+The **Scopes** specified in the scope claim of the JWT control overall access to API endpoints as specified in the `OpenAPI specification <https://github.com/NUWCDIVNPT/stig-manager/blob/main/api/source/specification/stig-manager.yaml>`_ .   In order for the web client provided with the Project to function as documented, STIG Manager Users and 
+"admins" (Application Managers) should have the scopes listed here. 
 
 
-All Users should get the following scopes in their token:
+ALL Users should get the following scopes in their token:
   - stig-manager:collection
   - stig-manager:stig:read
   - stig-manager:user:read
@@ -115,20 +116,23 @@ Users with the `create_collection` privilege do not require any additional scope
 
 The privileges specified in the ``STIGMAN_JWT_PRIVILEGES_CLAIM`` claim in the JWT map to Privileges in STIG Manager that allow different levels of access and abilities to manipulate STIGMan data. 
 
-.. list-table:: STIG Manager Privileges and Abilities (assumes a valid token has been granted by the OIDC provider): 
-  :widths: 20 60
+.. list-table:: STIG Manager Privileges, associated user role names, and Abilities (assumes a valid token has been granted by the OIDC provider): 
+  :widths: 20 20 60
   :header-rows: 1
   :class: tight-table
 
   * - User Privilege
+    - Informal User Role Name
     - Abilities
   * - admin
+    - "Application Manager"
     - Access STIG Manager; Can Manage Collections, Import STIGs, Manage Users, Import/Export App data
   * - create_collection
+    - "Collection Creator"
     - Access STIG Manager; Can create their own Collections
   * - No explicit privileges
+    - "User"
     - Access STIG Manager
-
 
 .. _keycloak:
 
@@ -182,11 +186,7 @@ Required Keycloak settings for the "stigman" realm:
      - Roles
    * - stig-manager:collection
      - user   
-   * - stig-manager:collection:read
-     - user
    * - stig-manager:op
-     - admin
-   * - stig-manager:op:read
      - admin
    * - stig-manager:stig
      - admin
