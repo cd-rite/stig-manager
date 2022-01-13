@@ -102,12 +102,13 @@ The **Scopes** specified in the scope claim of the JWT control overall access to
 "admins" (Application Managers) should have the scopes listed here. 
 
 
-ALL Users should get the following scopes in their token:
+Users without the "admin" privilege should get the following scopes in the generated OIDC token:
   - stig-manager:collection
   - stig-manager:stig:read
   - stig-manager:user:read
  
-Users with the ``admin`` privilege must include these scopes as well:
+Users with the ``admin`` privilege must include these scopes in the generated OIDC token:
+  - stig-manager:collection
   - stig-manager:op
   - stig-manager:stig
   - stig-manager:user
