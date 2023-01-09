@@ -1,0 +1,55 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-in-docker
+{
+	"name": "Docker in Docker - test2",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
+
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest",
+			"enableNonRootDocker": "true",
+			"moby": "true"
+		},
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {}
+	},
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [8080, 64001],
+	"forwardPorts": [8080, 64001],
+
+	"containerEnv": {
+		"STIGMAN_CLIENT_OIDC_PROVIDER": "https://${localEnv:CODESPACE_NAME}-8080.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/realms/stigman/",
+		"STIGMAN_CLIENT_OIDC_PROVIDER2": "https://${CODESPACE_NAME}-8080.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/",
+		"MY_CONTAINER_VAR2": "${localEnv:GITHUB_REPOSITORY}"
+	},
+
+	// Uncomment the next line to run commands after the container is created.
+	// "postCreateCommand": "cat /etc/os-release",
+	"postStartCommand": 
+		[
+			// "echo ${containerEnv:CODESPACE_NAME}",
+			"echo ${localEnv:CODESPACE_NAME}",
+			"echo ${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
+			// "echo ${CODESPACE_NAME}",	
+		// "docker run --name stig-manager-auth -d -p 8080:8080 -p 8443:8443 -e KC_PROXY=edge -e KC_HOSTNAME_URL=https://${localEnv:CODESPACE_NAME}-8080.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/ -e KC_HOSTNAME_ADMIN_URL=https://${localEnv:CODESPACE_NAME}-8080.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/ nuwcdivnpt/stig-manager-auth", 
+		// "docker run --name stig-manager-db -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpw -e MYSQL_DATABASE=stigman -e MYSQL_USER=stigman -e MYSQL_PASSWORD=stigman  mysql:8 --innodb-buffer-pool-size=512M --sort_buffer_size=100M"
+		],
+
+	"portsAttributes": {
+		"8080": {
+			"label": "auth-8080"
+		}
+	}
+
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "devcontainer"
+}
