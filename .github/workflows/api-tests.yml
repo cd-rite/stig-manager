@@ -19,13 +19,12 @@ jobs:
       - name: install dependencies
         run: npm ci
       - uses: oke-py/npm-audit-action@v2
-      - uses: ./
         with:
           # audit_level: moderate
           github_token: ${{ secrets.GITHUB_TOKEN }}
           create_issues: false
           create_pr_comments: true
-          working_directory: ./api/source/
+          working_directory: ./home/node/api/source/
           # issue_assignees: oke-py
           # issue_labels: vulnerability,test
           # dedupe_issues: true
