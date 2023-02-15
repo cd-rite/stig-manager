@@ -17,14 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: install dependencies
-        run: npm ci
+        run: npm ci 
+        working-directory: ./api/source/
       - uses: oke-py/npm-audit-action@v2
         with:
           # audit_level: moderate
           github_token: ${{ secrets.GITHUB_TOKEN }}
           create_issues: false
           create_pr_comments: true
-          working_directory: ./home/node/api/source/
+          working_directory: ./api/source/
           # issue_assignees: oke-py
           # issue_labels: vulnerability,test
           # dedupe_issues: true
