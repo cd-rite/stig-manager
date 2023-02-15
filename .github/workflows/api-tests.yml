@@ -21,14 +21,10 @@ jobs:
         working-directory: ./api/source/
       - uses: oke-py/npm-audit-action@v2
         with:
-          # audit_level: moderate
           github_token: ${{ secrets.GITHUB_TOKEN }}
           create_issues: false
           create_pr_comments: true
           working_directory: ./api/source/
-          # issue_assignees: oke-py
-          # issue_labels: vulnerability,test
-          # dedupe_issues: true
   test_api:
     name: Postman tests
     runs-on: ubuntu-latest
