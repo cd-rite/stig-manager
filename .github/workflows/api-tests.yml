@@ -134,7 +134,7 @@ jobs:
       - 
         name: Collect all container logs on failure
         if: ${{ cancelled() || failure() }}
-        uses: jwalton/gh-docker-logs@v1
+        uses: jwalton/gh-docker-logs@59c9656cd3cb7542525f3dce7ae2f44c0ff85d66
         with:
           dest: './logs'
       - 

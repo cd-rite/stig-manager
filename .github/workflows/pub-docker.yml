@@ -110,7 +110,7 @@ jobs:
         run: echo ${{ steps.docker_build.outputs.digest }}
       - 
         name: Update Docker Hub Description
-        uses: peter-evans/dockerhub-description@v3
+        uses: peter-evans/dockerhub-description@067627a8af8c4a66c03b5b5e896968ca4cafba79
         with:
           username: ${{ secrets.DOCKERHUB_ORG_OWNER_USERNAME }}
           password: ${{ secrets.DOCKERHUB_ORG_OWNER_PW }}
