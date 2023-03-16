@@ -11,7 +11,7 @@ on:
     - '.github/workflows/api-tests.yml'
 
 jobs:
-  scan:
+  npm_audit:
     name: npm audit
     runs-on: ubuntu-latest
     steps:
