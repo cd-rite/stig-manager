@@ -36,7 +36,16 @@ jobs:
         run: |
           docker build -t stig-manager .
       - name: install c8 coverage reporter
-        run: npm install c8 -g  
+        run: |
+          mkdir coverage
+          npm install c8 -g  
+      - name: check directory
+        run: |
+          pwd
+          ls -ltr
+      - name: run c8
+        run: |
+          c8 report html          
       - name: Run mock Keycloak
         id: idp-run
         working-directory: ./test/api/mock-keycloak
@@ -151,10 +160,13 @@ jobs:
         id: api-stop
         run: |
           docker stop stig-manager-api
-      - name: Group of log lines
+      - name: check directory
         run: |
           pwd
           ls -ltr
+      - name: run c8
+        run: |
+          c8 report html
   response_validation:
     name: Response validation
     needs:
