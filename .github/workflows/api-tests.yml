@@ -176,6 +176,7 @@ jobs:
           ls -ltr coverage/tmp
       - name: check directory4
         working-directory: ./coverage/tmp
+        if: steps.api-stop.conclusion == 'success'
         run: |
           pwd
           ls -ltr          
