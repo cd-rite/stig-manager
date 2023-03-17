@@ -199,8 +199,8 @@ jobs:
         run: |
           pwd
           ls -ltr
-          sudo c8 report --temp-directory "$(pwd)"/tmp
-          sudo c8 report --temp-directory "$(pwd)"/tmp -r html
+          sudo c8 report --temp-directory "$(pwd)"/coverage/tmp
+          sudo c8 report --temp-directory "$(pwd)"/coverage/tmp -r html
   response_validation:
     name: Response validation
     needs:
