@@ -9,6 +9,9 @@ on:
       - 'test/api/**'
       - 'Dockerfile'
       - '.github/workflows/api-tests.yml'
+defaults:
+  run:
+    shell: bash      
 
 jobs:
   npm_audit:
@@ -72,7 +75,7 @@ jobs:
         run: |
           docker run -d --name stig-manager-api \
           --net=host \
-          -v  "$(pwd)"/coverage:/home/node/coverage \
+          -v  "$(pwd)"/coverage:/home/node/coverage:shared \
           -e STIGMAN_API_PORT=64001 \
           -e STIGMAN_DB_HOST=localhost \
           -e STIGMAN_DB_PORT=3306 \
