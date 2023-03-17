@@ -169,7 +169,7 @@ jobs:
       - name: check directory2
         run: |
           pwd  
-          ls -ltr coverage
+          docker volume ls
       - name: check directory3
         run: |
           pwd            
