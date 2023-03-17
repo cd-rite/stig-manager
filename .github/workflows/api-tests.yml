@@ -46,6 +46,10 @@ jobs:
         run: |
           pwd
           ls -ltr
+      - name: check cov directory
+        run: |
+          pwd
+          ls -ltr coverage   
       - name: Run mock Keycloak
         id: idp-run
         working-directory: ./test/api/mock-keycloak
