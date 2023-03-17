@@ -43,9 +43,9 @@ jobs:
         run: |
           pwd
           ls -ltr
-      - name: run c8
-        run: |
-          c8 report html          
+      # - name: run c8
+      #   run: |
+      #     c8 report html          
       - name: Run mock Keycloak
         id: idp-run
         working-directory: ./test/api/mock-keycloak
@@ -73,7 +73,7 @@ jobs:
           -e STIGMAN_DB_PASSWORD=stigman \
           -e STIGMAN_API_AUTHORITY=http://127.0.0.1:8080/auth/realms/stigman \
           -e STIGMAN_DEV_RESPONSE_VALIDATION=logOnly \
-          -e NODE_V8_COVERAGE=coverage/raw \
+          -e NODE_V8_COVERAGE=coverage/tmp \
           stig-manager
       - name: Install Newman reporter
         id: newman-reporter-install
@@ -163,6 +163,10 @@ jobs:
       - name: check directory
         run: |
           pwd
+          ls -ltr
+          cd coverage
+          ls -ltr
+          cd tmp
           ls -ltr
       - name: run c8
         run: |
