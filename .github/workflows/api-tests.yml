@@ -195,11 +195,12 @@ jobs:
           ls -ltr 
       - name: run c8
         if: steps.api-stop.conclusion == 'success'
-        working-directory: ./coverage
+        working-directory: ./
         run: |
           pwd
           ls -ltr
-          sudo c8 report --temp-directory "$(pwd)"/tmp html
+          sudo c8 report --temp-directory "$(pwd)"/tmp
+          sudo c8 report --temp-directory "$(pwd)"/tmp -r html
   response_validation:
     name: Response validation
     needs:
