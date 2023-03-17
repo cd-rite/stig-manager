@@ -38,6 +38,7 @@ jobs:
       - name: install c8 coverage reporter
         run: |
           mkdir coverage
+          mkdir coverage/tmp
           npm install c8 -g  
       - name: check directory
         run: |
@@ -157,11 +158,17 @@ jobs:
         id: api-stop
         run: |
           docker stop stig-manager-api
-      - name: check directory
+      - name: check directory1
         run: |
           pwd
           ls -ltr
+      - name: check directory2
+        run: |
+          pwd  
           ls -ltr coverage
+      - name: check directory3
+        run: |
+          pwd            
           ls -ltr coverage/tmp
       - name: run c8
         run: |
