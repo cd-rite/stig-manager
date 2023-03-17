@@ -66,7 +66,7 @@ jobs:
         run: |
           docker run -d --name stig-manager-api \
           --net=host \
-          -v ./coverage:/home/node/coverage/tmp \
+          -v /coverage:/home/node/coverage/tmp \
           -e STIGMAN_API_PORT=64001 \
           -e STIGMAN_DB_HOST=localhost \
           -e STIGMAN_DB_PORT=3306 \
