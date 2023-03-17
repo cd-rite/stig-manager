@@ -161,8 +161,8 @@ jobs:
         run: |
           pwd
           ls -ltr
-          ls -ltr /coverage
-          ls -ltr /coverage/tmp
+          ls -ltr coverage
+          ls -ltr coverage/tmp
       - name: run c8
         run: |
           c8 report html
