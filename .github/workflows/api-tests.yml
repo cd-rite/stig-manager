@@ -44,7 +44,7 @@ jobs:
           pwd
           mkdir coverage
           mkdir coverage/tmp
-          sudo chmod -R 777 /coverage
+          sudo chmod -R 777 coverage/
           sudo npm install -g c8 
       - name: check directory
         run: |
@@ -178,7 +178,7 @@ jobs:
         run: |
           pwd
           ls -ltr
-          sudo chmod -R 777 /coverage
+          sudo chmod -R 777 coverage/
       - name: check directory2
         run: |
           pwd  
