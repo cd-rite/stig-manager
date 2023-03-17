@@ -151,6 +151,10 @@ jobs:
         id: api-stop
         run: |
           docker stop stig-manager-api
+      - name: Group of log lines
+        run: |
+          pwd
+          ls -ltr
   response_validation:
     name: Response validation
     needs:
