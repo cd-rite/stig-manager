@@ -180,8 +180,11 @@ jobs:
           pwd
           ls -ltr          
       - name: run c8
+        if: steps.api-stop.conclusion == 'success'
         working-directory: ./coverage
         run: |
+          pwd
+          ls -ltr
           c8 report --temp-directory tmp html
   response_validation:
     name: Response validation
