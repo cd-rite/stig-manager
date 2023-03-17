@@ -67,11 +67,11 @@ jobs:
           mysql:8.0.21
       - name: Run STIG Manager container
         id: api-run
-        working-directory: ./
+        # working-directory: ./
         run: |
           docker run -d --name stig-manager-api \
           --net=host \
-          -v /home/runner/work/stig-manager/stig-manager/coverage:/home/node/coverage \
+          -v  "$(pwd)"/coverage:/home/node/coverage \
           -e STIGMAN_API_PORT=64001 \
           -e STIGMAN_DB_HOST=localhost \
           -e STIGMAN_DB_PORT=3306 \
@@ -161,6 +161,10 @@ jobs:
         with:
           name: logs.tgz
           path: ./logs.tgz
+      - name: inspect STIG Manager container
+        id: api-inspect
+        run: |
+          docker inspect stig-manager-api           
       - name: Stop STIG Manager container
         id: api-stop
         run: |
@@ -190,7 +194,7 @@ jobs:
         run: |
           pwd
           ls -ltr
-          c8 report --temp-directory tmp html
+          c8 report --temp-directory "$(pwd)"/tmp html
   response_validation:
     name: Response validation
     needs:
