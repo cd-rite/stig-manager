@@ -36,6 +36,7 @@ jobs:
         run: |
           docker build -t stig-manager .
       - name: install c8 coverage reporter
+        working-directory: ./
         run: |
           mkdir coverage
           mkdir coverage/tmp
@@ -61,17 +62,18 @@ jobs:
           mysql:8.0.21
       - name: Run STIG Manager container
         id: api-run
+        working-directory: ./
         run: |
           docker run -d --name stig-manager-api \
           --net=host \
-          -v coverage:/coverage \
+          -v ./coverage:/home/node/coverage/tmp \
           -e STIGMAN_API_PORT=64001 \
           -e STIGMAN_DB_HOST=localhost \
           -e STIGMAN_DB_PORT=3306 \
           -e STIGMAN_DB_PASSWORD=stigman \
           -e STIGMAN_API_AUTHORITY=http://127.0.0.1:8080/auth/realms/stigman \
           -e STIGMAN_DEV_RESPONSE_VALIDATION=logOnly \
-          -e NODE_V8_COVERAGE=coverage/tmp \
+          -e NODE_V8_COVERAGE=/home/node/coverage/tmp \
           stig-manager
       - name: Install Newman reporter
         id: newman-reporter-install
@@ -159,6 +161,7 @@ jobs:
         run: |
           docker stop stig-manager-api
       - name: check directory1
+        working-directory: ./
         run: |
           pwd
           ls -ltr
