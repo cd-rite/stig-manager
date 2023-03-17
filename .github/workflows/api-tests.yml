@@ -180,8 +180,9 @@ jobs:
           pwd
           ls -ltr          
       - name: run c8
+        working-directory: ./coverage
         run: |
-          c8 report html
+          c8 report --temp-directory tmp html
   response_validation:
     name: Response validation
     needs:
