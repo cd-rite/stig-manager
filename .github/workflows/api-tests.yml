@@ -67,7 +67,7 @@ jobs:
           mysql:8.0.21
       - name: Run STIG Manager container
         id: api-run
-        # working-directory: ./
+        working-directory: ./
         run: |
           docker run -d --name stig-manager-api \
           --net=host \
