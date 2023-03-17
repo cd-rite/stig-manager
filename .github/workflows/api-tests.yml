@@ -41,7 +41,8 @@ jobs:
           pwd
           mkdir coverage
           mkdir coverage/tmp
-          npm install c8 -g  
+          sudo chmod 777 -R coverage/
+          sudo npm install -g c8 
       - name: check directory
         run: |
           pwd
@@ -78,7 +79,7 @@ jobs:
           -e STIGMAN_DB_PASSWORD=stigman \
           -e STIGMAN_API_AUTHORITY=http://127.0.0.1:8080/auth/realms/stigman \
           -e STIGMAN_DEV_RESPONSE_VALIDATION=logOnly \
-          -e NODE_V8_COVERAGE=/home/node/coverage/tmp \
+          -e NODE_V8_COVERAGE=./home/node/coverage/tmp \
           stig-manager
       - name: Install Newman reporter
         id: newman-reporter-install
