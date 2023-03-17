@@ -50,7 +50,7 @@ COMMIT_TAG=${COMMIT_TAG} \
 COMMIT_DESCRIBE=${COMMIT_DESCRIBE} \
 STIGMAN_CLIENT_DIRECTORY=./client \
 STIGMAN_DOCS_DIRECTORY=./docs
-
+STOPSIGNAL SIGINT
 EXPOSE 54000
 HEALTHCHECK --interval=120s --timeout=3s --start-period=120s CMD node healthcheck.js
 CMD [ "node", "index.js" ]
