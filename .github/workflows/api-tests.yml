@@ -9,9 +9,9 @@ on:
       - 'test/api/**'
       - 'Dockerfile'
       - '.github/workflows/api-tests.yml'
-defaults:
-  run:
-    shell: bash      
+# defaults:
+#   run:
+#     shell: bash      
 
 jobs:
   npm_audit:
