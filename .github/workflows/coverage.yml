@@ -158,7 +158,7 @@ jobs:
         run: |
           pkill -2 node
       - name: check directory1
-        working-directory: ./stig-manager/source/api/coverage
+        working-directory: ./source/api/coverage
         run: |
           pwd
           ls -ltr
