@@ -50,6 +50,7 @@ jobs:
         run: |
           sudo npm install -g c8 
       - name: install dependencies
+        working-directory: ./api/source
         run: npm ci   
       - name: Run mock Keycloak
         id: idp-run
