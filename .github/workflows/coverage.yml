@@ -45,6 +45,8 @@ jobs:
       #   id: image-build
       #   run: |
       #     docker build -t stig-manager .
+      - name: list processes2
+        run: ps -ef       
       - name: install c8 coverage reporter
         working-directory: ./
         run: |
@@ -154,12 +156,12 @@ jobs:
       #     name: logs.tgz
       #     path: ./logs.tgz   
       - name: list processes
-        run: ps -A
+        run: ps -ef
       - name: Stop STIG Manager
         id: api-stop
         run: sudo pkill -15 node
       - name: list processes2
-        run: ps -A        
+        run: ps -ef 
       - name: check directory1
         working-directory: ./api/source/coverage
         run: |
