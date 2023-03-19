@@ -154,7 +154,7 @@ jobs:
       #     name: logs.tgz
       #     path: ./logs.tgz   
       - name: list processes
-        id: process list
+        id: process-list
         run: ps  
       - name: Stop STIG Manager
         id: api-stop
