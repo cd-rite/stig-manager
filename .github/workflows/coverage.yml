@@ -157,12 +157,12 @@ jobs:
       #     path: ./logs.tgz   
       - name: list processes
         run: ps -ef
-      - name: Stop STIG Manager
-        id: api-stop
-        run: sudo kill-port --graceful -p 64001  
       # - name: Stop STIG Manager
       #   id: api-stop
-      #   run: sudo pkill -15 node
+      #   run: sudo kill-port --graceful -p 64001  
+      - name: Stop STIG Manager
+        id: api-stop
+        run: sudo killall -15 node
       - name: list processes2
         run: ps -ef 
       - name: check directory1
