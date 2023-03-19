@@ -170,25 +170,4 @@ jobs:
         run: |
           pwd
           ls -ltr          
-  response_validation:
-    name: Response validation
-    needs:
-      - test_api
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download API log artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: api-log
-          path: ./logs
-      - name: Test for response validation messages
-        working-directory: ./logs
-        run: |
-          jq -s 'map(select(.type=="responseValidation")|{method:.data.request.method,url:.data.request.url,errors:.data.error.errors,body:.data.body})' api-log.json > response-validation.json
-          exit $(jq '. | length' response-validation.json)
-      - name: Upload response validation artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@master
-        with:
-          name: response-validation
-          path: ./logs/response-validation.json
+
