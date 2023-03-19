@@ -157,7 +157,7 @@ jobs:
         run: ps -A
       - name: Stop STIG Manager
         id: api-stop
-        run: pkill -15 node
+        run: sudo pkill -15 node
       - name: list processes2
         run: ps -A        
       - name: check directory1
