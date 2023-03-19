@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - test-coverage
     paths:
       - 'api/source/**'
       - 'test/api/**'
