@@ -158,7 +158,7 @@ jobs:
         run: |
           pkill -2 node
       - name: check directory1
-        working-directory: ./source/api/coverage
+        working-directory: ./api/source/coverage
         run: |
           pwd
           ls -ltr
