@@ -50,7 +50,7 @@ jobs:
       - name: install c8 coverage reporter
         working-directory: ./
         run: |
-          sudo npm install -g c8 
+          sudo npm install -g c8 kill-port-process
       - name: install dependencies
         working-directory: ./api/source
         run: npm ci   
@@ -159,7 +159,10 @@ jobs:
         run: ps -ef
       - name: Stop STIG Manager
         id: api-stop
-        run: sudo pkill -15 node
+        run: sudo kill-port --graceful -p 64001  
+      # - name: Stop STIG Manager
+      #   id: api-stop
+      #   run: sudo pkill -15 node
       - name: list processes2
         run: ps -ef 
       - name: check directory1
