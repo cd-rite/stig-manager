@@ -190,7 +190,7 @@ jobs:
           name: coverage-report
           path: ./api/source/coverage
       - name: Upload coverage artifact
-        id: artifact-upload
+        id: artifact-upload2
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
