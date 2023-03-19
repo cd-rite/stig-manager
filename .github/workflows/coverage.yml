@@ -153,10 +153,12 @@ jobs:
       #   with:
       #     name: logs.tgz
       #     path: ./logs.tgz   
+      - name: list processes
+        id: process list
+        run: ps  
       - name: Stop STIG Manager
         id: api-stop
-        run: |
-          pkill -15 node
+        run: pkill -15 node
       - name: check directory1
         working-directory: ./api/source/coverage
         run: |
