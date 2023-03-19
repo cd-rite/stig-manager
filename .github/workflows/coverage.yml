@@ -161,11 +161,15 @@ jobs:
       #   id: api-stop
       #   run: sudo kill-port --graceful -p 64001  
       - name: Stop STIG Manager
+        if: steps.newman-run-additional-sundry.conclusion == 'success'
         id: api-stop
         run: sudo killall -15 node
       - name: list processes2
+        if: steps.api-stop.conclusion == 'success'
+
         run: ps -ef 
       - name: check directory1
+        if: steps.api-stop.conclusion == 'success'
         working-directory: ./api/source/coverage
         run: |
           pwd
