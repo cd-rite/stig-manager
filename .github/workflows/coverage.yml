@@ -52,9 +52,8 @@ jobs:
       - name: list processes2
         run: ps -ef       
       - name: install c8 coverage reporter
-        working-directory: ./
         run: |
-          sudo npm install -g c8 kill-port-process
+          sudo npm install -g c8
       - name: install dependencies
         working-directory: ./api/source
         run: npm ci   
