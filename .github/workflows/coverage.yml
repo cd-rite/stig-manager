@@ -181,5 +181,12 @@ jobs:
         working-directory: ./api/source/coverage/tmp
         run: |
           pwd
-          ls -ltr          
+          ls -ltr         
+      - name: Upload coverage artifact
+        id: artifact-upload
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: coverage-report
+          path: ./api/source/coverage
 
