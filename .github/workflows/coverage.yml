@@ -162,6 +162,11 @@ jobs:
         run: |
           pwd
           ls -ltr
+      - name: check directory1
+        working-directory: ./api/source/coverage/tmp
+        run: |
+          pwd
+          ls -ltr          
   response_validation:
     name: Response validation
     needs:
