@@ -95,6 +95,8 @@ jobs:
         run: ps -ef               
       - name: ls1
         run: ls -ltr   
+      - name: sleep I guess
+        run: sleep 10           
       - name: coverage directory
         run: printenv NODE_V8_COVERAGE
       - name: check for files in api/source
@@ -110,9 +112,9 @@ jobs:
         run:  sudo chmod -R 777 coverage
       - name: check for files after perms change
         run:  ls -ltr $NODE_V8_COVERAGE                
-      # - name: run c8 for coverage reports
-      #   working-directory: ./api/source
-      #   run:  c8 report --reporter=html --reporter=text-summary 
+      - name: run c8 for coverage reports
+        working-directory: ./api/source
+        run:  c8 report --reporter=text-summary 
       - name: ls1
         working-directory: ./api/source
         run: ls -ltr $NODE_V8_COVERAGE/..     
