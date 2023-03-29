@@ -191,7 +191,7 @@ jobs:
       - name: ps
         run: ps -ef       
       - name: sleep I guess
-        run: sleep 10        
+        run: sleep 20        
       - name: ps
         run: ps -ef                              
       - name: Upload Newman artifact
