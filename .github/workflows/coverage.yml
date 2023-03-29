@@ -79,12 +79,18 @@ jobs:
         run: sh -c 'echo $$ > /tmp/test.pid ; exec c8 node index.js' &
       - name: pid file check
         working-directory: ./api/source
-        run: cat /tmp/test.pid                
+        run: cat /tmp/test.pid         
+      - name: last backgrounded process
+        working-directory: ./api/source
+        run: echo "last backgrounded process $!"
       - name: ps
         run: ps -ef  
+      - name: try to get child based on parent
+        working-directory: ./api/source
+        run: ps -ef --ppid `cat /tmp/test.pid` -o pid=              
       - name: kill pid
         working-directory: ./api/source
-        run:  kill -9 `cat /tmp/test.pid`                
+        run: kill -9 $(ps -ef --ppid `cat /tmp/test.pid` -o pid= )
       - name: ps after kill
         run: ps -ef               
       - name: ls1
@@ -226,18 +232,18 @@ jobs:
       #   run: |
       #     pwd
       #     ls -ltr         
-      # - name: Upload coverage artifact
-      #   id: artifact-upload
-      #   uses: actions/upload-artifact@v2
-      #   if: ${{ always() }}
-      #   with:
-      #     name: coverage-report
-      #     path: ./api/source/coverage
-      # - name: Upload coverage artifact
-      #   id: artifact-upload2
-      #   uses: actions/upload-artifact@v2
-      #   if: ${{ always() }}
-      #   with:
-      #     name: coverage-report-raw
-      #     path: ./coverage-raw          
+      - name: Upload coverage artifact
+        id: artifact-upload
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: coverage-report
+          path: ./api/source/coverage
+      - name: Upload coverage artifact
+        id: artifact-upload2
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: coverage-report-raw
+          path: ./coverage-raw          
 
