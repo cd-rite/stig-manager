@@ -89,45 +89,45 @@ jobs:
         run: echo  $!
       - name: ps
         run: ps -ef  
-      - name: try to get child based on parent
-        working-directory: ./api/source
-        run: ps -ef --ppid `cat /tmp/test.pid` -o pid=              
-      - name: kill pid
-        working-directory: ./api/source
-        run: kill -SIGINT $(ps -ef --ppid `cat /tmp/test.pid` -o pid= )
-      - name: ps after kill
-        run: ps -ef               
-      - name: ls1
-        run: ls -ltr   
+      # - name: try to get child based on parent
+      #   working-directory: ./api/source
+      #   run: ps -ef --ppid `cat /tmp/test.pid` -o pid=              
+      # - name: kill pid
+      #   working-directory: ./api/source
+      #   run: kill -SIGINT $(ps -ef --ppid `cat /tmp/test.pid` -o pid= )
+      # - name: ps after kill
+      #   run: ps -ef               
+      # - name: ls1
+      #   run: ls -ltr   
       - name: sleep I guess
         run: sleep 10           
-      - name: coverage directory
-        run: printenv NODE_V8_COVERAGE
-      - name: check for files in api/source
-        working-directory: ./api/source
-        run:  ls -ltr $NODE_V8_COVERAGE
-      - name: check for files bare cov dir
-        run:  ls -ltr $NODE_V8_COVERAGE        
-      - name: check for files 2
-        working-directory: ./api/source
-        run:  ls -ltr $PWD/coverage/tmp  
-      - name: expand permissions
-        working-directory: ./api/source
-        run:  sudo chmod -R 777 coverage
-      - name: check for files after perms change
-        run:  ls -ltr $NODE_V8_COVERAGE                
-      - name: run c8 for coverage reports
-        working-directory: ./api/source
-        run:  c8 report --reporter=text-summary 
-      - name: ls1
-        working-directory: ./api/source
-        run: ls -ltr $NODE_V8_COVERAGE/..     
-      - name: ls1
-        working-directory: ./api/source
-        run: ls -ltr    
-      - name: ls1
-        working-directory: ./api/source
-        run: ls -ltr coverage
+      # - name: coverage directory
+      #   run: printenv NODE_V8_COVERAGE
+      # - name: check for files in api/source
+      #   working-directory: ./api/source
+      #   run:  ls -ltr $NODE_V8_COVERAGE
+      # - name: check for files bare cov dir
+      #   run:  ls -ltr $NODE_V8_COVERAGE        
+      # - name: check for files 2
+      #   working-directory: ./api/source
+      #   run:  ls -ltr $PWD/coverage/tmp  
+      # - name: expand permissions
+      #   working-directory: ./api/source
+      #   run:  sudo chmod -R 777 coverage
+      # - name: check for files after perms change
+      #   run:  ls -ltr $NODE_V8_COVERAGE                
+      # - name: run c8 for coverage reports
+      #   working-directory: ./api/source
+      #   run:  c8 report --reporter=text-summary 
+      # - name: ls1
+      #   working-directory: ./api/source
+      #   run: ls -ltr $NODE_V8_COVERAGE/..     
+      # - name: ls1
+      #   working-directory: ./api/source
+      #   run: ls -ltr    
+      # - name: ls1
+      #   working-directory: ./api/source
+      #   run: ls -ltr coverage
       # - name: Install Newman reporter
       #   id: newman-reporter-install
       #   run: |
@@ -180,6 +180,16 @@ jobs:
         run: |
           set -o pipefail
           newman run postman_collection.json -e postman_environment.json -d collectionRunnerData.json -n 1 --folder "Additional sundry tests" -r cli,htmlextra --reporter-cli-no-assertions --reporter-cli-no-console --reporter-htmlextra-showEnvironmentData --reporter-htmlextra-export ./newman/AdditionalSundryReport.html | grep -A18 '┌─────'
+      - name: ps
+        run: ps -ef            
+      - name: try to get child based on parent
+        working-directory: ./api/source
+        run: ps -ef --ppid `cat /tmp/test.pid` -o pid=              
+      - name: kill pid
+        working-directory: ./api/source
+        run: kill -SIGINT $(ps -ef --ppid `cat /tmp/test.pid` -o pid= )       
+      - name: ps
+        run: ps -ef             
       - name: Upload Newman artifact
         id: artifact-upload-newman
         uses: actions/upload-artifact@v3
