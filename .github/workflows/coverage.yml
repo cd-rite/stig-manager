@@ -181,7 +181,7 @@ jobs:
           set -o pipefail
           newman run postman_collection.json -e postman_environment.json -d collectionRunnerData.json -n 1 --folder "Additional sundry tests" -r cli,htmlextra --reporter-cli-no-assertions --reporter-cli-no-console --reporter-htmlextra-showEnvironmentData --reporter-htmlextra-export ./newman/AdditionalSundryReport.html | grep -A18 '┌─────'
       - name: Upload Newman artifact
-        id: artifact-upload
+        id: artifact-upload-newman
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
@@ -239,17 +239,17 @@ jobs:
       #     pwd
       #     ls -ltr         
       - name: Upload coverage artifact
-        id: artifact-upload
+        id: artifact-upload-coverage
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
           name: coverage-report
           path: ./api/source/coverage
-      - name: Upload coverage artifact
-        id: artifact-upload2
-        uses: actions/upload-artifact@v3
-        if: ${{ always() }}
-        with:
-          name: coverage-data-tmp
-          path: ./api/source/coverage/tmp
+      # - name: Upload coverage artifact
+      #   id: artifact-upload2
+      #   uses: actions/upload-artifact@v3
+      #   if: ${{ always() }}
+      #   with:
+      #     name: coverage-data-tmp
+      #     path: ./api/source/coverage/tmp
 
