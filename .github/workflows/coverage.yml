@@ -77,7 +77,7 @@ jobs:
           -e MYSQL_DATABASE=stigman \
           -e MYSQL_USER=stigman \
           -e MYSQL_PASSWORD=stigman \
-      #     mysql:8.0.21
+          mysql:8.0.21
       - name: run app and echo pid
         working-directory: ./api/source
         run: sh -c 'echo $$ > /tmp/test.pid ; exec c8 -r html -r text node index.js' &
