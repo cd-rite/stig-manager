@@ -19,7 +19,7 @@ env:
   STIGMAN_DB_PORT: 3306
   STIGMAN_DB_PASSWORD: stigman
   STIGMAN_API_AUTHORITY: http://127.0.0.1:8080/auth/realms/stigman 
-  NODE_V8_COVERAGE: /coverage/tmp/
+  NODE_V8_COVERAGE: /home/runner/work/stig-manager/stig-manager/api/source/coverage/tmp/
 
 jobs:
   # npm_audit:
@@ -83,7 +83,7 @@ jobs:
       - name: ps
         run: ps -ef  
       - name: kill pid
-        working-directory: ./api/sourcels 
+        working-directory: ./api/source
         run:  kill -9 `cat /tmp/test.pid`                
       - name: ps after kill
         run: ps -ef               
