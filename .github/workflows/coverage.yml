@@ -99,6 +99,9 @@ jobs:
       - name: check for files 2
         working-directory: ./api/source
         run:  ls -ltr $PWD/coverage/tmp  
+      - name: expand permissions
+        working-directory: ./api/source
+        run:  sudo chmod -R 777 coverage
       - name: run c8 for coverage reports
         working-directory: ./api/source
         run:  c8 report --reporter=html --reporter=text-summary 
