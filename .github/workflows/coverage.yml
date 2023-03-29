@@ -92,10 +92,13 @@ jobs:
       - name: check for files 
         run:  ls -ltr $NODE_V8_COVERAGE
       - name: check for files 2
-        run:  ls -ltr $PWD/coverage/tmp        
+        working-directory: ./api/source
+        run:  ls -ltr $PWD/coverage/tmp  
       - name: run c8 for coverage reports
+        working-directory: ./api/source
         run:  c8 report --reporter=html --reporter=text-summary --temp-directory $PWD/coverage/tmp
       - name: ls1
+        working-directory: ./api/source
         run: ls -ltr $NODE_V8_COVERAGE/..     
 
       # - name: Install Newman reporter
