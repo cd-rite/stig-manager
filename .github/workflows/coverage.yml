@@ -82,7 +82,7 @@ jobs:
         run: cat /tmp/test.pid         
       - name: last backgrounded process
         working-directory: ./api/source
-        run: echo "last backgrounded process $!"
+        run: echo  $!
       - name: ps
         run: ps -ef  
       - name: try to get child based on parent
