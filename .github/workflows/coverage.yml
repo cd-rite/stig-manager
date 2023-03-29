@@ -91,7 +91,10 @@ jobs:
         run: printenv NODE_V8_COVERAGE
       - name: check for files 
         run:  ls -ltr $NODE_V8_COVERAGE
-
+      - name: run c8 for coverage reports
+        run:  c8 report
+      - name: ls1
+        run: ls -ltr   ./coverage        
 
       # - name: Install Newman reporter
       #   id: newman-reporter-install
