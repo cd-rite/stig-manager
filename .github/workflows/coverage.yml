@@ -92,7 +92,7 @@ jobs:
       - name: check for files 
         run:  ls -ltr $NODE_V8_COVERAGE
       - name: run c8 for coverage reports
-        run:  c8 report --reporter=html --reporter=text-summary
+        run:  c8 report --reporter=html --reporter=text-summary --temp-directory $NODE_V8_COVERAGE
       - name: ls1
         run: ls -ltr $NODE_V8_COVERAGE/..     
 
