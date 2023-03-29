@@ -5,19 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prestart": "npm install",
-    "start": "node index.js",
-    "start-for-coverage": "cross-env STIGMAN_API_PORT=64001 STIGMAN_DB_HOST=localhost STIGMAN_DB_PASSWORD=stigman STIGMAN_OIDC_PROVIDER=http://localhost:8080/auth/realms/stigman NODE_V8_COVERAGE=$INIT_CWD/coverage/tmp npm run start",
-    "pretest:db": "docker run --name stig-manager-db-test -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpw -e MYSQL_DATABASE=stigman -e MYSQL_USER=stigman -e MYSQL_PASSWORD=stigman mysql:8.0.32 --innodb-buffer-pool-size=512M --sort_buffer_size=100M ",
-    "pretest:auth": "docker run --name stig-manager-auth -d -p 8080:8080 -p 8443:8443 nuwcdivnpt/stig-manager-auth",
-    "pretest": "npm --prefix ../../test/api/ install",
-    "test": "npm --prefix ../../test/api/ run start",
-    "pretest2": "npm --prefix ../../test/api/ install && docker run --name stig-manager-db-npmtest -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpw -e MYSQL_DATABASE=stigman -e MYSQL_USER=stigman -e MYSQL_PASSWORD=stigman mysql:8.0.32 || docker start stig-manager-db-npmtest           && docker run --name stig-manager-auth-npmtest -d -p 8080:8080 -p 8443:8443 nuwcdivnpt/stig-manager-auth || docker start stig-manager-auth-npmtest ",
-    "app-start-for-tests": "cross-env STIGMAN_API_PORT=64001 STIGMAN_DB_HOST=localhost STIGMAN_DB_PASSWORD=stigman STIGMAN_OIDC_PROVIDER=http://localhost:8080/realms/stigman node index.js",
-    "test3": "npm-run-all -p start-coverage test2",
-    "coverage-report": "c8 report --reporter=html --reporter=text-summary",
-    "posttest3": "c8 report --reporter=html --reporter=text-summary",
-    "test2": "npm --prefix ../../test/api/ run start",
-    "test4": "npm --prefix ../../test/api/ run start"
+    "start": "node index.js"
   },
   "keywords": [
     "swagger"
@@ -50,13 +38,5 @@
     "umzug": "^2.3.0",
     "uuid": "^9.0.0",
     "xlsx-template": "file:utils/xlsx-template-js-zip-upgrade"
-  },
-  "devDependencies": {
-    "c8": "^7.13.0",
-    "concurrently": "^7.6.0",
-    "cross-env": "^7.0.3",
-    "if-env": "^1.0.4",
-    "newman": "^5.3.2",
-    "npm-run-all": "^4.1.5"
   }
 }
