@@ -76,7 +76,7 @@ jobs:
       #     mysql:8.0.21
       - name: run app and echo pid
         working-directory: ./api/source
-        run: sh -c 'echo $$ > /tmp/test.pid ; exec c8 node index.js' &
+        run: sh -c 'echo $$ > /tmp/test.pid ; exec c8 -r html -r text node index.js' &
       - name: pid file check
         working-directory: ./api/source
         run: cat /tmp/test.pid         
@@ -110,9 +110,9 @@ jobs:
         run:  sudo chmod -R 777 coverage
       - name: check for files after perms change
         run:  ls -ltr $NODE_V8_COVERAGE                
-      - name: run c8 for coverage reports
-        working-directory: ./api/source
-        run:  c8 report --reporter=html --reporter=text-summary 
+      # - name: run c8 for coverage reports
+      #   working-directory: ./api/source
+      #   run:  c8 report --reporter=html --reporter=text-summary 
       - name: ls1
         working-directory: ./api/source
         run: ls -ltr $NODE_V8_COVERAGE/..     
@@ -244,6 +244,6 @@ jobs:
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
-          name: coverage-report-raw
-          path: ./coverage-raw          
+          name: coverage-data-tmp
+          path: ./api/source/coverage/tmp
 
