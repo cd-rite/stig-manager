@@ -76,7 +76,7 @@ jobs:
       #     mysql:8.0.21
       - name: run app and echo pid
         working-directory: ./api/source
-        run: sh -c 'echo $$ > /tmp/test.pid ; exec c8 -r html -r text node index.js' &
+        run: sh -c 'echo $$ > /tmp/test.pid ; exec c8 -r html -r text npm start' &
       - name: pid file check
         working-directory: ./api/source
         run: cat /tmp/test.pid         
