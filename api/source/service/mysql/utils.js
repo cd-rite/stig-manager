@@ -83,7 +83,7 @@ module.exports.initializeDatabase = async function () {
 
   // Preflight the pool every 5 seconds
   const detectedMySqlVersion = await retry(_this.testConnection, {
-    retries: 2,
+    retries: 10,
     factor: 1,
     minTimeout: 5 * 1000,
     maxTimeout: 5 * 1000,
