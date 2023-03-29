@@ -102,13 +102,20 @@ jobs:
       - name: expand permissions
         working-directory: ./api/source
         run:  sudo chmod -R 777 coverage
+      - name: check for files after perms change
+        run:  ls -ltr $NODE_V8_COVERAGE                
       - name: run c8 for coverage reports
         working-directory: ./api/source
         run:  c8 report --reporter=html --reporter=text-summary 
       - name: ls1
         working-directory: ./api/source
         run: ls -ltr $NODE_V8_COVERAGE/..     
-
+      - name: ls1
+        working-directory: ./api/source
+        run: ls -ltr    
+      - name: ls1
+        working-directory: ./api/source
+        run: ls -ltr /coverage           
       # - name: Install Newman reporter
       #   id: newman-reporter-install
       #   run: |
