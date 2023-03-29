@@ -115,7 +115,7 @@ jobs:
         run: ls -ltr    
       - name: ls1
         working-directory: ./api/source
-        run: ls -ltr /coverage           
+        run: ls -ltr coverage
       # - name: Install Newman reporter
       #   id: newman-reporter-install
       #   run: |
