@@ -83,7 +83,7 @@ jobs:
       - name: ps
         run: ps -ef  
       - name: kill pid
-        working-directory: ./api/source
+        working-directory: ./api/sourcels 
         run:  kill -9 `cat /tmp/test.pid`                
       - name: ps after kill
         run: ps -ef               
@@ -91,9 +91,11 @@ jobs:
         run: ls -ltr   
       - name: coverage directory
         run: printenv NODE_V8_COVERAGE
-      - name: check for files 
+      - name: check for files in api/source
         working-directory: ./api/source
         run:  ls -ltr $NODE_V8_COVERAGE
+      - name: check for files bare cov dir
+        run:  ls -ltr $NODE_V8_COVERAGE        
       - name: check for files 2
         working-directory: ./api/source
         run:  ls -ltr $PWD/coverage/tmp  
