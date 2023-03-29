@@ -13,13 +13,13 @@ on:
 # defaults:
 #   run:
 #     shell: bash      
-# env:
-#   STIGMAN_API_PORT: 64001
-#   STIGMAN_DB_HOST: localhost
-#   STIGMAN_DB_PORT: 3306
-#   STIGMAN_DB_PASSWORD: stigman
-#   STIGMAN_API_AUTHORITY: http://127.0.0.1:8080/auth/realms/stigman 
-#   NODE_V8_COVERAGE: ./coverage-raw
+env:
+  STIGMAN_API_PORT: 64001
+  STIGMAN_DB_HOST: localhost
+  STIGMAN_DB_PORT: 3306
+  STIGMAN_DB_PASSWORD: stigman
+  STIGMAN_API_AUTHORITY: http://127.0.0.1:8080/auth/realms/stigman 
+  NODE_V8_COVERAGE: $PWD/coverage/tmp/
 
 jobs:
   # npm_audit:
@@ -49,6 +49,8 @@ jobs:
       #   id: image-build
       #   run: |
       #     docker build -t stig-manager .
+      - name: coverage directory
+        run: printenv NODE_V8_COVERAGE      
       - name: list processes2
         run: ps -ef       
       - name: install c8 coverage reporter
@@ -57,24 +59,24 @@ jobs:
       - name: install dependencies
         working-directory: ./api/source
         run: npm install        
-      - name: Run mock Keycloak
-        id: idp-run
-        working-directory: ./test/api/mock-keycloak
-        run: |
-          python3 -m http.server 8080 &
-      - name: Run MySQL container
-        id: mysql-run
-        run: |
-          docker run -d --name stig-manager-db \
-          -p 3306:3306 \
-          -e MYSQL_ROOT_PASSWORD=rootpw \
-          -e MYSQL_DATABASE=stigman \
-          -e MYSQL_USER=stigman \
-          -e MYSQL_PASSWORD=stigman \
-          mysql:8.0.21
+      # - name: Run mock Keycloak
+      #   id: idp-run
+      #   working-directory: ./test/api/mock-keycloak
+      #   run: |
+      #     python3 -m http.server 8080 &
+      # - name: Run MySQL container
+      #   id: mysql-run
+      #   run: |
+      #     docker run -d --name stig-manager-db \
+      #     -p 3306:3306 \
+      #     -e MYSQL_ROOT_PASSWORD=rootpw \
+      #     -e MYSQL_DATABASE=stigman \
+      #     -e MYSQL_USER=stigman \
+      #     -e MYSQL_PASSWORD=stigman \
+      #     mysql:8.0.21
       - name: run app and echo pid
         working-directory: ./api/source
-        run: sh -c 'echo $$ > /tmp/test.pid ; exec npm run start-for-coverage' &
+        run: sh -c 'echo $$ > /tmp/test.pid ; exec node index.js' &
       - name: pid file check
         run: cat /tmp/test.pid                
       - name: ps
