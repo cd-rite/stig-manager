@@ -57,21 +57,21 @@ jobs:
       - name: install dependencies
         working-directory: ./api/source
         run: npm install        
-      # - name: Run mock Keycloak
-      #   id: idp-run
-      #   working-directory: ./test/api/mock-keycloak
-      #   run: |
-      #     python3 -m http.server 8080 &
-      # - name: Run MySQL container
-      #   id: mysql-run
-      #   run: |
-      #     docker run -d --name stig-manager-db \
-      #     -p 3306:3306 \
-      #     -e MYSQL_ROOT_PASSWORD=rootpw \
-      #     -e MYSQL_DATABASE=stigman \
-      #     -e MYSQL_USER=stigman \
-      #     -e MYSQL_PASSWORD=stigman \
-      #     mysql:8.0.21
+      - name: Run mock Keycloak
+        id: idp-run
+        working-directory: ./test/api/mock-keycloak
+        run: |
+          python3 -m http.server 8080 &
+      - name: Run MySQL container
+        id: mysql-run
+        run: |
+          docker run -d --name stig-manager-db \
+          -p 3306:3306 \
+          -e MYSQL_ROOT_PASSWORD=rootpw \
+          -e MYSQL_DATABASE=stigman \
+          -e MYSQL_USER=stigman \
+          -e MYSQL_PASSWORD=stigman \
+          mysql:8.0.21
       - name: run app and echo pid
         working-directory: ./api/source
         run: sh -c 'echo $$ > /tmp/test.pid ; exec npm run start-for-coverage' &
@@ -86,9 +86,9 @@ jobs:
       - name: ls1
         run: ls -ltr   
       - name: coverage directory
-        run: echo $NODE_V8_COVERAGE
+        run: printenv NODE_V8_COVERAGE
       - name: check for files 
-        run:  ls -ltr `cat $NODE_V8_COVERAGE`      
+        run:  ls -ltr $NODE_V8_COVERAGE
 
 
       # - name: Install Newman reporter
