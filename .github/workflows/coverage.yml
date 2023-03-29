@@ -92,9 +92,9 @@ jobs:
       - name: check for files 
         run:  ls -ltr $NODE_V8_COVERAGE
       - name: run c8 for coverage reports
-        run:  c8 report
+        run:  c8 report --reporter=html --reporter=text-summary
       - name: ls1
-        run: ls -ltr   ./coverage        
+        run: ls -ltr $NODE_V8_COVERAGE/..     
 
       # - name: Install Newman reporter
       #   id: newman-reporter-install
