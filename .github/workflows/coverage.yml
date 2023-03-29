@@ -82,7 +82,15 @@ jobs:
       - name: kill pid
         run:  kill -9 `cat /tmp/test.pid`                
       - name: ps after kill
-        run: ps -ef                  
+        run: ps -ef               
+      - name: ls1
+        run: ls -ltr   
+      - name: coverage directory
+        run: echo $NODE_V8_COVERAGE
+      - name: check for files 
+        run:  ls -ltr `cat $NODE_V8_COVERAGE`      
+
+
       # - name: Install Newman reporter
       #   id: newman-reporter-install
       #   run: |
