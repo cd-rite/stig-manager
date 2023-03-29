@@ -197,19 +197,19 @@ jobs:
         with:
           name: newman-htmlextra
           path: ./test/api/newman
-      - name: Extract API container log
-        id: api-log-extract
-        if: ${{ always() }}
-        working-directory: ./test/api
-        run: |
-          docker logs stig-manager-api > api-log.json
-      - name: Upload API log artifact
-        uses: actions/upload-artifact@v3
-        id: api-log-upload
-        if: ${{ always() }}
-        with:
-          name: api-log
-          path: ./test/api/api-log.json
+      # - name: Extract API container log
+      #   id: api-log-extract
+      #   if: ${{ always() }}
+      #   working-directory: ./test/api
+      #   run: |
+      #     docker logs stig-manager-api > api-log.json
+      # - name: Upload API log artifact
+      #   uses: actions/upload-artifact@v3
+      #   id: api-log-upload
+      #   if: ${{ always() }}
+      #   with:
+      #     name: api-log
+      #     path: ./test/api/api-log.json
       # - name: Collect all container logs on failure
       #   if: ${{ cancelled() || failure() }}
       #   uses: jwalton/gh-docker-logs@54a2a89cd6a2c929525f26ca67a7a4857a5dc1d9 # pin@v1
