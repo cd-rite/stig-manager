@@ -56,18 +56,7 @@ jobs:
           sudo npm install -g c8
       - name: install dependencies
         working-directory: ./api/source
-        run: npm ci   
-      - name: run app and echo pid
-        working-directory: ./api/source
-        run: sh -c 'echo $$ > /tmp/test.pid ; exec node index.js' &
-      - name: pid file check
-        run: cat /tmp/test.pid                
-      - name: ps
-        run: ps -ef  
-      - name: kill pid
-        run:  kill -9 `cat /tmp/test.pid`                
-      - name: ps after kill
-        run: ps -ef                
+        run: npm install        
       # - name: Run mock Keycloak
       #   id: idp-run
       #   working-directory: ./test/api/mock-keycloak
@@ -83,6 +72,17 @@ jobs:
       #     -e MYSQL_USER=stigman \
       #     -e MYSQL_PASSWORD=stigman \
       #     mysql:8.0.21
+      - name: run app and echo pid
+        working-directory: ./api/source
+        run: sh -c 'echo $$ > /tmp/test.pid ; exec npm run start-for-coverage' &
+      - name: pid file check
+        run: cat /tmp/test.pid                
+      - name: ps
+        run: ps -ef  
+      - name: kill pid
+        run:  kill -9 `cat /tmp/test.pid`                
+      - name: ps after kill
+        run: ps -ef                  
       # - name: Install Newman reporter
       #   id: newman-reporter-install
       #   run: |
