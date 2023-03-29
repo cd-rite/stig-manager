@@ -57,9 +57,11 @@ jobs:
       - name: install dependencies
         working-directory: ./api/source
         run: npm ci   
-      - name: run app and get pid
+      - name: run app and echo pid
         working-directory: ./api/source
         run: sh -c 'echo $$; exec node index.js'          
+      - name: ps
+        run: ps -ef        
       # - name: Run mock Keycloak
       #   id: idp-run
       #   working-directory: ./test/api/mock-keycloak
