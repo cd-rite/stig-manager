@@ -189,7 +189,11 @@ jobs:
         working-directory: ./api/source
         run: kill -SIGINT $(ps -ef --ppid `cat /tmp/test.pid` -o pid= )       
       - name: ps
-        run: ps -ef             
+        run: ps -ef       
+      - name: sleep I guess
+        run: sleep 10        
+      - name: ps
+        run: ps -ef                              
       - name: Upload Newman artifact
         id: artifact-upload-newman
         uses: actions/upload-artifact@v3
