@@ -48,14 +48,7 @@ jobs:
       - name: coverage directory
         run: printenv NODE_V8_COVERAGE      
       - name: list processes2
-        run: ps -ef       
-      - name: install c8 coverage reporter
-        run: |
-          sudo npm install -g c8
-      - name: Install Newman reporter
-        id: newman-reporter-install
-        run: |
-          sudo npm install -g newman-reporter-htmlextra                    
+        run: ps -ef                     
       - name: install dependencies
         working-directory: ./api/source
         run: npm install        
@@ -74,15 +67,22 @@ jobs:
           -e MYSQL_USER=stigman \
           -e MYSQL_PASSWORD=stigman \
           mysql:8.0.21
+      - name: install c8 coverage reporter
+        run: |
+          sudo npm install -g c8
+      - name: Install Newman reporter
+        id: newman-reporter-install
+        run: |
+          sudo npm install -g newman-reporter-htmlextra                
       - name: run app and echo pid
         working-directory: ./api/source
         run: sh -c 'echo $$ > /tmp/test.pid ; exec c8 -r html -r text node index.js' &
       - name: pid file check
         working-directory: ./api/source
         run: cat /tmp/test.pid         
-      - name: last backgrounded process
-        working-directory: ./api/source
-        run: echo  $!
+      # - name: last backgrounded process
+      #   working-directory: ./api/source
+      #   run: echo  $!
       - name: ps
         run: ps -ef  
       - name: sleep I guess
@@ -140,8 +140,8 @@ jobs:
         run: kill -SIGINT $(ps -ef --ppid `cat /tmp/test.pid` -o pid= )       
       - name: ps
         run: ps -ef       
-      - name: sleep I guess
-        run: sleep 20        
+      - name: wait until c8 process ends, or 60 seconds, whichever is shorter.
+        run: timeout 60 tail --pid=`cat /tmp/test.pid` -f /dev/null   
       - name: ps
         run: ps -ef                              
       - name: Upload Newman artifact
