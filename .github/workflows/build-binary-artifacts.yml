@@ -60,14 +60,14 @@ jobs:
         run: ./build.sh
       - name: Upload build
         uses: actions/upload-artifact@v3
-        with:
+        with:        
           name: binary-artifacts
-          path: ./bin/
+          path: ./api/bin/
       - name: Upload archives
         uses: actions/upload-artifact@v3
         with:
           name: binary-archives
-          path: ./dist/
+          path: ./api/dist/
       # - name: try existing build script
       #   id: theCurrentScript
       #   uses: actions/github-script@v6
