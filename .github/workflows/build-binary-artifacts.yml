@@ -53,6 +53,9 @@ jobs:
       - name: install pkg
         run: |
           sudo npm install -g pkg             
+      - name: install uglify
+        run: |
+          sudo npm install -g uglify-js              
       - name: try existing build script
         id: theCurrentScript
         # uses: actions/github-script@v6
