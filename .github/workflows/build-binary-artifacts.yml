@@ -43,6 +43,10 @@ jobs:
       #   with:
       #     name: docs-build
       #     path: ./docs/_build/html
+      - name: import keyring
+        env:
+          STIGMAN_KEYRING: ${{ secrets.STIGMAN_KEYRING }}
+        run:  gpg --no-default-keyring --keyring stig-manager.gpg --import `$STIGMAN_KEYRING`
       - name: Get repository metadata
         id: repo
         uses: actions/github-script@v6
@@ -60,7 +64,7 @@ jobs:
         id: theCurrentScript
         # uses: actions/github-script@v6
         working-directory: ./api
-        run: ./build.sh
+        run: ./build.sh  --sign
       - name: Upload build
         uses: actions/upload-artifact@v3
         with:        
