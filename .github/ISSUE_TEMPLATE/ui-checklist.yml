@@ -1,0 +1,43 @@
+
+name: UI Checklist
+description: A guide to help step through all UI components and verify expected behavior.
+labels: ['UI']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This checklist is intended to be used to help verify all UI components are working as expected. If an issue in the UI is discovered, please specify reproduction steps and screenshots if possible in the text area below the checklist. If no Issues are discovered, you do not need to create this issue, or, if you do, you may close it immediately.
+
+
+  - type: checkboxes
+    attributes:
+      label: INIT
+      description: |
+        Issue found in app init
+      options:
+        - label: 'Initial UI Load'
+        - label: 'Redirect to Keycloak'
+        - label: 'Redirect back to web client'
+        - label: 'Home Tab shows expected Version'
+
+  - type: checkboxes
+    attributes:
+      label: LOAD
+      description: |
+        Issue found in app load
+      options:
+        - label: 'Navtree loads App Management Nodes (If user is an App Manager)'
+        - label: 'Navtree loads with assigned Collection Nodes'
+        - label: 'Navtree loads STIG Library Nodes'
+        - label: 'Navtree loads UI Preferences Node'
+
+  - type: textarea
+    attributes:
+      label: Summary
+      description: |
+        Describe the issue you are experiencing.
+        Include general information, error messages, environments, and so on.
+    validations:
+      required: true
+
+
