@@ -1,5 +1,12 @@
 
+---
+name: UI CHECKLIST
+about: Test our UI components
+title: 'UI: '
+labels: UI
+assignees: ''
 
+---
 
 This checklist is intended to be used to help verify all UI components are working as expected.  If an issue in the UI is discovered, please specify reproduction steps and screenshots if possible in the text area below the checklist. 
 
