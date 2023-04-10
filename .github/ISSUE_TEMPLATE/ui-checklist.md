@@ -1,7 +1,14 @@
+---
+name: UI Checklist
+about: Describe this issue template's purpose here.
+title: UI Checklist Results
+labels: ''
+assignees: cd-rite
 
-
+---
 
 This checklist is intended to be used to help verify all UI components are working as expected.  If an issue in the UI is discovered, please specify reproduction steps and screenshots if possible in the text area below the checklist. 
+If no Issues are discovered, you do not need to create this issue, or, if you do, you may close it immediately.
 
 UI Component checklist:
 
@@ -64,6 +71,3 @@ If an issue is discovered, please provide reproduction steps and screenshots her
 **Expected behavior:** [What you expected to happen]
 
 **Actual behavior:** [What actually happened]
-
-
-
