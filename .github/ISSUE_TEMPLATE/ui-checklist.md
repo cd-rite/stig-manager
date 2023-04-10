@@ -1,4 +1,3 @@
-
 ---
 name: UI CHECKLIST
 about: Test our UI components
@@ -71,6 +70,4 @@ If an issue is discovered, please provide reproduction steps and screenshots her
 **Expected behavior:** [What you expected to happen]
 
 **Actual behavior:** [What actually happened]
-
-
 
