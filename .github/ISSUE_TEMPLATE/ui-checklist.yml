@@ -13,7 +13,7 @@ body:
     attributes:
       label: INIT
       description: |
-        Issue found in app init
+        Check App Initialization
       options:
         - label: 'Initial UI Load'
         - label: 'Redirect to Keycloak'
@@ -24,12 +24,25 @@ body:
     attributes:
       label: LOAD
       description: |
-        Issue found in app load
+        Check App UI Load
       options:
         - label: 'Navtree loads App Management Nodes (If user is an App Manager)'
         - label: 'Navtree loads with assigned Collection Nodes'
         - label: 'Navtree loads STIG Library Nodes'
         - label: 'Navtree loads UI Preferences Node'
+
+  - type: checkboxes
+    attributes:
+      label: App Management
+      description: |
+        Check App Management
+      options:
+        - label: 'Collections displays expected data'
+        - label: 'Navtree loads with assigned Collection Nodes'
+        - label: 'Navtree loads STIG Library Nodes'
+        - label: 'Navtree loads UI Preferences Node'
+
+
 
   - type: textarea
     attributes:
