@@ -150,10 +150,37 @@ UI Component checklist:
     - [ ] Import button works as expected
   - [ ] Delete... works as expected
   - [ ] Modify... works as expected
-  - [ ] Dbl-clicking Asset allows Asset to be edited
+  - [ ] Transfer To... works as expected
+  - [ ] Dbl-clicking Asset opens Asset Properties interface, with expected data
+    - [ ] Asset Edit interface works as expected
+    - [ ] Asset properties can be edited
+    - [ ] Asset Labels can be changed
+    - [ ] Asset Metadata can be changed
+    - [ ] Asset STIG Assignments can be edited
+- [ ] STIGs panel displays expected data
+  - [ ] Assign STIG.. works as expected
+  - [ ] Export Results... works as expected
+  - [ ] Unassign STIG... works as expected
+  - [ ] Dbl-clicking or selecting Modify STIG... works as expected
+    - [ ] STIG Edit interface works as expected
+    - [ ] Default STIG Revision can be pinned
+    - [ ] Assets can be assigned/unassigned selected STIG
 - [ ] .csv downloads work as expected
+### STIG Library
+- [ ] Displays expected data
+- [ ] Compare revisions works as expected
+  - [ ] Selected Benchmarks display expected Revisions
+  - [ ] When two Revisions are selected, Compare report displays expected data
+### Interface
+- [ ] What's New panel displays expected data
+- [ ] Dark Mode checkbox indicates and preserves user preference
 ### General
 - [ ] Column/View filtering works as expected.
+- [ ] Nav Tree panel collapses as expected
+- [ ] User info displayed at top of Nav Tree panel
+- [ ] Log-out button works as expected
+- [ ] Hovering over username displays token info
+- [ ] Interface scales and zooms as expected and remains usable (75-200%).
 
 
 
