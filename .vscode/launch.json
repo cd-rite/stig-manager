@@ -1,0 +1,33 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/api/source/index.js",
+            "env": {
+                "NODE_TLS_REJECT_UNAUTHORIZED": "0",
+
+                "STIGMAN_CLIENT_DIRECTORY": "../../client/src",
+                "STIGMAN_API_PORT": "64001",
+                "STIGMAN_DB_TYPE": "mysql",
+                "STIGMAN_DB_HOST": "localhost",
+                "STIGMAN_DB_PORT": "3306",
+                "STIGMAN_DB_USER": "stigman",
+                "STIGMAN_DB_PASSWORD": "stigman",
+                "STIGMAN_DB_SCHEMA": "stigman",
+                // "STIGMAN_OIDC_PROVIDER": "https://${env:CODESPACE_NAME}-8080.${env:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/realms/stigman",
+                "STIGMAN_OIDC_PROVIDER": "http://localhost:8080/realms/stigman",
+
+
+            }
+        }
+    ]
+}

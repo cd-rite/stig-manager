@@ -8,8 +8,7 @@ npm-debug.log
 test/*.log
 uploads/
 
-# VS Code #
-.vscode
+
 
 # docker-compose #
 .env
