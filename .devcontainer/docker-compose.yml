@@ -4,7 +4,7 @@ version: '3.8'
 
 services:
   devcontainer:
-    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    image: mcr.microsoft.com/devcontainers/universal:2
     volumes:
       - ../..:/workspaces:cached
     network_mode: service:db
