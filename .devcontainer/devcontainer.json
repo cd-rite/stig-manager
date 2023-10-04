@@ -6,10 +6,10 @@
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [8080, 64001],
-	"forwardPorts": [
-        8080, 
-        64001
-    ],
+	// "forwardPorts": [
+    //     8080, 
+    //     64001
+    // ],
 	"containerEnv": {
 		"STIGMAN_CLIENT_OIDC_PROVIDER": "https://${localEnv:CODESPACE_NAME}-8080.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/realms/stigman",
 		"STIGMAN_CLIENT_OIDC_PROVIDER2": "https://${CODESPACE_NAME}-8080.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/",
