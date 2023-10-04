@@ -1,0 +1,30 @@
+# STIG Manager docker-compose dev container orchestration
+
+version: '3.8'
+
+services:
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    volumes:
+      - ../..:/workspaces:cached
+    network_mode: service:db
+    command: sleep infinity
+  auth:
+    image: nuwcdivnpt/stig-manager-auth
+    ports:
+      - "8080:8080"
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpw
+      - MYSQL_USER=stigman
+      - MYSQL_PASSWORD=stigman
+      - MYSQL_DATABASE=stigman
+    volumes:
+      - ./mysql-data:/var/lib/mysql      
+    cap_add:
+      - SYS_NICE  # workaround MySQL logging bug => mbind: Operation not permitted 
+
+  

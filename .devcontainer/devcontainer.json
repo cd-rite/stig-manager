@@ -1,8 +1,11 @@
 {
     "name": "STIGMan OSS Dev Container",
-    "image":
-        "mcr.microsoft.com/devcontainers/universal:2",
+    // "image":
+    //     "mcr.microsoft.com/devcontainers/universal:2",
 
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "devcontainer",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [8080, 64001],
@@ -15,11 +18,11 @@
 		"STIGMAN_CLIENT_OIDC_PROVIDER2": "https://${CODESPACE_NAME}-8080.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/",
 		// "STIGMAN_OIDC_PROVIDER": "https://${CODESPACE_NAME}-8080.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/realms/stigman",
 		"MY_CONTAINER_VAR2": "${localEnv:GITHUB_REPOSITORY}"
-	},
+	}
     // Uncomment the next line to run commands after the container is created.
 	// "postCreateCommand": "cat /etc/os-release",
-	"postStartCommand": 
-		"chmod u+x .devcontainer/postStartCommands.sh ; .devcontainer/postStartCommands.sh"
+	// "postStartCommand": 
+	// 	"chmod u+x .devcontainer/postStartCommands.sh ; .devcontainer/postStartCommands.sh"
 	
 		
     // [
