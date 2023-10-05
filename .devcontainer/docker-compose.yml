@@ -5,17 +5,21 @@ version: '3.8'
 services:
   devcontainer:
     image: mcr.microsoft.com/devcontainers/universal:2
+    environment:
+      - STIGMAN_OIDC_PROVIDER=http://auth:8080/realms/stigman
+      - STIGMAN_DB_HOST=db
+      - STIGMAN_DB_PORT=3306
+      - STIGMAN_DB_PASSWORD=stigman
+
     volumes:
       - ../..:/workspaces:cached
-    # network_mode: service:db
-    command: sleep infinity
+    init: true    
     ports:
       - "64001:64001"    
   auth:
     image: nuwcdivnpt/stig-manager-auth
     ports:
       - "8080:8080"
-    network_mode: service:devcontainer
   db:
     image: mysql:8.0
     ports:
@@ -27,7 +31,6 @@ services:
       - MYSQL_DATABASE=stigman
     volumes:
       - ../volumes/mysql-data:/var/lib/mysql 
-    network_mode: service:devcontainer
     cap_add:
       - SYS_NICE  # workaround MySQL logging bug => mbind: Operation not permitted 
 
