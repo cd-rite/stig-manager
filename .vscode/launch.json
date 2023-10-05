@@ -24,7 +24,8 @@
                 "STIGMAN_DB_PASSWORD": "stigman",
                 "STIGMAN_DB_SCHEMA": "stigman",
                 // "STIGMAN_OIDC_PROVIDER": "https://${env:CODESPACE_NAME}-8080.${env:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/realms/stigman",
-                "STIGMAN_OIDC_PROVIDER": "http://localhost:8080/realms/stigman",
+                // "STIGMAN_OIDC_PROVIDER": "http://localhost:8080/realms/stigman",
+                "STIGMAN_OIDC_PROVIDER": "https://${env:CODESPACE_NAME}-8080.${env:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/realms/stigman",
 
 
             }

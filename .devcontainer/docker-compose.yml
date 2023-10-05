@@ -23,7 +23,7 @@ services:
       - MYSQL_PASSWORD=stigman
       - MYSQL_DATABASE=stigman
     volumes:
-      - ./mysql-data:/var/lib/mysql      
+      - ../volumes/mysql-data:/var/lib/mysql      
     cap_add:
       - SYS_NICE  # workaround MySQL logging bug => mbind: Operation not permitted 
 

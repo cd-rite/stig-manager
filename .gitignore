@@ -13,6 +13,9 @@ uploads/
 # docker-compose #
 .env
 
+# volumes #
+volumes
+
 # ZIP archives #
 # *.zip
 
