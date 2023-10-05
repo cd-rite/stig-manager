@@ -7,12 +7,15 @@ services:
     image: mcr.microsoft.com/devcontainers/universal:2
     volumes:
       - ../..:/workspaces:cached
-    network_mode: service:db
+    # network_mode: service:db
     command: sleep infinity
+    ports:
+      - "64001:64001"    
   auth:
     image: nuwcdivnpt/stig-manager-auth
     ports:
       - "8080:8080"
+    network_mode: service:devcontainer
   db:
     image: mysql:8.0
     ports:
@@ -23,7 +26,8 @@ services:
       - MYSQL_PASSWORD=stigman
       - MYSQL_DATABASE=stigman
     volumes:
-      - ../volumes/mysql-data:/var/lib/mysql      
+      - ../volumes/mysql-data:/var/lib/mysql 
+    network_mode: service:devcontainer
     cap_add:
       - SYS_NICE  # workaround MySQL logging bug => mbind: Operation not permitted 
 
