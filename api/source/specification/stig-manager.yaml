@@ -1,11 +1,97 @@
 openapi: 3.0.1
 info:
   title: STIG Manager API
-  description: An API for managing evaluations of Security Technical Implementation Guide (STIG) assessments.
+  description: |
+    An Open Source REST API for managing evaluations of Security Technical Implementation Guide (STIG) assessments.
+    ## Authentication
+      Most requests to the STIGMan API require authentication. To authenticate your request, you will need to provide an authentication token created by the configured OIDC provider with the required scopes or permissions. This token must be present in an `Authorization` header with the value `Bearer <token>`.
+      Check the individual endpoint specifications for more information about required scopes.  
+
+    ## Concepts
+    ### Projections
+      Most endpoints support the `projection` query parameter. This parameter allows the client to specify additional properties of the response object that should be included in the response. This is useful for reducing the baseline size of responses, and reducing the number of subsequent queries that might be required to retrieve additional information about the response object.
+      For example:
+      The baseline response to the /assets endpoint will include only a list of Assets and basic properties (id, name, description, labels, etc.) for the requested Collection. If the client needs to know the STIGs assigned to each Asset, the client can specify the `projection` query parameter with the value `stigs`:  
+      `http://localhost:64001/api/assets?collectionId=32&projection=stigs`  
+      This will cause the API response to include the STIGs assigned to each Asset.  
+
+
+      Please see descriptions of individual endpoints for more information about specific projections those endpoints support.
+
+    ### Collections
+      Collections are the top-level organizational unit in STIG Manager. 
+      - All Assets must be associated with a Collection. 
+      - Collections are owned by Users, and Users can grant other Users various levels of access to their Collections. 
+      - Collections support a variety of settings that control the behavior of the Collection and its Reviews.
+      - Collections support the creation of Labels that can be assigned to that Collection's Assets, providing a flexible organizational system for Users.
+      - Collections can be cloned to create a new Collection with the same Assets and Reviews as the source Collection.
+      - Reviews can be exported in a variety of file formats, or from one Collection to another.
+
+    **_NOTE:_**  Collections maintain an importOptions property stored in Collection metadata that is used to store User specified preferences for importing Reviews into the Collection. Well-behaved Clients are expected to honor the Options specified in this property when importing Reviews into a Collection.  For a description of these properties and their effects, please see the [Import Options section of the project Documentation](https://stig-manager.readthedocs.io/en/latest/user-guide/user-guide.html?highlight=options#import-options). For a sample implementation, check out the [stig-manager-client-modules repository](https://github.com/NUWCDIVNPT/stig-manager-client-modules).  
+      
+    ### Assets
+
+      All Assets must be in a Collection.
+
+    ### Reviews
+
+      All Reviews must be attached to an Asset in a Collection.
+
+    ### Users
+
+      Users can be granted various levels of access to Collections.  
+
+    ### Metrics
+
+      Returns precalculated Metrics for a Collection.        
+
+    ### STIGs
+
+      Endpoints relating to the Reference STIGs available in STIG Manager.
+
+    ### Operations
+
+      Information about the status and configuration of the STIG Manager API.    
+
+
+    ## Additional info:
+    - [STIG Manager GitHub Repository](https://github.com/NUWCDIVNPT/stig-manager)  
+    - [STIG Manager Documentation](https://stig-manager.readthedocs.io/en/latest/)  
+    - [STIG Manager on Docker Hub](https://hub.docker.com/r/nuwcdivnpt/stig-manager)  
+      
+
+
   contact:
     name: Carl Smigielski
     email: carl.a.smigielski@saic.com
   version: 'v1'
+externalDocs:
+  description: STIG Manager GitHub Repository
+  url: https://github.com/NUWCDIVNPT/stig-manager  
+tags:
+  - name: Asset
+    description: |
+      Assets are the basic targets of Evaluation in STIG Manager.  
+      - Assets can be assigned STIGs.
+      - Assets can be assigned Labels.
+      - Assets can be assigned Metadata.
+      - Assets can be assigned to Collections.
+      - All Assets must be in a Collection.  
+  - name: Collection
+    description: |
+      Collections are the top-level organizational unit in STIG Manager. 
+      - All Assets must be associated with a Collection. 
+      - Collections are owned by Users, and Users can grant other Users various levels of access to their Collections. 
+      - Collections support a variety of settings that control the behavior of the Collection and its Reviews.
+      - Collections support the creation of Labels that can be assigned to that Collection's Assets, providing a flexible organizational system for Users.
+      - Collections can be cloned to create a new Collection with the same Assets and Reviews as the source Collection.
+      - Reviews can be exported in a variety of file formats, or from one Collection to another.  
+
+      **_NOTE:_**  Collections maintain an importOptions property stored in Collection metadata that is used to store User specified preferences for importing Reviews into the Collection. Well-behaved Clients are expected to honor the Options specified in this property when importing Reviews into a Collection.  For a description of these properties and their effects, please see the [Import Options section of the project Documentation](https://stig-manager.readthedocs.io/en/latest/user-guide/user-guide.html?highlight=options#import-options). For a sample implementation, check out the [stig-manager-client-modules repository](https://github.com/NUWCDIVNPT/stig-manager-client-modules).  
+  - name: User
+    description: |
+      Users can be granted various levels of access to Collections.  
+
 servers:
   - url: 'http://localhost:64001/api'
 paths:
@@ -6963,7 +7049,7 @@ components:
     LabelMatchQuery:
       name: labelMatch
       in: query
-      description: Selectes Assets without labels
+      description: Selects Assets without labels
       schema:
         type: string
         enum:
@@ -6971,7 +7057,7 @@ components:
     LabelNameQuery:
       name: labelName
       in: query
-      description: Selectes Assets by label name
+      description: Selects Assets by label name
       schema:
         type: array
         uniqueItems: true
