@@ -48,7 +48,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue_number,
-              body: 'Everything is OK. Thank you for  PR:# ${{issue_number}} ! - another test - turned off auto analysis on sonarcloud side'
+              body: 'Everything is OK. Thank you for  PR:# ${{issue_number}} ! - another test - reference pr in call to sonarcloud'
             });
   # SonarCloudAnalysis-API:
   #   name: SonarCloud Analysis API
