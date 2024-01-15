@@ -114,6 +114,7 @@ jobs:
           # Additional arguments for the sonarcloud scanner
           projectBaseDir: ./api/source
           args: |
+            -Dsonar.pullrequest.key=${{steps.set-issue-number.outputs.result}}
             -Dsonar.projectKey=cd-rite_stig-manager
             -Dsonar.projectName=cd-rite_stig-manager
             -Dsonar.organization=cd-rite
