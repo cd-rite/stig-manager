@@ -63,7 +63,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue_number,
-              body: `second comment using step output for PR#: ${{steps.set-issue-number.outputs.result}} ! - trigger again`
+              body: `second comment using step output for PR#: ${{steps.set-issue-number.outputs.result}} ! - trigger for adding new sonarcloud argument`
             });
   # SonarCloudAnalysis-API:
   #   name: SonarCloud Analysis API
