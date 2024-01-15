@@ -48,7 +48,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue_number,
-              body: 'Everything is OK. Thank you for  PR:# ${{issue_number}} ! - another test - reference pr in call to sonarcloud'
+              body: `Everything is OK. Thank you for  PR#: ${issue_number} ! - another test - reference pr in call to sonarcloud`
             });
   # SonarCloudAnalysis-API:
   #   name: SonarCloud Analysis API
@@ -99,7 +99,6 @@ jobs:
           # Additional arguments for the sonarcloud scanner
           projectBaseDir: ./api/source
           args: |
-            -Dsonar.pullrequest.key=${{issue_number}}
             -Dsonar.projectKey=cd-rite_stig-manager
             -Dsonar.projectName=cd-rite_stig-manager
             -Dsonar.organization=cd-rite
