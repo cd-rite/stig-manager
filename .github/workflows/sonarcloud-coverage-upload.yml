@@ -38,6 +38,7 @@ jobs:
       - run: unzip pr.zip
 
       - name: 'Comment on PR'
+        id: set-issue-number
         uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -49,6 +50,20 @@ jobs:
               repo: context.repo.repo,
               issue_number: issue_number,
               body: `Everything is OK. Thank you for  PR#: ${issue_number} ! - another test - reference pr in call to sonarcloud - trigger`
+            });
+            return issue_number
+      - name: 'Comment on PR again'
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            var fs = require('fs');
+            var issue_number = Number(fs.readFileSync('./NR'));
+            await github.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              body: `second comment using step output for PR#: ${{steps.set-issue-number.outputs.result}} ! - another test - reference pr in call to sonarcloud - trigger`
             });
   # SonarCloudAnalysis-API:
   #   name: SonarCloud Analysis API
