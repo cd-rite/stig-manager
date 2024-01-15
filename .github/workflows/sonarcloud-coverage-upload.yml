@@ -63,7 +63,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue_number,
-              body: `second comment using step output for PR#: ${{steps.set-issue-number.outputs.result}} ! - another test - reference pr in call to sonarcloud - trigger`
+              body: `second comment using step output for PR#: ${{steps.set-issue-number.outputs.result}} ! - trigger again`
             });
   # SonarCloudAnalysis-API:
   #   name: SonarCloud Analysis API
@@ -114,6 +114,7 @@ jobs:
           # Additional arguments for the sonarcloud scanner
           projectBaseDir: ./api/source
           args: |
+            -Dsonar.pullrequest.key=${{steps.set-issue-number.outputs.result}}
             -Dsonar.projectKey=cd-rite_stig-manager
             -Dsonar.projectName=cd-rite_stig-manager
             -Dsonar.organization=cd-rite
