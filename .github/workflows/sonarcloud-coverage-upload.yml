@@ -48,16 +48,16 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue_number,
-              body: 'Everything is OK. Thank you for the PR! - another test'
+              body: 'Everything is OK. Thank you for  PR:# ${{issue_number}} ! - another test - turned off auto analysis on sonarcloud side'
             });
-  SonarCloudAnalysis-API:
-    name: SonarCloud Analysis API
-    # needs: test_api
-    runs-on: ubuntu-latest
-    if: >
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.conclusion == 'success'    
-    steps:
+  # SonarCloudAnalysis-API:
+  #   name: SonarCloud Analysis API
+  #   # needs: test_api
+  #   runs-on: ubuntu-latest
+  #   if: >
+  #     github.event.workflow_run.event == 'pull_request' &&
+  #     github.event.workflow_run.conclusion == 'success'    
+  #   steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -98,7 +98,9 @@ jobs:
         with:
           # Additional arguments for the sonarcloud scanner
           projectBaseDir: ./api/source
-          args: -Dsonar.projectKey=cd-rite_stig-manager
+          args: |
+            -Dsonar.pullrequest.key=${{issue_number}}
+            -Dsonar.projectKey=cd-rite_stig-manager
             -Dsonar.projectName=cd-rite_stig-manager
             -Dsonar.organization=cd-rite
             -Dsonar.inclusions=**/*.js
