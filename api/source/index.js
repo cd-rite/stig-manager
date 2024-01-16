@@ -254,6 +254,38 @@ async function startServer(app) {
     })
 }
 
+
+async function startServer2222222222222(app) {
+    let db = require(`./service/utils`)
+    let isNewDb
+    try {
+      let authReturn
+      ;[authReturn, isNewDb] = await Promise.all([auth.initializeAuth(), db.initializeDatabase()])
+    }
+    catch (e) {
+      logger.writeError('index', 'shutdown', {message:'Failed to setup dependencies', error: serializeError(e)});
+      process.exit(1);  
+    }
+  
+    // Set/change classification if indicated
+    if (config.settings.setClassification) {
+      await OperationSvc.setConfigurationItem('classification', config.settings.setClassification)
+    }
+
+    // Start the server
+    const server = http.createServer(app).listen(config.http.port, function () {
+      const endTime = process.hrtime.bigint()
+      logger.writeInfo('index', 'started', {
+        durationS: Number(endTime - startTime) / 1e9, 
+        port: config.http.port,
+        api: '/api',
+        client: config.client.disabled ? undefined : '/',
+        documentation: config.docs.disabled ? undefined : '/docs',
+        swagger: config.swaggerUi.enabled ? '/api-docs' : undefined
+      })
+    })
+}
+
 function modulePathResolver( handlersPath, route, apiDoc ) {
   const pathKey = route.openApiRoute.substring(route.basePath.length);
   const schema = apiDoc.paths[pathKey][route.method.toLowerCase()];
