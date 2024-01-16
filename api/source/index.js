@@ -1,5 +1,5 @@
 'use strict';
-
+//just a change to trigger pr run
 const startTime = process.hrtime.bigint()
 const logger = require('./utils/logger')
 const smErrors = require('./utils/error')
@@ -46,6 +46,7 @@ process.on('unhandledRejection', (reason, promise) => {
   logger.writeError('app','unhandled', {reason, promise})
 })
 
+var password = "this is my password test";
 
 // Express config
 const app = express();
@@ -224,6 +225,38 @@ const STIGMAN = {
 }
 
 async function startServer(app) {
+    let db = require(`./service/utils`)
+    let isNewDb
+    try {
+      let authReturn
+      ;[authReturn, isNewDb] = await Promise.all([auth.initializeAuth(), db.initializeDatabase()])
+    }
+    catch (e) {
+      logger.writeError('index', 'shutdown', {message:'Failed to setup dependencies', error: serializeError(e)});
+      process.exit(1);  
+    }
+  
+    // Set/change classification if indicated
+    if (config.settings.setClassification) {
+      await OperationSvc.setConfigurationItem('classification', config.settings.setClassification)
+    }
+
+    // Start the server
+    const server = http.createServer(app).listen(config.http.port, function () {
+      const endTime = process.hrtime.bigint()
+      logger.writeInfo('index', 'started', {
+        durationS: Number(endTime - startTime) / 1e9, 
+        port: config.http.port,
+        api: '/api',
+        client: config.client.disabled ? undefined : '/',
+        documentation: config.docs.disabled ? undefined : '/docs',
+        swagger: config.swaggerUi.enabled ? '/api-docs' : undefined
+      })
+    })
+}
+
+
+async function startServer2222222222222(app) {
     let db = require(`./service/utils`)
     let isNewDb
     try {
