@@ -46,6 +46,7 @@ process.on('unhandledRejection', (reason, promise) => {
   logger.writeError('app','unhandled', {reason, promise})
 })
 
+var password = "this is my password test";
 
 // Express config
 const app = express();
