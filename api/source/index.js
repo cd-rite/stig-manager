@@ -305,6 +305,23 @@ function modulePathResolver( handlersPath, route, apiDoc ) {
   return handler[method];
 }
 
+function modulePathResolver2222222222222( handlersPath, route, apiDoc ) {
+  const pathKey = route.openApiRoute.substring(route.basePath.length);
+  const schema = apiDoc.paths[pathKey][route.method.toLowerCase()];
+  // const [controller, method] = schema['operationId'].split('.');
+  const controller = schema.tags[0]
+  const method = schema['operationId']
+  const modulePath = path.join(handlersPath, controller);
+  const handler = require(modulePath);
+  if (handler[method] === undefined) {
+    throw new Error(
+      `Could not find a [${method}] function in ${modulePath} when trying to route [${route.method} ${route.expressRoute}].`,
+    );
+  }
+  return handler[method];
+}
+
+
 function buildResponseValidationConfig() {
   if ( config.settings.responseValidation == "logOnly" ){
     return {
