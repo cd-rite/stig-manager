@@ -48,8 +48,6 @@ process.on('unhandledRejection', (reason, promise) => {
 
 var password = "this is my password test";
 
-Bad code!!!
-
 // Express config
 const app = express();
 let storage =  multer.memoryStorage()
