@@ -1,4 +1,35 @@
-1.4.0
+1.4.3
+-----
+
+Changes:
+
+  - (API/UI) Added multi-asset patch endpoint with delete support for better performance when deleting large numbers of Assets
+  - (UI) Switch to newly-published stig-manager-client-modules package on npm
+  - (Docs) Updates to documentation publish process
+  - (API) Code cleanup
+  - (Docs) Updated STIGMan ASD reference checklist version
+
+1.4.2
+-----
+
+Changes:
+
+  - (API/UI) Meta-Collection Dashboard feature
+  - (Docs) Documentation updates
+  - (Demo/Docs) Demo data updates, include STIGs for demo data.
+  - (API) Code cleanup
+  - (API/Dependency) Dependency updates  
+
+  
+1.4.1
+-----
+
+Changes:
+
+  - (API) Fix regression preventing TLS connection to MySQL database
+
+
+  1.4.0
 -----
 
 Changes:

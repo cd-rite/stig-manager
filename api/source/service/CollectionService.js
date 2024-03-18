@@ -571,7 +571,7 @@ exports.setStigAssetsByCollectionUser = async function(collectionId, userId, sti
         }
         let sqlInsertSaIds = `INSERT IGNORE INTO user_stig_asset_map (userId, saId) SELECT ?, saId FROM stig_asset_map WHERE `
         sqlInsertSaIds += predicatesInsertSaIds.join('\nOR\n')
-        let [result] = await connection.execute(sqlInsertSaIds, bindsInsertSaIds)
+        await connection.execute(sqlInsertSaIds, bindsInsertSaIds)
       }
       await connection.commit()
     }
@@ -756,11 +756,11 @@ exports.getChecklistByCollectionStig = async function (collectionId, benchmarkId
     // Non-current revision
     if (revisionStr !== 'latest') {
       joins.splice(2, 1, 'left join revision rev on sa.benchmarkId=rev.benchmarkId')
-      const results = /V(\d+)R(\d+(\.\d+)?)/.exec(revisionStr)
+      const {version, release} = dbUtils.parseRevisionStr(revisionStr)
       predicates.statements.push('rev.version = :version')
       predicates.statements.push('rev.release = :release')
-      predicates.binds.version = results[1]
-      predicates.binds.release = results[2]
+      predicates.binds.version = version
+      predicates.binds.release = release
     }
 
     // Access control
@@ -798,6 +798,20 @@ exports.getChecklistByCollectionStig = async function (collectionId, benchmarkId
       'accepted', sum(CASE WHEN r.statusId = 3 THEN 1 ELSE 0 END)
     )
   ) as counts
+  ,json_object(
+    'ts', json_object(
+      'min', DATE_FORMAT(MIN(r.ts),'%Y-%m-%dT%H:%i:%sZ'),
+      'max', DATE_FORMAT(MAX(r.ts),'%Y-%m-%dT%H:%i:%sZ')
+    ),
+    'statusTs', json_object(
+      'min', DATE_FORMAT(MIN(r.statusTs),'%Y-%m-%dT%H:%i:%sZ'),
+      'max', DATE_FORMAT(MAX(r.statusTs),'%Y-%m-%dT%H:%i:%sZ')
+    ),
+    'touchTs', json_object(
+      'min', DATE_FORMAT(MIN(r.touchTs),'%Y-%m-%dT%H:%i:%sZ'),
+      'max', DATE_FORMAT(MAX(r.touchTs),'%Y-%m-%dT%H:%i:%sZ')
+    )
+  ) as timestamps
 from
   ${joins.join('\n')}
 where
@@ -1015,7 +1029,7 @@ exports.patchCollectionMetadata = async function ( collectionId, metadata ) {
     where 
       collectionId = ?`
   binds.push(JSON.stringify(metadata), collectionId)
-  let [rows] = await dbUtils.pool.query(sql, binds)
+  await dbUtils.pool.query(sql, binds)
   return true
 }
 
@@ -1029,7 +1043,7 @@ exports.putCollectionMetadata = async function ( collectionId, metadata ) {
     where 
       collectionId = ?`
   binds.push(JSON.stringify(metadata), collectionId)
-  let [rows] = await dbUtils.pool.query(sql, binds)
+  await dbUtils.pool.query(sql, binds)
   return true
 }
 
@@ -1223,8 +1237,9 @@ exports.getReviewHistoryStatsByCollection = async function (collectionId, startD
   }
 
   let sql = 'SELECT COUNT(*) as collectionHistoryEntryCount, MIN(rh.touchTs) as oldestHistoryEntryDate'
-
-  if (projection && projection.includes('asset')) {
+  
+  // If there is a response and the request included the asset projection
+  if (projection?.includes('asset')) {
     sql += `, coalesce(
       (SELECT json_arrayagg(
         json_object(
@@ -1669,9 +1684,7 @@ exports.writeStigPropsByCollectionStig = async function ({collectionId, benchmar
     let version, release
     if (defaultRevisionStr) {
       if (defaultRevisionStr !== 'latest') {
-        const revisionParts = /V(\d+)R(\d+(\.\d+)?)/.exec(defaultRevisionStr)
-        version = revisionParts[1]
-        release = revisionParts[2]
+        ;({version, release} = dbUtils.parseRevisionStr(defaultRevisionStr))
       }
     }
     connection = await dbUtils.pool.getConnection()

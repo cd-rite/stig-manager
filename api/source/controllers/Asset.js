@@ -5,6 +5,7 @@ const config = require('../utils/config')
 const escape = require('../utils/escape')
 const AssetService = require(`../service/AssetService`);
 const CollectionService = require(`../service/CollectionService`);
+const Security = require('../utils/accessLevels')
 const dbUtils = require(`../service/utils`)
 const {XMLBuilder} = require("fast-xml-parser")
 const SmError = require('../utils/error')
@@ -194,9 +195,9 @@ module.exports.getAsset = async function getAsset (req, res, next) {
     if (!response) {
       throw new SmError.PrivilegeError()
     }
-    
-    // If there is a response, check if the request included the stigGrants projection
-    if (projection && projection.includes('stigGrants')) {
+
+    // If there is a response and the request included the stigGrants projection
+    if (projection?.includes('stigGrants')) {
       // Check if the stigGrants projection is forbidden
       if (!elevate) {
         const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === response.collection.collectionId )
@@ -227,8 +228,9 @@ module.exports.getAssets = async function getAssets (req, res, next) {
     const collectionGrant = req.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
 
     if ( collectionGrant || elevate ) {
-      // Check if the request includes the stigGrants projection
-      if (projection && projection.includes('stigGrants')) {
+  
+      // If there is a response and the request included the stigGrants projection
+      if (projection?.includes('stigGrants')) {
         // Check if the stigGrants projection is forbidden
         if (!elevate) {
           if (collectionGrant?.accessLevel < 3)  {
@@ -761,7 +763,8 @@ module.exports.putAssetMetadataValue = async function (req, res, next) {
     let assetId = await getAssetIdAndCheckPermission(req)
     let key = req.params.key
     let value = req.body
-    let result = await AssetService.putAssetMetadataValue(assetId, key, value)
+
+    await AssetService.putAssetMetadataValue(assetId, key, value)
     res.status(204).send()
   }
   catch (err) {
@@ -775,7 +778,7 @@ module.exports.deleteAssetMetadataKey = async function (req, res, next) {
     let assetId = await getAssetIdAndCheckPermission(req)
     let key = req.params.key
 
-    let result = await AssetService.deleteAssetMetadataKey(assetId, key, req.userObject)
+    await AssetService.deleteAssetMetadataKey(assetId, key, req.userObject)
     res.status(204).send()
   }
   catch (err) {
@@ -783,47 +786,33 @@ module.exports.deleteAssetMetadataKey = async function (req, res, next) {
   }  
 }
 
-module.exports.getAssetLabels = async function (req, res, next) {
+module.exports.patchAssets = async function (req, res, next) {
   try {
-    res.json({})
+    const collectionId = getCollectionIdAndCheckPermission(req, Security.ACCESS_LEVEL.Manage)
+    const patchRequest = req.body
+    const collection = await CollectionService.getCollection( collectionId, ['assets'], false, req.userObject)
+    const collectionAssets = collection.assets.map( a => a.assetId)
+    if (!patchRequest.assetIds.every( a => collectionAssets.includes(a))) {
+      throw new SmError.PrivilegeError('One or more assetId is not a Collection member.')
+    }
+    await AssetService.deleteAssets(patchRequest.assetIds, req.userObject)
+    res.json({
+      operation: 'deleted',
+      assetIds: patchRequest.assetIds
+    })
   }
   catch (err) {
     next(err)
   }
 }
 
-module.exports.addAssetLabels = async function (req, res, next) {
-  try {
-    res.json({})
+function getCollectionIdAndCheckPermission(request, minimumAccessLevel = Security.ACCESS_LEVEL.Manage) {
+  let collectionId = request.query.collectionId
+  const collectionGrant = request.userObject.collectionGrants.find( g => g.collection.collectionId === collectionId )
+  if (collectionGrant?.accessLevel < minimumAccessLevel || !collectionGrant) {
+    throw new SmError.PrivilegeError()
   }
-  catch (err) {
-    next(err)
-  }
+  return collectionId
 }
 
-module.exports.replaceAssetLabels = async function (req, res, next) {
-  try {
-    res.json({})
-  }
-  catch (err) {
-    next(err)
-  }
-}
 
-module.exports.deleteAssetLabels = async function (req, res, next) {
-  try {
-    res.json({})
-  }
-  catch (err) {
-    next(err)
-  }
-}
-
-module.exports.deleteAssetLabelById = async function (req, res, next) {
-  try {
-    res.json({})
-  }
-  catch (err) {
-    next(err)
-  }
-}
