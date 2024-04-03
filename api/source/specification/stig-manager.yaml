@@ -12,6 +12,8 @@ info:
       - [OpenAPI Specification](https://swagger.io/specification/)
       - [OIDC](https://openid.net/connect/)
 
+    All Request and Response bodies are in JSON format unless otherwise specified.
+
     ### Authentication
       Most requests to the STIGMan API require authentication. To authenticate your request, you will need to provide an authentication token created by the configured OIDC provider with the required scopes or permissions. This token must be present in an `Authorization` header with the value `Bearer <token>`.
       Check the individual endpoint specifications for more information about required scopes.  
