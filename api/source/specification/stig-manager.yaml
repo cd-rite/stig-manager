@@ -2985,10 +2985,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                collections:
-                  type: string
+              type: object        
           multipart/form-data:
             schema:
               type: object

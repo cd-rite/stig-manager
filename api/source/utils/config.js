@@ -19,7 +19,7 @@ let config = {
     },
     client: {
         clientId: process.env.STIGMAN_CLIENT_ID || "stig-manager",
-        authority: process.env.STIGMAN_CLIENT_OIDC_PROVIDER || process.env.STIGMAN_OIDC_PROVIDER || "http://localhost:8080/auth/realms/stigman",
+        authority: process.env.STIGMAN_CLIENT_OIDC_PROVIDER || process.env.STIGMAN_OIDC_PROVIDER || "http://localhost:8080/realms/stigman",
         apiBase: process.env.STIGMAN_CLIENT_API_BASE || "api",
         disabled: process.env.STIGMAN_CLIENT_DISABLED === "true",
         directory: process.env.STIGMAN_CLIENT_DIRECTORY || '../../client/dist',
@@ -66,12 +66,12 @@ let config = {
     },
     swaggerUi: {
         enabled: process.env.STIGMAN_SWAGGER_ENABLED === "true", 
-        authority: process.env.STIGMAN_SWAGGER_OIDC_PROVIDER || process.env.STIGMAN_SWAGGER_AUTHORITY || process.env.STIGMAN_OIDC_PROVIDER || "http://localhost:8080/auth/realms/stigman", 
+        authority: process.env.STIGMAN_SWAGGER_OIDC_PROVIDER || process.env.STIGMAN_SWAGGER_AUTHORITY || process.env.STIGMAN_OIDC_PROVIDER || "http://localhost:8080/realms/stigman", 
         server: process.env.STIGMAN_SWAGGER_SERVER || "http://localhost:54000/api",
         oauth2RedirectUrl: process.env.STIGMAN_SWAGGER_REDIRECT || "http://localhost:54000/api-docs/oauth2-redirect.html"
     },
     oauth: {
-        authority: process.env.STIGMAN_OIDC_PROVIDER || process.env.STIGMAN_API_AUTHORITY || "http://localhost:8080/auth/realms/stigman",
+        authority: process.env.STIGMAN_OIDC_PROVIDER || process.env.STIGMAN_API_AUTHORITY || "http://localhost:8080/realms/stigman",
         claims: {
             scope: process.env.STIGMAN_JWT_SCOPE_CLAIM || "scope",
             username: process.env.STIGMAN_JWT_USERNAME_CLAIM,

@@ -1,0 +1,50 @@
+{
+    "assetId": "62",
+    "collectionId": "21",
+    "stigs":  ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
+    "benchmark": "VPN_SRG_TEST",
+    "assetCreate":{
+        "name": "TestAsset",
+        "collectionId": "21",
+        "description": "test",
+        "ip": "1.1.1.1",
+        "noncomputing": true,
+        "labelIds": [],
+        "metadata": {
+            "pocName": "pocName",
+            "pocEmail": "pocEmail@example.com",
+            "pocPhone": "12345",
+            "reqRar": "true"
+        },
+        "stigs": ["VPN_SRG_TEST", "Windows_10_STIG_TEST"]
+    },
+    "assetPatch": {
+        "name": "TestAssetPatch",
+        "description": "testPatch",
+        "ip": "2.2.2.2"
+    },
+    "assetPut": {
+        "name": "TestAssetPut",
+        "collectionId": "21",
+        "description": "testPut",
+        "ip": "1.1.1.1",
+        "noncomputing": true,
+        "labelIds": ["df4e6836-a003-11ec-b1bc-0242ac110002"],
+        "metadata": {
+            "pocName": "poc2Put",
+            "pocEmail": "pocEmailPut@email.com",
+            "pocPhone": "12342",
+            "reqRar": "true"
+        },
+        "stigs": [
+            "VPN_SRG_TEST",
+            "Windows_10_STIG_TEST",
+            "RHEL_7_STIG_TEST"
+        ]
+    },
+    "assetBatchDelete":{
+        "operation":"delete",
+        "assetIds":
+            ["29","42"]
+    }
+}
