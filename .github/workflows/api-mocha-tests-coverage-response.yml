@@ -13,7 +13,7 @@ on:
         branches:
             - main
             - test-coverage
-            - mocha-testing
+            - new-code-testing
         paths:
             - "api/source/**"
             - "test/api/**"
