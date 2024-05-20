@@ -1,23 +1,20 @@
 {
     "assetId": "62",
-    "collectionId": "21",
+    "testAsset": "42",
+    "testAssetName": "Collection_X_lvl1_asset-1",
+    "testAssetNoStigs": "29",
+    "testAssetlvl1NoAccess": "62",
+    "collectionDoesntExist": "999",
+    "testAssetNoStigsName": "ACHERNAR_Collection_X_asset",
+    "metadataKey": "testkey",
+    "metadataValue": "testvalue",
+    "collectionId21": "21",
+    "assetId34": "34",
+    "collectionId1": "1",
     "stigs":  ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
     "benchmark": "VPN_SRG_TEST",
-    "assetCreate":{
-        "name": "TestAsset",
-        "collectionId": "21",
-        "description": "test",
-        "ip": "1.1.1.1",
-        "noncomputing": true,
-        "labelIds": [],
-        "metadata": {
-            "pocName": "pocName",
-            "pocEmail": "pocEmail@example.com",
-            "pocPhone": "12345",
-            "reqRar": "true"
-        },
-        "stigs": ["VPN_SRG_TEST", "Windows_10_STIG_TEST"]
-    },
+    "testLabel": "755b8a28-9a68-11ec-b1bc-0242ac110002",
+    "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
     "assetPatch": {
         "name": "TestAssetPatch",
         "description": "testPatch",

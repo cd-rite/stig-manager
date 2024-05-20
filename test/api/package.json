@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "testing",
   "scripts": {
-    "test": "mocha --reporter mochawesome --exit './mocha/**/*.test.js'",
+    "test": "mocha --reporter mochawesome --showFailed --exit './mocha/**/*.test.js'",
     "test:dev": "nodemon --ext 'js' --exec 'npm test'"
   },
   "keywords": [],
@@ -15,6 +15,7 @@
     "chai": "^4.4.1",
     "chai-http": "^4.4.0",
     "form-data": "^4.0.0",
+    "json2csv": "^6.0.0-alpha.2",
     "mocha": "^10.4.0",
     "nodemon": "^3.1.0"
   },
