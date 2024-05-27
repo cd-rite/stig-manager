@@ -1,0 +1,44 @@
+{
+    "checklistLength": 81,
+    "assetMatchString": "asset",
+    "testLabelLvl1": "5130dc84-9a68-11ec-b1bc-0242ac110002",
+    "stigs": ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
+    "scraplvl1Collection":"86",
+    "scrapCollection": "1",
+    "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
+    "assetNoRestrictedGrants": "62",
+    "testCollection":{
+        "name": "Collection_X",
+        "collectionId": "21",
+        "benchmark": "VPN_SRG_TEST",
+        "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
+        "testLabel":"755b8a28-9a68-11ec-b1bc-0242ac110002",
+        "revisionStr": "V1R1"
+    },
+    "testAssetNoStigs":{
+        "name": "ACHERNAR_Collection_X_asset",
+        "assetId": "29",
+        "collectionId": "21"
+    },
+    "scrapAsset":{
+        "assetId": "34",
+        "metadataKey": "testkey",
+        "metadataValue": "testvalue",
+        "scrapBenchmark": "RHEL_7_STIG_TEST"
+    },
+    "testAsset": {
+        "name": "Collection_X_lvl1_asset-1",
+        "assetId": "42",
+        "collectionId": "21",
+        "usersWithGrant":["86,85"],
+        "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
+        "metadataKey": "testkey",
+        "metadataValue": "testvalue"
+    },
+    "putStigs": [
+        "VPN_SRG_TEST",
+        "VPN_SRG_OTHER",
+        "Windows_10_STIG_TEST",
+        "RHEL_7_STIG_TEST"
+    ]
+}

@@ -154,13 +154,72 @@ const deleteAsset = async assetId => {
 }
 
 const createDisabledCollectionsandAssets = async () => {
+  // this also should create stig grants for a user, add reviews too .
   const collection = await createTempCollection()
-  await deleteCollection(collection.data.collectionId)
   const asset = await createTempAsset()
+  await setStigGrants(21, 85, asset.data.assetId)
+  await importReview(21, asset.data.assetId)
   await deleteAsset(asset.data.assetId)
+  await deleteCollection(collection.data.collectionId)
 }
 
+const importReview = async (collectionId, assetId) => {
+  try {
+    const res = await axios.post(
+      `${config.baseUrl}/collections/${collectionId}/reviews/${assetId}`,
+      [
+        {
+        "ruleId": "{{testRuleId}}",
+        "result": "pass",
+        "detail": "test\nvisible to lvl1",
+        "comment": "sure",
+        "autoResult": false,
+        "status": "submitted"
+        }
+    ],
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res
+  } catch (e) {
+    throw e;
+  }
+}
 
+const setStigGrants = async (collectionId, userId, assetId) => {
+  try {
+    const res = await axios.put(
+      `${config.baseUrl}/collections/${collectionId}/grants/${userId}/access`,
+      [
+        {
+            "benchmarkId": "VPN_SRG_TEST",
+            "assetId": `${assetId}`
+        },
+        {
+            "benchmarkId": "VPN_SRG_TEST",
+            "assetId": "42"
+        },
+        {
+            "benchmarkId": "VPN_SRG_TEST",
+            "assetId": "154"
+        }        
+    ],
+    {
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+        'Content-Type': 'application/json'
+      }
+    }
+    )
+    return res
+  } catch (e) {
+    throw e;
+  }
+}
 
 const uploadTestStigs = async () => {
   const testFilenames = [
@@ -200,9 +259,48 @@ const uploadTestStigs = async () => {
     }
   }
 }
+
+const getAsset = async assetId => {
+  try {
+    const res = await axios.get(
+      `${config.baseUrl}/assets/${assetId}?projection=statusStats&projection=stigs&projection=stigGrants`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res.data
+  }
+  catch (e) {
+   return e;
+  }
+}
+
+const getAssetsByLabel = async (collectionId, labelId) => {
+  try {
+    const res = await axios.get(
+      `${config.baseUrl}/collections/${collectionId}/labels/${labelId}/assets`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res.data
+  }
+  catch (e) {
+   return e;
+  }
+}
+
 module.exports = {
   loadAppData,
   uploadTestStigs,
   createTempAsset,
-  createDisabledCollectionsandAssets
+  createDisabledCollectionsandAssets,
+  getAsset,
+  getAssetsByLabel
 }
