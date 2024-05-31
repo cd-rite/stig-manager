@@ -9,13 +9,13 @@ const usersEnv = require('./users.json')
 
 describe('Asset PUT tests', () => {
 
-      before(async function () {
-      this.timeout(4000)
-      await utils.loadAppData()
-      await utils.uploadTestStigs()
-      await utils.createDisabledCollectionsandAssets()
+    before(async function () {
+        this.timeout(4000)
+        await utils.loadAppData()
+        await utils.uploadTestStigs()
+        await utils.createDisabledCollectionsandAssets()
     })
- 
+
   describe(`/assets/{assetId}`, () => {
 
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
@@ -206,7 +206,7 @@ describe('Asset PUT tests', () => {
             })
         })
     }
-   })
+    })
   describe(`/collections/{collectionId}/stigs/{benchmarkId}/assets`, () => {
 
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]

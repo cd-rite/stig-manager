@@ -1,0 +1,34 @@
+{
+    "testCollection":{
+        "name": "Collection_X",
+        "collectionId": "21",
+        "benchmark": "VPN_SRG_TEST",
+        "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
+        "testLabel":"755b8a28-9a68-11ec-b1bc-0242ac110002",
+        "revisionStr": "V1R1",
+        "assetIDsInCollection":["29","62","42","154"],
+        "metadataKey": "testkey",
+        "metadataValue": "testvalue",
+        "ruleId": "SV-106179r1_rule"
+        
+    },
+    "testAsset": {
+        "name": "Collection_X_lvl1_asset-1",
+        "assetId": "42",
+        "collectionId": "21",
+        "usersWithGrant":["86,85"],
+        "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
+        "metadataKey": "testkey",
+        "metadataValue": "testvalue",
+        "labels": [
+            "755b8a28-9a68-11ec-b1bc-0242ac110002",
+            "5130dc84-9a68-11ec-b1bc-0242ac110002"
+          ]
+    },
+    "stigmanadmin":{
+        "username": "stigmanadmin",
+        "userId":"1"
+    },
+    "testRuleId": "SV-106191r1_rule"
+    
+}

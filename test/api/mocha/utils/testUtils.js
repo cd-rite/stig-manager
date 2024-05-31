@@ -1,6 +1,7 @@
 const axios = require('axios')
 const config = require('../testConfig.json')
 const appdata = require('../../form-data-files/appdata.json')
+const batchAppData = require('../../form-data-files/batch-test-data.json')
 const FormData = require('form-data')
 const fs = require('fs')
 const path = require('path')
@@ -24,6 +25,22 @@ const loadAppData = async () => {
   }
 }
 
+const loadBatchAppData = async () => {
+  try {
+    const res = await axios.post(
+      `${config.baseUrl}/op/appdata?elevate=true`,
+      batchAppData,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+  } catch (e) {
+    console.log(e)
+  }
+}
 const createTempCollection = async () => {
   try {
     const res = await axios.post(
@@ -278,10 +295,64 @@ const getAsset = async assetId => {
   }
 }
 
+const getUser = async userId => {
+  try {
+    const res = await axios.get(
+      `${config.baseUrl}/users/${userId}?elevate=true&projection=collectionGrants&projection=statistics`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res.data
+  }
+  catch (e) {
+   return e;
+  }
+}
+
 const getAssetsByLabel = async (collectionId, labelId) => {
   try {
     const res = await axios.get(
       `${config.baseUrl}/collections/${collectionId}/labels/${labelId}/assets`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res.data
+  }
+  catch (e) {
+   return e;
+  }
+}
+
+const getCollectionMetricsDetails = async (collectionId) => {
+  try {
+    const res = await axios.get(
+      `${config.baseUrl}/collections/${collectionId}/metrics/detail`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res.data
+  }
+  catch (e) {
+   return e;
+  }
+}
+
+const getReviews = async (collectionId) => {
+  try {
+    const res = await axios.get(
+      `${config.baseUrl}/collections/${collectionId}/reviews/`,
       {
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -302,5 +373,9 @@ module.exports = {
   createTempAsset,
   createDisabledCollectionsandAssets,
   getAsset,
-  getAssetsByLabel
+  getAssetsByLabel,
+  getUser,
+  getReviews,
+  loadBatchAppData,
+  getCollectionMetricsDetails
 }
