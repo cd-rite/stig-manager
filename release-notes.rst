@@ -1,3 +1,25 @@
+1.4.11
+-----
+
+Changes:
+
+  - (UI/API) Removing feature from Release 1.4.8 adding resultEngine, user, statusUser columns to Detail metrics exports. The feature was found to cause poor performance in large deployments. 
+
+1.4.10
+-----
+
+Changes:
+
+  - (API) bugfix: Resolves issue allowing Collection Owner/Managers to create restricted grant assignments outside of Collection boundary
+  
+1.4.9
+-----
+
+Changes:
+
+  - (UI) bugfix: Resolves issue preventing node expansion in the Export Results interface
+
+
 1.4.8
 -----
 
