@@ -8,14 +8,14 @@ const utils = require('../utils/testUtils')
 const assetEnv = require('../assetEnv.json')
 
 
-describe('Access Control Testing Asset Gets ', () => {
+describe('Access Control Testing Asset gets ', () => {
   before(async function () {
     this.timeout(4000)
     await utils.loadAppData()
     await utils.uploadTestStigs()
     await utils.createDisabledCollectionsandAssets()
   })
-  describe('/assets/{assetId}', () => {
+  describe('GET - getAsset - /assets/{assetId}', () => {
     
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
     const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
@@ -48,8 +48,7 @@ describe('Access Control Testing Asset Gets ', () => {
       })
     }
   })
-
-  describe('/assets/{assetId}/metadata, /assets/{assetId}/metadata/keys, /assets/{assetId}/metadata/keys/{key}', () => {
+  describe('GET - getAssetMetadata - /assets/{assetId}/metadata,', () => {
     
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
     const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
@@ -63,7 +62,16 @@ describe('Access Control Testing Asset Gets ', () => {
             .set('Authorization', 'Bearer ' + user.token)
           expect(res).to.have.status(200)
         })
+      })
+    }
+  })
 
+  describe('GET - getAssetMetadataKeys - /assets/{assetId}/metadata/keys', () => {
+    const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
+    const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
+
+    for (let user of users) {
+      describe(`Testing as ${user.name}`, () => {
         it('Return the Metadata KEYS for an Asset', async () => {
           const res = await chai
             .request(config.baseUrl)
@@ -71,7 +79,16 @@ describe('Access Control Testing Asset Gets ', () => {
             .set('Authorization', 'Bearer ' + user.token)
           expect(res).to.have.status(200)
         })
+      })
+    }
+  })
 
+  describe('GET - getAssetMetadataValue - /assets/{assetId}/metadata/keys/{key}', () => {
+    const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
+    const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
+
+    for (let user of users) {
+      describe(`Testing as ${user.name}`, () => {
         it('Return the Metadata VALUE for an Asset metadata KEY', async () => {
 
           const res = await chai
@@ -84,7 +101,7 @@ describe('Access Control Testing Asset Gets ', () => {
     }
   })
 
-  describe('/assets', () => {
+  describe('GET - getAssets - /assets', () => {
 
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
     const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
@@ -137,74 +154,74 @@ describe('Access Control Testing Asset Gets ', () => {
         })
     })
   }
-})
+  })
 
-  describe('/assets/{assetId}/checklists', () => {
+  describe('GET - getChecklistByAsset - /assets/{assetId}/checklists', () => {
 
-    const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
-    const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
+      const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
+      const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
 
-    for (let user of users) {
-      describe(`Testing as ${user.name}`, () => {
-        it('Return the Checklist for the supplied Asset with benchmark query param', async () => {
+      for (let user of users) {
+        describe(`Testing as ${user.name}`, () => {
+          it('Return the Checklist for the supplied Asset with benchmark query param', async () => {
 
-          const res = await chai
-            .request(config.baseUrl)
-            .get(`/assets/${assetEnv.testAsset.assetId}/checklists?benchmarkId=${assetEnv.testCollection.benchmark}`)
-            .set('Authorization', 'Bearer ' + user.token)
-          expect(res).to.have.status(200)
-        })
-
-        it('Return the Checklist for the supplied Asset and MULTI-STIG JSON (.cklB) - no specified STIG', async () => {
-            
             const res = await chai
               .request(config.baseUrl)
-              .get(`/assets/${assetEnv.testAsset.assetId}/checklists?format=cklb`)
+              .get(`/assets/${assetEnv.testAsset.assetId}/checklists?benchmarkId=${assetEnv.testCollection.benchmark}`)
               .set('Authorization', 'Bearer ' + user.token)
             expect(res).to.have.status(200)
-        })
+          })
 
-        it('Return the Checklist for the supplied Asset and MULTI-STIG JSON (.cklB) - specific STIGs', async () => {
+          it('Return the Checklist for the supplied Asset and MULTI-STIG JSON (.cklB) - no specified STIG', async () => {
+              
+              const res = await chai
+                .request(config.baseUrl)
+                .get(`/assets/${assetEnv.testAsset.assetId}/checklists?format=cklb`)
+                .set('Authorization', 'Bearer ' + user.token)
+              expect(res).to.have.status(200)
+          })
 
-          const res = await chai
-            .request(config.baseUrl)
-            .get(`/assets/${assetEnv.testAsset.assetId}/checklists?format=cklb&benchmarkId=${assetEnv.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
-            .set('Authorization', 'Bearer ' + user.token)
-          
-          if(user.grant === "Restricted"){
-            expect(res).to.have.status(400)
-            return
-          }
-          expect(res).to.have.status(200)
-        })
+          it('Return the Checklist for the supplied Asset and MULTI-STIG JSON (.cklB) - specific STIGs', async () => {
 
-        it('Return the Checklist for the supplied Asset and MULTI-STIG XML (.CKL) - no specified stigs', async () => {
-
-          const res = await chai
-            .request(config.baseUrl)
-            .get(`/assets/${assetEnv.testAsset.assetId}/checklists/`)
-            .set('Authorization', 'Bearer ' + user.token)
-          expect(res).to.have.status(200)
-        })
-
-        it('Return the Checklist for the supplied Asset and MULTI-STIG XML (.CKL) - specified stigs', async () => {
-            
             const res = await chai
               .request(config.baseUrl)
-              .get(`/assets/${assetEnv.testAsset.assetId}/checklists?benchmarkId=${assetEnv.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
+              .get(`/assets/${assetEnv.testAsset.assetId}/checklists?format=cklb&benchmarkId=${assetEnv.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
               .set('Authorization', 'Bearer ' + user.token)
-      
-              if(user.grant === "Restricted"){
-                expect(res).to.have.status(400)
-                return
-              }
-              expect(res).to.have.status(200)
-        })
-      })
-    }
-})
+            
+            if(user.grant === "Restricted"){
+              expect(res).to.have.status(400)
+              return
+            }
+            expect(res).to.have.status(200)
+          })
 
-  describe('/assets/{assetId}/checklists/{benchmarkId}/{revisionStr}', () => {
+          it('Return the Checklist for the supplied Asset and MULTI-STIG XML (.CKL) - no specified stigs', async () => {
+
+            const res = await chai
+              .request(config.baseUrl)
+              .get(`/assets/${assetEnv.testAsset.assetId}/checklists/`)
+              .set('Authorization', 'Bearer ' + user.token)
+            expect(res).to.have.status(200)
+          })
+
+          it('Return the Checklist for the supplied Asset and MULTI-STIG XML (.CKL) - specified stigs', async () => {
+              
+              const res = await chai
+                .request(config.baseUrl)
+                .get(`/assets/${assetEnv.testAsset.assetId}/checklists?benchmarkId=${assetEnv.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
+                .set('Authorization', 'Bearer ' + user.token)
+        
+                if(user.grant === "Restricted"){
+                  expect(res).to.have.status(400)
+                  return
+                }
+                expect(res).to.have.status(200)
+          })
+        })
+      }
+  })
+
+  describe('GET - getChecklistByAssetStig - /assets/{assetId}/checklists/{benchmarkId}/{revisionStr}', () => {
 
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
     const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
@@ -271,7 +288,7 @@ describe('Access Control Testing Asset Gets ', () => {
     }
   })
 
-  describe('/assets/{assetId}/stigs', () => {
+  describe('GET - getStigsByAsset - /assets/{assetId}/stigs', () => {
 
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
     const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
@@ -296,7 +313,7 @@ describe('Access Control Testing Asset Gets ', () => {
     }
   })
 
-  describe('/collections/{collectionId}/labels/{labelId}/assets', () => {
+  describe('GET - getAssetsByCollectionLabelId - /collections/{collectionId}/labels/{labelId}/assets', () => {
 
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
     const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
@@ -325,8 +342,8 @@ describe('Access Control Testing Asset Gets ', () => {
         })
     })
   }
-})
-  describe('/collections/{collectionId}/stigs/{benchmarkId}/assets', () => {
+  })
+describe('GET - getAssetsByStig - /collections/{collectionId}/stigs/{benchmarkId}/assets', () => {
 
       const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
       const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))

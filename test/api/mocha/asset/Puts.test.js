@@ -24,7 +24,7 @@ describe('Asset PUT tests', () => {
     await utils.createDisabledCollectionsandAssets()
   })
 
-  describe(`/assets/{assetId}`, () => {
+  describe(`PUT - replaceAsset -/assets/{assetId}`, () => {
     
     it('Set all properties of an Asset', async function () {
       const res = await chai.request(config.baseUrl)
@@ -181,7 +181,7 @@ describe('Asset PUT tests', () => {
     })
   })
   
-  describe(`/assets/{assetId}/metadata`, () => {
+  describe(`PUT - putAssetMetadata - /assets/{assetId}/metadata`, () => {
 
     it('Set metadata of an Asset', async function () {
       const res = await chai.request(config.baseUrl)
@@ -199,7 +199,7 @@ describe('Asset PUT tests', () => {
       expect(effectedAsset.metadata).to.have.property(assetEnv.scrapAsset.metadataKey)
     })
   })
-  describe(`/assets/{assetId}/metadata/keys/{key}`, () => {
+  describe(`PUT - putAssetMetadataValue - /assets/{assetId}/metadata/keys/{key}`, () => {
    
     it('Set one metadata key/value of an Asset', async function () {
       const res = await chai.request(config.baseUrl)
@@ -214,7 +214,7 @@ describe('Asset PUT tests', () => {
       expect(effectedAsset.metadata).to.have.property(assetEnv.scrapAsset.metadataKey)
     })
   })
-  describe(`/assets/{assetId}/stigs/{benchmarkId}`, () => {
+  describe(`PUT - attachStigToAsset - /assets/{assetId}/stigs/{benchmarkId}`, () => {
   
     it('PUT a STIG assignment to an Asset Copy 3', async function () {
       const res = await chai.request(config.baseUrl)
@@ -236,7 +236,7 @@ describe('Asset PUT tests', () => {
       }
     })
   })
-  describe(`/collections/{collectionId}/labels/{labelId}/assets`, () => {
+  describe(`PUT - putAssetsByCollectionLabelId - /collections/{collectionId}/labels/{labelId}/assets`, () => {
    
     it('Replace a Labels Asset Mappings in a Collection', async function () {
       const res = await chai.request(config.baseUrl)
@@ -259,8 +259,8 @@ describe('Asset PUT tests', () => {
         .send(["9999"])
       expect(res).to.have.status(403)
     })
-})
-  describe(`/collections/{collectionId}/stigs/{benchmarkId}/assets`, () => {
+  })
+  describe(`PUT - attachAssetsToStig - /collections/{collectionId}/stigs/{benchmarkId}/assets`, () => {
    
     it(' gh-756 issue. assign a benchmark used in test Collection in scrap Collection', async function () {
       const res = await chai.request(config.baseUrl)

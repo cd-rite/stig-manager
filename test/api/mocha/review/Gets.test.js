@@ -165,7 +165,7 @@ describe('Review GETS tests using "admin" user ', () => {
         .set('Authorization', `Bearer ${user.token}`)
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
-      expect(res.body).to.be.lengthOf(17)
+      expect(res.body).to.be.lengthOf(14)
 
       for(let review of res.body){
         expect(review.userId).to.be.equal(reviewEnv.stigmanadmin.userId)

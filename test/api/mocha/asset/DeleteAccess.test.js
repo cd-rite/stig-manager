@@ -8,15 +8,14 @@ const assetEnv = require('../assetEnv.json')
 const usersEnv = require('./users.json')
 
 
-describe('Asset Delete tests admin user', () => {
+describe('Asset delete Access Control tests admin user', () => {
     before(async function () {
         this.timeout(4000)
         await utils.uploadTestStigs()
         await utils.loadAppData()
         await utils.createDisabledCollectionsandAssets()
     })
-
-    describe(`/assets/{assetId}/metadata/keys/{key}`, () => {
+    describe(`DELETE - deleteAssetMetadataKey - /assets/{assetId}/metadata/keys/{key}`, () => {
         const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
         const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
         for(let user of users) {
@@ -38,8 +37,7 @@ describe('Asset Delete tests admin user', () => {
             })
         }
     })
-
-    describe(`/assets/{assetId}/stigs`, () => {
+    describe(`DELETE - removeStigsFromAsset -/assets/{assetId}/stigs`, () => {
         const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
         const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
 
@@ -61,7 +59,7 @@ describe('Asset Delete tests admin user', () => {
             })
         }
     })
-    describe(`/assets/{assetId}/stigs/{benchmarkId}`, () => {
+    describe(`DELETE - removeStigFromAsset - /assets/{assetId}/stigs/{benchmarkId}`, () => {
         const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
         const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
 
@@ -82,7 +80,7 @@ describe('Asset Delete tests admin user', () => {
             })
         }
     })
-    describe(`/assets/{assetId}`, () => {
+    describe(`DELETE - deleteAsset - /assets/{assetId}`, () => {
   
         const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
         const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))

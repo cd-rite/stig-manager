@@ -10,7 +10,7 @@
         "metadataKey": "testkey",
         "metadataValue": "testvalue",
         "ruleId": "SV-106179r1_rule"
-        
+     
     },
     "testAsset": {
         "name": "Collection_X_lvl1_asset-1",
@@ -29,6 +29,8 @@
         "username": "stigmanadmin",
         "userId":"1"
     },
-    "testRuleId": "SV-106191r1_rule"
+    "testRuleId": "SV-106191r1_rule",
+    "freshRuleId": "SV-106195r1_rule"
+        
     
 }

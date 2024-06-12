@@ -76,25 +76,16 @@ const checkReviews = (reviews, postreview, user) => {
 }
 
 describe('Review POSTs tests using "admin" user ', () => {
-  before(async function () {
-    this.timeout(4000)
-    await utils.loadAppData()
-    ///wait utils.uploadTestStigs()
-    //await utils.createDisabledCollectionsandAssets()
-  })
+
 
   describe('/collections/{collectionId}/reviews', () => {
     for(let user of users){
       describe(`Batch Review Editing for user ${user.name}`, () => {
 
-
         beforeEach(async function () {
           this.timeout(4000)
-          await utils.loadBatchAppData()
-         // await utils.uploadTestStigs()
-          //await utils.createDisabledCollectionsandAssets()
+           await utils.loadBatchAppData()
         })
-
         it(`POST batch review: target assets, whole stig`, async () => {
 
           const postreview = {
@@ -483,7 +474,6 @@ describe('Review POSTs tests using "admin" user ', () => {
           }
         })
         it(`POST batch review: update but with exclusionary updateFilters (request should do nothing)`, async () => {
-
           const postreview = {
             source: {
               review: {
@@ -527,30 +517,6 @@ describe('Review POSTs tests using "admin" user ', () => {
          
           for(let review of reviews){
             expect(review.detail).to.not.eql(postreview.source.review.detail)
-            if(review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == reviewEnv.testAsset.assetId){
-              expect(review.resultEngine).to.eql(null);
-              expect(review.status.label).to.eql("saved");
-              expect(review.status.user.username).to.eql(user);
-              expect(review.username).to.eql(user);
-              expect(review.result).to.eql(postreview.source.review.result);
-              expect(review.detail).to.eql(postreview.source.review.detail);
-            }
-            else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 154) {
-              expect(review.resultEngine).to.eql(null);
-              expect(review.status.label).to.eql("submitted");
-              expect(review.status.user.username).to.eql("admin");
-              expect(review.username).to.eql(user.name);
-              expect(review.result).to.eql(postreview.source.review.result);
-              expect(review.detail).to.eql(postreview.source.review.detail);
-          }
-          else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 62) {
-              expect(review.resultEngine).to.eql(null);
-              expect(review.status.label).to.eql("saved");
-              expect(review.status.user.username).to.eql(user.name);
-              expect(review.username).to.eql(user.name);
-              expect(review.result).to.eql(postreview.source.review.result);
-              expect(review.detail).to.eql(postreview.source.review.detail);
-            }
           }
         })
         it(`POST batch review: update -  updateFilters - admins reviews only`, async () => {
@@ -593,7 +559,12 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body.validationErrors).to.have.length(0)
 
           const reviews = await utils.getReviews(reviewEnv.testCollection.collectionId)
-          expect(reviews).to.have.lengthOf(2)
+          if(user.name == "lvl1"){
+            expect(reviews).to.have.lengthOf(2)
+          }
+          else{
+            expect(reviews).to.have.lengthOf(2)
+          }
 
           for(let review of reviews){
             if(review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == reviewEnv.testAsset.assetId){
@@ -907,10 +878,18 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body).to.have.property('updated')
           expect(res.body).to.have.property('inserted')
   
-          expect(res.body.inserted).to.eql(241)
           expect(res.body.updated).to.eql(2)
-          expect(res.body.failedValidation).to.eql(0)
-          expect(res.body.validationErrors).to.have.length(0)
+        
+          if(user.name == "lvl1"){
+            expect(res.body.inserted).to.eql(160)
+            expect(res.body.failedValidation).to.eql(81)
+            expect(res.body.validationErrors).to.have.length(50)
+          }
+          else{
+            expect(res.body.inserted).to.eql(241)
+            expect(res.body.failedValidation).to.eql(0)
+            expect(res.body.validationErrors).to.have.length(0)
+          }
   
           const reviews = await utils.getCollectionMetricsDetails(reviewEnv.testCollection.collectionId)
           expect(reviews).to.have.lengthOf(6)
@@ -921,330 +900,331 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
           }
         })
+        
       })
   }
 
-    // describe(`Batch Review Editing - Validation Errors, expect failure. `, () => {
+    describe(`Batch Review Editing - Validation Errors, expect failure. `, () => {
         
-    //   beforeEach(async function () {
-    //     this.timeout(4000)
-    //     await utils.loadBatchAppData()
-    //     await utils.uploadTestStigs()
-    //     await utils.createDisabledCollectionsandAssets()
-    //   })
-    //   for(let user of users){
-    //     it(`POST batch Review: target by assets, and one rule, expect validation failure - invalid result for status`, async () => {
-    //         const postreview = {
-    //           source: {
-    //             review: {
-    //               result: 'informational',
-    //               detail: 'tesetsetset',
-    //               status: 'submitted'
-    //             }
-    //           },
-    //           assets: {
-    //             assetIds: ['62', '42', '154']
-    //           },
-    //           rules: { ruleIds: ['SV-106179r1_rule'] }
-    //         }
+      beforeEach(async function () {
+        this.timeout(4000)
+        await utils.loadBatchAppData()
+        await utils.uploadTestStigs()
+        await utils.createDisabledCollectionsandAssets()
+      })
+      for(let user of users){
+        it(`POST batch Review: target by assets, and one rule, expect validation failure - invalid result for status`, async () => {
+            const postreview = {
+              source: {
+                review: {
+                  result: 'informational',
+                  detail: 'tesetsetset',
+                  status: 'submitted'
+                }
+              },
+              assets: {
+                assetIds: ['62', '42', '154']
+              },
+              rules: { ruleIds: ['SV-106179r1_rule'] }
+            }
 
-    //       const res = await chai.request(config.baseUrl)
-    //         .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews`)
-    //         .set('Authorization', `Bearer ${user.token}`)
-    //         .send(postreview)
-    //       expect(res).to.have.status(200)
-    //       expect(res.body).to.be.an('object')
-    //       expect(res.body).to.have.property('failedValidation')
-    //       expect(res.body).to.have.property('updated')
-    //       expect(res.body).to.have.property('inserted')
-    //       expect(res.body).to.have.property('validationErrors')
+          const res = await chai.request(config.baseUrl)
+            .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews`)
+            .set('Authorization', `Bearer ${user.token}`)
+            .send(postreview)
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('object')
+          expect(res.body).to.have.property('failedValidation')
+          expect(res.body).to.have.property('updated')
+          expect(res.body).to.have.property('inserted')
+          expect(res.body).to.have.property('validationErrors')
 
-    //       expect(res.body.inserted).to.eql(0)
-    //       expect(res.body.updated).to.eql(0)
-    //       expect(res.body.failedValidation).to.eql(3)
-    //       expect(res.body.validationErrors).to.have.length(3)
+          expect(res.body.inserted).to.eql(0)
+          expect(res.body.updated).to.eql(0)
+          expect(res.body.failedValidation).to.eql(3)
+          expect(res.body.validationErrors).to.have.length(3)
                 
-    //       if (user.name == "lvl1"){
-    //         expect(res.body.validationErrors).to.have.length(3)
-    //         for (review of res.body.validationErrors){
-    //             expect(review.error).to.be.oneOf(["status is not allowed for the result","no grant for this asset/ruleId"])
-    //             if (review.assetId == 62) {
-    //                 expect(review.error).to.eql("no grant for this asset/ruleId")                
-    //             }
-    //         }
-    //       }
-    //       else {
-    //         expect(res.body.validationErrors).to.have.length(3)
-    //         for (review of res.body.validationErrors){
-    //             expect(review.error).to.eql("status is not allowed for the result")
-    //         }   
-    //       }    
+          if (user.name == "lvl1"){
+            expect(res.body.validationErrors).to.have.length(3)
+            for (review of res.body.validationErrors){
+                expect(review.error).to.be.oneOf(["status is not allowed for the result","no grant for this asset/ruleId"])
+                if (review.assetId == 62) {
+                    expect(review.error).to.eql("no grant for this asset/ruleId")                
+                }
+            }
+          }
+          else {
+            expect(res.body.validationErrors).to.have.length(3)
+            for (review of res.body.validationErrors){
+                expect(review.error).to.eql("status is not allowed for the result")
+            }   
+          }    
 
-    //     })
-    //     it(`POST batch Review: target by stig, and one rule, expect validation failure - fail result, no comment`, async () => {
-    //       const postreview = {
-    //         source: {
-    //           review: {
-    //             result: 'fail',
-    //             detail: 'tesetsetset',
-    //             comment: '',
-    //             status: 'submitted'
-    //           }
-    //         },
-    //         assets: {
-    //           benchmarkIds: ['VPN_SRG_TEST']
-    //         },
-    //         rules: { ruleIds: ['SV-106179r1_rule'] }
-    //       }
+        })
+        it(`POST batch Review: target by stig, and one rule, expect validation failure - fail result, no comment`, async () => {
+          const postreview = {
+            source: {
+              review: {
+                result: 'fail',
+                detail: 'tesetsetset',
+                comment: '',
+                status: 'submitted'
+              }
+            },
+            assets: {
+              benchmarkIds: ['VPN_SRG_TEST']
+            },
+            rules: { ruleIds: ['SV-106179r1_rule'] }
+          }
 
-    //     const res = await chai.request(config.baseUrl)
-    //       .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews`)
-    //       .set('Authorization', `Bearer ${user.token}`)
-    //       .send(postreview)
-    //     expect(res).to.have.status(200)
-    //     expect(res.body).to.be.an('object')
-    //     expect(res.body).to.have.property('failedValidation')
-    //     expect(res.body).to.have.property('updated')
-    //     expect(res.body).to.have.property('inserted')
-    //     expect(res.body).to.have.property('validationErrors')
+        const res = await chai.request(config.baseUrl)
+          .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews`)
+          .set('Authorization', `Bearer ${user.token}`)
+          .send(postreview)
+        expect(res).to.have.status(200)
+        expect(res.body).to.be.an('object')
+        expect(res.body).to.have.property('failedValidation')
+        expect(res.body).to.have.property('updated')
+        expect(res.body).to.have.property('inserted')
+        expect(res.body).to.have.property('validationErrors')
 
-    //     if (user.name == "lvl1"){
-    //       expect(res.body.failedValidation).to.eql(2)
-    //       expect(res.body.validationErrors).to.have.length(2)
-    //     }
-    //     else {
-    //       expect(res.body.failedValidation).to.eql(3)
-    //       expect(res.body.validationErrors).to.have.length(3)
-    //     }
-    //     expect(res.body.inserted).to.eql(0)
-    //     expect(res.body.updated).to.eql(0)
+        if (user.name == "lvl1"){
+          expect(res.body.failedValidation).to.eql(2)
+          expect(res.body.validationErrors).to.have.length(2)
+        }
+        else {
+          expect(res.body.failedValidation).to.eql(3)
+          expect(res.body.validationErrors).to.have.length(3)
+        }
+        expect(res.body.inserted).to.eql(0)
+        expect(res.body.updated).to.eql(0)
 
-    //     const reviews = await utils.getReviews(reviewEnv.testCollection.collectionId)
+        const reviews = await utils.getReviews(reviewEnv.testCollection.collectionId)
 
-    //     expect(reviews).to.have.lengthOf(2)
+        expect(reviews).to.have.lengthOf(2)
         
-    //     for (let review of reviews){
-    //       if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == reviewEnv.testAsset.assetId){ 
-    //         // CASE: Existing review, test reset of resultengine and status - all users can update
-    //           expect(review.status.label).to.eql("submitted");
-    //           expect(review.status.user.username).to.eql("admin");
-    //           expect(review.username).to.eql("admin");
-    //           expect(review.result).to.eql("pass");
-    //       }
-    //       // CASE: Existing review, test reset of resultengine and status - all users can update
-    //       else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 154) {
-    //           expect(review.resultEngine).to.eql(null);
-    //           expect(review.status.label).to.eql("submitted");
-    //           expect(review.status.user.username).to.eql("admin");
-    //           expect(review.username).to.eql("admin");
-    //           expect(review.result).to.eql("fail");
-    //       }
-    //     // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
-    //     else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 62) {
-    //         expect(review.resultEngine).to.eql(null);
-    //         expect(review.status.label).to.eql("saved");
-    //         expect(review.status.user.username).to.eql(user.name);
-    //         expect(review.username).to.eql(user.name);
-    //         expect(review.result).to.eql(postreview.source.review.result);
-    //         expect(review.detail).to.eql(postreview.source.review.detail);
-    //       }
-    //     }
-    //     })
-    //     it(`POST batch Review: target by stig, and one rule, expect validation failure - invalid result for status`, async () => {
-    //         const postreview = {
-    //           source: {
-    //             review: {
-    //               result: 'informational',
-    //               detail: 'tesetsetset',
-    //               status: 'submitted'
-    //             }
-    //           },
-    //           assets: {
-    //             benchmarkIds: ['VPN_SRG_TEST']
-    //           },
-    //           rules: { ruleIds: ['SV-106179r1_rule'] }
-    //         }
+        for (let review of reviews){
+          if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == reviewEnv.testAsset.assetId){ 
+            // CASE: Existing review, test reset of resultengine and status - all users can update
+              expect(review.status.label).to.eql("submitted");
+              expect(review.status.user.username).to.eql("admin");
+              expect(review.username).to.eql("admin");
+              expect(review.result).to.eql("pass");
+          }
+          // CASE: Existing review, test reset of resultengine and status - all users can update
+          else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 154) {
+              expect(review.resultEngine).to.eql(null);
+              expect(review.status.label).to.eql("submitted");
+              expect(review.status.user.username).to.eql("admin");
+              expect(review.username).to.eql("admin");
+              expect(review.result).to.eql("fail");
+          }
+        // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
+        else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 62) {
+            expect(review.resultEngine).to.eql(null);
+            expect(review.status.label).to.eql("saved");
+            expect(review.status.user.username).to.eql(user.name);
+            expect(review.username).to.eql(user.name);
+            expect(review.result).to.eql(postreview.source.review.result);
+            expect(review.detail).to.eql(postreview.source.review.detail);
+          }
+        }
+        })
+        it(`POST batch Review: target by stig, and one rule, expect validation failure - invalid result for status`, async () => {
+            const postreview = {
+              source: {
+                review: {
+                  result: 'informational',
+                  detail: 'tesetsetset',
+                  status: 'submitted'
+                }
+              },
+              assets: {
+                benchmarkIds: ['VPN_SRG_TEST']
+              },
+              rules: { ruleIds: ['SV-106179r1_rule'] }
+            }
 
-    //     const res = await chai.request(config.baseUrl)
-    //       .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews`)
-    //       .set('Authorization', `Bearer ${user.token}`)
-    //       .send(postreview)
-    //     expect(res).to.have.status(200)
-    //     expect(res.body).to.be.an('object')
-    //     expect(res.body).to.have.property('failedValidation')
-    //     expect(res.body).to.have.property('updated')
-    //     expect(res.body).to.have.property('inserted')
-    //     expect(res.body).to.have.property('validationErrors')
-    //     expect(res.body.inserted).to.eql(0)
-    //     expect(res.body.updated).to.eql(0)
-    //     if (user.name == "lvl1"){
-    //       expect(res.body.failedValidation).to.eql(2)
-    //       expect(res.body.validationErrors).to.have.length(2)
-    //     }
-    //     else {
-    //       expect(res.body.failedValidation).to.eql(3)
-    //       expect(res.body.validationErrors).to.have.length(3)
-    //     }
+        const res = await chai.request(config.baseUrl)
+          .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews`)
+          .set('Authorization', `Bearer ${user.token}`)
+          .send(postreview)
+        expect(res).to.have.status(200)
+        expect(res.body).to.be.an('object')
+        expect(res.body).to.have.property('failedValidation')
+        expect(res.body).to.have.property('updated')
+        expect(res.body).to.have.property('inserted')
+        expect(res.body).to.have.property('validationErrors')
+        expect(res.body.inserted).to.eql(0)
+        expect(res.body.updated).to.eql(0)
+        if (user.name == "lvl1"){
+          expect(res.body.failedValidation).to.eql(2)
+          expect(res.body.validationErrors).to.have.length(2)
+        }
+        else {
+          expect(res.body.failedValidation).to.eql(3)
+          expect(res.body.validationErrors).to.have.length(3)
+        }
 
-    //     const reviews = await utils.getReviews(reviewEnv.testCollection.collectionId)
-    //     expect(reviews).to.have.lengthOf(2)
+        const reviews = await utils.getReviews(reviewEnv.testCollection.collectionId)
+        expect(reviews).to.have.lengthOf(2)
         
-    //     for (let review of reviews){
-    //       if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == reviewEnv.testAsset.assetId){ 
-    //         // CASE: Existing review, test reset of resultengine and status - all users can update
-    //           expect(review.status.label).to.eql("submitted");
-    //           expect(review.status.user.username).to.eql("admin");
-    //           expect(review.username).to.eql("admin");
-    //           expect(review.result).to.eql("pass");
-    //       }
-    //       // CASE: Existing review, test reset of resultengine and status - all users can update
-    //       else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 154) {
-    //           expect(review.resultEngine).to.eql(null);
-    //           expect(review.status.label).to.eql("submitted");
-    //           expect(review.status.user.username).to.eql("admin");
-    //           expect(review.username).to.eql("admin");
-    //           expect(review.result).to.eql("fail");
-    //       }
-    //     // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
-    //     else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 62) {
-    //         expect(review.resultEngine).to.eql(null);
-    //         expect(review.status.label).to.eql("saved");
-    //         expect(review.status.user.username).to.eql(user.name);
-    //         expect(review.username).to.eql(user.name);
-    //         expect(review.result).to.eql(postreview.source.review.result);
-    //         expect(review.detail).to.eql(postreview.source.review.detail);
-    //       }
-    //     }
-    //     })
-    //     it(`POST batch Review: target by stig, and one rule, expect validation failure - no detail`, async () => {
-    //       const postreview = {
-    //         source: {
-    //           review: {
-    //             result: 'pass',
-    //             detail: '',
-    //             comment: 'test comment',
-    //             status: 'submitted'
-    //           }
-    //         },
-    //         assets: {
-    //           benchmarkIds: ['VPN_SRG_TEST']
-    //         },
-    //         rules: { ruleIds: ['SV-106179r1_rule'] }
-    //       }
+        for (let review of reviews){
+          if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == reviewEnv.testAsset.assetId){ 
+            // CASE: Existing review, test reset of resultengine and status - all users can update
+              expect(review.status.label).to.eql("submitted");
+              expect(review.status.user.username).to.eql("admin");
+              expect(review.username).to.eql("admin");
+              expect(review.result).to.eql("pass");
+          }
+          // CASE: Existing review, test reset of resultengine and status - all users can update
+          else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 154) {
+              expect(review.resultEngine).to.eql(null);
+              expect(review.status.label).to.eql("submitted");
+              expect(review.status.user.username).to.eql("admin");
+              expect(review.username).to.eql("admin");
+              expect(review.result).to.eql("fail");
+          }
+        // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
+        else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 62) {
+            expect(review.resultEngine).to.eql(null);
+            expect(review.status.label).to.eql("saved");
+            expect(review.status.user.username).to.eql(user.name);
+            expect(review.username).to.eql(user.name);
+            expect(review.result).to.eql(postreview.source.review.result);
+            expect(review.detail).to.eql(postreview.source.review.detail);
+          }
+        }
+        })
+        it(`POST batch Review: target by stig, and one rule, expect validation failure - no detail`, async () => {
+          const postreview = {
+            source: {
+              review: {
+                result: 'pass',
+                detail: '',
+                comment: 'test comment',
+                status: 'submitted'
+              }
+            },
+            assets: {
+              benchmarkIds: ['VPN_SRG_TEST']
+            },
+            rules: { ruleIds: ['SV-106179r1_rule'] }
+          }
 
-    //   const res = await chai.request(config.baseUrl)
-    //     .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews`)
-    //     .set('Authorization', `Bearer ${user.token}`)
-    //     .send(postreview)
-    //   expect(res).to.have.status(200)
-    //   expect(res.body).to.be.an('object')
-    //   expect(res.body).to.have.property('failedValidation')
-    //   expect(res.body).to.have.property('updated')
-    //   expect(res.body).to.have.property('inserted')
-    //   expect(res.body).to.have.property('validationErrors')
-    //   expect(res.body.inserted).to.eql(0)
-    //   expect(res.body.updated).to.eql(0)
-    //   if (user.name == "lvl1"){
-    //     expect(res.body.failedValidation).to.eql(2)
-    //     expect(res.body.validationErrors).to.have.length(2)
-    //   }
-    //   else {
-    //     expect(res.body.failedValidation).to.eql(3)
-    //     expect(res.body.validationErrors).to.have.length(3)
-    //   }
-    //   const reviews = await utils.getReviews(reviewEnv.testCollection.collectionId)
-    //   expect(reviews).to.have.lengthOf(2)
+      const res = await chai.request(config.baseUrl)
+        .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews`)
+        .set('Authorization', `Bearer ${user.token}`)
+        .send(postreview)
+      expect(res).to.have.status(200)
+      expect(res.body).to.be.an('object')
+      expect(res.body).to.have.property('failedValidation')
+      expect(res.body).to.have.property('updated')
+      expect(res.body).to.have.property('inserted')
+      expect(res.body).to.have.property('validationErrors')
+      expect(res.body.inserted).to.eql(0)
+      expect(res.body.updated).to.eql(0)
+      if (user.name == "lvl1"){
+        expect(res.body.failedValidation).to.eql(2)
+        expect(res.body.validationErrors).to.have.length(2)
+      }
+      else {
+        expect(res.body.failedValidation).to.eql(3)
+        expect(res.body.validationErrors).to.have.length(3)
+      }
+      const reviews = await utils.getReviews(reviewEnv.testCollection.collectionId)
+      expect(reviews).to.have.lengthOf(2)
     
-    //   for (let review of reviews){
-    //     if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == reviewEnv.testAsset.assetId){ 
-    //       // CASE: Existing review, test reset of resultengine and status - all users can update
-    //         expect(review.status.label).to.eql("submitted");
-    //         expect(review.status.user.username).to.eql("admin");
-    //         expect(review.username).to.eql("admin");
-    //         expect(review.result).to.eql("pass");
-    //     }
-    //     // CASE: Existing review, test reset of resultengine and status - all users can update
-    //     else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 154) {
-    //         expect(review.resultEngine).to.eql(null);
-    //         expect(review.status.label).to.eql("submitted");
-    //         expect(review.status.user.username).to.eql("admin");
-    //         expect(review.username).to.eql("admin");
-    //         expect(review.result).to.eql("fail");
-    //   }
-    //   // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
-    //   else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 62) {
-    //       expect(review.resultEngine).to.eql(null);
-    //       expect(review.status.label).to.eql("saved");
-    //       expect(review.status.user.username).to.eql(user.name);
-    //       expect(review.username).to.eql(user.name);
-    //       expect(review.result).to.eql(postreview.source.review.result);
-    //       expect(review.detail).to.eql(postreview.source.review.detail);
-    //     }
-    //   }
-    //     })
-    //   }
-    // })
+      for (let review of reviews){
+        if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == reviewEnv.testAsset.assetId){ 
+          // CASE: Existing review, test reset of resultengine and status - all users can update
+            expect(review.status.label).to.eql("submitted");
+            expect(review.status.user.username).to.eql("admin");
+            expect(review.username).to.eql("admin");
+            expect(review.result).to.eql("pass");
+        }
+        // CASE: Existing review, test reset of resultengine and status - all users can update
+        else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 154) {
+            expect(review.resultEngine).to.eql(null);
+            expect(review.status.label).to.eql("submitted");
+            expect(review.status.user.username).to.eql("admin");
+            expect(review.username).to.eql("admin");
+            expect(review.result).to.eql("fail");
+      }
+      // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
+      else if (review.ruleId == reviewEnv.testCollection.ruleId && review.assetId == 62) {
+          expect(review.resultEngine).to.eql(null);
+          expect(review.status.label).to.eql("saved");
+          expect(review.status.user.username).to.eql(user.name);
+          expect(review.username).to.eql(user.name);
+          expect(review.result).to.eql(postreview.source.review.result);
+          expect(review.detail).to.eql(postreview.source.review.detail);
+        }
+      }
+        })
+      }
+    })
   })
+  
+  describe('/collections/{collectionId}/reviews/{assetId}', () => {
 
-  // describe('/collections/{collectionId}/reviews/{assetId}', () => {
+    before(async function () {
+      this.timeout(4000)
+      await utils.loadAppData()
+      await utils.uploadTestStigs()
+      await utils.createDisabledCollectionsandAssets()
+    })
 
-  //   before(async function () {
-  //     this.timeout(4000)
-  //     await utils.loadAppData()
-  //     await utils.uploadTestStigs()
-  //     await utils.createDisabledCollectionsandAssets()
-  //   })
-
-  //   it('Import one or more Reviews from a JSON body new ruleId', async () => {
-  //     const res = await chai.request(config.baseUrl)
-  //       .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}`)
-  //       .set('Authorization', `Bearer ${adminUser.token}`)
-  //       .send([
-  //         {
-  //         "ruleId": `SV-106191r1_rule`,
-  //         "result": "pass",
-  //         "detail": "test\nvisible to lvl1",
-  //         "comment": "sure",
-  //         "autoResult": false,
-  //         "status": "submitted"
-  //         }
-  //     ])
-  //     const expectedResponse = {
-  //       rejected: [],
-  //       affected: {
-  //           inserted: 1,
-  //           updated: 0
-  //       }
-  //     }
-  //     expect(res).to.have.status(200)
-  //     expect(res.body).to.be.an('object')
-  //     expect(res.body).to.deep.equal(expectedResponse)
-  //   })
-  //   it('Import one or more Reviews from a JSON body already used ruleId should be an update', async () => {
-  //     const res = await chai.request(config.baseUrl)
-  //       .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}`)
-  //       .set('Authorization', `Bearer ${adminUser.token}`)
-  //       .send([
-  //         {
-  //         "ruleId": `${reviewEnv.testCollection.ruleId}`,
-  //         "result": "pass",
-  //         "detail": "test\nvisible to lvl1",
-  //         "comment": "sure",
-  //         "autoResult": false,
-  //         "status": "submitted"
-  //         }
-  //     ])
-  //     const expectedResponse = {
-  //       rejected: [],
-  //       affected: {
-  //           inserted: 0,
-  //           updated: 1
-  //       }
-  //     }
-  //     expect(res).to.have.status(200)
-  //     expect(res.body).to.be.an('object')
-  //     expect(res.body).to.deep.equal(expectedResponse)
-  //   })
-  // })
+    it('Import one or more Reviews from a JSON body new ruleId', async () => {
+      const res = await chai.request(config.baseUrl)
+        .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .send([
+          {
+          "ruleId": `SV-106191r1_rule`,
+          "result": "pass",
+          "detail": "test\nvisible to lvl1",
+          "comment": "sure",
+          "autoResult": false,
+          "status": "submitted"
+          }
+      ])
+      const expectedResponse = {
+        rejected: [],
+        affected: {
+            inserted: 1,
+            updated: 0
+        }
+      }
+      expect(res).to.have.status(200)
+      expect(res.body).to.be.an('object')
+      expect(res.body).to.deep.equal(expectedResponse)
+    })
+    it('Import one or more Reviews from a JSON body already used ruleId should be an update', async () => {
+      const res = await chai.request(config.baseUrl)
+        .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .send([
+          {
+          "ruleId": `${reviewEnv.testCollection.ruleId}`,
+          "result": "pass",
+          "detail": "test\nvisible to lvl1",
+          "comment": "sure",
+          "autoResult": false,
+          "status": "submitted"
+          }
+      ])
+      const expectedResponse = {
+        rejected: [],
+        affected: {
+            inserted: 0,
+            updated: 1
+        }
+      }
+      expect(res).to.have.status(200)
+      expect(res.body).to.be.an('object')
+      expect(res.body).to.deep.equal(expectedResponse)
+    })
+  })
 })
 

@@ -41,6 +41,7 @@ const loadBatchAppData = async () => {
     console.log(e)
   }
 }
+
 const createTempCollection = async () => {
   try {
     const res = await axios.post(
@@ -178,6 +179,7 @@ const createDisabledCollectionsandAssets = async () => {
   await importReview(21, asset.data.assetId)
   await deleteAsset(asset.data.assetId)
   await deleteCollection(collection.data.collectionId)
+  return {collection: collection.data , asset: asset.data}
 }
 
 const importReview = async (collectionId, assetId) => {
@@ -367,6 +369,24 @@ const getReviews = async (collectionId) => {
   }
 }
 
+const getChecklist = async (assetId, benchmarkId, revisionStr) => {
+  try {
+    const res = await axios.get(
+      `${config.baseUrl}/assets/${assetId}/checklists/${benchmarkId}/${revisionStr}?format=ckl`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res.data
+  }
+  catch (e) {
+   return e;
+  }
+}
+
 module.exports = {
   loadAppData,
   uploadTestStigs,
@@ -377,5 +397,6 @@ module.exports = {
   getUser,
   getReviews,
   loadBatchAppData,
-  getCollectionMetricsDetails
+  getCollectionMetricsDetails,
+  getChecklist
 }

@@ -14,7 +14,7 @@ describe('Access Control Testing Asset Patch ', () => {
         await utils.loadAppData()
         await utils.createDisabledCollectionsandAssets()
     })
-  describe(`/assets/{assetId}`, () => {
+    describe(`PATCH - updateAsset - /assets/{assetId}`, () => {
 
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
     const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
@@ -97,67 +97,67 @@ describe('Access Control Testing Asset Patch ', () => {
             })
         })
     }
-  })
+    })
 
-  describe(`/assets`, () => {
-
-  const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
-  const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
-
-    for (let user of users) {
-        describe(`Testing as ${user.name}`, () => {
-
-            before(async function () {
-                this.timeout(4000)
-                await utils.uploadTestStigs()
-                await utils.loadAppData()
-                await utils.createDisabledCollectionsandAssets()
-            })
-
-            it('Delete Assets - expect success for valid users', async () => {
-                const res = await chai
-                    .request(config.baseUrl)
-                    .patch(`/assets?collectionId=${assetEnv.testCollection.collectionId}`)
-                    .set('Authorization', 'Bearer ' + user.token)
-                    .send({
-                    "operation": "delete",
-                    "assetIds": ["29","42"]
-                    })
-                
-                if(user.name === "lvl1" || user.name === "lvl2") {
-                    expect(res).to.have.status(403)
-                    return
-                }
-                expect(res).to.have.status(200)    
-            })
-        })
-    }
-  })  
-
-  describe(`/assets/{assetId}/metadata`, () => {
+    describe(`PATCH - patchAssets - /assets`, () => {
 
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
     const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
 
-    for (let user of users) {
-        describe(`Testing as ${user.name}`, () => {
+        for (let user of users) {
+            describe(`Testing as ${user.name}`, () => {
 
-            it('Merge provided properties with an Asset - Change metadata', async () => {
-            const res = await chai
-                .request(config.baseUrl)
-                .patch(`/assets/${assetEnv.scrapAsset.assetId}/metadata`)
-                .set('Authorization', 'Bearer ' + user.token)
-                .send({
-                "testkey":"poc2Patched"
+                before(async function () {
+                    this.timeout(4000)
+                    await utils.uploadTestStigs()
+                    await utils.loadAppData()
+                    await utils.createDisabledCollectionsandAssets()
                 })
-                if(user.grant === "Restricted" || user.grant === "Full") {
-                    expect(res).to.have.status(403)
-                    return
-                }
-                expect(res).to.have.status(200)
+
+                it('Delete Assets - expect success for valid users', async () => {
+                    const res = await chai
+                        .request(config.baseUrl)
+                        .patch(`/assets?collectionId=${assetEnv.testCollection.collectionId}`)
+                        .set('Authorization', 'Bearer ' + user.token)
+                        .send({
+                        "operation": "delete",
+                        "assetIds": ["29","42"]
+                        })
+                    
+                    if(user.name === "lvl1" || user.name === "lvl2") {
+                        expect(res).to.have.status(403)
+                        return
+                    }
+                    expect(res).to.have.status(200)    
+                })
             })
-        })
-    }
-  })
+        }
+    })  
+
+    describe(`PATCH - patchAssetMetadata - /assets/{assetId}/metadata`, () => {
+
+        const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
+        const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))
+
+        for (let user of users) {
+            describe(`Testing as ${user.name}`, () => {
+
+                it('Merge provided properties with an Asset - Change metadata', async () => {
+                const res = await chai
+                    .request(config.baseUrl)
+                    .patch(`/assets/${assetEnv.scrapAsset.assetId}/metadata`)
+                    .set('Authorization', 'Bearer ' + user.token)
+                    .send({
+                    "testkey":"poc2Patched"
+                    })
+                    if(user.grant === "Restricted" || user.grant === "Full") {
+                        expect(res).to.have.status(403)
+                        return
+                    }
+                    expect(res).to.have.status(200)
+                })
+            })
+        }
+    })
 })
 

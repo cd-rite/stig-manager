@@ -22,7 +22,7 @@ describe('User GETS tests using "admin" user ', () => {
     await utils.createDisabledCollectionsandAssets()
   })
 
-  describe(`/user`, () => {
+  describe(`GET - getUserObject - /user`, () => {
 
     it('Return the requesters user information - check user', async () => {
       const res = await chai
@@ -41,9 +41,8 @@ describe('User GETS tests using "admin" user ', () => {
       }
     })
   })
-
   
-  describe(`/users`, () => {
+  describe(`GET - getUsers - /users`, () => {
 
     it('Return a list of Users accessible to the requester USERNAME', async () => {
 
@@ -110,7 +109,7 @@ describe('User GETS tests using "admin" user ', () => {
     })
   })
 
-  describe(`/users{userId}}`, async () => {
+  describe(`GET - getUserByUserId - /users{userId}}`, async () => {
 
 
     it('Return a User', async () => {
@@ -137,7 +136,7 @@ describe('User POST tests using "admin" user ', () => {
     await utils.createDisabledCollectionsandAssets()
   })
 
-  describe(`/users`, () => {
+  describe(`POST - createUser - /users`, () => {
 
     it('Create a User', async () => {
       const res = await chai
@@ -182,7 +181,7 @@ describe('User PATCH tests using "admin" user ', () => {
     await utils.createDisabledCollectionsandAssets()
   })
 
-  describe(`/users{userId}`, async () => {
+  describe(`PATCH - updateUser - /users{userId}`, async () => {
 
 
     it('Merge provided properties with a User - Change Username', async () => {
@@ -231,7 +230,7 @@ describe('User PUT tests using "admin" user ', () => {
     await utils.createDisabledCollectionsandAssets()
   })
 
-  describe(`/users{userId}`, async () => {
+  describe(`PUT - replaceUser - /users{userId}`, async () => {
 
 
     it(`Set all properties of a User - Change Username`, async () => {
@@ -281,7 +280,7 @@ describe('User Delete tests using "admin" user ', () => {
     await utils.createDisabledCollectionsandAssets()
   })
 
-  describe(`/users/{userId}`, async () => {
+  describe(`DELETE - deleteUser - /users/{userId}`, async () => {
 
     it('Delete a User - fail due to user access record', async () => {
       const res = await chai

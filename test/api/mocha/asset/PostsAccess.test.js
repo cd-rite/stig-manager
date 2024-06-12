@@ -7,7 +7,7 @@ const utils = require('../utils/testUtils')
 const assetEnv = require('../assetEnv.json')
 const usersEnv = require('./users.json')
 
-describe('Access Control Testing Asset Posts', () => {
+describe('Access Control Testing Asset posts', () => {
   before(async function () {
     this.timeout(4000)
     await utils.loadAppData()
@@ -15,7 +15,7 @@ describe('Access Control Testing Asset Posts', () => {
     await utils.createDisabledCollectionsandAssets()
   })
   
-  describe(`/assets`, () => {
+  describe(`POST - createAsset - /assets`, () => {
 
     const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
     const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))

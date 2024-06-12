@@ -15,7 +15,7 @@ const user =
   }
 
 
-describe('Asset PATCH tests', () => {
+describe('Asset patch tests as admin user', () => {
 
   beforeEach(async function () {
     this.timeout(4000)
@@ -24,7 +24,7 @@ describe('Asset PATCH tests', () => {
     await utils.createDisabledCollectionsandAssets()
   })
 
-  describe(`/assets/{assetId}`, () => {
+  describe(`PATCH - updateAsset - /assets/{assetId}`, () => {
    
     it('Merge provided properties with an Asset - Change Collection - Fail for all users', async () => {
       const res = await chai
@@ -130,7 +130,7 @@ describe('Asset PATCH tests', () => {
     })
   })
 
-  describe(`/assets`, () => {
+  describe(`PATCH - patchAssets - /assets`, () => {
  
     it('Delete Assets - expect success for valid users', async () => {
       const res = await chai
@@ -179,7 +179,7 @@ describe('Asset PATCH tests', () => {
     })
   })  
 
-  describe(`/assets/{assetId}/metadata`, () => {
+  describe(`PATCH - patchAssetMetadata - /assets/{assetId}/metadata`, () => {
 
     it('Merge provided properties with an Asset - Change metadata', async () => {
       const res = await chai
