@@ -5,10 +5,12 @@ const batchAppData = require('../../form-data-files/batch-test-data.json')
 const FormData = require('form-data')
 const fs = require('fs')
 const path = require('path')
+const reviewEnv = require('../reviewEnv.json')
 
 const adminToken = config.adminToken
 
 const loadAppData = async () => {
+  
   try {
     const res = await axios.post(
       `${config.baseUrl}/op/appdata?elevate=true`,
@@ -188,7 +190,7 @@ const importReview = async (collectionId, assetId) => {
       `${config.baseUrl}/collections/${collectionId}/reviews/${assetId}`,
       [
         {
-        "ruleId": "{{testRuleId}}",
+        "ruleId": `${reviewEnv.testCollection.ruleId}`,
         "result": "pass",
         "detail": "test\nvisible to lvl1",
         "comment": "sure",
@@ -276,6 +278,34 @@ const uploadTestStigs = async () => {
     } catch (error) {
       console.error(`Failed to upload ${filename}:`, error)
     }
+  }
+}
+
+const replaceStigRevision = async (stigFile = "U_VPN_SRG_V1R1_Manual-xccdf-replace.xml") => {
+  const directoryPath = path.join(__dirname, '../../form-data-files/')
+
+  const formData = new FormData()
+  const filePath = path.join(directoryPath, stigFile)
+  formData.append('importFile', fs.createReadStream(filePath), {
+    stigFile,
+    contentType: 'text/xml'
+  })
+
+  const axiosConfig = {
+    method: 'post',
+    url: `${config.baseUrl}/stigs?clobber=true`,
+    headers: {
+      ...formData.getHeaders(),
+      Authorization: `Bearer ${adminToken}`
+    },
+    data: formData
+  }
+
+  try {
+    const response = await axios(axiosConfig)
+    console.log(`Successfully uploaded ${stigFile}`)
+  } catch (error) {
+    console.error(`Failed to upload ${stigFile}:`, error)
   }
 }
 
@@ -398,5 +428,6 @@ module.exports = {
   getReviews,
   loadBatchAppData,
   getCollectionMetricsDetails,
-  getChecklist
+  getChecklist,
+  replaceStigRevision
 }

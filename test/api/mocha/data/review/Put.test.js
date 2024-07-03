@@ -2,9 +2,9 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const expect = chai.expect
-const config = require('../testConfig.json')
-const utils = require('../utils/testUtils')
-const reviewEnv = require('../reviewEnv.json')
+const config = require('../../testConfig.json')
+const utils = require('../../utils/testUtils')
+const reviewEnv = require('../../reviewEnv.json')
 const xml2js = require('xml2js');
 const user =
   {
@@ -28,7 +28,7 @@ describe('Review Put tests using "admin" user ', () => {
     })
 
     
-  describe('/collections/{collectionId}/reviews/{assetId}/{ruleId}', () => {
+  describe('PUT - putReviewByAssetRule - /collections/{collectionId}/reviews/{assetId}/{ruleId}', () => {
     
     it('PUT Review: no resultEngine - check response does not include "resultEngine": 0', async () => {
 
@@ -388,7 +388,7 @@ describe('Review Put tests using "admin" user ', () => {
     })
   })
 
-  describe('/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata', () => {
+  describe('PUT - putReviewMetadata - /collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata', () => {
 
     before(async function () {
       this.timeout(4000)
@@ -409,7 +409,7 @@ describe('Review Put tests using "admin" user ', () => {
     })
   })
 
-  describe('/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys/{key}', () => {
+  describe('PUT - putReviewMetadataValue - /collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys/{key}', () => {
 
     before(async function () {
       this.timeout(4000)

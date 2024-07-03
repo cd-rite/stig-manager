@@ -2,9 +2,9 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const expect = chai.expect
-const config = require('../testConfig.json')
-const utils = require('../utils/testUtils')
-const reviewEnv = require('../reviewEnv.json')
+const config = require('../../testConfig.json')
+const utils = require('../../utils/testUtils')
+const reviewEnv = require('../../reviewEnv.json')
 
 const adminUser =
   {
@@ -78,7 +78,7 @@ const checkReviews = (reviews, postreview, user) => {
 describe('Review POSTs tests using "admin" user ', () => {
 
 
-  describe('/collections/{collectionId}/reviews', () => {
+  describe('POST - postReviewBatch - /collections/{collectionId}/reviews', () => {
     for(let user of users){
       describe(`Batch Review Editing for user ${user.name}`, () => {
 
@@ -1166,13 +1166,16 @@ describe('Review POSTs tests using "admin" user ', () => {
     })
   })
   
-  describe('/collections/{collectionId}/reviews/{assetId}', () => {
+  describe('POST - postReviewsByAsset - /collections/{collectionId}/reviews/{assetId}', () => {
 
+    let deletedCollection, deletedAsset
     before(async function () {
       this.timeout(4000)
       await utils.loadAppData()
       await utils.uploadTestStigs()
-      await utils.createDisabledCollectionsandAssets()
+      const deletedItems = await utils.createDisabledCollectionsandAssets()
+      deletedCollection = deletedItems.collection
+      deletedAsset = deletedItems.asset
     })
 
     it('Import one or more Reviews from a JSON body new ruleId', async () => {
@@ -1225,6 +1228,55 @@ describe('Review POSTs tests using "admin" user ', () => {
       expect(res.body).to.be.an('object')
       expect(res.body).to.deep.equal(expectedResponse)
     })
+
+    it('Import reviews for asset in deleted collection and deleted asset', async () => {
+      const res = await chai.request(config.baseUrl)
+        .post(`/collections/${deletedCollection.collectionId}/reviews/${deletedAsset.assetId}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .send([
+          {
+          "ruleId": `${reviewEnv.testCollection.ruleId}`,
+          "result": "pass",
+          "detail": "test\nvisible to lvl1",
+          "comment": "sure",
+          "autoResult": false,
+          "status": "submitted"
+          }
+      ])
+      expect(res).to.have.status(403) 
+    })
+    it('Import reviews for asset in deleted collection', async () => {
+      const res = await chai.request(config.baseUrl)
+        .post(`/collections/${deletedCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .send([
+          {
+          "ruleId": `${reviewEnv.testCollection.ruleId}`,
+          "result": "pass",
+          "detail": "test\nvisible to lvl1",
+          "comment": "sure",
+          "autoResult": false,
+          "status": "submitted"
+          }
+      ])
+      expect(res).to.have.status(403) 
+    })
+    // it('Import reviews for deleted asset', async () => {
+    //   const res = await chai.request(config.baseUrl)
+    //     .post(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${deletedAsset.assetId}`)
+    //     .set('Authorization', `Bearer ${adminUser.token}`)
+    //     .send([
+    //       {
+    //       "ruleId": `${reviewEnv.testCollection.ruleId}`,
+    //       "result": "pass",
+    //       "detail": "test\nvisible to lvl1",
+    //       "comment": "sure",
+    //       "autoResult": false,
+    //       "status": "submitted"
+    //       }
+    //   ])
+    //   expect(res).to.have.status(403) 
+    // })
   })
 })
 

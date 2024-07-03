@@ -2,9 +2,9 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const expect = chai.expect
-const config = require('../testConfig.json')
-const utils = require('../utils/testUtils')
-const reviewEnv = require('../reviewEnv.json')
+const config = require('../../testConfig.json')
+const utils = require('../../utils/testUtils')
+const reviewEnv = require('../../reviewEnv.json')
 
 const user =
   {
@@ -22,7 +22,7 @@ describe('Review GETS tests using "admin" user ', () => {
     await utils.createDisabledCollectionsandAssets()
   })
 
-  describe('/collections/{collectionId}/reviews', () => {
+  describe('GET - getReviewsByCollection - /collections/{collectionId}/reviews', () => {
     it('Return a list of reviews accessible to the requester', async () => {
       const res = await chai.request(config.baseUrl)
         .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews?projection=rule&projection=stigs&projection=metadata`)
@@ -172,7 +172,7 @@ describe('Review GETS tests using "admin" user ', () => {
       }
     })
   })
-  describe('/collections/{collectionId}/reviews/{assetId}', () => {
+  describe('GET - getReviewsByAsset - /collections/{collectionId}/reviews/{assetId}', () => {
     it('Return a list of Reviews for an Asset', async () => {
       const res = await chai.request(config.baseUrl)
         .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}?projection=rule&projection=stigs&projection=metadata`)
@@ -310,7 +310,7 @@ describe('Review GETS tests using "admin" user ', () => {
       }
     })
   })
-  describe('/collections/{collectionId}/reviews/{assetId}/{ruleId}', () => {
+  describe('GET - getReviewByAssetRule - /collections/{collectionId}/reviews/{assetId}/{ruleId}', () => {
 
     it('Return the Review for an Asset and Rule', async () => {
       const res = await chai.request(config.baseUrl)
@@ -358,7 +358,7 @@ describe('Review GETS tests using "admin" user ', () => {
       } 
     })
   })
-  describe('/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata', () => {
+  describe('GET - getReviewMetadata - /collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata', () => {
 
     it('Return the metadata for a Review', async () => {
       const res = await chai.request(config.baseUrl)
@@ -371,7 +371,7 @@ describe('Review GETS tests using "admin" user ', () => {
     })
 
   })
-  describe('/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys', () => {
+  describe('GET - getReviewMetadataKeys - /collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys', () => {
       
       it('Return the Review Metadata KEYS for an Asset and Rule', async () => {
         const res = await chai.request(config.baseUrl)
@@ -383,7 +383,7 @@ describe('Review GETS tests using "admin" user ', () => {
         expect(res.body).to.include(reviewEnv.testAsset.metadataKey)
       })
   })
-  describe('/collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys/{key}', () => {
+  describe('GET - getReviewMetadataValue - /collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata/keys/{key}', () => {
 
     it('Return the Review Metadata VALUE for an Asset/Rule/metadata KEY', async () => {
       const res = await chai.request(config.baseUrl)

@@ -2,10 +2,10 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const expect = chai.expect
+const config = require('../../testConfig.json')
+const utils = require('../../utils/testUtils')
+const assetEnv = require('../../assetEnv.json')
 const usersEnv = require('../../data/asset/users.json')
-const config = require('../testConfig.json')
-const utils = require('../utils/testUtils')
-const assetEnv = require('../assetEnv.json')
 
 
 describe('Access Control Testing Asset gets ', () => {
@@ -343,7 +343,8 @@ describe('Access Control Testing Asset gets ', () => {
     })
   }
   })
-describe('GET - getAssetsByStig - /collections/{collectionId}/stigs/{benchmarkId}/assets', () => {
+  
+  describe('GET - getAssetsByStig - /collections/{collectionId}/stigs/{benchmarkId}/assets', () => {
 
       const usersNamesToTest = ["admin", "lvl1", "lvl2", "lvl3"]
       const users = usersEnv.filter(user => usersNamesToTest.includes(user.name))

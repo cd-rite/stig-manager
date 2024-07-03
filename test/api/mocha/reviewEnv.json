@@ -9,8 +9,13 @@
         "assetIDsInCollection":["29","62","42","154"],
         "metadataKey": "testkey",
         "metadataValue": "testvalue",
-        "ruleId": "SV-106179r1_rule"
+        "ruleId": "SV-106179r1_rule",
+        "groupId": "V-97041"
      
+    },
+    "testAssetlvl1NoAccess":{
+        "assetId":"62",
+        "ruleId": "SV-77809r3_rule"
     },
     "testAsset": {
         "name": "Collection_X_lvl1_asset-1",
@@ -30,7 +35,9 @@
         "userId":"1"
     },
     "testRuleId": "SV-106191r1_rule",
-    "freshRuleId": "SV-106195r1_rule"
+    "freshRuleId": "SV-106195r1_rule",
+    "allStigsForAdmin": ["A10_Networks_ADC_ALG_STIG","AAA_Service_SRG", "Adobe_Acrobat_Pro_DC_Continuous_STIG",
+    "RHEL_7_STIG_TEST","VPN_SRG_OTHER", "VPN_SRG_Rule-fingerprint-match-test","VPN_SRG_TEST","Windows_10_STIG_TEST"]
         
     
 }

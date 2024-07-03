@@ -2,10 +2,9 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const expect = chai.expect
-//const users = require('./users.json')
-const config = require('../testConfig.json')
-const utils = require('../utils/testUtils')
-const assetEnv = require('../assetEnv.json')
+const config = require('../../testConfig.json')
+const utils = require('../../utils/testUtils')
+const assetEnv = require('../../assetEnv.json')
 const xml2js = require('xml2js');
 
 const user =

@@ -2,10 +2,10 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const expect = chai.expect
-const config = require('../testConfig.json')
-const utils = require('../utils/testUtils')
-const userEnv = require('../usersEnv.json')
+const userEnv = require('../../usersEnv.json')
 const testUsers = require('../../data/users/users.json')
+const config = require('../../testConfig.json')
+const utils = require('../../utils/testUtils')
 
 describe('User GETS tests using "admin" user ', () => {
   before(async function () {

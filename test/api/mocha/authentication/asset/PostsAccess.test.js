@@ -6,7 +6,6 @@ const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
 const assetEnv = require('../../assetEnv.json')
 const usersEnv = require('../../data/asset/users.json')
-
 describe('Access Control Testing Asset posts', () => {
   before(async function () {
     this.timeout(4000)
