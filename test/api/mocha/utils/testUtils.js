@@ -246,11 +246,11 @@ const uploadTestStigs = async () => {
   const testFilenames = [
     'U_MS_Windows_10_STIG_V1R23_Manual-xccdf.xml',
     'U_RHEL_7_STIG_V3R0-3_Manual-xccdf.xml',
-    'U_VPN_SRG_V1R0_Manual-xccdf.xml',
     'U_VPN_SRG_V1R1_Manual-xccdf-replace.xml',
     'U_VPN_SRG_V1R1_Manual-xccdf.xml',
     'U_VPN_SRG_V2R3_Manual-xccdf-reviewKeyChange.xml',
     'U_VPN_SRG-OTHER_V1R1_Manual-xccdf.xml',
+    'U_VPN_SRG_V1R0_Manual-xccdf.xml',
     'U_VPN_SRG-OTHER_V1R1_twoRules-matchingFingerprints.xml'
   ]
   const directoryPath = path.join(__dirname, '../../form-data-files/')
@@ -309,6 +309,24 @@ const replaceStigRevision = async (stigFile = "U_VPN_SRG_V1R1_Manual-xccdf-repla
   }
 }
 
+const deleteStig = async (benchmarkId) => {
+  try {
+
+    const axiosConfig = {
+      method: 'delete',
+      url: `${config.baseUrl}/stigs/${benchmarkId}?elevate=true&force=true`,
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          "Content-Type": "application/json",
+        }
+      }
+    const res = await axios(axiosConfig)
+    return res
+  } catch (e) {
+    throw e
+  }
+}
+
 const getAsset = async assetId => {
   try {
     const res = await axios.get(
@@ -324,6 +342,24 @@ const getAsset = async assetId => {
   }
   catch (e) {
    return e;
+  }
+}
+
+const getStigByBenchmarkId = async benchmarkId => {
+  try {
+    const res = await axios.get(
+      `${config.baseUrl}/stigs/${benchmarkId}?elevate=true`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json' 
+        }
+      }
+    )
+    return res.data
+  }
+  catch (e) {
+    return e
   }
 }
 
@@ -395,7 +431,7 @@ const getReviews = async (collectionId) => {
     return res.data
   }
   catch (e) {
-   return e;
+   return undefined;
   }
 }
 
@@ -417,9 +453,69 @@ const getChecklist = async (assetId, benchmarkId, revisionStr) => {
   }
 }
 
+const getCollection = async (collectionId) => {
+  try {
+    const res = await axios.get(
+      `${config.baseUrl}/collections/${collectionId}?projection=grants&projection=assets&projection=labels&projection=owners&projection=statistics&projection=stigs`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res.data
+  }
+  catch (e) {
+   return undefined;
+  }
+}
+
+const getStigByCollectionBenchmarkId = async (collectionId, benchmarkId) => {
+
+  try {
+    const res = await axios.get(
+      `${config.baseUrl}/collections/${collectionId}/stigs/${benchmarkId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res.data
+  }
+  catch (e) {
+    return undefined
+  }
+}
+
+const setDefaultRevision = async (collectionId, benchmarkId, revisionStr) => {
+
+  try {
+    const res = await axios.post(
+      `${config.baseUrl}/collections/${collectionId}/stigs/${benchmarkId}`,
+      {"defaultRevisionStr": revisionStr},
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return res
+  }
+  catch (e) {
+    return e;
+  }
+
+}
+
 module.exports = {
   loadAppData,
   uploadTestStigs,
+  getStigByCollectionBenchmarkId,
+  setDefaultRevision,
   createTempAsset,
   createDisabledCollectionsandAssets,
   getAsset,
@@ -429,5 +525,8 @@ module.exports = {
   loadBatchAppData,
   getCollectionMetricsDetails,
   getChecklist,
-  replaceStigRevision
+  replaceStigRevision,
+  deleteStig,
+  getStigByBenchmarkId,
+  getCollection
 }

@@ -47,146 +47,67 @@ describe('Stig GETS tests using "admin" user ', () => {
         })
     })
     describe('GET - getCci - /stigs/ccis/{cci}', () => {
-    it('Return a list of Reviews for an Asset', async () => {
-        const res = await chai.request(config.baseUrl)
-        .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}?projection=rule&projection=stigs&projection=metadata`)
-        .set('Authorization', `Bearer ${user.token}`)
-        expect(res).to.have.status(200)
-        expect(res.body).to.be.an('array')
 
-
-        for(let review of res.body){
-        // checking for basic properties
-        expect(review).to.have.property('assetId')
-        expect(review.assetId).to.be.equal(reviewEnv.testAsset.assetId)
-        expect(review).to.have.property('assetLabelIds')
-        expect(review).to.have.property('assetName')
-        expect(review).to.have.property('resultEngine')
-        expect(review).to.have.property('detail')
-        expect(review).to.have.property('status')
-
-        //check projectrions 
-        expect(review).to.have.property('rule')
-        expect(review).to.have.property('stigs')
-        expect(review.stigs).to.be.an('array')  
-        expect(review).to.have.property('metadata')
-
-        for(let stig of review.stigs){
-            expect(stig).to.have.property('benchmarkId')
-            expect(stig.benchmarkId).to.be.oneOf(reviewEnv.testAsset.validStigs)
-        }
-
-        //check metadata
-        expect(review.metadata).to.be.an('object')
-        
-        //check rule
-        expect(review.rule).to.be.an('object')
-        expect(review.rule).to.have.property('ruleId')
-        
-        }
-    })
-
-    it('Return a list of Reviews for an Asset, benchmarkId Projection.', async () => {
-        const res = await chai.request(config.baseUrl)
-        .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}?benchmarkId=${reviewEnv.testCollection.benchmark}&projection=rule&projection=stigs&projection=metadata`)
-        .set('Authorization', `Bearer ${user.token}`)
-        expect(res).to.have.status(200)
-        expect(res.body).to.be.an('array')
-        expect(res.body).to.be.lengthOf(6)
-
-
-        for(let review of res.body){
-        expect(review.assetId).to.be.equal(reviewEnv.testAsset.assetId)
-        for(let stig of review.stigs){
-            expect(stig).to.have.property('benchmarkId')
-            expect(stig.benchmarkId).to.be.equal(reviewEnv.testCollection.benchmark)
-        }        
-        }
-    })
-    it('Return a list of Reviews for an Asset , metadata Projection.', async () => {
-        const res = await chai.request(config.baseUrl)
-        .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}?projection=rule&projection=stigs&metadata=${reviewEnv.testAsset.metadataKey}%3A${reviewEnv.testAsset.metadataValue}&projection=metadata`)
-        .set('Authorization', `Bearer ${user.token}`)
-        expect(res).to.have.status(200)
-        expect(res.body).to.be.an('array')
-        expect(res.body).to.be.lengthOf(1)
-
-        for(let review of res.body){
-        expect(review.assetId).to.be.equal(reviewEnv.testAsset.assetId)
-        expect(review.metadata).to.be.an('object')
-        expect(review.metadata).to.have.property(reviewEnv.testCollection.metadataKey)
-        expect(review.metadata[reviewEnv.testCollection.metadataKey]).to.be.equal(reviewEnv.testCollection.metadataValue)
-        }
-    })
-    it('Return a list of reviews accessible to the requester, result projection pass only', async () => {
-        const res = await chai.request(config.baseUrl)
-        .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}?result=pass&projection=rule&projection=stigs&projection=metadata`)
-        .set('Authorization', `Bearer ${user.token}`)
-        expect(res).to.have.status(200)
-        expect(res.body).to.be.an('array')
-        expect(res.body).to.be.lengthOf(4)
-
-        for(let review of res.body){
-        expect(review.assetId).to.be.equal(reviewEnv.testAsset.assetId)
-        expect(review.result).to.be.equal('pass')
-        }
-    })
-    it('Return a list of reviews accessible to the requester, result projection fail only', async () => {
-        const res = await chai.request(config.baseUrl)
-        .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}?result=fail&projection=rule&projection=stigs&projection=metadata`)
-        .set('Authorization', `Bearer ${user.token}`)
-        expect(res).to.have.status(200)
-        expect(res.body).to.be.an('array')
-        expect(res.body).to.be.lengthOf(4)
-
-        for(let review of res.body){
-        expect(review.assetId).to.be.equal(reviewEnv.testAsset.assetId)
-        expect(review.result).to.be.equal('fail')
-        }
-    })
-    it('Return a list of reviews accessible to the requester, result projection informational only', async () => {
-        const res = await chai.request(config.baseUrl)
-        .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}?result=informational&projection=rule&projection=stigs&projection=metadata`)
-        .set('Authorization', `Bearer ${user.token}`)
-        expect(res).to.have.status(200)
-        expect(res.body).to.be.an('array')
-        expect(res.body).to.be.lengthOf(0)
-
-        for(let review of res.body){
-        expect(review.assetId).to.be.equal(reviewEnv.testAsset.assetId)
-        expect(review.result).to.be.equal('informational')
-        }
-    })
-    it('Return a list of reviews accessible to the requester, status projection: saved.', async () => {
-        const res = await chai.request(config.baseUrl)
-        .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}?status=saved&projection=rule&projection=stigs&projection=metadata`)
-        .set('Authorization', `Bearer ${user.token}`)
-        expect(res).to.have.status(200)
-        expect(res.body).to.be.an('array')
-        expect(res.body).to.be.lengthOf(2)
-
-        for(let review of res.body){
-        expect(review.assetId).to.be.equal(reviewEnv.testAsset.assetId)
-        expect(review.status.label).to.be.equal('saved')
-        }
-    })
-    it('Return a list of reviews accessible to the requester, status projection: submitted.', async () => {
-        const res = await chai.request(config.baseUrl)
-        .get(`/collections/${reviewEnv.testCollection.collectionId}/reviews/${reviewEnv.testAsset.assetId}?status=submitted&projection=rule&projection=stigs&projection=metadata`)
-        .set('Authorization', `Bearer ${user.token}`)
-        expect(res).to.have.status(200)
-        expect(res.body).to.be.an('array')
-        expect(res.body).to.be.lengthOf(7)
-
-        for(let review of res.body){
-        expect(review.assetId).to.be.equal(reviewEnv.testAsset.assetId)
-        expect(review.status.label).to.be.equal('submitted')
-        }
-    })
+        it('Return data for the specified CCI', async () => {
+            const res = await chai.request(config.baseUrl)
+            .get(`/stigs/ccis/${stigEnv.testCollection.cci}?projection=stigs&projection=emassAp&projection=references`)
+            .set('Authorization', `Bearer ${user.token}`)
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('object')
+            expect(res.body.cci).to.be.equal(stigEnv.testCollection.cci)
+            expect(res.body).to.have.property('stigs')
+            expect(res.body).to.have.property('emassAp')
+            expect(res.body).to.have.property('references')
+        })
     })
     describe('GET - getRuleByRuleId - /stigs/rules/{ruleId}', () => {
+
+        it('Return data for the specified rule', async () => {
+            const res = await chai.request(config.baseUrl)
+            .get(`/stigs/rules/${stigEnv.testCollection.ruleId}?projection=detail&projection=ccis&projection=check&projection=fix`)
+            .set('Authorization', `Bearer ${user.token}`)
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('object')
+            expect(res.body.ruleId).to.be.equal(stigEnv.testCollection.ruleId)
+            expect(res.body).to.have.property('detail')
+            expect(res.body).to.have.property('ccis')
+            expect(res.body).to.have.property('check')
+            expect(res.body).to.have.property('fix')
+        })
     })
     describe('GET - getScapMap - /stigs/scap-maps', () => {
+        it('Return a list of SCAP maps', async () => {
+            const res = await chai.request(config.baseUrl)
+            .get('/stigs/scap-maps')
+            .set('Authorization', `Bearer ${user.token}`)
+            expect(res).to.have.status(200)
+            expect(res.body).to.eql([
+                {
+                  scapBenchmarkId: 'CAN_Ubuntu_18-04_STIG',
+                  benchmarkId: 'U_CAN_Ubuntu_18-04_STIG'
+                },
+                {
+                  scapBenchmarkId: 'Mozilla_Firefox_RHEL',
+                  benchmarkId: 'Mozilla_Firefox'
+                },
+                {
+                  scapBenchmarkId: 'Mozilla_Firefox_Windows',
+                  benchmarkId: 'Mozilla_Firefox'
+                },
+                {
+                  scapBenchmarkId: 'MOZ_Firefox_Linux',
+                  benchmarkId: 'MOZ_Firefox_STIG'
+                },
+                {
+                  scapBenchmarkId: 'MOZ_Firefox_Windows',
+                  benchmarkId: 'MOZ_Firefox_STIG'
+                },    
+                {
+                  scapBenchmarkId: 'Solaris_10_X86_STIG',
+                  benchmarkId: 'Solaris_10_X86'
+                }
+              ])
+        })
     })
     describe('GET - getStigById - /stigs/{benchmarkId}', () => {
 
@@ -295,9 +216,45 @@ describe('Stig GETS tests using "admin" user ', () => {
             expect(res.body.rules).to.be.an('array')
         })
     }) 
-    describe('GET - getRevisionsByBenchmarkId - /stigs/{benchmarkId}/revisions/{revisionStr}/rules', () => {
+    describe('GET - getRulesByRevision - /stigs/{benchmarkId}/revisions/{revisionStr}/rules', () => {
+        it("Return rule data for the LATEST revision of a STIG", async () => {
+            const res = await chai.request(config.baseUrl)
+            .get(`/stigs/${stigEnv.testCollection.benchmark}/revisions/${'latest'}/rules?projection=detail&projection=ccis&projection=check&projection=fix`)
+            .set('Authorization', `Bearer ${user.token}`)
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('array')
+            expect(res.body).to.be.lengthOf(81)
+            expect(res.body[0]).to.have.property('detail')
+            expect(res.body[0]).to.have.property('ccis')
+            expect(res.body[0]).to.have.property('check')
+            expect(res.body[0]).to.have.property('fix')
+        })
+        it("Return rule data for the specified revision of a STIG.", async () => {
+            const res = await chai.request(config.baseUrl)
+            .get(`/stigs/${stigEnv.testCollection.benchmark}/revisions/${stigEnv.testCollection.revisionStr}/rules?projection=detail&projection=ccis&projection=check&projection=fix`)
+            .set('Authorization', `Bearer ${user.token}`)
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('array')
+            expect(res.body).to.be.lengthOf(81)
+            expect(res.body[0]).to.have.property('detail')
+            expect(res.body[0]).to.have.property('ccis')
+            expect(res.body[0]).to.have.property('check')
+            expect(res.body[0]).to.have.property('fix')
+        })
     }) 
-    describe('GET - getRevisionsByBenchmarkId - /stigs/{benchmarkId}/revisions/{revisionStr}/rules/{ruleId}', () => {
+    describe('GET - getRuleByRevision - /stigs/{benchmarkId}/revisions/{revisionStr}/rules/{ruleId}', () => {
+        it("Return rule data for the specified revision of a STIG.", async () => {
+            const res = await chai.request(config.baseUrl)
+            .get(`/stigs/${stigEnv.testCollection.benchmark}/revisions/${stigEnv.testCollection.revisionStr}/rules/${stigEnv.testCollection.ruleId}?projection=detail&projection=ccis&projection=check&projection=fix`)
+            .set('Authorization', `Bearer ${user.token}`)
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('object')
+            expect(res.body).to.have.property('detail')
+            expect(res.body).to.have.property('ccis')
+            expect(res.body).to.have.property('check')
+            expect(res.body).to.have.property('fix')
+            expect(res.body.ruleId).to.be.equal(stigEnv.testCollection.ruleId)
+        })
     })
 })
 

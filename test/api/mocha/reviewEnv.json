@@ -1,16 +1,42 @@
 {
     "testCollection":{
-        "name": "Collection_X",
+        "name": "Collection X",
         "collectionId": "21",
         "benchmark": "VPN_SRG_TEST",
         "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
         "testLabel":"755b8a28-9a68-11ec-b1bc-0242ac110002",
+        "testLabelName": "test-label-lvl1",
+        "labels": [
+            "755b8a28-9a68-11ec-b1bc-0242ac110002",
+            "5130dc84-9a68-11ec-b1bc-0242ac110002"
+        ],
         "revisionStr": "V1R1",
         "assetIDsInCollection":["29","62","42","154"],
         "metadataKey": "testkey",
         "metadataValue": "testvalue",
         "ruleId": "SV-106179r1_rule",
-        "groupId": "V-97041"
+        "groupId": "V-97041",
+        "cci": "000015",
+        "userIdsWithGrant":["86","85","21", "44", "87", "1", "45" ],
+        "owners": ["87","1","45"],
+        "allMetadata": [{
+            "key": "pocEmail",
+            "value": "pocEmail@email.com"
+        },
+        {
+            "key": "pocName",
+            "value": "poc2Patched"
+        },
+        {
+            "key": "pocPhone",
+            "value": "12342"
+        },
+        {
+            "key": "reqRar",
+            "value": "true"
+        }],
+        "collectionMetadataKey": "pocName",
+        "collectionMetadataValue": "poc2Patched"
      
     },
     "testAssetlvl1NoAccess":{
@@ -22,6 +48,7 @@
         "assetId": "42",
         "collectionId": "21",
         "usersWithGrant":["86,85"],
+        "benchmark": "VPN_SRG_TEST",
         "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
         "metadataKey": "testkey",
         "metadataValue": "testvalue",
@@ -34,10 +61,45 @@
         "username": "stigmanadmin",
         "userId":"1"
     },
+    "lvl1":{
+        "userId": "85",
+        "label": "5130dc84-9a68-11ec-b1bc-0242ac110002"
+    },
+   
     "testRuleId": "SV-106191r1_rule",
     "freshRuleId": "SV-106195r1_rule",
     "allStigsForAdmin": ["A10_Networks_ADC_ALG_STIG","AAA_Service_SRG", "Adobe_Acrobat_Pro_DC_Continuous_STIG",
-    "RHEL_7_STIG_TEST","VPN_SRG_OTHER", "VPN_SRG_Rule-fingerprint-match-test","VPN_SRG_TEST","Windows_10_STIG_TEST"]
-        
-    
+    "RHEL_7_STIG_TEST","VPN_SRG_OTHER", "VPN_SRG_Rule-fingerprint-match-test","VPN_SRG_TEST","Windows_10_STIG_TEST"],
+    "testStigfile": "U_VPN_SRG_V1R1_Manual-xccdf.xml",
+    "scrapBenchmark": "RHEL_7_STIG_TEST",
+    "collectionMetadataKey": "pocName",
+    "collectionMetadataValue": "poc2Patched",
+    "reviewHistory":{
+        "assetId": "42",
+        "startDate": "1900-10-01",
+        "endDate": "2020-10-01",
+        "ruleId": "SV-106179r1_rule",
+        "status": "submitted"
+    },
+    "scrapCollection":{
+        "collectionId": "1",
+        "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST", "RHEL_7_STIG_TEST"],
+          "scrapLabel": "df4e6836-a003-11ec-b1bc-0242ac110002"
+    },
+    "scrapLvl1User":{
+        "userId": "86"
+    },
+    "scrapAsset":{
+        "assetId": "34",
+        "scrapBenchmark": "RHEL_7_STIG_TEST"
+      
+    },
+    "deleteCollection":{
+        "collectionId": "84"
+    },
+    "metrics":{
+        "benchmark": "VPN_SRG_TEST",
+        "checklistLength": 81,
+        "labelFull": "test-label-full"
+    }
 }
