@@ -24,7 +24,7 @@
             "value": "pocEmail@email.com"
         },
         {
-            "key": "pocName",
+            "key": "pocName",               
             "value": "poc2Patched"
         },
         {
@@ -37,7 +37,6 @@
         }],
         "collectionMetadataKey": "pocName",
         "collectionMetadataValue": "poc2Patched"
-     
     },
     "testAssetlvl1NoAccess":{
         "assetId":"62",
@@ -63,7 +62,9 @@
     },
     "lvl1":{
         "userId": "85",
-        "label": "5130dc84-9a68-11ec-b1bc-0242ac110002"
+        "label": "5130dc84-9a68-11ec-b1bc-0242ac110002",
+        "assignedStigs": ["VPN_SRG_TEST"],
+        "assets": ["42", "154"]
     },
    
     "testRuleId": "SV-106191r1_rule",
