@@ -12,7 +12,7 @@
 # **/uploads
 # **/docker
 
-ARG BASE_IMAGE="node:lts-alpine"
+ARG BASE_IMAGE=node:20.15.1-alpine3.20
 FROM ${BASE_IMAGE}
 LABEL maintainer="carl.a.smigielski@saic.com"
 ARG COMMIT_BRANCH="unspecified"
