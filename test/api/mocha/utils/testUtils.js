@@ -1,46 +1,79 @@
 const axios = require('axios')
 const config = require('../testConfig.json')
-const appdata = require('../../form-data-files/appdata.json')
-const batchAppData = require('../../form-data-files/batch-test-data.json')
 const FormData = require('form-data')
 const fs = require('fs')
 const path = require('path')
-const reviewEnv = require('../reviewEnv.json')
+const enviornment = require('../enviornment.json')
 
 const adminToken = config.adminToken
 
 const loadAppData = async () => {
-  
+
+  const appdataFile = path.join(__dirname, '../../form-data-files/appdata.json')
+  const formData = new FormData()
+  formData.append('importFile', fs.createReadStream(appdataFile), {
+    filename: 'appdata.json',
+    contentType: 'application/json'
+  })
+  const axiosConfig = {
+    method: 'post',
+    url: `${config.baseUrl}/op/appdata?elevate=true`,
+    headers: {
+      ...formData.getHeaders(),
+      Authorization: `Bearer ${adminToken}`
+    },
+    data: formData
+  }
   try {
-    const res = await axios.post(
-      `${config.baseUrl}/op/appdata?elevate=true`,
-      appdata,
-      {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    )
-  } catch (e) {
-    console.log(e)
+    const response = await axios(axiosConfig)
+  } catch (error) {
+    console.error(`Failed to upload:`, error)
   }
 }
 
 const loadBatchAppData = async () => {
+  const appdataFile = path.join(__dirname, '../../form-data-files/batch-test-data.json')
+  const formData = new FormData()
+  formData.append('importFile', fs.createReadStream(appdataFile), {
+    filename: 'appdata.json',
+    contentType: 'application/json'
+  })
+  const axiosConfig = {
+    method: 'post',
+    url: `${config.baseUrl}/op/appdata?elevate=true`,
+    headers: {
+      ...formData.getHeaders(),
+      Authorization: `Bearer ${adminToken}`
+    },
+    data: formData
+  }
   try {
-    const res = await axios.post(
-      `${config.baseUrl}/op/appdata?elevate=true`,
-      batchAppData,
-      {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    )
-  } catch (e) {
-    console.log(e)
+    const response = await axios(axiosConfig)
+  } catch (error) {
+    console.error(`Failed to upload:`, error)
+  }
+}
+
+const loadMetaMetricsAppData = async () => {
+  const appdataFile = path.join(__dirname, '../../form-data-files/appdata-meta-metrics-with-pin.json')
+  const formData = new FormData()
+  formData.append('importFile', fs.createReadStream(appdataFile), {
+    filename: 'appdata.json',
+    contentType: 'application/json'
+  })
+  const axiosConfig = {
+    method: 'post',
+    url: `${config.baseUrl}/op/appdata?elevate=true`,
+    headers: {
+      ...formData.getHeaders(),
+      Authorization: `Bearer ${adminToken}`
+    },
+    data: formData
+  }
+  try {
+    const response = await axios(axiosConfig)
+  } catch (error) {
+    console.error(`Failed to upload:`, error)
   }
 }
 
@@ -190,7 +223,7 @@ const importReview = async (collectionId, assetId) => {
       `${config.baseUrl}/collections/${collectionId}/reviews/${assetId}`,
       [
         {
-        "ruleId": `${reviewEnv.testCollection.ruleId}`,
+        "ruleId": `${enviornment.testCollection.ruleId}`,
         "result": "pass",
         "detail": "test\nvisible to lvl1",
         "comment": "sure",
@@ -513,6 +546,7 @@ const setDefaultRevision = async (collectionId, benchmarkId, revisionStr) => {
 
 module.exports = {
   loadAppData,
+  loadMetaMetricsAppData,
   uploadTestStigs,
   getStigByCollectionBenchmarkId,
   setDefaultRevision,
