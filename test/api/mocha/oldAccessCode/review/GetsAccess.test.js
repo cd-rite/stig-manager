@@ -5,7 +5,7 @@ const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
 const enviornment = require('../../enviornment.json')
-const usersEnv = require('../../users.json')
+const usersEnv = require('../../iterations.json')
 
 describe('Access Control Testing Review gets', () => {
   before(async function () {
