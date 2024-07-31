@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 
 const user =
   {
@@ -21,7 +21,7 @@ const lvl1 =  {
       "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJGSjg2R2NGM2pUYk5MT2NvNE52WmtVQ0lVbWZZQ3FvcXRPUWVNZmJoTmxFIn0.eyJleHAiOjE4NjQ3MDg5ODQsImlhdCI6MTY3MDU2ODE4NCwiYXV0aF90aW1lIjoxNjcwNTY4MTg0LCJqdGkiOiIxMDhmMDc2MC0wYmY5LTRkZjEtYjE0My05NjgzNmJmYmMzNjMiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvc3RpZ21hbiIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiJlM2FlMjdiOC1kYTIwLTRjNDItOWRmOC02MDg5ZjcwZjc2M2IiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzdGlnLW1hbmFnZXIiLCJub25jZSI6IjE0ZmE5ZDdkLTBmZTAtNDQyNi04ZmQ5LTY5ZDc0YTZmMzQ2NCIsInNlc3Npb25fc3RhdGUiOiJiNGEzYWNmMS05ZGM3LTQ1ZTEtOThmOC1kMzUzNjJhZWM0YzciLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtc3RpZ21hbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7InJlYWxtLW1hbmFnZW1lbnQiOnsicm9sZXMiOlsidmlldy11c2VycyIsInF1ZXJ5LWdyb3VwcyIsInF1ZXJ5LXVzZXJzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBzdGlnLW1hbmFnZXI6Y29sbGVjdGlvbiBzdGlnLW1hbmFnZXI6c3RpZzpyZWFkIHN0aWctbWFuYWdlcjp1c2VyOnJlYWQgc3RpZy1tYW5hZ2VyOmNvbGxlY3Rpb246cmVhZCIsInNpZCI6ImI0YTNhY2YxLTlkYzctNDVlMS05OGY4LWQzNTM2MmFlYzRjNyIsIm5hbWUiOiJyZXN0cmljdGVkIiwicHJlZmVycmVkX3VzZXJuYW1lIjoibHZsMSIsImdpdmVuX25hbWUiOiJyZXN0cmljdGVkIn0.OqLARi5ILt3j2rMikXy0ECTTqjWco0-CrMwzE88gUv2i8rVO9kMgVsXbtPk2L2c9NNNujnxqg7QIr2_sqA51saTrZHvzXcsT8lBruf74OubRMwcTQqJap-COmrzb60S7512k0WfKTYlHsoCn_uAzOb9sp8Trjr0NksU8OXCElDU"
 }
 
-describe('Metrics get tests using "admin" user ', () => {
+describe('Metrics get tests using "admin" user ', () => { 
   before(async function () {
     this.timeout(4000)
     await utils.loadAppData()
@@ -35,7 +35,7 @@ describe('Metrics get tests using "admin" user ', () => {
     beforeEach(async function () {
         metricsReferenceCommon = {
             assessed: 6,
-            assessments: enviornment.metrics.checklistLength,
+            assessments: environment.metrics.checklistLength,
             maxTs: "2022-02-03T00:07:05Z",
             minTs: "2020-08-11T22:27:26Z",
             results: {
@@ -112,7 +112,7 @@ describe('Metrics get tests using "admin" user ', () => {
 
     it('Return detailed metrics for the specified Collection np param', async () => {
       const res = await chai.request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail`)
+        .get(`/collections/${environment.testCollection.collectionId}/metrics/detail`)
         .set('Authorization', `Bearer ${user.token}`)
       expect(res).to.have.status(200)
 
@@ -121,7 +121,7 @@ describe('Metrics get tests using "admin" user ', () => {
         const regex = new RegExp(assetMatchString)
         expect(item.name).to.match(regex)
 
-        if(item.assetId === enviornment.testAsset.assetId && item.benchmarkId === enviornment.metrics.benchmark){
+        if(item.assetId === environment.testAsset.assetId && item.benchmarkId === environment.metrics.benchmark){
             expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
             expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
             expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -146,7 +146,7 @@ describe('Metrics get tests using "admin" user ', () => {
     })
     it('Return detailed metrics for the specified Collection - with params', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail?benchmarkId=${enviornment.metrics.benchmark}&assetId=${enviornment.testAsset.assetId}&labelName=${enviornment.testCollection.testLabelName}`)
+          .get(`/collections/${environment.testCollection.collectionId}/metrics/detail?benchmarkId=${environment.metrics.benchmark}&assetId=${environment.testAsset.assetId}&labelName=${environment.testCollection.testLabelName}`)
           .set('Authorization', `Bearer ${user.token}`)
 
         expect(res).to.have.status(200)
@@ -156,16 +156,16 @@ describe('Metrics get tests using "admin" user ', () => {
             const regex = new RegExp(assetMatchString)
             expect(item.name).to.match(regex)
 
-            expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-            expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
-            expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+            expect(item.assetId).to.equal(environment.testAsset.assetId)
+            expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
+            expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
 
             expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
             expect(item.metrics.results.notapplicable.total).to.equal(metricsReferenceCommon.results.notapplicable.total)
             expect(item.metrics.results.pass.total).to.equal(metricsReferenceCommon.results.pass.total)
             expect(item.metrics.results.fail.total).to.equal(metricsReferenceCommon.results.fail.total)
             expect(item.metrics.statuses.submitted.total).to.equal(metricsReferenceCommon.statuses.submitted.total)
-            expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+            expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
             expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
         }
     })
@@ -256,16 +256,16 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return detail metrics - assset agg', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
         for(item of res.body){  
-            if(item.assetId === enviornment.testAsset.assetId){
+            if(item.assetId === environment.testAsset.assetId){
                 let assetMatchString = "asset"
                 const regex = new RegExp(assetMatchString)
                 expect(item.name).to.match(regex)
-                expect(item.assetId).to.equal(enviornment.testAsset.assetId)
+                expect(item.assetId).to.equal(environment.testAsset.assetId)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -291,16 +291,16 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return detail metrics - asset agg - with param assetId', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?assetId=${enviornment.testAsset.assetId}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?assetId=${environment.testAsset.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
         for(item of res.body){  
-            if(item.assetId === enviornment.testAsset.assetId){
+            if(item.assetId === environment.testAsset.assetId){
                 let assetMatchString = "asset"
                 const regex = new RegExp(assetMatchString)
                 expect(item.name).to.match(regex)
-                expect(item.assetId).to.equal(enviornment.testAsset.assetId)
+                expect(item.assetId).to.equal(environment.testAsset.assetId)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -326,7 +326,7 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return detail metrics - asset agg - with params', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
@@ -339,11 +339,11 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 2
 
         for(item of res.body){  
-            if(item.assetId === enviornment.testAsset.assetId){
+            if(item.assetId === environment.testAsset.assetId){
                 let assetMatchString = "asset"
                 const regex = new RegExp(assetMatchString)
                 expect(item.name).to.match(regex)
-                expect(item.assetId).to.equal(enviornment.testAsset.assetId)
+                expect(item.assetId).to.equal(environment.testAsset.assetId)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -369,7 +369,7 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return detail metrics - asset agg - with params - all', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?benchmarkId=${enviornment.metrics.benchmark}&assetId=${enviornment.testAsset.assetId}&labelId=${enviornment.testCollection.testLabel}&labelName=${enviornment.testCollection.testLabelName}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?benchmarkId=${environment.metrics.benchmark}&assetId=${environment.testAsset.assetId}&labelId=${environment.testCollection.testLabel}&labelName=${environment.testCollection.testLabelName}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
@@ -385,9 +385,9 @@ describe('Metrics get tests using "admin" user ', () => {
             let assetMatchString = "asset"
             const regex = new RegExp(assetMatchString)
             expect(item.name).to.match(regex)
-            expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-            expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-            expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+            expect(item.assetId).to.equal(environment.testAsset.assetId)
+            expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+            expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
             expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
             expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
             expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -412,7 +412,7 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return detail metrics - asset agg - with param labelId', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?labelId=${enviornment.testCollection.testLabel}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?labelId=${environment.testCollection.testLabel}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
@@ -436,10 +436,10 @@ describe('Metrics get tests using "admin" user ', () => {
             const regex = new RegExp(assetMatchString)
 
 
-            if(item.assetId === enviornment.testAsset.assetId){
-                expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-                expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+            if(item.assetId === environment.testAsset.assetId){
+                expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+                expect(item.assetId).to.equal(environment.testAsset.assetId)
+                expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
                 expect(item.name).to.match(regex)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -466,7 +466,7 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return detail metrics - asset agg - with param labelName', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?labelName=${enviornment.metrics.labelFull}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?labelName=${environment.metrics.labelFull}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
@@ -484,10 +484,10 @@ describe('Metrics get tests using "admin" user ', () => {
             const regex = new RegExp(assetMatchString)
 
 
-            if(item.assetId === enviornment.testAsset.assetId){
-                expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-                expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+            if(item.assetId === environment.testAsset.assetId){
+                expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+                expect(item.assetId).to.equal(environment.testAsset.assetId)
+                expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
                 expect(item.name).to.match(regex)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -601,12 +601,12 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return detail metrics - collection agg - no params', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
-        expect(res.body.assets).to.equal(enviornment.testCollection.assetIDsInCollection.length)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
-        expect(res.body.stigs).to.equal(enviornment.testCollection.validStigs.length)
+        expect(res.body.assets).to.equal(environment.testCollection.assetIDsInCollection.length)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
+        expect(res.body.stigs).to.equal(environment.testCollection.validStigs.length)
         expect(res.body.checklists).to.eql(6)
         expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
         expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -644,12 +644,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 3  
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection?assetId=${enviornment.testAsset.assetId}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection?assetId=${environment.testAsset.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.assets).to.equal(1)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
-        expect(res.body.stigs).to.equal(enviornment.testCollection.validStigs.length)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
+        expect(res.body.stigs).to.equal(environment.testCollection.validStigs.length)
         expect(res.body.checklists).to.eql(2)
         expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
         expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -686,12 +686,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 4
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection?labelId=${enviornment.testCollection.testLabel}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection?labelId=${environment.testCollection.testLabel}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.assets).to.equal(2)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
-        expect(res.body.stigs).to.equal(enviornment.testCollection.validStigs.length)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
+        expect(res.body.stigs).to.equal(environment.testCollection.validStigs.length)
         expect(res.body.checklists).to.eql(4)
         expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
         expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -728,12 +728,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 4
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection?labelName=${enviornment.metrics.labelFull}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection?labelName=${environment.metrics.labelFull}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.assets).to.equal(2)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
-        expect(res.body.stigs).to.equal(enviornment.testCollection.validStigs.length)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
+        expect(res.body.stigs).to.equal(environment.testCollection.validStigs.length)
         expect(res.body.checklists).to.eql(4)
         expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
         expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -766,11 +766,11 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 5      
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.assets).to.equal(3)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
         expect(res.body.stigs).to.equal(1)
         expect(res.body.checklists).to.eql(3)
         expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
@@ -798,7 +798,7 @@ describe('Metrics get tests using "admin" user ', () => {
   describe('GET - getMetricsDetailByCollectionAggLabel - /collections/{collectionId}/metrics/detail/label', () => {
 
     let metricsReferenceCommon
-    let checklistLength = enviornment.metrics.checklistLength
+    let checklistLength = environment.metrics.checklistLength
     let testTotalAssessmentsForTestAsset = 368
     let testTotalAssessmentsForTestLabel = 736
 
@@ -884,12 +884,12 @@ describe('Metrics get tests using "admin" user ', () => {
         }
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(3)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -929,12 +929,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 3
       
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(3)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -952,7 +952,7 @@ describe('Metrics get tests using "admin" user ', () => {
                 expect(item.metrics.statuses.submitted.total).to.equal(metricsReferenceCommon.statuses.submitted.total)
                 expect(item.metrics.statuses.accepted.total).to.equal(metricsReferenceCommon.statuses.accepted.total)
                 expect(item.metrics.statuses.rejected.total).to.equal(metricsReferenceCommon.statuses.rejected.total)
-                metricsReferenceCommon.assessments = enviornment.metrics.checklistLength * item.assets
+                metricsReferenceCommon.assessments = environment.metrics.checklistLength * item.assets
                 expect(item.metrics.assessments).to.equal(metricsReferenceCommon.assessments)
                 expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
             }
@@ -976,12 +976,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 3           
     
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label?assetId=${enviornment.testAsset.assetId}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label?assetId=${environment.testAsset.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(2)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1016,12 +1016,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.statuses.saved.total = 3
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label?labelId=${enviornment.testCollection.testLabel}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label?labelId=${environment.testCollection.testLabel}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(1)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1056,12 +1056,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.statuses.saved.total = 3
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label?labelName=${enviornment.testCollection.testLabelName}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label?labelName=${environment.testCollection.testLabelName}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(1)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1089,7 +1089,7 @@ describe('Metrics get tests using "admin" user ', () => {
   describe('GET - getMetricsDetailByCollectionAggStig - /collections/{collectionId}/metrics/detail/stig', () => {
 
     let metricsReferenceCommon
-    let testChecklistLength = enviornment.metrics.checklistLength
+    let testChecklistLength = environment.metrics.checklistLength
     let testTotalAssessmentsForTestAsset = 368
     let testTotalAssessmentsForTestSTIG = testChecklistLength * 3
 
@@ -1176,12 +1176,12 @@ describe('Metrics get tests using "admin" user ', () => {
         }
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
         for(const item of res.body){
-            if(item.benchmarkId == enviornment.testCollection.benchmark){
+            if(item.benchmarkId == environment.testCollection.benchmark){
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1215,13 +1215,13 @@ describe('Metrics get tests using "admin" user ', () => {
         }
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(1)
        
         for(const item of res.body){
-            expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+            expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
             expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
             expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
             expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1268,14 +1268,14 @@ describe('Metrics get tests using "admin" user ', () => {
   
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig?assetId=${enviornment.testAsset.assetId}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig?assetId=${environment.testAsset.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(2)
 
         for(const item of res.body){
-            if(item.benchmarkId == enviornment.testCollection.benchmark){
-                expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+            if(item.benchmarkId == environment.testCollection.benchmark){
+                expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1321,16 +1321,16 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 3 
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig?labelId=${enviornment.testCollection.testLabel}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig?labelId=${environment.testCollection.testLabel}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(2)
 
         for(const item of res.body){
-            if(item.benchmarkId == enviornment.testCollection.benchmark){
+            if(item.benchmarkId == environment.testCollection.benchmark){
                 metricsReferenceCommon.assessments = testChecklistLength * item.assets
                 expect(item.assets).to.equal(2)
-                expect(item.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
+                expect(item.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1376,16 +1376,16 @@ describe('Metrics get tests using "admin" user ', () => {
 
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig?labelName=${enviornment.testCollection.testLabelName}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig?labelName=${environment.testCollection.testLabelName}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(2)
 
         for(const item of res.body){
-            if(item.benchmarkId == enviornment.testCollection.benchmark){
+            if(item.benchmarkId == environment.testCollection.benchmark){
                 metricsReferenceCommon.assessments = testChecklistLength * item.assets
                 expect(item.assets).to.equal(1)
-                expect(item.benchmarkId).to.be.eql(enviornment.metrics.benchmark)
+                expect(item.benchmarkId).to.be.eql(environment.metrics.benchmark)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1420,7 +1420,7 @@ describe('Metrics get tests using "admin" user ', () => {
     beforeEach(async function () {
         metricsReferenceCommon = {
             assessed: 6,
-            assessments: enviornment.metrics.checklistLength,
+            assessments: environment.metrics.checklistLength,
             maxTs: "2022-02-03T00:07:05Z",
             minTs: "2020-08-11T22:27:26Z",
             results: {
@@ -1497,7 +1497,7 @@ describe('Metrics get tests using "admin" user ', () => {
                     metricsReferenceCommon.results.fixed.total
         }
       const res = await chai.request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary`)
+        .get(`/collections/${environment.testCollection.collectionId}/metrics/summary`)
         .set('Authorization', `Bearer ${user.token}`)
       expect(res).to.have.status(200)
 
@@ -1506,7 +1506,7 @@ describe('Metrics get tests using "admin" user ', () => {
         const regex = new RegExp(assetMatchString)
         expect(item.name).to.match(regex)
         
-        if(item.assetId === enviornment.testAsset.assetId && item.benchmarkId === enviornment.metrics.benchmark){
+        if(item.assetId === environment.testAsset.assetId && item.benchmarkId === environment.metrics.benchmark){
             let regex = new RegExp("asset")
             expect(item.name).to.match(regex)
             expect(item.metrics.findings.low).to.equal(1)
@@ -1514,14 +1514,14 @@ describe('Metrics get tests using "admin" user ', () => {
             expect(item.metrics.results.pass).to.equal(2)
             expect(item.metrics.results.fail).to.equal(3)
             expect(item.metrics.statuses.submitted).to.equal(5)
-            expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+            expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
             expect(item.metrics.assessed).to.equal(6)
         }
       }
     })
     it('Return summary metrics for the Collection - benchmark param - no agg', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary?benchmarkId=${enviornment.metrics.benchmark}`)
+          .get(`/collections/${environment.testCollection.collectionId}/metrics/summary?benchmarkId=${environment.metrics.benchmark}`)
           .set('Authorization', `Bearer ${user.token}`)
 
         expect(res).to.have.status(200)
@@ -1530,23 +1530,23 @@ describe('Metrics get tests using "admin" user ', () => {
             let assetMatchString = "asset"
             const regex = new RegExp(assetMatchString)
             expect(item.name).to.match(regex)
-            if(item.assetId === enviornment.testAsset.assetId){
-                expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)
-                expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
+            if(item.assetId === environment.testAsset.assetId){
+                expect(item.benchmarkId).to.eql(environment.metrics.benchmark)
+                expect(item.assetId).to.equal(environment.testAsset.assetId)
+                expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
                 expect(item.metrics.results.notapplicable).to.equal(metricsReferenceCommon.results.notapplicable.total)
                 expect(item.metrics.results.pass).to.equal(metricsReferenceCommon.results.pass.total)
                 expect(item.metrics.results.fail).to.equal(metricsReferenceCommon.results.fail.total)
                 expect(item.metrics.statuses.submitted).to.equal(metricsReferenceCommon.statuses.submitted.total)
-                expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+                expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
                 expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
             }
         }
     })
     it('Return summary metrics for the Collection - asset param - no agg', async () => {
     const res = await chai.request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary?assetId=${enviornment.testAsset.assetId}`)
+        .get(`/collections/${environment.testCollection.collectionId}/metrics/summary?assetId=${environment.testAsset.assetId}`)
         .set('Authorization', `Bearer ${user.token}`)
 
     expect(res).to.have.status(200)
@@ -1555,23 +1555,23 @@ describe('Metrics get tests using "admin" user ', () => {
         let assetMatchString = "asset"
         const regex = new RegExp(assetMatchString)
         expect(item.name).to.match(regex)
-        if(item.benchmarkId === enviornment.metrics.benchmark){
-            expect(item.assetId).to.eql(enviornment.testAsset.assetId)
-            expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
-            expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+        if(item.benchmarkId === environment.metrics.benchmark){
+            expect(item.assetId).to.eql(environment.testAsset.assetId)
+            expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
+            expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
             expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
             expect(item.metrics.results.notapplicable).to.equal(metricsReferenceCommon.results.notapplicable.total)
             expect(item.metrics.results.pass).to.equal(metricsReferenceCommon.results.pass.total)
             expect(item.metrics.results.fail).to.equal(metricsReferenceCommon.results.fail.total)
             expect(item.metrics.statuses.submitted).to.equal(metricsReferenceCommon.statuses.submitted.total)
-            expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+            expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
             expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
         }
     }
     })
     it('Return summary metrics for the Collection - labelId param - no agg', async () => {
     const res = await chai.request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary?labelId=${enviornment.testCollection.testLabel}`)
+        .get(`/collections/${environment.testCollection.collectionId}/metrics/summary?labelId=${environment.testCollection.testLabel}`)
         .set('Authorization', `Bearer ${user.token}`)
 
     expect(res).to.have.status(200)
@@ -1580,22 +1580,22 @@ describe('Metrics get tests using "admin" user ', () => {
         let assetMatchString = "asset"
         const regex = new RegExp(assetMatchString)
         expect(item.name).to.match(regex)
-        if(item.benchmarkId === enviornment.metrics.benchmark && item.assetId === enviornment.testAsset.assetId){
-            expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
-            expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+        if(item.benchmarkId === environment.metrics.benchmark && item.assetId === environment.testAsset.assetId){
+            expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
+            expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
             expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
             expect(item.metrics.results.notapplicable).to.equal(metricsReferenceCommon.results.notapplicable.total)
             expect(item.metrics.results.pass).to.equal(metricsReferenceCommon.results.pass.total)
             expect(item.metrics.results.fail).to.equal(metricsReferenceCommon.results.fail.total)
             expect(item.metrics.statuses.submitted).to.equal(metricsReferenceCommon.statuses.submitted.total)
-            expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+            expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
             expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
         }
     }
     })
     it('Return summary metrics for the Collection - labelName param - no agg', async () => {
     const res = await chai.request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary?labelName=${enviornment.testCollection.testLabelName}`)
+        .get(`/collections/${environment.testCollection.collectionId}/metrics/summary?labelName=${environment.testCollection.testLabelName}`)
         .set('Authorization', `Bearer ${user.token}`)
 
     expect(res).to.have.status(200)
@@ -1604,15 +1604,15 @@ describe('Metrics get tests using "admin" user ', () => {
         let assetMatchString = "asset"
         const regex = new RegExp(assetMatchString)
         expect(item.name).to.match(regex)
-        if(item.benchmarkId === enviornment.metrics.benchmark && item.assetId === enviornment.testAsset.assetId){
-            expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
-            expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+        if(item.benchmarkId === environment.metrics.benchmark && item.assetId === environment.testAsset.assetId){
+            expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
+            expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
             expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
             expect(item.metrics.results.notapplicable).to.equal(metricsReferenceCommon.results.notapplicable.total)
             expect(item.metrics.results.pass).to.equal(metricsReferenceCommon.results.pass.total)
             expect(item.metrics.results.fail).to.equal(metricsReferenceCommon.results.fail.total)
             expect(item.metrics.statuses.submitted).to.equal(metricsReferenceCommon.statuses.submitted.total)
-            expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+            expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
             expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
         }
     }
@@ -1623,7 +1623,7 @@ describe('Metrics get tests using "admin" user ', () => {
 
     let metricsReferenceCommon
 
-    let testChecklistLength = enviornment.metrics.checklistLength
+    let testChecklistLength = environment.metrics.checklistLength
     let testTotalAssessmentsForTestAsset = 368
 
     beforeEach(async function () {
@@ -1699,7 +1699,7 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return summary metrics asset agg - summary', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
@@ -1713,7 +1713,7 @@ describe('Metrics get tests using "admin" user ', () => {
     
         metricsReferenceCommon.assessments = testTotalAssessmentsForTestAsset    
         for(item of res.body){  
-            if(item.assetId === enviornment.testAsset.assetId){
+            if(item.assetId === environment.testAsset.assetId){
                 let assetMatchString = "asset"
                 const regex = new RegExp(assetMatchString)
                 expect(item.name).to.match(regex)
@@ -1738,7 +1738,7 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return summary metrics - asset agg - with param assetId', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset?assetId=${enviornment.testAsset.assetId}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset?assetId=${environment.testAsset.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
@@ -1752,11 +1752,11 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.assessments = testTotalAssessmentsForTestAsset    
 
         for(item of res.body){  
-            if(item.assetId === enviornment.testAsset.assetId){
+            if(item.assetId === environment.testAsset.assetId){
                 let assetMatchString = "asset"
                 const regex = new RegExp(assetMatchString)
                 expect(item.name).to.match(regex)
-                expect(item.assetId).to.equal(enviornment.testAsset.assetId)
+                expect(item.assetId).to.equal(environment.testAsset.assetId)
                 expect(item.name).to.match(regex)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -1779,7 +1779,7 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return summary metrics - asset agg - with benchmarkID', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
@@ -1798,11 +1798,11 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 2
         
         for(item of res.body){  
-            if(item.assetId === enviornment.testAsset.assetId){
+            if(item.assetId === environment.testAsset.assetId){
                 let assetMatchString = "asset"
                 const regex = new RegExp(assetMatchString)
                 expect(item.name).to.match(regex)
-                expect(item.benchmarkIds[0]).to.equal(enviornment.metrics.benchmark)
+                expect(item.benchmarkIds[0]).to.equal(environment.metrics.benchmark)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1825,7 +1825,7 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return summary metrics - asset agg - with param labelId', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset?labelId=${enviornment.testCollection.testLabel}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset?labelId=${environment.testCollection.testLabel}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
@@ -1848,11 +1848,11 @@ describe('Metrics get tests using "admin" user ', () => {
             let assetMatchString = "asset"
             const regex = new RegExp(assetMatchString)
             expect(item.name).to.match(regex)
-            if(item.assetId === enviornment.testAsset.assetId){
-                expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-                expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
-                expect(item.benchmarkIds[0]).to.equal(enviornment.metrics.benchmark)
+            if(item.assetId === environment.testAsset.assetId){
+                expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+                expect(item.assetId).to.equal(environment.testAsset.assetId)
+                expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+                expect(item.benchmarkIds[0]).to.equal(environment.metrics.benchmark)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1874,7 +1874,7 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return summary metrics - asset agg - with param labelName', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset?labelName=${enviornment.metrics.labelFull}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset?labelName=${environment.metrics.labelFull}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
@@ -1898,11 +1898,11 @@ describe('Metrics get tests using "admin" user ', () => {
                 let assetMatchString = "asset"
                 const regex = new RegExp(assetMatchString)
                 expect(item.name).to.match(regex)
-                if(item.assetId === enviornment.testAsset.assetId){
-                    expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-                    expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                    expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
-                    expect(item.benchmarkIds[0]).to.equal(enviornment.metrics.benchmark)
+                if(item.assetId === environment.testAsset.assetId){
+                    expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+                    expect(item.assetId).to.equal(environment.testAsset.assetId)
+                    expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+                    expect(item.benchmarkIds[0]).to.equal(environment.metrics.benchmark)
                     expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                     expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                     expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -1927,7 +1927,7 @@ describe('Metrics get tests using "admin" user ', () => {
   describe('GET - getMetricsSummaryByCollectionAgg - /collections/{collectionId}/metrics/summary/collection', () => {
 
     let metricsReferenceCommon
-    let testChecklistLength =enviornment.metrics.checklistLength
+    let testChecklistLength =environment.metrics.checklistLength
     let testTotalAssessmentsForTestAsset = 368
     let testTotalAssessmentsForCollection = 1104
 
@@ -2017,12 +2017,12 @@ describe('Metrics get tests using "admin" user ', () => {
     it('Return summary metrics - collection agg - no params', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
-        expect(res.body.assets).to.equal(enviornment.testCollection.assetIDsInCollection.length)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
-        expect(res.body.stigs).to.equal(enviornment.testCollection.validStigs.length)
+        expect(res.body.assets).to.equal(environment.testCollection.assetIDsInCollection.length)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
+        expect(res.body.stigs).to.equal(environment.testCollection.validStigs.length)
         expect(res.body.checklists).to.eql(6)
         expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
         expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -2056,11 +2056,11 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 3  
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection?assetId=${enviornment.testAsset.assetId}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection?assetId=${environment.testAsset.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.assets).to.equal(1)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
         expect(res.body.checklists).to.eql(2)
         expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
         expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -2093,12 +2093,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 4
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection?labelId=${enviornment.testCollection.testLabel}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection?labelId=${environment.testCollection.testLabel}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.assets).to.equal(2)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
-        expect(res.body.stigs).to.equal(enviornment.testCollection.validStigs.length)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
+        expect(res.body.stigs).to.equal(environment.testCollection.validStigs.length)
         expect(res.body.checklists).to.eql(4)
         expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
         expect(res.body.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2130,12 +2130,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 4
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection?labelName=${enviornment.metrics.labelFull}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection?labelName=${environment.metrics.labelFull}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.assets).to.equal(2)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
-        expect(res.body.stigs).to.equal(enviornment.testCollection.validStigs.length)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
+        expect(res.body.stigs).to.equal(environment.testCollection.validStigs.length)
         expect(res.body.checklists).to.eql(4)
         expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
         expect(res.body.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2162,11 +2162,11 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 5          
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.assets).to.equal(3)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
         expect(res.body.stigs).to.equal(1)
         expect(res.body.checklists).to.eql(3)
         expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -2189,7 +2189,7 @@ describe('Metrics get tests using "admin" user ', () => {
   describe('GET - getMetricsSummaryByCollectionAggLabel - /collections/{collectionId}/metrics/summary/label', () => {
 
     let metricsReferenceCommon
-    let checklistLength = enviornment.metrics.checklistLength
+    let checklistLength = environment.metrics.checklistLength
     let testTotalAssessmentsForTestAsset = 368
     let testTotalAssessmentsForTestLabel = 736
 
@@ -2275,12 +2275,12 @@ describe('Metrics get tests using "admin" user ', () => {
         }
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(3)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2316,12 +2316,12 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 3
       
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(3)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2336,7 +2336,7 @@ describe('Metrics get tests using "admin" user ', () => {
                 expect(item.metrics.statuses.accepted).to.equal(metricsReferenceCommon.statuses.accepted.total)
                 expect(item.metrics.statuses.rejected).to.equal(metricsReferenceCommon.statuses.rejected.total)
                 expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
-                metricsReferenceCommon.assessments = enviornment.metrics.checklistLength * item.assets
+                metricsReferenceCommon.assessments = environment.metrics.checklistLength * item.assets
                 expect(item.metrics.assessments).to.equal(metricsReferenceCommon.assessments)
             }
         }
@@ -2359,14 +2359,14 @@ describe('Metrics get tests using "admin" user ', () => {
           metricsReferenceCommon.findings.medium = 3           
     
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label?assetId=${enviornment.testAsset.assetId}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label?assetId=${environment.testAsset.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(2)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.assets).to.equal(1)
-                expect(item.labelId).to.equal(enviornment.testCollection.testLabel)
+                expect(item.labelId).to.equal(environment.testCollection.testLabel)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2397,14 +2397,14 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.statuses.saved.total = 3
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label?labelId=${enviornment.testCollection.testLabel}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label?labelId=${environment.testCollection.testLabel}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(1)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.assets).to.equal(2)
-                expect(item.labelId).to.equal(enviornment.testCollection.testLabel)
+                expect(item.labelId).to.equal(environment.testCollection.testLabel)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2435,14 +2435,14 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.statuses.saved.total = 3
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label?labelName=${enviornment.testCollection.testLabelName}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label?labelName=${environment.testCollection.testLabelName}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(1)
         for (const item of res.body){
-            if(item.labelId === enviornment.testCollection.testLabel){
+            if(item.labelId === environment.testCollection.testLabel){
                 expect(item.assets).to.equal(2)
-                expect(item.labelId).to.equal(enviornment.testCollection.testLabel)
+                expect(item.labelId).to.equal(environment.testCollection.testLabel)
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2467,7 +2467,7 @@ describe('Metrics get tests using "admin" user ', () => {
 
 
     let metricsReferenceCommon
-    let testChecklistLength = enviornment.metrics.checklistLength
+    let testChecklistLength = environment.metrics.checklistLength
     let testTotalAssessmentsForTestAsset = 368
     let testTotalAssessmentsForTestSTIG = testChecklistLength * 3
 
@@ -2555,12 +2555,12 @@ describe('Metrics get tests using "admin" user ', () => {
    
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
 
         for(const item of res.body){
-            if(item.benchmarkId == enviornment.testCollection.benchmark){
+            if(item.benchmarkId == environment.testCollection.benchmark){
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2584,13 +2584,13 @@ describe('Metrics get tests using "admin" user ', () => {
       
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(1)
        
         for(const item of res.body){
-            expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+            expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
             expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
             expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
             expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2625,14 +2625,14 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 2    
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig?assetId=${enviornment.testAsset.assetId}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig?assetId=${environment.testAsset.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(2)
 
         for(const item of res.body){
-            if(item.benchmarkId == enviornment.testCollection.benchmark){
-                expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+            if(item.benchmarkId == environment.testCollection.benchmark){
+                expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2666,16 +2666,16 @@ describe('Metrics get tests using "admin" user ', () => {
         metricsReferenceCommon.findings.medium = 3 
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig?labelId=${enviornment.testCollection.testLabel}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig?labelId=${environment.testCollection.testLabel}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(2)
 
         for(const item of res.body){
-            if(item.benchmarkId == enviornment.testCollection.benchmark){
+            if(item.benchmarkId == environment.testCollection.benchmark){
                 metricsReferenceCommon.assessments = testChecklistLength * item.assets
                 expect(item.assets).to.equal(2)
-                expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+                expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2709,16 +2709,16 @@ describe('Metrics get tests using "admin" user ', () => {
       metricsReferenceCommon.findings.medium = 3 
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig?labelName=${enviornment.metrics.labelFull}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig?labelName=${environment.metrics.labelFull}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body.length).to.eql(2)
 
         for(const item of res.body){
-            if(item.benchmarkId == enviornment.testCollection.benchmark){
+            if(item.benchmarkId == environment.testCollection.benchmark){
                 metricsReferenceCommon.assessments = testChecklistLength * item.assets
                 expect(item.assets).to.equal(2)
-                expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+                expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                 expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                 expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                 expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2741,7 +2741,7 @@ describe('Metrics get tests using "admin" user ', () => {
 })
 
 describe('Metrics get tests using "lvl1" user ', () => {
-    let testChecklistLength = enviornment.metrics.checklistLength
+    let testChecklistLength = environment.metrics.checklistLength
     let testTotalAssessmentsForTestAsset = 368;
     let testTotalAssessmentsForTestSTIG = testChecklistLength * 3;
     let testTotalAssessmentsForCollection = 1104;
@@ -2759,7 +2759,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       beforeEach(async function () {
           metricsReferenceCommon = {
               assessed: 6,
-              assessments: enviornment.metrics.checklistLength,
+              assessments: environment.metrics.checklistLength,
               maxTs: "2022-02-03T00:07:05Z",
               minTs: "2020-08-11T22:27:26Z",
               results: {
@@ -2835,7 +2835,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
      
       it('Return detailed metrics for the specified Collection no param', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail`)
+          .get(`/collections/${environment.testCollection.collectionId}/metrics/detail`)
           .set('Authorization', `Bearer ${lvl1.token}`)
         expect(res).to.have.status(200)
   
@@ -2844,7 +2844,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
           const regex = new RegExp(assetMatchString)
           expect(item.name).to.match(regex)
   
-          if(item.assetId === enviornment.testAsset.assetId && item.benchmarkId === enviornment.metrics.benchmark){
+          if(item.assetId === environment.testAsset.assetId && item.benchmarkId === environment.metrics.benchmark){
               expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
               expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
               expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -2869,7 +2869,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       })
       it('Return detailed metrics for the specified Collection - with params', async () => {
           const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail?benchmarkId=${enviornment.metrics.benchmark}&assetId=${enviornment.testAsset.assetId}&labelName=${enviornment.testCollection.testLabelName}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail?benchmarkId=${environment.metrics.benchmark}&assetId=${environment.testAsset.assetId}&labelName=${environment.testCollection.testLabelName}`)
             .set('Authorization', `Bearer ${lvl1.token}`)
   
           expect(res).to.have.status(200)
@@ -2879,16 +2879,16 @@ describe('Metrics get tests using "lvl1" user ', () => {
               const regex = new RegExp(assetMatchString)
               expect(item.name).to.match(regex)
   
-              expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-              expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
-              expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+              expect(item.assetId).to.equal(environment.testAsset.assetId)
+              expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
+              expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
   
               expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
               expect(item.metrics.results.notapplicable.total).to.equal(metricsReferenceCommon.results.notapplicable.total)
               expect(item.metrics.results.pass.total).to.equal(metricsReferenceCommon.results.pass.total)
               expect(item.metrics.results.fail.total).to.equal(metricsReferenceCommon.results.fail.total)
               expect(item.metrics.statuses.submitted.total).to.equal(metricsReferenceCommon.statuses.submitted.total)
-              expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+              expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
               expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
           }
       })
@@ -2902,7 +2902,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       beforeEach(async function () {
           metricsReferenceCommon = {
               assessed: 9,
-              assessments: enviornment.metrics.checklistLength,
+              assessments: environment.metrics.checklistLength,
               maxTs: "2022-02-03T00:07:05Z",
               minTs: "2020-08-11T22:27:26Z",
               results: {
@@ -2986,16 +2986,16 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
           for(item of res.body){  
-              if(item.assetId === enviornment.testAsset.assetId){
+              if(item.assetId === environment.testAsset.assetId){
                   let assetMatchString = "asset"
                   const regex = new RegExp(assetMatchString)
                   expect(item.name).to.match(regex)
-                  expect(item.assetId).to.equal(enviornment.testAsset.assetId)
+                  expect(item.assetId).to.equal(environment.testAsset.assetId)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -3028,16 +3028,16 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?assetId=${enviornment.testAsset.assetId}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?assetId=${environment.testAsset.assetId}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
           for(item of res.body){  
-              if(item.assetId === enviornment.testAsset.assetId){
+              if(item.assetId === environment.testAsset.assetId){
                   let assetMatchString = "asset"
                   const regex = new RegExp(assetMatchString)
                   expect(item.name).to.match(regex)
-                  expect(item.assetId).to.equal(enviornment.testAsset.assetId)
+                  expect(item.assetId).to.equal(environment.testAsset.assetId)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -3063,7 +3063,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       it('Return detail metrics - asset agg - with params', async () => {
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?benchmarkId=${enviornment.metrics.benchmark}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?benchmarkId=${environment.metrics.benchmark}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
@@ -3076,11 +3076,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
           metricsReferenceCommon.findings.medium = 2
   
           for(item of res.body){  
-              if(item.assetId === enviornment.testAsset.assetId){
+              if(item.assetId === environment.testAsset.assetId){
                   let assetMatchString = "asset"
                   const regex = new RegExp(assetMatchString)
                   expect(item.name).to.match(regex)
-                  expect(item.assetId).to.equal(enviornment.testAsset.assetId)
+                  expect(item.assetId).to.equal(environment.testAsset.assetId)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -3106,7 +3106,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       it('Return detail metrics - asset agg - with params - all', async () => {
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?benchmarkId=${enviornment.metrics.benchmark}&assetId=${enviornment.testAsset.assetId}&labelId=${enviornment.testCollection.testLabel}&labelName=${enviornment.testCollection.testLabelName}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?benchmarkId=${environment.metrics.benchmark}&assetId=${environment.testAsset.assetId}&labelId=${environment.testCollection.testLabel}&labelName=${environment.testCollection.testLabelName}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
@@ -3122,9 +3122,9 @@ describe('Metrics get tests using "lvl1" user ', () => {
               let assetMatchString = "asset"
               const regex = new RegExp(assetMatchString)
               expect(item.name).to.match(regex)
-              expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-              expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-              expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+              expect(item.assetId).to.equal(environment.testAsset.assetId)
+              expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+              expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
               expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
               expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
               expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -3156,7 +3156,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?labelId=${enviornment.testCollection.testLabel}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?labelId=${environment.testCollection.testLabel}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
@@ -3166,10 +3166,10 @@ describe('Metrics get tests using "lvl1" user ', () => {
               const regex = new RegExp(assetMatchString)
   
   
-              if(item.assetId === enviornment.testAsset.assetId){
-                  expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-                  expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                  expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+              if(item.assetId === environment.testAsset.assetId){
+                  expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+                  expect(item.assetId).to.equal(environment.testAsset.assetId)
+                  expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
                   expect(item.name).to.match(regex)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -3196,7 +3196,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       it('Return detail metrics - asset agg - with param labelName', async () => {
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/asset?labelName=${enviornment.metrics.labelFull}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/asset?labelName=${environment.metrics.labelFull}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
@@ -3212,10 +3212,10 @@ describe('Metrics get tests using "lvl1" user ', () => {
               const regex = new RegExp(assetMatchString)
   
   
-              if(item.assetId === enviornment.testAsset.assetId){
-                  expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-                  expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                  expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+              if(item.assetId === environment.testAsset.assetId){
+                  expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+                  expect(item.assetId).to.equal(environment.testAsset.assetId)
+                  expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
                   expect(item.name).to.match(regex)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -3253,7 +3253,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
           assets: 4,
           checklists: 6,
           assessed: 17,
-          assessments: enviornment.metrics.checklistLength,
+          assessments: environment.metrics.checklistLength,
           maxTs: "2022-02-03T00:07:05Z",
           minTs: "2020-08-11T22:27:26Z",
           results: {
@@ -3344,12 +3344,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 4      
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
-          expect(res.body.assets).to.equal(enviornment.lvl1.assets.length)
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
-          expect(res.body.stigs).to.equal(enviornment.lvl1.assignedStigs.length)
+          expect(res.body.assets).to.equal(environment.lvl1.assets.length)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
+          expect(res.body.stigs).to.equal(environment.lvl1.assignedStigs.length)
           expect(res.body.checklists).to.eql(2)
           expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
           expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -3387,12 +3387,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2        
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection?assetId=${enviornment.testAsset.assetId}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection?assetId=${environment.testAsset.assetId}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.assets).to.equal(1)
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
-          expect(res.body.stigs).to.equal(enviornment.lvl1.assignedStigs.length)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
+          expect(res.body.stigs).to.equal(environment.lvl1.assignedStigs.length)
           expect(res.body.checklists).to.eql(1)
           expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
           expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -3430,11 +3430,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2      
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection?labelId=${enviornment.testCollection.testLabel}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection?labelId=${environment.testCollection.testLabel}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.assets).to.equal(1)
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
           expect(res.body.stigs).to.equal(1)
           expect(res.body.checklists).to.eql(1)
           expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
@@ -3473,11 +3473,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2      
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection?labelName=${enviornment.metrics.labelFull}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection?labelName=${environment.metrics.labelFull}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.assets).to.equal(1)
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
           expect(res.body.stigs).to.equal(1)
           expect(res.body.checklists).to.eql(1)
           expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
@@ -3516,11 +3516,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 4
 
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/collection?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/collection?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${lvl1.token}`)
         expect(res).to.have.status(200)
         expect(res.body.assets).to.equal(2)
-        expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+        expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
         expect(res.body.stigs).to.equal(1)
         expect(res.body.checklists).to.eql(2)
         expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
@@ -3639,12 +3639,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
             metricsReferenceCommon.findings.medium = 2
 
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(3)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -3680,12 +3680,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
           metricsReferenceCommon.findings.medium = 2
 
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label?benchmarkId=${enviornment.metrics.benchmark}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label?benchmarkId=${environment.metrics.benchmark}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(3)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.assets).to.eql(1)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -3704,7 +3704,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                   expect(item.metrics.statuses.submitted.total).to.equal(metricsReferenceCommon.statuses.submitted.total)
                   expect(item.metrics.statuses.accepted.total).to.equal(metricsReferenceCommon.statuses.accepted.total)
                   expect(item.metrics.statuses.rejected.total).to.equal(metricsReferenceCommon.statuses.rejected.total)
-                  metricsReferenceCommon.assessments = enviornment.metrics.checklistLength * item.assets
+                  metricsReferenceCommon.assessments = environment.metrics.checklistLength * item.assets
                   expect(item.metrics.assessments).to.equal(metricsReferenceCommon.assessments)
                   expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
               }
@@ -3722,12 +3722,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2     
       
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label?assetId=${enviornment.testAsset.assetId}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label?assetId=${environment.testAsset.assetId}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(2)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -3762,12 +3762,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label?labelId=${enviornment.testCollection.testLabel}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label?labelId=${environment.testCollection.testLabel}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -3804,12 +3804,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/label?labelName=${enviornment.testCollection.testLabelName}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/label?labelName=${environment.testCollection.testLabelName}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -3928,12 +3928,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
           }
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
           for(const item of res.body){
-              if(item.benchmark == enviornment.testCollection.benchmark){
+              if(item.benchmark == environment.testCollection.benchmark){
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -3973,13 +3973,13 @@ describe('Metrics get tests using "lvl1" user ', () => {
           metricsReferenceCommon.findings.medium = 4
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig?benchmarkId=${enviornment.metrics.benchmark}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig?benchmarkId=${environment.metrics.benchmark}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
          
           for(const item of res.body){
-              expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+              expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
               expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
               expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
               expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -4017,15 +4017,15 @@ describe('Metrics get tests using "lvl1" user ', () => {
             metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig?assetId=${enviornment.testAsset.assetId}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig?assetId=${environment.testAsset.assetId}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
   
           for(const item of res.body){
-              if(item.benchmarkId == enviornment.testCollection.benchmark){
+              if(item.benchmarkId == environment.testCollection.benchmark){
                  metricsReferenceCommon.assessments = testChecklistLength * item.assets
-                  expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+                  expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -4070,16 +4070,16 @@ describe('Metrics get tests using "lvl1" user ', () => {
           metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig?labelId=${enviornment.testCollection.testLabel}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig?labelId=${environment.testCollection.testLabel}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
   
           for(const item of res.body){
-              if(item.benchmark == enviornment.testCollection.benchmark){
+              if(item.benchmark == environment.testCollection.benchmark){
                   metricsReferenceCommon.assessments = testChecklistLength * item.assets
                   expect(item.assets).to.equal(1)
-                  expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+                  expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -4125,16 +4125,16 @@ describe('Metrics get tests using "lvl1" user ', () => {
           metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/detail/stig?labelName=${enviornment.testCollection.testLabelName}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/detail/stig?labelName=${environment.testCollection.testLabelName}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
   
           for(const item of res.body){
-              if(item.benchmark == enviornment.testCollection.benchmark){
+              if(item.benchmark == environment.testCollection.benchmark){
                   metricsReferenceCommon.assessments = testChecklistLength * item.assets
                   expect(item.assets).to.equal(1)
-                  expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+                  expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -4169,7 +4169,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       beforeEach(async function () {
           metricsReferenceCommon = {
               assessed: 6,
-              assessments: enviornment.metrics.checklistLength,
+              assessments: environment.metrics.checklistLength,
               maxTs: "2022-02-03T00:07:05Z",
               minTs: "2020-08-11T22:27:26Z",
               results: {
@@ -4246,7 +4246,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       it('Return summary metrics for the Collection - no agg - no params', async () => {
          
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary`)
+          .get(`/collections/${environment.testCollection.collectionId}/metrics/summary`)
           .set('Authorization', `Bearer ${lvl1.token}`)
         expect(res).to.have.status(200)
   
@@ -4255,7 +4255,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
           const regex = new RegExp(assetMatchString)
           expect(item.name).to.match(regex)
           
-          if(item.assetId === enviornment.testAsset.assetId && item.benchmarkId === enviornment.metrics.benchmark){
+          if(item.assetId === environment.testAsset.assetId && item.benchmarkId === environment.metrics.benchmark){
               let regex = new RegExp("asset")
               expect(item.name).to.match(regex)
               expect(item.metrics.findings.low).to.equal(1)
@@ -4263,14 +4263,14 @@ describe('Metrics get tests using "lvl1" user ', () => {
               expect(item.metrics.results.pass).to.equal(2)
               expect(item.metrics.results.fail).to.equal(3)
               expect(item.metrics.statuses.submitted).to.equal(5)
-              expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+              expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
               expect(item.metrics.assessed).to.equal(6)
           }
         }
       })
       it('Return summary metrics for the Collection - benchmark param - no agg', async () => {
           const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary?benchmarkId=${enviornment.metrics.benchmark}`)
+            .get(`/collections/${environment.testCollection.collectionId}/metrics/summary?benchmarkId=${environment.metrics.benchmark}`)
             .set('Authorization', `Bearer ${lvl1.token}`)
   
           expect(res).to.have.status(200)
@@ -4279,23 +4279,23 @@ describe('Metrics get tests using "lvl1" user ', () => {
               let assetMatchString = "asset"
               const regex = new RegExp(assetMatchString)
               expect(item.name).to.match(regex)
-              if(item.assetId === enviornment.testAsset.assetId){
-                  expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)
-                  expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                  expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
+              if(item.assetId === environment.testAsset.assetId){
+                  expect(item.benchmarkId).to.eql(environment.metrics.benchmark)
+                  expect(item.assetId).to.equal(environment.testAsset.assetId)
+                  expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
                   expect(item.metrics.results.notapplicable).to.equal(metricsReferenceCommon.results.notapplicable.total)
                   expect(item.metrics.results.pass).to.equal(metricsReferenceCommon.results.pass.total)
                   expect(item.metrics.results.fail).to.equal(metricsReferenceCommon.results.fail.total)
                   expect(item.metrics.statuses.submitted).to.equal(metricsReferenceCommon.statuses.submitted.total)
-                  expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+                  expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
                   expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
               }
           }
       })
       it('Return summary metrics for the Collection - asset param - no agg', async () => {
       const res = await chai.request(config.baseUrl)
-          .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary?assetId=${enviornment.testAsset.assetId}`)
+          .get(`/collections/${environment.testCollection.collectionId}/metrics/summary?assetId=${environment.testAsset.assetId}`)
           .set('Authorization', `Bearer ${lvl1.token}`)
   
       expect(res).to.have.status(200)
@@ -4304,23 +4304,23 @@ describe('Metrics get tests using "lvl1" user ', () => {
           let assetMatchString = "asset"
           const regex = new RegExp(assetMatchString)
           expect(item.name).to.match(regex)
-          if(item.benchmarkId === enviornment.metrics.benchmark){
-              expect(item.assetId).to.eql(enviornment.testAsset.assetId)
-              expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
-              expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+          if(item.benchmarkId === environment.metrics.benchmark){
+              expect(item.assetId).to.eql(environment.testAsset.assetId)
+              expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
+              expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
               expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
               expect(item.metrics.results.notapplicable).to.equal(metricsReferenceCommon.results.notapplicable.total)
               expect(item.metrics.results.pass).to.equal(metricsReferenceCommon.results.pass.total)
               expect(item.metrics.results.fail).to.equal(metricsReferenceCommon.results.fail.total)
               expect(item.metrics.statuses.submitted).to.equal(metricsReferenceCommon.statuses.submitted.total)
-              expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+              expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
               expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
           }
       }
       })
       it('Return summary metrics for the Collection - labelId param - no agg', async () => {
       const res = await chai.request(config.baseUrl)
-          .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary?labelId=${enviornment.testCollection.testLabel}`)
+          .get(`/collections/${environment.testCollection.collectionId}/metrics/summary?labelId=${environment.testCollection.testLabel}`)
           .set('Authorization', `Bearer ${lvl1.token}`)
   
       expect(res).to.have.status(200)
@@ -4329,22 +4329,22 @@ describe('Metrics get tests using "lvl1" user ', () => {
           let assetMatchString = "asset"
           const regex = new RegExp(assetMatchString)
           expect(item.name).to.match(regex)
-          if(item.benchmarkId === enviornment.metrics.benchmark && item.assetId === enviornment.testAsset.assetId){
-              expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
-              expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+          if(item.benchmarkId === environment.metrics.benchmark && item.assetId === environment.testAsset.assetId){
+              expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
+              expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
               expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
               expect(item.metrics.results.notapplicable).to.equal(metricsReferenceCommon.results.notapplicable.total)
               expect(item.metrics.results.pass).to.equal(metricsReferenceCommon.results.pass.total)
               expect(item.metrics.results.fail).to.equal(metricsReferenceCommon.results.fail.total)
               expect(item.metrics.statuses.submitted).to.equal(metricsReferenceCommon.statuses.submitted.total)
-              expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+              expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
               expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
           }
       }
       })
       it('Return summary metrics for the Collection - labelName param - no agg', async () => {
       const res = await chai.request(config.baseUrl)
-          .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary?labelName=${enviornment.testCollection.testLabelName}`)
+          .get(`/collections/${environment.testCollection.collectionId}/metrics/summary?labelName=${environment.testCollection.testLabelName}`)
           .set('Authorization', `Bearer ${lvl1.token}`)
   
       expect(res).to.have.status(200)
@@ -4353,15 +4353,15 @@ describe('Metrics get tests using "lvl1" user ', () => {
           let assetMatchString = "asset"
           const regex = new RegExp(assetMatchString)
           expect(item.name).to.match(regex)
-          if(item.benchmarkId === enviornment.metrics.benchmark && item.assetId === enviornment.testAsset.assetId){
-              expect(item.benchmarkId).to.equal(enviornment.metrics.benchmark)
-              expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+          if(item.benchmarkId === environment.metrics.benchmark && item.assetId === environment.testAsset.assetId){
+              expect(item.benchmarkId).to.equal(environment.metrics.benchmark)
+              expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
               expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
               expect(item.metrics.results.notapplicable).to.equal(metricsReferenceCommon.results.notapplicable.total)
               expect(item.metrics.results.pass).to.equal(metricsReferenceCommon.results.pass.total)
               expect(item.metrics.results.fail).to.equal(metricsReferenceCommon.results.fail.total)
               expect(item.metrics.statuses.submitted).to.equal(metricsReferenceCommon.statuses.submitted.total)
-              expect(item.metrics.assessments).to.equal(enviornment.metrics.checklistLength)
+              expect(item.metrics.assessments).to.equal(environment.metrics.checklistLength)
               expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
           }
       }
@@ -4371,7 +4371,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
     describe('GET - getMetricsSummaryByCollectionAggAsset - /collections/{collectionId}/metrics/summary/asset', () => {
   
       let metricsReferenceCommon
-      let testChecklistLength = enviornment.metrics.checklistLength
+      let testChecklistLength = environment.metrics.checklistLength
       testTotalAssessmentsForTestAsset = testChecklistLength
   
       beforeEach(async function () {
@@ -4454,7 +4454,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       it('Return summary metrics asset agg - summary', async () => {
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset`)
               .set('Authorization', `Bearer ${lvl1.token}`)
         expect(res).to.have.status(200)
   
@@ -4467,7 +4467,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       
           metricsReferenceCommon.assessments = testTotalAssessmentsForTestAsset    
           for(item of res.body){  
-              if(item.assetId === enviornment.testAsset.assetId){
+              if(item.assetId === environment.testAsset.assetId){
                   let assetMatchString = "asset"
                   const regex = new RegExp(assetMatchString)
                   expect(item.name).to.match(regex)
@@ -4492,7 +4492,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       it('Return summary metrics - asset agg - with param assetId', async () => {
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset?assetId=${enviornment.testAsset.assetId}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset?assetId=${environment.testAsset.assetId}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
@@ -4505,11 +4505,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
           metricsReferenceCommon.assessments = testTotalAssessmentsForTestAsset    
   
           for(item of res.body){  
-              if(item.assetId === enviornment.testAsset.assetId){
+              if(item.assetId === environment.testAsset.assetId){
                   let assetMatchString = "asset"
                   const regex = new RegExp(assetMatchString)
                   expect(item.name).to.match(regex)
-                  expect(item.assetId).to.equal(enviornment.testAsset.assetId)
+                  expect(item.assetId).to.equal(environment.testAsset.assetId)
                   expect(item.name).to.match(regex)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -4532,7 +4532,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       it('Return summary metrics - asset agg - with benchmarkID', async () => {
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset?benchmarkId=${enviornment.metrics.benchmark}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset?benchmarkId=${environment.metrics.benchmark}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
@@ -4545,11 +4545,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
           metricsReferenceCommon.findings.medium = 2
           
           for(item of res.body){  
-              if(item.assetId === enviornment.testAsset.assetId){
+              if(item.assetId === environment.testAsset.assetId){
                   let assetMatchString = "asset"
                   const regex = new RegExp(assetMatchString)
                   expect(item.name).to.match(regex)
-                  expect(item.benchmarkIds[0]).to.equal(enviornment.metrics.benchmark)
+                  expect(item.benchmarkIds[0]).to.equal(environment.metrics.benchmark)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -4572,7 +4572,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       it('Return summary metrics - asset agg - with param labelId', async () => {
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset?labelId=${enviornment.testCollection.testLabel}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset?labelId=${environment.testCollection.testLabel}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
@@ -4588,11 +4588,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
               let assetMatchString = "asset"
               const regex = new RegExp(assetMatchString)
               expect(item.name).to.match(regex)
-              if(item.assetId === enviornment.testAsset.assetId){
-                  expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-                  expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                  expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
-                  expect(item.benchmarkIds[0]).to.equal(enviornment.metrics.benchmark)
+              if(item.assetId === environment.testAsset.assetId){
+                  expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+                  expect(item.assetId).to.equal(environment.testAsset.assetId)
+                  expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+                  expect(item.benchmarkIds[0]).to.equal(environment.metrics.benchmark)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -4614,7 +4614,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
       it('Return summary metrics - asset agg - with param labelName', async () => {
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/asset?labelName=${enviornment.metrics.labelFull}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/asset?labelName=${environment.metrics.labelFull}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
@@ -4630,11 +4630,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
                   let assetMatchString = "asset"
                   const regex = new RegExp(assetMatchString)
                   expect(item.name).to.match(regex)
-                  if(item.assetId === enviornment.testAsset.assetId){
-                      expect(enviornment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
-                      expect(item.assetId).to.equal(enviornment.testAsset.assetId)
-                      expect(enviornment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
-                      expect(item.benchmarkIds[0]).to.equal(enviornment.metrics.benchmark)
+                  if(item.assetId === environment.testAsset.assetId){
+                      expect(environment.testCollection.testLabelName).to.be.oneOf(item.labels.map(label => label.name))
+                      expect(item.assetId).to.equal(environment.testAsset.assetId)
+                      expect(environment.metrics.benchmark).to.be.oneOf(item.benchmarkIds.map(b => b))
+                      expect(item.benchmarkIds[0]).to.equal(environment.metrics.benchmark)
                       expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                       expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                       expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -4659,7 +4659,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
     describe('GET - getMetricsSummaryByCollectionAgg - /collections/{collectionId}/metrics/summary/collection', () => {
   
       let metricsReferenceCommon
-      let testChecklistLength =enviornment.metrics.checklistLength
+      let testChecklistLength =environment.metrics.checklistLength
       let testTotalAssessmentsForTestAsset = 368
       let testTotalAssessmentsForCollection = 1104
   
@@ -4762,11 +4762,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 4      
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.assets).to.equal(2)
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
           expect(res.body.stigs).to.equal(1)
           expect(res.body.checklists).to.eql(2)
           expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
@@ -4801,11 +4801,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2        
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection?assetId=${enviornment.testAsset.assetId}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection?assetId=${environment.testAsset.assetId}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.assets).to.equal(1)
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
           expect(res.body.checklists).to.eql(1)
           expect(res.body.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
           expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -4838,11 +4838,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2        
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection?labelId=${enviornment.testCollection.testLabel}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection?labelId=${environment.testCollection.testLabel}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.assets).to.equal(1)
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
           expect(res.body.stigs).to.equal(1)
           expect(res.body.checklists).to.eql(1)
           expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -4876,11 +4876,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
   
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection?labelName=${enviornment.metrics.labelFull}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection?labelName=${environment.metrics.labelFull}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.assets).to.equal(1)
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
           expect(res.body.stigs).to.equal(1)
           expect(res.body.checklists).to.eql(1)
           expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -4913,11 +4913,11 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 4
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/collection?benchmarkId=${enviornment.metrics.benchmark}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/collection?benchmarkId=${environment.metrics.benchmark}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.assets).to.equal(2)
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
           expect(res.body.stigs).to.equal(1)
           expect(res.body.checklists).to.eql(2)
           expect(res.body.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -4940,7 +4940,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
     describe('GET - getMetricsSummaryByCollectionAggLabel - /collections/{collectionId}/metrics/summary/label', () => {
   
       let metricsReferenceCommon
-      let checklistLength = enviornment.metrics.checklistLength
+      let checklistLength = environment.metrics.checklistLength
       let testTotalAssessmentsForTestAsset = 368
       let testTotalAssessmentsForTestLabel = 736
   
@@ -5034,12 +5034,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
          
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(3)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -5071,12 +5071,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2
         
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label?benchmarkId=${enviornment.metrics.benchmark}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label?benchmarkId=${environment.metrics.benchmark}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(3)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -5091,7 +5091,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                   expect(item.metrics.statuses.accepted).to.equal(metricsReferenceCommon.statuses.accepted.total)
                   expect(item.metrics.statuses.rejected).to.equal(metricsReferenceCommon.statuses.rejected.total)
                   expect(item.metrics.assessed).to.equal(metricsReferenceCommon.assessed)
-                  metricsReferenceCommon.assessments = enviornment.metrics.checklistLength * item.assets
+                  metricsReferenceCommon.assessments = environment.metrics.checklistLength * item.assets
                   expect(item.metrics.assessments).to.equal(metricsReferenceCommon.assessments)
               }
           }
@@ -5108,14 +5108,14 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2     
       
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label?assetId=${enviornment.testAsset.assetId}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label?assetId=${environment.testAsset.assetId}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(2)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.assets).to.equal(1)
-                  expect(item.labelId).to.equal(enviornment.testCollection.testLabel)
+                  expect(item.labelId).to.equal(environment.testCollection.testLabel)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -5145,14 +5145,14 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label?labelId=${enviornment.testCollection.testLabel}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label?labelId=${environment.testCollection.testLabel}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.assets).to.equal(1)
-                  expect(item.labelId).to.equal(enviornment.testCollection.testLabel)
+                  expect(item.labelId).to.equal(environment.testCollection.testLabel)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -5176,14 +5176,14 @@ describe('Metrics get tests using "lvl1" user ', () => {
           metricsReferenceCommon.statuses.saved.total = 3
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/label?labelName=${enviornment.testCollection.testLabelName}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/label?labelName=${environment.testCollection.testLabelName}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
           for (const item of res.body){
-              if(item.labelId === enviornment.testCollection.testLabel){
+              if(item.labelId === environment.testCollection.testLabel){
                   expect(item.assets).to.equal(2)
-                  expect(item.labelId).to.equal(enviornment.testCollection.testLabel)
+                  expect(item.labelId).to.equal(environment.testCollection.testLabel)
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -5208,7 +5208,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
   
   
       let metricsReferenceCommon
-      let testChecklistLength = enviornment.metrics.checklistLength
+      let testChecklistLength = environment.metrics.checklistLength
       let testTotalAssessmentsForTestAsset = 368
       let testTotalAssessmentsForTestSTIG = testChecklistLength * 3
   
@@ -5308,12 +5308,12 @@ describe('Metrics get tests using "lvl1" user ', () => {
             metricsReferenceCommon.findings.medium = 4
 
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
   
           for(const item of res.body){
-              if(item.benchmark == enviornment.testCollection.benchmark){
+              if(item.benchmark == environment.testCollection.benchmark){
                 metricsReferenceCommon.assessments = testChecklistLength * item.assets
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
@@ -5349,13 +5349,13 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 4
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig?benchmarkId=${enviornment.metrics.benchmark}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig?benchmarkId=${environment.metrics.benchmark}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
          
           for(const item of res.body){
-              expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+              expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
               expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
               expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
               expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -5389,15 +5389,15 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig?assetId=${enviornment.testAsset.assetId}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig?assetId=${environment.testAsset.assetId}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
   
           for(const item of res.body){
-              if(item.benchmark == enviornment.testCollection.benchmark){
+              if(item.benchmark == environment.testCollection.benchmark){
                 metricsReferenceCommon.assessments = testChecklistLength * item.assets
-                  expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+                  expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -5432,16 +5432,16 @@ describe('Metrics get tests using "lvl1" user ', () => {
         metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig?labelId=${enviornment.testCollection.testLabel}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig?labelId=${environment.testCollection.testLabel}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
   
           for(const item of res.body){
-              if(item.benchmark == enviornment.testCollection.benchmark){
+              if(item.benchmark == environment.testCollection.benchmark){
                   metricsReferenceCommon.assessments = testChecklistLength * item.assets
                   expect(item.assets).to.equal(1)
-                  expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+                  expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)
@@ -5474,16 +5474,16 @@ describe('Metrics get tests using "lvl1" user ', () => {
             metricsReferenceCommon.findings.medium = 2
   
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/metrics/summary/stig?labelName=${enviornment.metrics.labelFull}`)
+              .get(`/collections/${environment.testCollection.collectionId}/metrics/summary/stig?labelName=${environment.metrics.labelFull}`)
               .set('Authorization', `Bearer ${lvl1.token}`)
           expect(res).to.have.status(200)
           expect(res.body.length).to.eql(1)
   
           for(const item of res.body){
-              if(item.benchmark == enviornment.testCollection.benchmark){
+              if(item.benchmark == environment.testCollection.benchmark){
                   metricsReferenceCommon.assessments = testChecklistLength * item.assets
                   expect(item.assets).to.equal(1)
-                  expect(item.benchmarkId).to.eql(enviornment.metrics.benchmark)  
+                  expect(item.benchmarkId).to.eql(environment.metrics.benchmark)  
                   expect(item.metrics.maxTs).to.equal(metricsReferenceCommon.maxTs)
                   expect(item.metrics.minTs).to.equal(metricsReferenceCommon.minTs)
                   expect(item.metrics.findings.low).to.equal(metricsReferenceCommon.findings.low)

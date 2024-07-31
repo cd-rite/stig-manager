@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 
 const user =
   {
@@ -32,7 +32,7 @@ describe('Review delete tests using "admin" user ', () => {
     
     it('Delete a Review', async () => {
       const res = await chai.request(config.baseUrl)
-        .delete(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs`)
+        .delete(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs`)
         .set('Authorization', `Bearer ${user.token}`)
       
       expect(res).to.have.status(200)
@@ -42,7 +42,7 @@ describe('Review delete tests using "admin" user ', () => {
     })
     it('Delete a Review - freshRuleId - review may or may not exist', async () => {
       const res = await chai.request(config.baseUrl)
-        .delete(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.freshRuleId}?projection=rule&projection=history&projection=stigs`)
+        .delete(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.freshRuleId}?projection=rule&projection=history&projection=stigs`)
         .set('Authorization', `Bearer ${user.token}`)
       
       expect(res).to.have.status(204)
@@ -60,9 +60,9 @@ describe('Review delete tests using "admin" user ', () => {
 
     it('Delete one metadata key/value of a Review', async () => {
       const res = await chai.request(config.baseUrl)
-        .delete(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}/metadata/keys/${enviornment.testCollection.metadataKey}`)
+        .delete(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}/metadata/keys/${environment.testCollection.metadataKey}`)
         .set('Authorization', `Bearer ${user.token}`)
-        .send(`${JSON.stringify(enviornment.testCollection.metadataValue)}`)
+        .send(`${JSON.stringify(environment.testCollection.metadataValue)}`)
       expect(res).to.have.status(204)
     })
   })

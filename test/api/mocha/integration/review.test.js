@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../testConfig.json')
 const utils = require('../utils/testUtils')
-const enviornment = require('../enviornment.json')
+const environment = require('../environment.json')
 const xml2js = require('xml2js')
 
 const user =
@@ -37,14 +37,14 @@ describe('PUT - putReviewByAssetRule - /collections/{collectionId}/reviews/{asse
             }
     
             const res = await chai.request(config.baseUrl)
-                .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs`)
+                .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs`)
                 .set('Authorization', `Bearer ${user.token}`)
                 .send(putBody)
             expect(res).to.have.status(200)
         })
         it('Return the Checklist for the supplied Asset and STIG XML (.ckl) - check that informational + detail exported as not_reviewed + finding_details', async () => {
             const res = await chai.request(config.baseUrl)
-                .get(`/assets/${enviornment.testAsset.assetId}/checklists/${enviornment.testCollection.benchmark}/${enviornment.testCollection.revisionStr}?format=ckl`)
+                .get(`/assets/${environment.testAsset.assetId}/checklists/${environment.testCollection.benchmark}/${environment.testCollection.revisionStr}?format=ckl`)
                 .set('Authorization', `Bearer ${user.token}`)
             expect(res).to.have.status(200)
             let cklData
@@ -59,12 +59,12 @@ describe('PUT - putReviewByAssetRule - /collections/{collectionId}/reviews/{asse
                 for (let cklSiDatum of iStig.STIG_INFO[0].SI_DATA){
                     if (cklSiDatum.SID_NAME[0] == 'stigid'){
                         currentStigId = cklSiDatum.SID_DATA[0]
-                        expect(currentStigId).to.be.oneOf(enviornment.testCollection.validStigs);
+                        expect(currentStigId).to.be.oneOf(environment.testCollection.validStigs);
                     }
                 }
                 let cklVulns = iStig.VULN;
                 if (currentStigId == 'VPN_SRG_TEST') {
-                    expect(cklVulns).to.be.an('array').of.length(enviornment.metrics.checklistLength)
+                    expect(cklVulns).to.be.an('array').of.length(environment.metrics.checklistLength)
                     for (let thisVuln of cklVulns){
                         for (let stigData of thisVuln.STIG_DATA){
                             if (stigData.ATTRIBUTE_DATA[0] == 'SV-106179r1_rule'){
@@ -90,7 +90,7 @@ describe('PUT - putReviewByAssetRule - /collections/{collectionId}/reviews/{asse
             }
     
             const res = await chai.request(config.baseUrl)
-                .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs`)
+                .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs`)
                 .set('Authorization', `Bearer ${user.token}`)
                 .send(putBody)
             expect(res).to.have.status(400)

@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const usersEnv = require('../../iterations.json')
 
 describe('Access Control Testing Review gets', () => {
@@ -24,7 +24,7 @@ describe('Access Control Testing Review gets', () => {
 
         it('Return a list of reviews accessible to the requester', async () => {
           const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/reviews?projection=rule&projection=stigs&projection=metadata`)
+            .get(`/collections/${environment.testCollection.collectionId}/reviews?projection=rule&projection=stigs&projection=metadata`)
             .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
         })
@@ -40,7 +40,7 @@ describe('Access Control Testing Review gets', () => {
 
         it('Return a list of Reviews for an Asset', async () => {
           const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}?projection=rule&projection=stigs&projection=metadata`)
+            .get(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}?projection=rule&projection=stigs&projection=metadata`)
             .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
         })
@@ -55,7 +55,7 @@ describe('Access Control Testing Review gets', () => {
       describe(`Testing as User ${user.name}`, () => {
         it('Return the Review for an Asset and Rule', async () => {
           const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}?projection=rule&projection=stigs&projection=metadata&projection=history`)
+            .get(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}?projection=rule&projection=stigs&projection=metadata&projection=history`)
             .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
         })
@@ -71,7 +71,7 @@ describe('Access Control Testing Review gets', () => {
       describe(`Testing as User ${user.name}`, () => {
         it('Return the metadata for a Review', async () => {
           const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}/metadata`)
+            .get(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}/metadata`)
             .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
          
@@ -88,7 +88,7 @@ describe('Access Control Testing Review gets', () => {
       describe(`Testing as User ${user.name}`, () => {
         it('Return the Review Metadata KEYS for an Asset and Rule', async () => {
           const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}/metadata/keys`)
+            .get(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}/metadata/keys`)
             .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
           
@@ -106,7 +106,7 @@ describe('Access Control Testing Review gets', () => {
       describe(`Testing as User ${user.name}`, () => {
         it('Return the Review Metadata VALUE for an Asset/Rule/metadata KEY', async () => {
           const res = await chai.request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}/metadata/keys/${enviornment.testAsset.metadataKey}`)
+            .get(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}/metadata/keys/${environment.testAsset.metadataKey}`)
             .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
        

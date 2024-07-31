@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 
 const user =
   {
@@ -28,11 +28,11 @@ describe('Asset PUT tests', () => {
     
     it('Set all properties of an Asset', async function () {
       const res = await chai.request(config.baseUrl)
-        .put(`/assets/${enviornment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .put(`/assets/${environment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({
           "name": 'TestAsset' + Math.floor(Math.random() * 1000),
-          "collectionId": enviornment.scrapCollection.collectionId,
+          "collectionId": environment.scrapCollection.collectionId,
           "description": "test desc",
           "ip": "1.1.1.1",
           "noncomputing": true,
@@ -71,7 +71,7 @@ describe('Asset PUT tests', () => {
       ])
       }
       const effectedAsset = await utils.getAsset(res.body.assetId)
-      expect(effectedAsset.collection.collectionId).to.equal(enviornment.scrapCollection.collectionId)
+      expect(effectedAsset.collection.collectionId).to.equal(environment.scrapCollection.collectionId)
       expect(effectedAsset.description).to.equal('test desc')
       expect(effectedAsset.labelIds).to.have.lengthOf(1)
       expect(effectedAsset.stigs).to.be.an('array').of.length(3)
@@ -87,11 +87,11 @@ describe('Asset PUT tests', () => {
 
     it('Set all properties of an Asset - assign new STIG', async function () {
       const res = await chai.request(config.baseUrl)
-        .put(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .put(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({
           "name": 'TestAsset' + Math.floor(Math.random() * 1000),
-          "collectionId": enviornment.testCollection.collectionId,
+          "collectionId": environment.testCollection.collectionId,
           "description": "test desc",
           "ip": "1.1.1.1",
           "noncomputing": true,
@@ -113,34 +113,34 @@ describe('Asset PUT tests', () => {
 
         expect(res.body.stigs).to.be.an('array').of.length(4)
         for (let stig of res.body.stigs) {
-          expect(stig.benchmarkId).to.be.oneOf(enviornment.putStigs)
+          expect(stig.benchmarkId).to.be.oneOf(environment.putStigs)
         }
 
         expect(res.body.stigGrants).to.be.an('array').of.length(4)
         for (let stig of res.body.stigGrants) {
-          expect(stig.benchmarkId).to.be.oneOf(enviornment.putStigs)
+          expect(stig.benchmarkId).to.be.oneOf(environment.putStigs)
         }
 
         const effectedAsset = await utils.getAsset(res.body.assetId)
-        expect(effectedAsset.collection.collectionId).to.equal(enviornment.testCollection.collectionId)
+        expect(effectedAsset.collection.collectionId).to.equal(environment.testCollection.collectionId)
         expect(effectedAsset.stigs).to.be.an('array').of.length(4)
         for (const stig of effectedAsset.stigs) {
-          expect(stig.benchmarkId).to.be.oneOf(enviornment.putStigs)
+          expect(stig.benchmarkId).to.be.oneOf(environment.putStigs)
         }
     })
 
     it('Set all properties of an Asset- with metadata', async function () {
       const res = await chai.request(config.baseUrl)
-        .put(`/assets/${enviornment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .put(`/assets/${environment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({
           "name":'TestAsset' + Math.floor(Math.random() * 1000),
-          "collectionId": enviornment.scrapCollection.collectionId,
+          "collectionId": environment.scrapCollection.collectionId,
           "description": "test desc",
           "ip": "1.1.1.1",
           "noncomputing": true,
           "metadata" : {
-            [enviornment.scrapAsset.metadataKey]: enviornment.scrapAsset.metadataValue
+            [environment.scrapAsset.metadataKey]: environment.scrapAsset.metadataValue
           },
           "stigs": [
               "VPN_SRG_TEST",
@@ -150,23 +150,23 @@ describe('Asset PUT tests', () => {
       })
       expect(res).to.have.status(200)
       expect(res.body.metadata).to.exist
-      expect(res.body.metadata).to.have.property(enviornment.scrapAsset.metadataKey)
-      expect(res.body.metadata[enviornment.scrapAsset.metadataKey]).to.equal(enviornment.scrapAsset.metadataValue)
+      expect(res.body.metadata).to.have.property(environment.scrapAsset.metadataKey)
+      expect(res.body.metadata[environment.scrapAsset.metadataKey]).to.equal(environment.scrapAsset.metadataValue)
 
       const effectedAsset = await utils.getAsset(res.body.assetId)
       expect(effectedAsset.metadata).to.exist
-      expect(effectedAsset.metadata).to.have.property(enviornment.scrapAsset.metadataKey)
-      expect(effectedAsset.metadata[enviornment.scrapAsset.metadataKey]).to.equal(enviornment.scrapAsset.metadataValue)
+      expect(effectedAsset.metadata).to.have.property(environment.scrapAsset.metadataKey)
+      expect(effectedAsset.metadata[environment.scrapAsset.metadataKey]).to.equal(environment.scrapAsset.metadataValue)
 
     })
 
     it('Set all properties of an Asset - Change Collection - invalid for all users', async function () {
       const res = await chai.request(config.baseUrl)
-        .put(`/assets/${enviornment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .put(`/assets/${environment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({
           "name": 'TestAsset' + Math.floor(Math.random() * 1000),
-          "collectionId": enviornment.scrapLvl1User.userId,
+          "collectionId": environment.scrapLvl1User.userId,
           "description": "test desc",
           "ip": "1.1.1.1",
           "noncomputing": true,
@@ -185,53 +185,53 @@ describe('Asset PUT tests', () => {
 
     it('Set metadata of an Asset', async function () {
       const res = await chai.request(config.baseUrl)
-        .put(`/assets/${enviornment.scrapAsset.assetId}/metadata`)
+        .put(`/assets/${environment.scrapAsset.assetId}/metadata`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({
-          [enviornment.scrapAsset.metadataKey]: enviornment.scrapAsset.metadataValue
+          [environment.scrapAsset.metadataKey]: environment.scrapAsset.metadataValue
         })
       expect(res).to.have.status(200)
-      expect(res.body).to.have.property(enviornment.scrapAsset.metadataKey)
-      expect(res.body[enviornment.scrapAsset.metadataKey]).to.equal(enviornment.scrapAsset.metadataValue)
+      expect(res.body).to.have.property(environment.scrapAsset.metadataKey)
+      expect(res.body[environment.scrapAsset.metadataKey]).to.equal(environment.scrapAsset.metadataValue)
 
-      const effectedAsset = await utils.getAsset(enviornment.scrapAsset.assetId)
+      const effectedAsset = await utils.getAsset(environment.scrapAsset.assetId)
       expect(effectedAsset.metadata).to.exist
-      expect(effectedAsset.metadata).to.have.property(enviornment.scrapAsset.metadataKey)
+      expect(effectedAsset.metadata).to.have.property(environment.scrapAsset.metadataKey)
     })
   })
   describe(`PUT - putAssetMetadataValue - /assets/{assetId}/metadata/keys/{key}`, () => {
    
     it('Set one metadata key/value of an Asset', async function () {
       const res = await chai.request(config.baseUrl)
-        .put(`/assets/${enviornment.scrapAsset.assetId}/metadata/keys/${enviornment.scrapAsset.metadataKey}`)
+        .put(`/assets/${environment.scrapAsset.assetId}/metadata/keys/${environment.scrapAsset.metadataKey}`)
         .set('Authorization', 'Bearer ' + user.token)
         .set('Content-Type', 'application/json') 
-        .send(`${JSON.stringify(enviornment.scrapAsset.metadataValue)}`)
+        .send(`${JSON.stringify(environment.scrapAsset.metadataValue)}`)
 
       expect(res).to.have.status(204)
-      const effectedAsset = await utils.getAsset(enviornment.scrapAsset.assetId)
+      const effectedAsset = await utils.getAsset(environment.scrapAsset.assetId)
       expect(effectedAsset.metadata).to.exist
-      expect(effectedAsset.metadata).to.have.property(enviornment.scrapAsset.metadataKey)
+      expect(effectedAsset.metadata).to.have.property(environment.scrapAsset.metadataKey)
     })
   })
   describe(`PUT - attachStigToAsset - /assets/{assetId}/stigs/{benchmarkId}`, () => {
   
     it('PUT a STIG assignment to an Asset Copy 3', async function () {
       const res = await chai.request(config.baseUrl)
-        .put(`/assets/${enviornment.scrapAsset.assetId}/stigs/${enviornment.scrapAsset.scrapBenchmark}`)
+        .put(`/assets/${environment.scrapAsset.assetId}/stigs/${environment.scrapAsset.scrapBenchmark}`)
         .set('Authorization', 'Bearer ' + user.token)
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array').of.length(3)
       for (let stig of res.body) {
-        if (stig.benchmarkId === enviornment.scrapAsset.scrapBenchmark) {
-          expect(stig.benchmarkId).to.equal(enviornment.scrapAsset.scrapBenchmark)
+        if (stig.benchmarkId === environment.scrapAsset.scrapBenchmark) {
+          expect(stig.benchmarkId).to.equal(environment.scrapAsset.scrapBenchmark)
         }
       }
-      const effectedAsset = await utils.getAsset(enviornment.scrapAsset.assetId)
+      const effectedAsset = await utils.getAsset(environment.scrapAsset.assetId)
       expect(effectedAsset.stigs).to.be.an('array').of.length(3)
       for (let stig of effectedAsset.stigs) {
-        if (stig.benchmarkId === enviornment.scrapAsset.scrapBenchmark) {
-          expect(stig.benchmarkId).to.equal(enviornment.scrapAsset.scrapBenchmark)
+        if (stig.benchmarkId === environment.scrapAsset.scrapBenchmark) {
+          expect(stig.benchmarkId).to.equal(environment.scrapAsset.scrapBenchmark)
         }
       }
     })
@@ -240,21 +240,21 @@ describe('Asset PUT tests', () => {
    
     it('Replace a Labels Asset Mappings in a Collection', async function () {
       const res = await chai.request(config.baseUrl)
-        .put(`/collections/${enviornment.testCollection.collectionId}/labels/${enviornment.testCollection.testLabel}/assets`)
+        .put(`/collections/${environment.testCollection.collectionId}/labels/${environment.testCollection.testLabel}/assets`)
         .set('Authorization', 'Bearer ' + user.token)
-        .send([enviornment.testAsset.assetId])
+        .send([environment.testAsset.assetId])
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array').of.length(1)
-      expect(res.body[0].assetId).to.equal(enviornment.testAsset.assetId)
+      expect(res.body[0].assetId).to.equal(environment.testAsset.assetId)
 
-      const effectedAsset = await utils.getAssetsByLabel(enviornment.testCollection.collectionId, enviornment.testCollection.testLabel)
+      const effectedAsset = await utils.getAssetsByLabel(environment.testCollection.collectionId, environment.testCollection.testLabel)
       expect(effectedAsset).to.have.lengthOf(1)
-      expect(effectedAsset[0].assetId).to.equal(enviornment.testAsset.assetId)
+      expect(effectedAsset[0].assetId).to.equal(environment.testAsset.assetId)
     })
     
     it('Replace a Labels Asset Mappings in a Collection assign to an asset that does not exist', async function () {
       const res = await chai.request(config.baseUrl)
-        .put(`/collections/${enviornment.testCollection.collectionId}/labels/${enviornment.testCollection.testLabel}/assets`)
+        .put(`/collections/${environment.testCollection.collectionId}/labels/${environment.testCollection.testLabel}/assets`)
         .set('Authorization', 'Bearer ' + user.token)
         .send(["9999"])
       expect(res).to.have.status(403)

@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const users = require('../../iterations.json')
 
 describe('PATCH - Collection', () => {
@@ -54,7 +54,7 @@ describe('PATCH - Collection', () => {
                 }
             
             const res = await chai.request(config.baseUrl)
-                  .patch(`/collections/${enviornment.scrapCollection.collectionId}?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
+                  .patch(`/collections/${environment.scrapCollection.collectionId}?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
                   .set('Authorization', `Bearer ${user.token}`)
                   .send(patchRequest)
             
@@ -81,7 +81,7 @@ describe('PATCH - Collection', () => {
             expect(res.body.statistics).to.have.property("assetCount").to.equal(res.body.assets.length)
 
             for(stig of res.body.stigs) {
-                expect(stig.benchmarkId).to.be.oneOf(enviornment.scrapCollection.validStigs)
+                expect(stig.benchmarkId).to.be.oneOf(environment.scrapCollection.validStigs)
             }
           })
         })
@@ -90,7 +90,7 @@ describe('PATCH - Collection', () => {
 
           it('Merge provided properties with a Collection Label', async () => {
               const res = await chai.request(config.baseUrl)
-                  .patch(`/collections/${enviornment.testCollection.collectionId}/labels/${enviornment.testCollection.testLabel}`)
+                  .patch(`/collections/${environment.testCollection.collectionId}/labels/${environment.testCollection.testLabel}`)
                   .set('Authorization', `Bearer ${user.token}`)
                   .send({
                       "name": "test-label-full",
@@ -102,7 +102,7 @@ describe('PATCH - Collection', () => {
                     return
                 }
               expect(res).to.have.status(200)
-              expect(res.body.labelId).to.equal(enviornment.testCollection.testLabel)
+              expect(res.body.labelId).to.equal(environment.testCollection.testLabel)
               expect(res.body.description).to.equal("test label patched")
               expect(res.body.color).to.equal("aa34cc")
               expect(res.body.name).to.equal("test-label-full")
@@ -114,15 +114,15 @@ describe('PATCH - Collection', () => {
           it('Merge metadata property/value into a Collection', async () => {
               
               const res = await chai.request(config.baseUrl)
-                  .patch(`/collections/${enviornment.testCollection.collectionId}/metadata`)
+                  .patch(`/collections/${environment.testCollection.collectionId}/metadata`)
                   .set('Authorization', `Bearer ${user.token}`)
-                  .send({[enviornment.testCollection.metadataKey]: enviornment.testCollection.metadataValue})
+                  .send({[environment.testCollection.metadataKey]: environment.testCollection.metadataValue})
             if(user.name === "lvl1" || user.name === "lvl2") {
                 expect(res).to.have.status(403)
                 return
              }
               expect(res).to.have.status(200)
-              expect(res.body).to.contain({[enviornment.testCollection.metadataKey]: enviornment.testCollection.metadataValue})
+              expect(res.body).to.contain({[environment.testCollection.metadataKey]: environment.testCollection.metadataValue})
           })
         })
       })

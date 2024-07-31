@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require("../testConfig.json")
 const utils = require("../utils/testUtils")
-const enviornment = require("../enviornment.json")
+const environment = require("../environment.json")
 
 const user = {
   name: "admin",
@@ -26,26 +26,26 @@ describe(`PUT - attachAssetsToStig - /collections/{collectionId}/stigs/{benchmar
     
     it('gh-756 issue. assign a benchmark used in test Collection in scrap Collection', async function () {
       const res = await chai.request(config.baseUrl)
-      .put(`/collections/${enviornment.scrapCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
+      .put(`/collections/${environment.scrapCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
       .set('Authorization', 'Bearer ' + user.token)
-      .send([enviornment.scrapAsset.assetId])
+      .send([environment.scrapAsset.assetId])
       
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       expect(res.body).to.be.an('array').of.length(1)
-      expect(res.body[0].assetId).to.equal(enviornment.scrapAsset.assetId)
+      expect(res.body[0].assetId).to.equal(environment.scrapAsset.assetId)
       expect(res.body[0]).to.have.property('restrictedUserAccess')
     })
     it('Verify that test collection still has expected benchmark assignments', async function () {
         const res = await chai.request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/stigs`)
+        .get(`/collections/${environment.testCollection.collectionId}/stigs`)
         .set('Authorization', 'Bearer ' + user.token)
         expect(res).to.have.status(200)
         let returnedStigs = []
         for (let stig of res.body) {
             returnedStigs.push(stig.benchmarkId)
         }
-        expect(returnedStigs).to.include(enviornment.testCollection.benchmark);
+        expect(returnedStigs).to.include(environment.testCollection.benchmark);
     })
   })
 })

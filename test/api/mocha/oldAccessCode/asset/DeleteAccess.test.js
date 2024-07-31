@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const usersEnv = require('../../iterations.json')
 
 describe('Asset delete Access Control tests admin user', () => {
@@ -22,10 +22,10 @@ describe('Asset delete Access Control tests admin user', () => {
                 it('Delete one metadata key/value of an Asset', async () => {
                     const res = await chai
                         .request(config.baseUrl)
-                        .delete(`/assets/${enviornment.scrapAsset.assetId}/metadata/keys/${enviornment.scrapAsset.metadataKey}`)
+                        .delete(`/assets/${environment.scrapAsset.assetId}/metadata/keys/${environment.scrapAsset.metadataKey}`)
                         .set('Content-Type', 'application/json') 
                         .set('Authorization', 'Bearer ' + user.token)
-                        .send(`${JSON.stringify(enviornment.scrapAsset.metadataValue)}`)
+                        .send(`${JSON.stringify(environment.scrapAsset.metadataValue)}`)
 
                         if(user.name === 'lvl1' || user.name === 'lvl2') {
                             expect(res).to.have.status(403)
@@ -46,7 +46,7 @@ describe('Asset delete Access Control tests admin user', () => {
                 it('Delete all STIG assignments to an Asset', async () => {
                     const res = await chai
                         .request(config.baseUrl)
-                        .delete(`/assets/${enviornment.scrapAsset.assetId}/stigs`)
+                        .delete(`/assets/${environment.scrapAsset.assetId}/stigs`)
                         .set('Authorization', 'Bearer ' + user.token)
 
                     if(user.name === 'lvl1' || user.name === 'lvl2') {
@@ -67,7 +67,7 @@ describe('Asset delete Access Control tests admin user', () => {
                 it('Delete a STIG assignment to an Asset', async () => {
                     const res = await chai
                         .request(config.baseUrl)
-                        .delete(`/assets/${enviornment.scrapAsset.assetId}/stigs/${enviornment.scrapAsset.scrapBenchmark}`)
+                        .delete(`/assets/${environment.scrapAsset.assetId}/stigs/${environment.scrapAsset.scrapBenchmark}`)
                         .set('Authorization', 'Bearer ' + user.token)
 
                     if(user.name === 'lvl1' || user.name === 'lvl2') {
@@ -94,7 +94,7 @@ describe('Asset delete Access Control tests admin user', () => {
                 it('Delete test Asset', async () => {
                     const res = await chai
                         .request(config.baseUrl)
-                        .delete(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+                        .delete(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
                         .set('Authorization', 'Bearer ' + user.token) 
                     
                     if(user.name === 'lvl1' || user.name === 'lvl2') {

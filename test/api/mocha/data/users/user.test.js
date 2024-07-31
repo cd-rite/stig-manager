@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 
 const user =
   {
@@ -59,26 +59,26 @@ describe('User GETS tests using "admin" user ', () => {
 
       const res = await chai
           .request(config.baseUrl)
-          .get(`/users?elevate=true&username=${enviornment.wfTest.username}&projection=collectionGrants&projection=statistics`)
+          .get(`/users?elevate=true&username=${environment.wfTest.username}&projection=collectionGrants&projection=statistics`)
           .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       expect(res.body[0].username).to.equal('wf-test')
-      expect(res.body[0].userId).to.equal(enviornment.wfTest.userId)
+      expect(res.body[0].userId).to.equal(environment.wfTest.userId)
     })
 
     it('Return a list of Users accessible to the requester USERNAME no projections', async () => {
 
       const res = await chai
           .request(config.baseUrl)
-          .get(`/users?elevate=true&username=${enviornment.wfTest.username}`)
+          .get(`/users?elevate=true&username=${environment.wfTest.username}`)
           .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       expect(res.body[0].username).to.equal('wf-test')
-      expect(res.body[0].userId).to.equal(enviornment.wfTest.userId)
+      expect(res.body[0].userId).to.equal(environment.wfTest.userId)
     })
     it('Return a list of Users accessible to the requester', async () => {
 
@@ -95,7 +95,7 @@ describe('User GETS tests using "admin" user ', () => {
         expect(user).to.have.property('statistics')
         expect(user).to.have.property('username')
         expect(user).to.have.property('userId')
-        expect(user.userId).to.be.oneOf(enviornment.allUserIds)
+        expect(user.userId).to.be.oneOf(environment.allUserIds)
       }
     })
 
@@ -115,7 +115,7 @@ describe('User GETS tests using "admin" user ', () => {
             expect(user).to.have.property('userId')
             expect(user).to.not.have.property('collectionGrants')
             expect(user).to.not.have.property('statistics')
-            expect(user.userId).to.be.oneOf(enviornment.allUserIds)
+            expect(user.userId).to.be.oneOf(environment.allUserIds)
           }
     })
   })
@@ -126,15 +126,15 @@ describe('User GETS tests using "admin" user ', () => {
     it('Return a User', async () => {
       const res = await chai
           .request(config.baseUrl)
-          .get(`/users/${enviornment.wfTest.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+          .get(`/users/${environment.wfTest.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
           .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('object')
       expect(res.body).to.have.property('collectionGrants')
       expect(res.body).to.have.property('statistics')
-      expect(res.body.username).to.equal(enviornment.wfTest.username)
-      expect(res.body.userId).to.equal(enviornment.wfTest.userId)
+      expect(res.body.username).to.equal(environment.wfTest.username)
+      expect(res.body.userId).to.equal(environment.wfTest.userId)
     })
   })
 })
@@ -158,7 +158,7 @@ describe('User POST tests using "admin" user ', () => {
             "username": "TEST_USER" +  Math.floor(Math.random() * 1000),
             "collectionGrants": [
                 {
-                    "collectionId": `${enviornment.scrapCollection.collectionId}`,
+                    "collectionId": `${environment.scrapCollection.collectionId}`,
                     "accessLevel": 1
                 }
             ]
@@ -169,7 +169,7 @@ describe('User POST tests using "admin" user ', () => {
         for(let grant of res.body.collectionGrants) {
           expect(grant).to.have.property('collection')
           expect(grant).to.have.property('accessLevel')
-          expect(grant.collection.collectionId).to.equal(enviornment.scrapCollection.collectionId)
+          expect(grant.collection.collectionId).to.equal(environment.scrapCollection.collectionId)
         }
 
         const createdUser = await utils.getUser(res.body.userId)
@@ -198,13 +198,13 @@ describe('User PATCH tests using "admin" user ', () => {
     it('Merge provided properties with a User - Change Username', async () => {
       const res = await chai
             .request(config.baseUrl)
-            .patch(`/users/${enviornment.scrapLvl1User.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+            .patch(`/users/${environment.scrapLvl1User.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
             .set('Authorization', 'Bearer ' + user.token)
             .send({
               "username": "PatchTest",
               "collectionGrants": [
                   {
-                      "collectionId": `${enviornment.scrapCollection.collectionId}`,
+                      "collectionId": `${environment.scrapCollection.collectionId}`,
                       "accessLevel": 1
                   }
               ]
@@ -212,14 +212,14 @@ describe('User PATCH tests using "admin" user ', () => {
           expect(res).to.have.status(200)
           expect(res.body).to.be.an('object')
           expect(res.body.username).to.equal('PatchTest')
-          expect(res.body.userId).to.equal(enviornment.scrapLvl1User.userId)
+          expect(res.body.userId).to.equal(environment.scrapLvl1User.userId)
           expect(res.body.collectionGrants).to.be.an('array')
           expect(res.body.statistics).to.be.an('object')
 
           for(let grant of res.body.collectionGrants) {
             expect(grant).to.have.property('collection')
             expect(grant).to.have.property('accessLevel')
-            expect(grant.collection.collectionId).to.equal(enviornment.scrapCollection.collectionId)
+            expect(grant.collection.collectionId).to.equal(environment.scrapCollection.collectionId)
           }
 
           const userEffected = await utils.getUser(res.body.userId)
@@ -247,13 +247,13 @@ describe('User PUT tests using "admin" user ', () => {
     it(`Set all properties of a User - Change Username`, async () => {
     const res = await chai
       .request(config.baseUrl)
-      .put(`/users/${enviornment.scrapLvl1User.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+      .put(`/users/${environment.scrapLvl1User.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
       .set('Authorization', 'Bearer ' + user.token)
       .send({
         "username": "putTesting",
         "collectionGrants": [
             {
-                "collectionId": `${enviornment.scrapCollection.collectionId}`,
+                "collectionId": `${environment.scrapCollection.collectionId}`,
                 "accessLevel": 1
             }
         ]
@@ -261,14 +261,14 @@ describe('User PUT tests using "admin" user ', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('object')
       expect(res.body.username).to.equal('putTesting')
-      expect(res.body.userId).to.equal(enviornment.scrapLvl1User.userId)
+      expect(res.body.userId).to.equal(environment.scrapLvl1User.userId)
       expect(res.body.collectionGrants).to.be.an('array')
       expect(res.body.statistics).to.be.an('object')
 
       for(let grant of res.body.collectionGrants) {
         expect(grant).to.have.property('collection')
         expect(grant).to.have.property('accessLevel')
-        expect(grant.collection.collectionId).to.equal(enviornment.scrapCollection.collectionId)
+        expect(grant.collection.collectionId).to.equal(environment.scrapCollection.collectionId)
       }
 
       const userEffected = await utils.getUser(res.body.userId)
@@ -296,7 +296,7 @@ describe('User Delete tests using "admin" user ', () => {
     it('Delete a User - fail due to user access record', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .delete(`/users/${enviornment.admin.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+        .delete(`/users/${environment.admin.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
         .set('Authorization', 'Bearer ' + user.token)
 
         expect(res).to.have.status(422)
@@ -304,18 +304,18 @@ describe('User Delete tests using "admin" user ', () => {
     it('Delete a User - succeed, as user has never accessed th system', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .delete(`/users/${enviornment.deleteUser.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+        .delete(`/users/${environment.deleteUser.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
         .set('Authorization', 'Bearer ' + user.token)
 
         expect(res).to.have.status(200)
-        const userEffected = await utils.getUser(enviornment.deleteUser.userId)
+        const userEffected = await utils.getUser(environment.deleteUser.userId)
         expect(userEffected).to.be.empty
     })
 
     it('Delete a User - not elevated', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .delete(`/users/${enviornment.deleteUser.userId}?elevate=false&projection=collectionGrants&projection=statistics`)
+        .delete(`/users/${environment.deleteUser.userId}?elevate=false&projection=collectionGrants&projection=statistics`)
         .set('Authorization', 'Bearer ' + user.token)
 
         expect(res).to.have.status(403)
@@ -344,7 +344,7 @@ describe('User Get tests using "lvl1" user ', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array').of.length(10)
       for(let user of res.body) {
-        expect(user.userId).to.be.oneOf(enviornment.allUserIds)
+        expect(user.userId).to.be.oneOf(environment.allUserIds)
       }
     })
   })

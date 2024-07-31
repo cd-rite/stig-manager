@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const usersEnv = require('../../iterations.json')
 
 describe('Access Control Testing Asset gets ', () => {
@@ -24,7 +24,7 @@ describe('Access Control Testing Asset gets ', () => {
         it('Return an Asset (with STIGgrants projection)', async () => {
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+            .get(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
             .set('Authorization', 'Bearer ' + user.token)
 
             if (user.grant === "Restricted" || user.grant === "Full") {
@@ -38,7 +38,7 @@ describe('Access Control Testing Asset gets ', () => {
         it('Return an Asset (without STIGgrants projection)', async () => {
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs`)
+            .get(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs`)
             .set('Authorization', 'Bearer ' + user.token)
 
             expect(res).to.have.status(200)
@@ -57,7 +57,7 @@ describe('Access Control Testing Asset gets ', () => {
         it('Return the Metadata for an Asset', async () => {
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.testAsset.assetId}/metadata`)
+            .get(`/assets/${environment.testAsset.assetId}/metadata`)
             .set('Authorization', 'Bearer ' + user.token)
           expect(res).to.have.status(200)
         })
@@ -74,7 +74,7 @@ describe('Access Control Testing Asset gets ', () => {
         it('Return the Metadata KEYS for an Asset', async () => {
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.testAsset.assetId}/metadata/keys`)
+            .get(`/assets/${environment.testAsset.assetId}/metadata/keys`)
             .set('Authorization', 'Bearer ' + user.token)
           expect(res).to.have.status(200)
         })
@@ -92,7 +92,7 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.testAsset.assetId}/metadata/keys/${enviornment.testAsset.metadataKey}`)
+            .get(`/assets/${environment.testAsset.assetId}/metadata/keys/${environment.testAsset.metadataKey}`)
             .set('Authorization', 'Bearer ' + user.token)
           expect(res).to.have.status(200)
         })
@@ -110,7 +110,7 @@ describe('Access Control Testing Asset gets ', () => {
 
         it('Assets accessible to the requester (with STIG grants projection)', async () => {
           const res = await chai
-            .request(config.baseUrl).get(`/assets?collectionId=${enviornment.testCollection.collectionId}&benchmarkId=${enviornment.testCollection.benchmark}&projection=statusStats&projection=stigs&projection=stigGrants`)
+            .request(config.baseUrl).get(`/assets?collectionId=${environment.testCollection.collectionId}&benchmarkId=${environment.testCollection.benchmark}&projection=statusStats&projection=stigs&projection=stigGrants`)
             .set('Authorization', 'Bearer ' + user.token)
 
           if(user.grant === "Restricted" || user.grant === "Full"){
@@ -124,7 +124,7 @@ describe('Access Control Testing Asset gets ', () => {
 
         it('Assets accessible to the requester (with STIG grants projection - no benchmark specified)', async () => {
           const res = await chai
-            .request(config.baseUrl).get(`/assets?collectionId=${enviornment.testCollection.collectionId}&projection=statusStats&projection=stigs&projection=stigGrants`)
+            .request(config.baseUrl).get(`/assets?collectionId=${environment.testCollection.collectionId}&projection=statusStats&projection=stigs&projection=stigGrants`)
             .set('Authorization', 'Bearer ' + user.token)
 
           if(user.grant === "Restricted" || user.grant === "Full"){
@@ -138,7 +138,7 @@ describe('Access Control Testing Asset gets ', () => {
 
         it('Assets accessible to the requester - labels', async () => {
           const res = await chai
-            .request(config.baseUrl).get(`/assets?collectionId=${enviornment.testCollection.collectionId}&labelId=${enviornment.testCollection.testLabel}`)
+            .request(config.baseUrl).get(`/assets?collectionId=${environment.testCollection.collectionId}&labelId=${environment.testCollection.testLabel}`)
             .set('Authorization', 'Bearer ' + user.token)
           expect(res).to.have.status(200)
         })
@@ -147,7 +147,7 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets?collectionId=${enviornment.testCollection.collectionId}&benchmarkId=${enviornment.testCollection.benchmark}&projection=statusStats&projection=stigs`)
+            .get(`/assets?collectionId=${environment.testCollection.collectionId}&benchmarkId=${environment.testCollection.benchmark}&projection=statusStats&projection=stigs`)
             .set('Authorization', 'Bearer ' + user.token)
           expect(res).to.have.status(200)
         })
@@ -166,7 +166,7 @@ describe('Access Control Testing Asset gets ', () => {
 
             const res = await chai
               .request(config.baseUrl)
-              .get(`/assets/${enviornment.testAsset.assetId}/checklists?benchmarkId=${enviornment.testCollection.benchmark}`)
+              .get(`/assets/${environment.testAsset.assetId}/checklists?benchmarkId=${environment.testCollection.benchmark}`)
               .set('Authorization', 'Bearer ' + user.token)
             expect(res).to.have.status(200)
           })
@@ -175,7 +175,7 @@ describe('Access Control Testing Asset gets ', () => {
               
               const res = await chai
                 .request(config.baseUrl)
-                .get(`/assets/${enviornment.testAsset.assetId}/checklists?format=cklb`)
+                .get(`/assets/${environment.testAsset.assetId}/checklists?format=cklb`)
                 .set('Authorization', 'Bearer ' + user.token)
               expect(res).to.have.status(200)
           })
@@ -184,7 +184,7 @@ describe('Access Control Testing Asset gets ', () => {
 
             const res = await chai
               .request(config.baseUrl)
-              .get(`/assets/${enviornment.testAsset.assetId}/checklists?format=cklb&benchmarkId=${enviornment.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
+              .get(`/assets/${environment.testAsset.assetId}/checklists?format=cklb&benchmarkId=${environment.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
               .set('Authorization', 'Bearer ' + user.token)
             
             if(user.grant === "Restricted"){
@@ -198,7 +198,7 @@ describe('Access Control Testing Asset gets ', () => {
 
             const res = await chai
               .request(config.baseUrl)
-              .get(`/assets/${enviornment.testAsset.assetId}/checklists/`)
+              .get(`/assets/${environment.testAsset.assetId}/checklists/`)
               .set('Authorization', 'Bearer ' + user.token)
             expect(res).to.have.status(200)
           })
@@ -207,7 +207,7 @@ describe('Access Control Testing Asset gets ', () => {
               
               const res = await chai
                 .request(config.baseUrl)
-                .get(`/assets/${enviornment.testAsset.assetId}/checklists?benchmarkId=${enviornment.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
+                .get(`/assets/${environment.testAsset.assetId}/checklists?benchmarkId=${environment.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
                 .set('Authorization', 'Bearer ' + user.token)
         
                 if(user.grant === "Restricted"){
@@ -231,7 +231,7 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.testAsset.assetId}/checklists/${enviornment.testCollection.benchmark}/${enviornment.testCollection.revisionStr}?format=ckl`)
+            .get(`/assets/${environment.testAsset.assetId}/checklists/${environment.testCollection.benchmark}/${environment.testCollection.revisionStr}?format=ckl`)
             .set('Authorization', 'Bearer ' + user.token)
           expect(res).to.have.status(200)
         })
@@ -240,7 +240,7 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.testAsset.assetId}/checklists/${enviornment.testCollection.benchmark}/${enviornment.testCollection.revisionStr}?format=cklb`)
+            .get(`/assets/${environment.testAsset.assetId}/checklists/${environment.testCollection.benchmark}/${environment.testCollection.revisionStr}?format=cklb`)
             .set('Authorization', 'Bearer ' + user.token)
 
           expect(res).to.have.status(200)
@@ -250,7 +250,7 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.assetNoRestrictedGrants}/checklists/${enviornment.testCollection.benchmark}/${enviornment.testCollection.revisionStr}?format=cklb`)
+            .get(`/assets/${environment.assetNoRestrictedGrants}/checklists/${environment.testCollection.benchmark}/${environment.testCollection.revisionStr}?format=cklb`)
             .set('Authorization', 'Bearer ' + user.token)
 
           if(user.name === "lvl1"){
@@ -264,7 +264,7 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.testAsset.assetId}/checklists/${enviornment.testCollection.benchmark}/${enviornment.testCollection.revisionStr}?format=json`)
+            .get(`/assets/${environment.testAsset.assetId}/checklists/${environment.testCollection.benchmark}/${environment.testCollection.revisionStr}?format=json`)
             .set('Authorization', 'Bearer ' + user.token)
 
           expect(res).to.have.status(200)
@@ -274,7 +274,7 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.assetNoRestrictedGrants}/checklists/${enviornment.testCollection.benchmark}/${enviornment.testCollection.revisionStr}?format=json`)
+            .get(`/assets/${environment.assetNoRestrictedGrants}/checklists/${environment.testCollection.benchmark}/${environment.testCollection.revisionStr}?format=json`)
             .set('Authorization', 'Bearer ' + user.token)
 
             if(user.name === "lvl1"){
@@ -298,14 +298,14 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/assets/${enviornment.testAsset.assetId}/stigs`)
+            .get(`/assets/${environment.testAsset.assetId}/stigs`)
             .set('Authorization', 'Bearer ' + user.token)
 
           expect(res).to.have.status(200)
           expect(res.body).to.be.an('array')
           
           for(let stig of res.body){
-            expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
+            expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
           }
         })  
       })
@@ -323,7 +323,7 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/collections/${enviornment.testCollection.collectionId}/labels/${enviornment.testCollection.testLabel}/assets`)
+            .get(`/collections/${environment.testCollection.collectionId}/labels/${environment.testCollection.testLabel}/assets`)
             .set('Authorization', 'Bearer ' + user.token)
           expect(res).to.have.status(200)
         })
@@ -331,7 +331,7 @@ describe('Access Control Testing Asset gets ', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .get(`/collections/83/labels/${enviornment.testCollection.testLabel}/assets`)
+            .get(`/collections/83/labels/${environment.testCollection.testLabel}/assets`)
             .set('Authorization', 'Bearer ' + user.token)
           if(user.name === "admin"){
             expect(res).to.have.status(200)
@@ -353,7 +353,7 @@ describe('Access Control Testing Asset gets ', () => {
           it('Get Assets in Collection with a STIG (collection only has a grant for admin user all others should fail. ', async () => {
             const res = await chai
               .request(config.baseUrl)
-              .get(`/collections/83/stigs/${enviornment.testCollection.benchmark}/assets`)
+              .get(`/collections/83/stigs/${environment.testCollection.benchmark}/assets`)
               .set('Authorization', 'Bearer ' + user.token)
             if(user.name === "admin"){
               expect(res).to.have.status(200)
@@ -366,7 +366,7 @@ describe('Access Control Testing Asset gets ', () => {
 
             const res = await chai
               .request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
+              .get(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
               .set('Authorization', 'Bearer ' + user.token)
 
             expect(res).to.have.status(200)
@@ -375,7 +375,7 @@ describe('Access Control Testing Asset gets ', () => {
 
             const res = await chai
               .request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${enviornment.lvl1.label}`)
+              .get(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${environment.lvl1.label}`)
               .set('Authorization', 'Bearer ' + user.token)
 
             expect(res).to.have.status(200)
@@ -383,7 +383,7 @@ describe('Access Control Testing Asset gets ', () => {
           it('Assets in a Collection attached to a STIG - label', async () => {
             const res = await chai
               .request(config.baseUrl)
-              .get(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${enviornment.testCollection.testLabel}`)
+              .get(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${environment.testCollection.testLabel}`)
               .set('Authorization', 'Bearer ' + user.token)
             expect(res).to.have.status(200)
           })

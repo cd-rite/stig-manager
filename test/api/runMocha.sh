@@ -10,8 +10,8 @@ usage() {
   exit 
 }
 
-DEFAULT_COMMAND="npx mocha --reporter mochawesome --showFailed --exit './mocha/**/*.test.js'"
-COMMAND="npx mocha --reporter mochawesome --showFailed --exit"
+DEFAULT_COMMAND="npx mocha --reporter mochawesome --no-timeouts --showFailed --exit './mocha/**/*.test.js'"
+COMMAND="npx mocha --reporter mochawesome --no-timeouts --showFailed --exit"
 
 PATTERNS=()
 FILES=()
@@ -48,7 +48,7 @@ if [ ${#DIRECTORIES[@]} -gt 0 ]; then
 elif [ ${#FILES[@]} -gt 0 ]; then
   COMMAND+=" ${FILES[*]}"
 else
-  COMMAND+=" './**/*.test.js'"
+  COMMAND+=" './mocha/**/*.test.js'"
 fi
 
 GREP_PATTERN=""

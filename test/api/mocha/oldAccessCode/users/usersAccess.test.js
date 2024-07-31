@@ -2,7 +2,7 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const expect = chai.expect
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const testUsers = require('../../iterations.json')
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
@@ -46,7 +46,7 @@ describe('User GETS tests using "admin" user ', () => {
                 
                 const res = await chai
                     .request(config.baseUrl)
-                    .get(`/users?elevate=true&username=${enviornment.wfTest.username}&projection=collectionGrants&projection=statistics`)
+                    .get(`/users?elevate=true&username=${environment.wfTest.username}&projection=collectionGrants&projection=statistics`)
                     .set('Authorization', 'Bearer ' + user.token)
 
                     if(user.name === "admin") {
@@ -58,7 +58,7 @@ describe('User GETS tests using "admin" user ', () => {
             it('Return a list of Users accessible to the requester USERNAME not elevated', async () => {
                 const res = await chai
                     .request(config.baseUrl)
-                    .get(`/users?elevate=false&username=${enviornment.wfTest.username}&projection=collectionGrants&projection=statistics`)
+                    .get(`/users?elevate=false&username=${environment.wfTest.username}&projection=collectionGrants&projection=statistics`)
                     .set('Authorization', 'Bearer ' + user.token)
                 expect(res).to.have.status(403)
             })
@@ -67,7 +67,7 @@ describe('User GETS tests using "admin" user ', () => {
 
                 const res = await chai
                     .request(config.baseUrl)
-                    .get(`/users?elevate=true&username=${enviornment.wfTest.username}`)
+                    .get(`/users?elevate=true&username=${environment.wfTest.username}`)
                     .set('Authorization', 'Bearer ' + user.token)
 
                
@@ -81,7 +81,7 @@ describe('User GETS tests using "admin" user ', () => {
 
                 const res = await chai
                     .request(config.baseUrl)
-                    .get(`/users?&username=${enviornment.wfTest.username}`)
+                    .get(`/users?&username=${environment.wfTest.username}`)
                     .set('Authorization', 'Bearer ' + user.token)
 
                     expect(res).to.have.status(200)
@@ -115,7 +115,7 @@ describe('User GETS tests using "admin" user ', () => {
                         expect(user).to.have.property('userId')
                         expect(user).to.not.have.property('collectionGrants')
                         expect(user).to.not.have.property('statistics')
-                        expect(user.userId).to.be.oneOf(enviornment.allUserIds)
+                        expect(user.userId).to.be.oneOf(environment.allUserIds)
                     }
             })
         })
@@ -132,7 +132,7 @@ describe('User GETS tests using "admin" user ', () => {
             it('Return a User', async () => {
                 const res = await chai
                     .request(config.baseUrl)
-                    .get(`/users/${enviornment.wfTest.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+                    .get(`/users/${environment.wfTest.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
                     .set('Authorization', 'Bearer ' + user.token)
 
                     if(user.name === "admin") {
@@ -144,14 +144,14 @@ describe('User GETS tests using "admin" user ', () => {
          it('Return a User elevate is false', async () => {
             const res = await chai
                 .request(config.baseUrl)
-                .get(`/users/${enviornment.wfTest.userId}?elevate=false&projection=collectionGrants&projection=statistics`)
+                .get(`/users/${environment.wfTest.userId}?elevate=false&projection=collectionGrants&projection=statistics`)
                 .set('Authorization', 'Bearer ' + user.token)
                 expect(res).to.have.status(403)
          })
          it('Return a User not elevated query param', async () => {
             const res = await chai
                 .request(config.baseUrl)
-                .get(`/users/${enviornment.wfTest.userId}?&projection=collectionGrants&projection=statistics`)
+                .get(`/users/${environment.wfTest.userId}?&projection=collectionGrants&projection=statistics`)
                 .set('Authorization', 'Bearer ' + user.token)
                 expect(res).to.have.status(403)
             })
@@ -184,7 +184,7 @@ describe('User POST tests using "admin" user ', () => {
                         "username": "TEST_USER" +  Math.floor(Math.random() * 1000),
                         "collectionGrants": [
                             {
-                                "collectionId": `${enviornment.scrapCollection.collectionId}`,
+                                "collectionId": `${environment.scrapCollection.collectionId}`,
                                 "accessLevel": 1
                             }
                         ]
@@ -205,7 +205,7 @@ describe('User POST tests using "admin" user ', () => {
                             "username": "TEST_USER" +  Math.floor(Math.random() * 1000),
                             "collectionGrants": [
                                 {
-                                    "collectionId": `${enviornment.scrapCollection.collectionId}`,
+                                    "collectionId": `${environment.scrapCollection.collectionId}`,
                                     "accessLevel": 1
                                 }
                             ]
@@ -238,13 +238,13 @@ describe('User PATCH tests using "admin" user ', () => {
             it('Merge provided properties with a User - Change Username', async () => {
                 const res = await chai
                         .request(config.baseUrl)
-                        .patch(`/users/${enviornment.scrapLvl1User.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+                        .patch(`/users/${environment.scrapLvl1User.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
                         .set('Authorization', 'Bearer ' + user.token)
                         .send({
                         "username": "PatchTest",
                         "collectionGrants": [
                             {
-                                "collectionId": `${enviornment.scrapCollection.collectionId}`,
+                                "collectionId": `${environment.scrapCollection.collectionId}`,
                                 "accessLevel": 1
                             }
                         ]
@@ -259,13 +259,13 @@ describe('User PATCH tests using "admin" user ', () => {
                 it('Merge provided properties with a User - Change Username no elevate no projections', async () => {
                     const res = await chai
                             .request(config.baseUrl)
-                            .patch(`/users/${enviornment.scrapLvl1User.userId}`)
+                            .patch(`/users/${environment.scrapLvl1User.userId}`)
                             .set('Authorization', 'Bearer ' + user.token)
                             .send({
                             "username": "PatchTest",
                             "collectionGrants": [
                                 {
-                                    "collectionId": `${enviornment.scrapCollection.collectionId}`,
+                                    "collectionId": `${environment.scrapCollection.collectionId}`,
                                     "accessLevel": 1
                                 }
                             ]
@@ -296,13 +296,13 @@ describe('User PUT tests using "admin" user ', () => {
             it(`Set all properties of a User - Change Username`, async () => {
                 const res = await chai
                 .request(config.baseUrl)
-                .put(`/users/${enviornment.scrapLvl1User.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+                .put(`/users/${environment.scrapLvl1User.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
                 .set('Authorization', 'Bearer ' + user.token)
                 .send({
                     "username": "putTesting",
                     "collectionGrants": [
                         {
-                            "collectionId": `${enviornment.scrapCollection.collectionId}`,
+                            "collectionId": `${environment.scrapCollection.collectionId}`,
                             "accessLevel": 1
                         }
                     ]
@@ -316,13 +316,13 @@ describe('User PUT tests using "admin" user ', () => {
             it(`Set all properties of a User - Change Username`, async () => {
                 const res = await chai
                 .request(config.baseUrl)
-                .put(`/users/${enviornment.scrapLvl1User.userId}`)
+                .put(`/users/${environment.scrapLvl1User.userId}`)
                 .set('Authorization', 'Bearer ' + user.token)
                 .send({
                     "username": "putTesting",
                     "collectionGrants": [
                         {
-                            "collectionId": `${enviornment.scrapCollection.collectionId}`,
+                            "collectionId": `${environment.scrapCollection.collectionId}`,
                             "accessLevel": 1
                         }
                     ]
@@ -352,7 +352,7 @@ describe('User Delete tests using "admin" user ', () => {
             it('Delete a User - fail due to user access record', async () => {
                 const res = await chai
                     .request(config.baseUrl)
-                    .delete(`/users/${enviornment.admin.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+                    .delete(`/users/${environment.admin.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
                     .set('Authorization', 'Bearer ' + user.token)
 
                     if(user.name === "admin") {
@@ -364,7 +364,7 @@ describe('User Delete tests using "admin" user ', () => {
             it('Delete a User - succeed, as user has never accessed th system', async () => {
                 const res = await chai
                     .request(config.baseUrl)
-                    .delete(`/users/${enviornment.deleteUser.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
+                    .delete(`/users/${environment.deleteUser.userId}?elevate=true&projection=collectionGrants&projection=statistics`)
                     .set('Authorization', 'Bearer ' + user.token)
 
                     if(user.name === "admin") {
@@ -377,7 +377,7 @@ describe('User Delete tests using "admin" user ', () => {
             it('Delete a User - not elevated', async () => {
                 const res = await chai
                     .request(config.baseUrl)
-                    .delete(`/users/${enviornment.deleteUser.userId}?elevate=false&projection=collectionGrants&projection=statistics`)
+                    .delete(`/users/${environment.deleteUser.userId}?elevate=false&projection=collectionGrants&projection=statistics`)
                     .set('Authorization', 'Bearer ' + user.token)
 
                     expect(res).to.have.status(403)

@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 
 const user =
   {
@@ -21,7 +21,7 @@ const lvl1=
 }
 const checkReviews = (reviews, postreview, user) => {
   for(let review of reviews){
-    if(review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){
+    if(review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){
       if (postreview.action == "insert") {
          expect(review.resultEngine).to.not.eql(null);
          expect(review.status.user.username).to.eql("admin");
@@ -34,7 +34,7 @@ const checkReviews = (reviews, postreview, user) => {
         expect(review.detail).to.eql(postreview.source.review.detail)
       }
     }
-    else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+    else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
       if (postreview.action == "insert") {
         expect(review.status.user.username).to.eql("admin");
         expect(review.username).to.eql("admin");              
@@ -49,7 +49,7 @@ const checkReviews = (reviews, postreview, user) => {
         expect(review.detail).to.eql(postreview.source.review.detail)
       }
    }
-   else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+   else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
       if (postreview.action == "insert") {
         expect(review.resultEngine).to.eql(null);
       }
@@ -92,7 +92,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -101,7 +101,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body).to.have.property('updated')
           expect(res.body).to.have.property('inserted')
         
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
 
           if(user.name == "lvl1"){
             expect(res.body.inserted).to.eql(160)
@@ -120,7 +120,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           
 
           for(let review of reviews){
-            if(review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){
+            if(review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){
               if (postreview.action == "insert") {
                   expect(review.resultEngine).to.not.eql(null);
                   expect(review.status.user.username).to.eql("admin");
@@ -133,7 +133,7 @@ describe('Review POSTs tests using "admin" user ', () => {
                 expect(review.detail).to.eql(postreview.source.review.detail)
               }
             }
-            else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+            else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
               if (postreview.action == "insert") {
                 expect(review.status.user.username).to.eql("admin");
                 expect(review.username).to.eql("admin");              
@@ -148,7 +148,7 @@ describe('Review POSTs tests using "admin" user ', () => {
                 expect(review.detail).to.eql(postreview.source.review.detail)
               }
             }
-            else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+            else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
               if (postreview.action == "insert") {
                 expect(review.resultEngine).to.eql(null);
               }
@@ -182,7 +182,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -191,7 +191,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body).to.have.property('updated')
           expect(res.body).to.have.property('inserted')
 
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
         
           if(user.name == "lvl1"){
             expect(res.body.inserted).to.eql(0)
@@ -209,7 +209,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           }
 
           for(let review of reviews){
-            if(review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){
+            if(review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){
               if (postreview.action == "insert") {
                   expect(review.resultEngine).to.not.eql(null);
                   expect(review.status.user.username).to.eql("admin");
@@ -222,7 +222,7 @@ describe('Review POSTs tests using "admin" user ', () => {
                 expect(review.detail).to.eql(postreview.source.review.detail)
               }
             }
-            else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+            else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
               if (postreview.action == "insert") {
                 expect(review.status.user.username).to.eql("admin");
                 expect(review.username).to.eql("admin");              
@@ -237,7 +237,7 @@ describe('Review POSTs tests using "admin" user ', () => {
                 expect(review.detail).to.eql(postreview.source.review.detail)
               }
             }
-            else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+            else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
               if (postreview.action == "insert") {
                 expect(review.resultEngine).to.eql(null);
               }
@@ -270,7 +270,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -278,7 +278,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body).to.have.property('failedValidation')
           expect(res.body).to.have.property('updated')
           expect(res.body).to.have.property('inserted')
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
 
           if(user.name == "lvl1"){
             expect(res.body.inserted).to.eql(0)
@@ -315,7 +315,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -323,7 +323,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body).to.have.property('failedValidation')
           expect(res.body).to.have.property('updated')
           expect(res.body).to.have.property('inserted')
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
 
           if(user.name == "lvl1"){
             expect(res.body.inserted).to.eql(160)
@@ -361,7 +361,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -370,7 +370,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body).to.have.property('updated')
           expect(res.body).to.have.property('inserted')
 
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
 
           if(user.name == "lvl1"){
             expect(res.body.inserted).to.eql(0)
@@ -408,7 +408,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -417,7 +417,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body).to.have.property('updated')
           expect(res.body).to.have.property('inserted')
 
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
           
           if(user.name == "lvl1"){
             expect(res.body.inserted).to.eql(0)
@@ -435,7 +435,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           }
 
           for(let review of reviews){
-            if(review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){
+            if(review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){
               expect(review.resultEngine).to.eql(null)
               expect(review.status.label).to.eql("saved")
               expect(review.status.user.username).to.eql(user.name)
@@ -443,7 +443,7 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.result).to.eql(postreview.source.review.result)
               expect(review.detail).to.eql(postreview.source.review.detail)
             }
-            else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+            else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
               expect(review.resultEngine).to.eql(null)
               expect(review.status.label).to.eql("submitted")
             
@@ -452,7 +452,7 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.result).to.eql(postreview.source.review.result)
               expect(review.detail).to.eql(postreview.source.review.detail)
           }
-          else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+          else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
               expect(review.status.label).to.eql("saved")
               expect(review.status.user.username).to.eql(user.name)
               expect(review.username).to.eql(user.name)
@@ -486,7 +486,7 @@ describe('Review POSTs tests using "admin" user ', () => {
 
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -500,7 +500,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body.failedValidation).to.eql(0)
           expect(res.body.validationErrors).to.have.length(0)
 
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
           expect(reviews).to.have.lengthOf(2)
           
           for(let review of reviews){
@@ -532,7 +532,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -546,7 +546,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body.failedValidation).to.eql(0)
           expect(res.body.validationErrors).to.have.length(0)
 
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
           if(user.name == "lvl1"){
             expect(reviews).to.have.lengthOf(2)
           }
@@ -555,7 +555,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           }
 
           for(let review of reviews){
-            if(review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){
+            if(review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){
               expect(review.resultEngine).to.eql(null);
               expect(review.status.label).to.eql("saved");
               expect(review.status.user.username).to.eql(user.name)
@@ -564,7 +564,7 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.detail).to.eql(postreview.source.review.detail);
             
             }
-            else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+            else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
               expect(review.resultEngine).to.eql(null);
               expect(review.status.label).to.eql("submitted");
               expect(review.status.user.username).to.eql("admin");
@@ -572,7 +572,7 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.result).to.eql(postreview.source.review.result);
               expect(review.detail).to.eql(postreview.source.review.detail);
           }
-          else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+          else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
             expect(review.resultEngine).to.eql(null);
             expect(review.status.label).to.eql("saved");
             expect(review.status.user.username).to.eql(user.name);
@@ -608,7 +608,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -622,12 +622,12 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body.failedValidation).to.eql(0)
           expect(res.body.validationErrors).to.have.length(0)
 
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
           expect(reviews).to.have.lengthOf(2)
 
           for(let review of reviews){
           
-            if(review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){
+            if(review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){
               expect(review.resultEngine).to.eql(null)
               expect(review.status.label).to.eql("saved")
               expect(review.status.user.username).to.eql(user.name)
@@ -636,13 +636,13 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.detail).to.eql(postreview.source.review.detail)
             
             }
-            else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+            else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
               expect(review.resultEngine).to.eql(null)
               expect(review.status.label).to.eql("submitted")
               expect(review.status.user.username).to.eql("admin")
               expect(review.username).to.eql("admin")
           }
-          else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+          else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
             expect(review.resultEngine).to.eql(null);
             expect(review.status.label).to.eql("saved");
             expect(review.status.user.username).to.eql(user.name);
@@ -679,7 +679,7 @@ describe('Review POSTs tests using "admin" user ', () => {
 
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -693,12 +693,12 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body.failedValidation).to.eql(0)
           expect(res.body.validationErrors).to.have.length(0)
 
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
           expect(reviews).to.have.lengthOf(2)
 
           for(let review of reviews){
           
-            if(review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){
+            if(review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){
               expect(review.resultEngine).to.eql(null)
               expect(review.status.label).to.eql("saved")
               expect(review.status.user.username).to.eql(user.name)
@@ -707,14 +707,14 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.detail).to.eql(postreview.source.review.detail)
             
             }
-            else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+            else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
               expect(review.resultEngine).to.eql(null)
               expect(review.status.label).to.eql("submitted")
               expect(review.status.user.username).to.eql("admin")
               expect(review.username).to.eql("admin")
               expect(review.detail).to.eql("test")
           }
-          else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+          else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
             expect(review.resultEngine).to.eql(null);
             expect(review.status.label).to.eql("saved");
             expect(review.status.user.username).to.eql(user.name);
@@ -749,7 +749,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -763,7 +763,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           expect(res.body.failedValidation).to.eql(0)
           expect(res.body.validationErrors).to.have.length(0)
 
-          const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+          const reviews = await utils.getReviews(environment.testCollection.collectionId)
           expect(reviews).to.have.lengthOf(2)
 
           for(let review of reviews){
@@ -795,7 +795,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
 
             const res = await chai.request(config.baseUrl)
-              .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+              .post(`/collections/${environment.testCollection.collectionId}/reviews`)
               .set('Authorization', `Bearer ${user.token}`)
               .send(postreview)
             expect(res).to.have.status(200)
@@ -809,12 +809,12 @@ describe('Review POSTs tests using "admin" user ', () => {
             expect(res.body.failedValidation).to.eql(0)
             expect(res.body.validationErrors).to.have.length(0)
     
-            const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+            const reviews = await utils.getReviews(environment.testCollection.collectionId)
             expect(reviews).to.have.lengthOf(2)
     
             for(let review of reviews){
           
-              if(review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){
+              if(review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){
                 expect(review.resultEngine).to.eql(null)
                 expect(review.status.label).to.eql("saved")
                 expect(review.status.user.username).to.eql(user.name)
@@ -823,14 +823,14 @@ describe('Review POSTs tests using "admin" user ', () => {
                 expect(review.detail).to.eql(postreview.source.review.detail)
               
               }
-              else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+              else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
                 expect(review.resultEngine).to.eql(null)
                 expect(review.status.label).to.eql("submitted")
                 expect(review.status.user.username).to.eql("admin")
                 expect(review.username).to.eql("admin")
                 expect(review.detail).to.eql("test")
             }
-            else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+            else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
               expect(review.resultEngine).to.eql(null);
               expect(review.status.label).to.eql("saved");
               expect(review.status.user.username).to.eql(user.name);
@@ -857,7 +857,7 @@ describe('Review POSTs tests using "admin" user ', () => {
               }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -879,11 +879,11 @@ describe('Review POSTs tests using "admin" user ', () => {
             expect(res.body.validationErrors).to.have.length(0)
           }
 
-          const reviews = await utils.getCollectionMetricsDetails(enviornment.testCollection.collectionId)
+          const reviews = await utils.getCollectionMetricsDetails(environment.testCollection.collectionId)
           expect(reviews).to.have.lengthOf(6)
 
           for(let review of reviews){
-            if(review.assetId == enviornment.testAsset.assetId && review.benchmarkId == enviornment.testCollection.benchmarkId){
+            if(review.assetId == environment.testAsset.assetId && review.benchmarkId == environment.testCollection.benchmarkId){
               expect(review.metrics.assessed).to.equal(241);
             }
           }
@@ -914,7 +914,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
 
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(postreview)
           expect(res).to.have.status(200)
@@ -963,7 +963,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           }
 
         const res = await chai.request(config.baseUrl)
-          .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+          .post(`/collections/${environment.testCollection.collectionId}/reviews`)
           .set('Authorization', `Bearer ${user.token}`)
           .send(postreview)
         expect(res).to.have.status(200)
@@ -984,12 +984,12 @@ describe('Review POSTs tests using "admin" user ', () => {
         expect(res.body.inserted).to.eql(0)
         expect(res.body.updated).to.eql(0)
 
-        const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+        const reviews = await utils.getReviews(environment.testCollection.collectionId)
 
         expect(reviews).to.have.lengthOf(2)
         
         for (let review of reviews){
-          if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){ 
+          if (review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){ 
             // CASE: Existing review, test reset of resultengine and status - all users can update
               expect(review.status.label).to.eql("submitted");
               expect(review.status.user.username).to.eql("admin");
@@ -997,7 +997,7 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.result).to.eql("pass");
           }
           // CASE: Existing review, test reset of resultengine and status - all users can update
-          else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+          else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
               expect(review.resultEngine).to.eql(null);
               expect(review.status.label).to.eql("submitted");
               expect(review.status.user.username).to.eql("admin");
@@ -1005,7 +1005,7 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.result).to.eql("fail");
           }
         // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
-        else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+        else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
             expect(review.resultEngine).to.eql(null);
             expect(review.status.label).to.eql("saved");
             expect(review.status.user.username).to.eql(user.name);
@@ -1031,7 +1031,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             }
 
         const res = await chai.request(config.baseUrl)
-          .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+          .post(`/collections/${environment.testCollection.collectionId}/reviews`)
           .set('Authorization', `Bearer ${user.token}`)
           .send(postreview)
         expect(res).to.have.status(200)
@@ -1045,11 +1045,11 @@ describe('Review POSTs tests using "admin" user ', () => {
         expect(res.body.failedValidation).to.eql(3)
         expect(res.body.validationErrors).to.have.length(3)
 
-        const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+        const reviews = await utils.getReviews(environment.testCollection.collectionId)
         expect(reviews).to.have.lengthOf(2)
         
         for (let review of reviews){
-          if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){ 
+          if (review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){ 
             // CASE: Existing review, test reset of resultengine and status - all users can update
               expect(review.status.label).to.eql("submitted");
               expect(review.status.user.username).to.eql("admin");
@@ -1057,7 +1057,7 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.result).to.eql("pass");
           }
           // CASE: Existing review, test reset of resultengine and status - all users can update
-          else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+          else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
               expect(review.resultEngine).to.eql(null);
               expect(review.status.label).to.eql("submitted");
               expect(review.status.user.username).to.eql("admin");
@@ -1065,7 +1065,7 @@ describe('Review POSTs tests using "admin" user ', () => {
               expect(review.result).to.eql("fail");
           }
         // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
-        else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+        else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
             expect(review.resultEngine).to.eql(null);
             expect(review.status.label).to.eql("saved");
             expect(review.status.user.username).to.eql(user.name);
@@ -1092,7 +1092,7 @@ describe('Review POSTs tests using "admin" user ', () => {
           }
 
       const res = await chai.request(config.baseUrl)
-        .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+        .post(`/collections/${environment.testCollection.collectionId}/reviews`)
         .set('Authorization', `Bearer ${user.token}`)
         .send(postreview)
       expect(res).to.have.status(200)
@@ -1111,11 +1111,11 @@ describe('Review POSTs tests using "admin" user ', () => {
         expect(res.body.failedValidation).to.eql(3)
         expect(res.body.validationErrors).to.have.length(3)
       }
-      const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+      const reviews = await utils.getReviews(environment.testCollection.collectionId)
       expect(reviews).to.have.lengthOf(2)
     
       for (let review of reviews){
-        if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){ 
+        if (review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){ 
           // CASE: Existing review, test reset of resultengine and status - all users can update
             expect(review.status.label).to.eql("submitted");
             expect(review.status.user.username).to.eql("admin");
@@ -1123,7 +1123,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             expect(review.result).to.eql("pass");
         }
         // CASE: Existing review, test reset of resultengine and status - all users can update
-        else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+        else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
             expect(review.resultEngine).to.eql(null);
             expect(review.status.label).to.eql("submitted");
             expect(review.status.user.username).to.eql("admin");
@@ -1131,7 +1131,7 @@ describe('Review POSTs tests using "admin" user ', () => {
             expect(review.result).to.eql("fail");
       }
       // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
-      else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+      else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
           expect(review.resultEngine).to.eql(null);
           expect(review.status.label).to.eql("saved");
           expect(review.status.user.username).to.eql(user.name);
@@ -1157,7 +1157,7 @@ describe('Review POSTs tests using "admin" user ', () => {
 
     it('Import one or more Reviews from a JSON body new ruleId', async () => {
       const res = await chai.request(config.baseUrl)
-        .post(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}`)
+        .post(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}`)
         .set('Authorization', `Bearer ${user.token}`)
         .send([
           {
@@ -1182,11 +1182,11 @@ describe('Review POSTs tests using "admin" user ', () => {
     })
     it('Import one or more Reviews from a JSON body already used ruleId should be an update', async () => {
       const res = await chai.request(config.baseUrl)
-        .post(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}`)
+        .post(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}`)
         .set('Authorization', `Bearer ${user.token}`)
         .send([
           {
-          "ruleId": `${enviornment.testCollection.ruleId}`,
+          "ruleId": `${environment.testCollection.ruleId}`,
           "result": "pass",
           "detail": "test\nvisible to lvl1",
           "comment": "sure",
@@ -1212,7 +1212,7 @@ describe('Review POSTs tests using "admin" user ', () => {
         .set('Authorization', `Bearer ${user.token}`)
         .send([
           {
-          "ruleId": `${enviornment.testCollection.ruleId}`,
+          "ruleId": `${environment.testCollection.ruleId}`,
           "result": "pass",
           "detail": "test\nvisible to lvl1",
           "comment": "sure",
@@ -1224,11 +1224,11 @@ describe('Review POSTs tests using "admin" user ', () => {
     })
     it('Import reviews for asset in deleted collection', async () => {
       const res = await chai.request(config.baseUrl)
-        .post(`/collections/${deletedCollection.collectionId}/reviews/${enviornment.testAsset.assetId}`)
+        .post(`/collections/${deletedCollection.collectionId}/reviews/${environment.testAsset.assetId}`)
         .set('Authorization', `Bearer ${user.token}`)
         .send([
           {
-          "ruleId": `${enviornment.testCollection.ruleId}`,
+          "ruleId": `${environment.testCollection.ruleId}`,
           "result": "pass",
           "detail": "test\nvisible to lvl1",
           "comment": "sure",
@@ -1240,11 +1240,11 @@ describe('Review POSTs tests using "admin" user ', () => {
     })
     it('Import reviews for deleted asset', async () => {
       const res = await chai.request(config.baseUrl)
-        .post(`/collections/${deletedCollection.collectionId}/reviews/${enviornment.testAsset.assetId}`)
+        .post(`/collections/${deletedCollection.collectionId}/reviews/${environment.testAsset.assetId}`)
         .set('Authorization', `Bearer ${user.token}`)
         .send([
           {
-          "ruleId": `${enviornment.testCollection.ruleId}`,
+          "ruleId": `${environment.testCollection.ruleId}`,
           "result": "pass",
           "detail": "test\nvisible to lvl1",
           "comment": "sure",
@@ -1281,7 +1281,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
           rules: { ruleIds: ['SV-106179r1_rule'] }
         }
       const res = await chai.request(config.baseUrl)
-      .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+      .post(`/collections/${environment.testCollection.collectionId}/reviews`)
       .set('Authorization', `Bearer ${lvl1.token}`)
       .send(postreview)
       expect(res).to.have.status(200)
@@ -1294,11 +1294,11 @@ describe('Review POSTs tests using "lvl1" user ', () => {
       expect(res.body.updated).to.eql(0)
       expect(res.body.failedValidation).to.eql(2)
       expect(res.body.validationErrors).to.have.length(2)
-      const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+      const reviews = await utils.getReviews(environment.testCollection.collectionId)
       expect(reviews).to.have.lengthOf(2)
       
       for (let review of reviews){
-        if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){ 
+        if (review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){ 
           // CASE: Existing review, test reset of resultengine and status - all users can update
             expect(review.status.label).to.eql("submitted");
             expect(review.status.user.username).to.eql("admin");
@@ -1306,7 +1306,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
             expect(review.result).to.eql("pass");
         }
         // CASE: Existing review, test reset of resultengine and status - all users can update
-        else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+        else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
             expect(review.resultEngine).to.eql(null);
             expect(review.status.label).to.eql("submitted");
             expect(review.status.user.username).to.eql("admin");
@@ -1314,7 +1314,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
             expect(review.result).to.eql("fail");
         }
       // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
-      else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+      else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
           expect(review.resultEngine).to.eql(null);
           expect(review.status.label).to.eql("saved");
           expect(review.status.user.username).to.eql(user.name);
@@ -1343,12 +1343,12 @@ describe('Review POSTs tests using "lvl1" user ', () => {
       }
 
       const res = await chai.request(config.baseUrl)
-        .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+        .post(`/collections/${environment.testCollection.collectionId}/reviews`)
         .set('Authorization', `Bearer ${lvl1.token}`)
         .send(postreview)
       expect(res).to.have.status(200)
   
-      const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+      const reviews = await utils.getReviews(environment.testCollection.collectionId)
     
       expect(res.body.inserted).to.eql(0)
       expect(res.body.failedValidation).to.eql(1)
@@ -1356,7 +1356,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
       expect(res.body.validationErrors).to.have.length(1)
       expect(reviews).to.have.lengthOf(2)
       for(let review of reviews){
-        if(review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){
+        if(review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){
           if (postreview.action == "insert") {
               expect(review.resultEngine).to.not.eql(null);
               expect(review.status.user.username).to.eql("admin");
@@ -1369,7 +1369,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
             expect(review.detail).to.eql(postreview.source.review.detail)
           }
         }
-        else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+        else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
           if (postreview.action == "insert") {
             expect(review.status.user.username).to.eql("admin");
             expect(review.username).to.eql("admin");              
@@ -1384,7 +1384,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
             expect(review.detail).to.eql(postreview.source.review.detail)
           }
         }
-        else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+        else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
           if (postreview.action == "insert") {
             expect(review.resultEngine).to.eql(null);
           }
@@ -1416,7 +1416,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
       }
 
     const res = await chai.request(config.baseUrl)
-      .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+      .post(`/collections/${environment.testCollection.collectionId}/reviews`)
       .set('Authorization', `Bearer ${lvl1.token}`)
       .send(postreview)
     expect(res).to.have.status(200)
@@ -1433,12 +1433,12 @@ describe('Review POSTs tests using "lvl1" user ', () => {
     expect(res.body.inserted).to.eql(0)
     expect(res.body.updated).to.eql(0)
 
-    const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+    const reviews = await utils.getReviews(environment.testCollection.collectionId)
 
     expect(reviews).to.have.lengthOf(2)
     
     for (let review of reviews){
-      if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){ 
+      if (review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){ 
         // CASE: Existing review, test reset of resultengine and status - all users can update
           expect(review.status.label).to.eql("submitted");
           expect(review.status.user.username).to.eql("admin");
@@ -1446,7 +1446,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
           expect(review.result).to.eql("pass");
       }
       // CASE: Existing review, test reset of resultengine and status - all users can update
-      else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+      else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
           expect(review.resultEngine).to.eql(null);
           expect(review.status.label).to.eql("submitted");
           expect(review.status.user.username).to.eql("admin");
@@ -1454,7 +1454,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
           expect(review.result).to.eql("fail");
       }
     // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
-    else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+    else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
         expect(review.resultEngine).to.eql(null);
         expect(review.status.label).to.eql("saved");
         expect(review.status.user.username).to.eql(user.name);
@@ -1481,7 +1481,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
       }
 
       const res = await chai.request(config.baseUrl)
-        .post(`/collections/${enviornment.testCollection.collectionId}/reviews`)
+        .post(`/collections/${environment.testCollection.collectionId}/reviews`)
         .set('Authorization', `Bearer ${lvl1.token}`)
         .send(postreview)
       expect(res).to.have.status(200)
@@ -1494,11 +1494,11 @@ describe('Review POSTs tests using "lvl1" user ', () => {
       expect(res.body.updated).to.eql(0)
       expect(res.body.failedValidation).to.eql(2)
       expect(res.body.validationErrors).to.have.length(2)
-      const reviews = await utils.getReviews(enviornment.testCollection.collectionId)
+      const reviews = await utils.getReviews(environment.testCollection.collectionId)
       expect(reviews).to.have.lengthOf(2)
 
       for (let review of reviews){
-        if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == enviornment.testAsset.assetId){ 
+        if (review.ruleId == environment.testCollection.ruleId && review.assetId == environment.testAsset.assetId){ 
           // CASE: Existing review, test reset of resultengine and status - all users can update
             expect(review.status.label).to.eql("submitted");
             expect(review.status.user.username).to.eql("admin");
@@ -1506,7 +1506,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
             expect(review.result).to.eql("pass");
         }
         // CASE: Existing review, test reset of resultengine and status - all users can update
-        else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 154) {
+        else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 154) {
             expect(review.resultEngine).to.eql(null);
             expect(review.status.label).to.eql("submitted");
             expect(review.status.user.username).to.eql("admin");
@@ -1514,7 +1514,7 @@ describe('Review POSTs tests using "lvl1" user ', () => {
             expect(review.result).to.eql("fail");
       }
       // CASE: new  review, test reset of resultengine and status - non-lvl1-can update
-      else if (review.ruleId == enviornment.testCollection.ruleId && review.assetId == 62) {
+      else if (review.ruleId == environment.testCollection.ruleId && review.assetId == 62) {
           expect(review.resultEngine).to.eql(null);
           expect(review.status.label).to.eql("saved");
           expect(review.status.user.username).to.eql(user.name);

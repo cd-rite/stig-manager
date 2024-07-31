@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require("../../testConfig.json")
 const utils = require("../../utils/testUtils")
-const enviornment = require("../../enviornment.json")
+const environment = require("../../environment.json")
 const users = require("../../iterations.json")
 
 
@@ -175,7 +175,7 @@ describe('POST - Collection', () => {
 
         before(async function () {
           this.timeout(4000)
-          await utils.setDefaultRevision(enviornment.testCollection.collectionId, enviornment.testCollection.benchmark, "V1R0")
+          await utils.setDefaultRevision(environment.testCollection.collectionId, environment.testCollection.benchmark, "V1R0")
         })
         // this test is dependant on the endpoints of the util functions to be working correctly. 
         it("clone collection for later Review check and test projections everything matches source ", async () => {
@@ -314,7 +314,7 @@ describe('POST - Collection', () => {
           ]
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/clone?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=labels`        )
+            .post(`/collections/${environment.testCollection.collectionId}/clone?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=labels`        )
             .set("Authorization", `Bearer ${user.token}`)
             .send({
               name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -359,7 +359,7 @@ describe('POST - Collection', () => {
                         expect(messageObj.collection.stigs).to.have.lengthOf(2)
                         expect(messageObj.collection.stigs).to.eql(stigsProjected)
                         for(const stig of messageObj.collection.stigs){
-                            expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
+                            expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
                             
                         }
                         // labels
@@ -374,7 +374,7 @@ describe('POST - Collection', () => {
             if(clonedCollectionId !== null){
             // check reviews are there.
             const clonedCollectionReviews = await utils.getReviews(clonedCollectionId)
-            const sourceCollectionReviews = await utils.getReviews(enviornment.testCollection.collectionId)
+            const sourceCollectionReviews = await utils.getReviews(environment.testCollection.collectionId)
             expect(clonedCollectionReviews).to.exist
             expect(sourceCollectionReviews).to.exist
             expect(clonedCollectionReviews).to.be.an('array').of.length(sourceCollectionReviews.length)
@@ -388,7 +388,7 @@ describe('POST - Collection', () => {
 
             // compare the cloned collection with the source collection should be the same
             const clonedCollection = await utils.getCollection(clonedCollectionId)
-            const sourceCollection = await utils.getCollection(enviornment.testCollection.collectionId)
+            const sourceCollection = await utils.getCollection(environment.testCollection.collectionId)
             expect(sourceCollection).to.exist
             expect(clonedCollection).to.exist 
 
@@ -401,7 +401,6 @@ describe('POST - Collection', () => {
             expect(clonedCollection.owners).to.have.lengthOf(sourceCollection.owners.length)
           }
         })
-
         it("clone test collection - no grants", async () => {
           const grantsProjected = [
             {
@@ -423,7 +422,7 @@ describe('POST - Collection', () => {
 
           const res = await chai
           .request(config.baseUrl)
-          .post(`/collections/${enviornment.testCollection.collectionId}/clone?projection=grants&projection=owners`        )
+          .post(`/collections/${environment.testCollection.collectionId}/clone?projection=grants&projection=owners`        )
           .set("Authorization", `Bearer ${user.token}`)
           .send({
             name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -469,7 +468,7 @@ describe('POST - Collection', () => {
 
           const res = await chai
           .request(config.baseUrl)
-          .post(`/collections/${enviornment.testCollection.collectionId}/clone?projection=labels`        )
+          .post(`/collections/${environment.testCollection.collectionId}/clone?projection=labels`        )
           .set("Authorization", `Bearer ${user.token}`)
           .send({
             name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -507,7 +506,7 @@ describe('POST - Collection', () => {
 
           const res = await chai
           .request(config.baseUrl)
-          .post(`/collections/${enviornment.testCollection.collectionId}/clone?projection=assets`        )
+          .post(`/collections/${environment.testCollection.collectionId}/clone?projection=assets`        )
           .set("Authorization", `Bearer ${user.token}`)
           .send({
             name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -545,7 +544,7 @@ describe('POST - Collection', () => {
 
           const res = await chai
           .request(config.baseUrl)
-          .post(`/collections/${enviornment.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
+          .post(`/collections/${environment.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
           .set("Authorization", `Bearer ${user.token}`)
           .send({
             name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -584,7 +583,7 @@ describe('POST - Collection', () => {
 
           const res = await chai
           .request(config.baseUrl)
-          .post(`/collections/${enviornment.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
+          .post(`/collections/${environment.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
           .set("Authorization", `Bearer ${user.token}`)
           .send({
             name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -628,7 +627,7 @@ describe('POST - Collection', () => {
 
           const res = await chai
           .request(config.baseUrl)
-          .post(`/collections/${enviornment.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
+          .post(`/collections/${environment.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
           .set("Authorization", `Bearer ${user.token}`)
           .send({
             name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -679,11 +678,11 @@ describe('POST - Collection', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/export-to/${enviornment.scrapCollection.collectionId}`)
+            .post(`/collections/${environment.testCollection.collectionId}/export-to/${environment.scrapCollection.collectionId}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send([
               {
-                assetId: enviornment.testAsset.assetId,
+                assetId: environment.testAsset.assetId,
               },
             ])
             expect(res).to.have.status(200)
@@ -707,11 +706,11 @@ describe('POST - Collection', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/export-to/${enviornment.scrapCollection.collectionId}`)
+            .post(`/collections/${environment.testCollection.collectionId}/export-to/${environment.scrapCollection.collectionId}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send([
               {
-                assetId: enviornment.testAsset.assetId,
+                assetId: environment.testAsset.assetId,
               },
             ])
             expect(res).to.have.status(200)
@@ -742,7 +741,7 @@ describe('POST - Collection', () => {
             }
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.scrapCollection.collectionId}/labels`)
+            .post(`/collections/${environment.scrapCollection.collectionId}/labels`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(request)
             expect(res).to.have.status(201)
@@ -769,14 +768,14 @@ describe('POST - Collection', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}`)
+            .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R1")
             expect(res.body.revisionPinned).to.equal(true)
             expect(res.body.ruleCount).to.equal(81)
-            expect(res.body.benchmarkId).to.equal(enviornment.testCollection.benchmark)
+            expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
             expect(res.body.assetCount).to.equal(3)
         })
 
@@ -789,14 +788,14 @@ describe('POST - Collection', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}`)
+            .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R1")
             expect(res.body.revisionPinned).to.equal(false)
             expect(res.body.ruleCount).to.equal(81)
-            expect(res.body.benchmarkId).to.equal(enviornment.testCollection.benchmark)
+            expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
             expect(res.body.assetCount).to.equal(3)
         })
         it("Set the Assets mapped to a STIG - assets only", async () => {
@@ -807,14 +806,14 @@ describe('POST - Collection', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}`)
+            .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R1")
             expect(res.body.revisionPinned).to.equal(false)
             expect(res.body.ruleCount).to.equal(81)
-            expect(res.body.benchmarkId).to.equal(enviornment.testCollection.benchmark)
+            expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
             expect(res.body.assetCount).to.equal(3)
         })
         it("Set the Assets mapped to a STIG - invalid rev - expect 422", async () => {
@@ -825,7 +824,7 @@ describe('POST - Collection', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}`)
+            .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
             expect(res).to.have.status(422)
@@ -838,14 +837,14 @@ describe('POST - Collection', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}`)
+            .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R0")
             expect(res.body.revisionPinned).to.equal(true)
             expect(res.body.ruleCount).to.equal(81)
-            expect(res.body.benchmarkId).to.equal(enviornment.testCollection.benchmark)
+            expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
             expect(res.body.assetCount).to.equal(3)
         })
         it("Set the Assets mapped to a STIG - clear assets", async () => {
@@ -856,7 +855,7 @@ describe('POST - Collection', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}`)
+            .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
             expect(res).to.have.status(204)
@@ -869,14 +868,14 @@ describe('POST - Collection', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}`)
+            .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R1")
             expect(res.body.revisionPinned).to.equal(false)
             expect(res.body.ruleCount).to.equal(81)
-            expect(res.body.benchmarkId).to.equal(enviornment.testCollection.benchmark)
+            expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
             expect(res.body.assetCount).to.equal(3)
         })
       })

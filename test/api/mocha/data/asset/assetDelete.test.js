@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 
 const user =
   {
@@ -27,28 +27,28 @@ describe('Asset delete tests admin user', () => {
     it('Delete one metadata key/value of an Asset', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .delete(`/assets/${enviornment.scrapAsset.assetId}/metadata/keys/${enviornment.scrapAsset.metadataKey}`)
+        .delete(`/assets/${environment.scrapAsset.assetId}/metadata/keys/${environment.scrapAsset.metadataKey}`)
         .set('Content-Type', 'application/json') 
         .set('Authorization', 'Bearer ' + user.token)
-        .send(`${JSON.stringify(enviornment.scrapAsset.metadataValue)}`)
+        .send(`${JSON.stringify(environment.scrapAsset.metadataValue)}`)
 
       expect(res).to.have.status(204)
       
-      const asset = await utils.getAsset(enviornment.scrapAsset.assetId)
-      expect(asset.metadata).to.not.have.property(enviornment.scrapAsset.metadataKey)
+      const asset = await utils.getAsset(environment.scrapAsset.assetId)
+      expect(asset.metadata).to.not.have.property(environment.scrapAsset.metadataKey)
     })
   })
   describe(`DELETE - removeStigsFromAsset -/assets/{assetId}/stigs`, () => {
     it('Delete all STIG assignments to an Asset', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .delete(`/assets/${enviornment.scrapAsset.assetId}/stigs`)
+        .delete(`/assets/${environment.scrapAsset.assetId}/stigs`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
 
-      const asset = await utils.getAsset(enviornment.scrapAsset.assetId)
+      const asset = await utils.getAsset(environment.scrapAsset.assetId)
       expect(asset.stigs).to.be.an('array').that.is.empty
       
     })
@@ -57,13 +57,13 @@ describe('Asset delete tests admin user', () => {
     it('Delete a STIG assignment to an Asset', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .delete(`/assets/${enviornment.scrapAsset.assetId}/stigs/${enviornment.scrapAsset.scrapBenchmark}`)
+        .delete(`/assets/${environment.scrapAsset.assetId}/stigs/${environment.scrapAsset.scrapBenchmark}`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
 
-      const asset = await utils.getAsset(enviornment.scrapAsset.assetId)
-      expect(asset.stigs).to.not.include(enviornment.scrapAsset.scrapBenchmark)
+      const asset = await utils.getAsset(environment.scrapAsset.assetId)
+      expect(asset.stigs).to.not.include(environment.scrapAsset.scrapBenchmark)
     })
   })
   describe(`DELETE - deleteAsset - /assets/{assetId}`, () => {
@@ -80,7 +80,7 @@ describe('Asset delete tests admin user', () => {
       // this might need preivledges? 
       const tempAsset = await utils.createTempAsset({
           name: 'tempAsset',
-          collectionId: enviornment.scrapCollection.collectionId,
+          collectionId: environment.scrapCollection.collectionId,
           description: 'temp',
           ip: '1.1.1.1',
           noncomputing: true,
@@ -110,12 +110,12 @@ describe('Asset delete tests admin user', () => {
     it('Delete test Asset', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .delete(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .delete(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token) 
       
       expect(res).to.have.status(200)
       expect(res.body).to.have.property('assetId')
-      expect(res.body.assetId).to.equal(enviornment.testAsset.assetId)
+      expect(res.body.assetId).to.equal(environment.testAsset.assetId)
     })
   })
 })

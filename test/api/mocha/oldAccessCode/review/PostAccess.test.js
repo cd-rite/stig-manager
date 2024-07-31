@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const usersEnv = require('../../iterations.json')
 
 describe('Access Control Testing Review posts', () => {
@@ -70,7 +70,7 @@ describe('Access Control Testing Review posts', () => {
 
         it('Import one or more Reviews from a JSON body new ruleId should work for all users', async () => {
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
             .send([
               {
@@ -88,7 +88,7 @@ describe('Access Control Testing Review posts', () => {
         })
         it('Import one or more Reviews from a JSON body new ruleId should fail for user lvl1 because they do not have access to asset', async () => {
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAssetlvl1NoAccess.assetId}`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAssetlvl1NoAccess.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
             .send([
               {
@@ -110,11 +110,11 @@ describe('Access Control Testing Review posts', () => {
         })
         it('Import one or more Reviews from a JSON body - no Asset Access - multiple posts', async () => {
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAssetlvl1NoAccess.assetId}`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAssetlvl1NoAccess.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
             .send([
               {
-              "ruleId": `${enviornment.testCollection.ruleId}`,
+              "ruleId": `${environment.testCollection.ruleId}`,
               "result": "pass",
               "detail": "test\nvisible to lvl1",
               "comment": "sure",
@@ -122,7 +122,7 @@ describe('Access Control Testing Review posts', () => {
               "status": "submitted"
               },
               {
-                "ruleId": `${enviornment.testAssetlvl1NoAccess.ruleId}`,
+                "ruleId": `${environment.testAssetlvl1NoAccess.ruleId}`,
                 "result": "pass",
                 "detail": "test\nvisible to lvl1",
                 "comment": "sure",
@@ -140,11 +140,11 @@ describe('Access Control Testing Review posts', () => {
         })
         it('Import one or more Reviews from a JSON body - no Asset Access - multiple posts', async () => {
           const res = await chai.request(config.baseUrl)
-            .post(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAssetlvl1NoAccess.assetId}`)
+            .post(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAssetlvl1NoAccess.assetId}`)
             .set('Authorization', `Bearer ${user.token}`)
             .send([
               {
-              "ruleId": `${enviornment.testCollection.ruleId}`,
+              "ruleId": `${environment.testCollection.ruleId}`,
               "result": "pass",
               "detail": "test\nvisible to lvl1",
               "comment": "sure",
@@ -152,7 +152,7 @@ describe('Access Control Testing Review posts', () => {
               "status": "submitted"
               },
               {
-                "ruleId": `${enviornment.testAssetlvl1NoAccess.ruleId}`,
+                "ruleId": `${environment.testAssetlvl1NoAccess.ruleId}`,
                 "result": "pass",
                 "detail": "test\nvisible to lvl1",
                 "comment": "sure",

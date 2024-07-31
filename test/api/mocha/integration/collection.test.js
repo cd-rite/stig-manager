@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require("../testConfig.json")
 const utils = require("../utils/testUtils")
-const enviornment = require("../enviornment.json")
+const environment = require("../environment.json")
 
 const user = {
   name: "admin",
@@ -51,7 +51,7 @@ describe('PATCH - updateCollection - /collections/{collectionId}', () => {
               } 
         
             const res = await chai.request(config.baseUrl)
-                .patch(`/collections/${enviornment.scrapCollection.collectionId}`)
+                .patch(`/collections/${environment.scrapCollection.collectionId}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 .send(patchRequest)
             expect(res).to.have.status(200)
@@ -85,7 +85,7 @@ describe('PATCH - updateCollection - /collections/{collectionId}', () => {
               }
         
             const res = await chai.request(config.baseUrl)
-                .patch(`/collections/${enviornment.scrapCollection.collectionId}`)
+                .patch(`/collections/${environment.scrapCollection.collectionId}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 .send(patchRequest)
             expect(res).to.have.status(403)
@@ -119,7 +119,7 @@ describe('PATCH - updateCollection - /collections/{collectionId}', () => {
               }
         
             const res = await chai.request(config.baseUrl)
-                .patch(`/collections/${enviornment.scrapCollection.collectionId}`)
+                .patch(`/collections/${environment.scrapCollection.collectionId}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 .send(patchRequest)
             expect(res).to.have.status(200)
@@ -172,7 +172,7 @@ describe('PATCH - updateCollection - /collections/{collectionId}', () => {
               }
         
             const res = await chai.request(config.baseUrl)
-                .put(`/collections/${enviornment.scrapCollection.collectionId}?projection=grants&projection=owners`)
+                .put(`/collections/${environment.scrapCollection.collectionId}?projection=grants&projection=owners`)
                 .set('Authorization', `Bearer ${user.token}`)
                 .send(putRequest)
             expect(res).to.have.status(403)
@@ -192,25 +192,25 @@ describe('PUT - setStigAssetsByCollectionUser - /collections/{collectionId}/gran
         it('set stig-asset grant to create conditions leading to issue gh-761', async () => {
 
             const res = await chai.request(config.baseUrl)
-                .put(`/collections/${enviornment.testCollection.collectionId}/grants/${enviornment.scrapLvl1User.userId}/access`)
+                .put(`/collections/${environment.testCollection.collectionId}/grants/${environment.scrapLvl1User.userId}/access`)
                 .set('Authorization', `Bearer ${user.token}`)
                 .send([
                     {
-                        "benchmarkId": `${enviornment.testCollection.benchmark}`,
-                        "assetId": `${enviornment.testAsset.assetId}`
+                        "benchmarkId": `${environment.testCollection.benchmark}`,
+                        "assetId": `${environment.testAsset.assetId}`
                     }
                 ])
             expect(res).to.have.status(200)
             expect(res.body).to.have.lengthOf(1)
             for(const item of res.body){
-                expect(item.benchmarkId).to.equal(enviornment.testCollection.benchmark)
-                expect(item.asset.assetId).to.equal(enviornment.testAsset.assetId)
+                expect(item.benchmarkId).to.equal(environment.testCollection.benchmark)
+                expect(item.asset.assetId).to.equal(environment.testAsset.assetId)
             }
         })
         it('Assets accessible to the requester (with STIG grants projection) -statusStats', async () => {
 
             const res = await chai.request(config.baseUrl)
-                .get(`/assets?collectionId=${enviornment.testCollection.collectionId}&projection=statusStats&projection=stigGrants`)
+                .get(`/assets?collectionId=${environment.testCollection.collectionId}&projection=statusStats&projection=stigGrants`)
                 .set('Authorization', `Bearer ${user.token}`)
                
             expect(res).to.have.status(200)
@@ -224,16 +224,16 @@ describe('PUT - setStigAssetsByCollectionUser - /collections/{collectionId}/gran
                 returnedAssetIds.push(asset.assetId)
                 expect(asset.statusStats).to.exist
 
-                if (asset.assetId == enviornment.testAsset.assetId){ 
+                if (asset.assetId == environment.testAsset.assetId){ 
                     expect(asset.statusStats.ruleCount).to.eql(368)
                     expect(asset.statusStats.stigCount).to.eql(2)
 
                     expect(asset.stigGrants).to.exist
                     for (let grant of asset.stigGrants){
-                        expect(grant.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
-                        if(grant.benchmarkId == enviornment.testCollection.benchmark){
+                        expect(grant.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
+                        if(grant.benchmarkId == environment.testCollection.benchmark){
                             expect(grant.users).to.have.lengthOf(2)
-                            expect(enviornment.scrapLvl1User.userId).to.be.oneOf(grant.users.map(user => user.userId))
+                            expect(environment.scrapLvl1User.userId).to.be.oneOf(grant.users.map(user => user.userId))
                         }
                     }
                 }

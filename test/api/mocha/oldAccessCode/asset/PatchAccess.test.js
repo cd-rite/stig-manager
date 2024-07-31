@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const usersEnv = require('../../iterations.json')
 describe('Access Control Testing Asset Patch ', () => {
     before(async function () {
@@ -24,10 +24,10 @@ describe('Access Control Testing Asset Patch ', () => {
             it('Merge provided properties with an Asset - Change Collection - Fail for all users', async () => {
                 const res = await chai
                     .request(config.baseUrl)
-                    .patch(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+                    .patch(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
                     .set('Authorization', 'Bearer ' + user.token)
                     .send({ 
-                    "collectionId": enviornment.scrapLvl1User.userId,
+                    "collectionId": environment.scrapLvl1User.userId,
                     "description": "test desc",
                     "ip": "1.1.1.1",
                     "noncomputing": true,
@@ -45,10 +45,10 @@ describe('Access Control Testing Asset Patch ', () => {
             it('Merge provided properties with an Asset - Change Collection - valid for lvl3 and lvl4 only (IE works for admin for me)', async () => {
                 const res = await chai
                     .request(config.baseUrl)
-                    .patch(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+                    .patch(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
                     .set('Authorization', 'Bearer ' + user.token)
                     .send({
-                    "collectionId": enviornment.scrapCollection.collectionId,
+                    "collectionId": environment.scrapCollection.collectionId,
                     "description": "test desc",
                     "ip": "1.1.1.1",
                     "noncomputing": true,
@@ -69,10 +69,10 @@ describe('Access Control Testing Asset Patch ', () => {
             
                 const res = await chai
                     .request(config.baseUrl)
-                    .patch(`/assets/${enviornment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+                    .patch(`/assets/${environment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
                     .set('Authorization', 'Bearer ' + user.token)
                     .send({
-                    "collectionId": enviornment.scrapCollection.collectionId,
+                    "collectionId": environment.scrapCollection.collectionId,
                     "description": "scrap",
                     "ip": "1.1.1.1",
                     "noncomputing": true,
@@ -116,7 +116,7 @@ describe('Access Control Testing Asset Patch ', () => {
                 it('Delete Assets - expect success for valid users', async () => {
                     const res = await chai
                         .request(config.baseUrl)
-                        .patch(`/assets?collectionId=${enviornment.testCollection.collectionId}`)
+                        .patch(`/assets?collectionId=${environment.testCollection.collectionId}`)
                         .set('Authorization', 'Bearer ' + user.token)
                         .send({
                         "operation": "delete",
@@ -144,7 +144,7 @@ describe('Access Control Testing Asset Patch ', () => {
                 it('Merge provided properties with an Asset - Change metadata', async () => {
                 const res = await chai
                     .request(config.baseUrl)
-                    .patch(`/assets/${enviornment.scrapAsset.assetId}/metadata`)
+                    .patch(`/assets/${environment.scrapAsset.assetId}/metadata`)
                     .set('Authorization', 'Bearer ' + user.token)
                     .send({
                     "testkey":"poc2Patched"

@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const xml2js = require('xml2js');
 
 const user =
@@ -34,22 +34,22 @@ describe('Asset get tests using "admin" user ', () => {
     it('Return an Asset (with STIGgrants projection)', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .get(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('object')        
-      expect(res.body.name).to.eql(enviornment.testAsset.name)
-      expect(res.body.collection.collectionId).to.eql(enviornment.testAsset.collectionId)
+      expect(res.body.name).to.eql(environment.testAsset.name)
+      expect(res.body.collection.collectionId).to.eql(environment.testAsset.collectionId)
       expect(res.body.labelIds).to.be.an('array').of.length(2)
       
       if(res.request.url.includes('/projection=stigGrants/')){
         expect(res.body.stigGrants).to.exist;
         expect(res.body.stigGrants).to.be.an("array").of.length.at.least(1)
         for (let grant of res.body.stigGrants){
-            expect(grant.benchmarkId).to.be.oneOf(enviornment.testAsset.validStigs);
+            expect(grant.benchmarkId).to.be.oneOf(environment.testAsset.validStigs);
             for(let user of grant.users){
-              expect(user.userId).to.be.oneOf(enviornment.testAsset.usersWithGrant);
+              expect(user.userId).to.be.oneOf(environment.testAsset.usersWithGrant);
             }
         }
       }
@@ -57,7 +57,7 @@ describe('Asset get tests using "admin" user ', () => {
         expect(res.body.stigs).to.exist;
         expect(res.body.stigs).to.be.an("array").of.length.at.least(1)
         for (let stig of res.body.stigs){
-            expect(stig.benchmarkId).to.be.oneOf(enviornment.testAsset.validStigs);
+            expect(stig.benchmarkId).to.be.oneOf(environment.testAsset.validStigs);
         }
       }
       if(res.request.url.includes('/projection=statusStats/')){
@@ -69,13 +69,13 @@ describe('Asset get tests using "admin" user ', () => {
     it('Return an Asset (with STIGgrants projection) - Asset - no assigned STIGs', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAssetNoStigs.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .get(`/assets/${environment.testAssetNoStigs.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('object')        
-      expect(res.body.name).to.eql(enviornment.testAssetNoStigs.name)
-      expect(res.body.collection.collectionId).to.eql(enviornment.testAssetNoStigs.collectionId)
+      expect(res.body.name).to.eql(environment.testAssetNoStigs.name)
+      expect(res.body.collection.collectionId).to.eql(environment.testAssetNoStigs.collectionId)
       expect(res.body.labelIds).to.be.an('array').of.length(0)
 
       if(res.request.url.includes('/projection=stigGrants/')){
@@ -96,19 +96,19 @@ describe('Asset get tests using "admin" user ', () => {
     it('Return an Asset (without STIGgrants projection)', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs`)
+        .get(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('object')        
-      expect(res.body.name).to.eql(enviornment.testAsset.name)
-      expect(res.body.collection.collectionId).to.eql(enviornment.testAssetNoStigs.collectionId)
+      expect(res.body.name).to.eql(environment.testAsset.name)
+      expect(res.body.collection.collectionId).to.eql(environment.testAssetNoStigs.collectionId)
       expect(res.body.stigGrants).to.not.exist
       if(res.request.url.includes('/projection=stigs/')){
         expect(res.body.stigs).to.exist;
         expect(res.body.stigs).to.be.an("array").of.length.at.least(1)
         for (let stig of res.body.stigs){
-            expect(stig.benchmarkId).to.be.oneOf(enviornment.testAsset.validStigs);
+            expect(stig.benchmarkId).to.be.oneOf(environment.testAsset.validStigs);
         }
       }
       if(res.request.url.includes('/projection=statusStats/')){
@@ -120,13 +120,13 @@ describe('Asset get tests using "admin" user ', () => {
     it('Return an Asset (with STIGgrants projection) - Asset - no assigned STIGs', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAssetNoStigs.assetId}?projection=statusStats&projection=stigs`)
+        .get(`/assets/${environment.testAssetNoStigs.assetId}?projection=statusStats&projection=stigs`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('object')        
-      expect(res.body.name).to.eql(enviornment.testAssetNoStigs.name)
-      expect(res.body.collection.collectionId).to.eql(enviornment.testAssetNoStigs.collectionId)
+      expect(res.body.name).to.eql(environment.testAssetNoStigs.name)
+      expect(res.body.collection.collectionId).to.eql(environment.testAssetNoStigs.collectionId)
 
       if(res.request.url.includes('/projection=stigs/')){
         expect(res.body.stigs).to.exist;
@@ -143,25 +143,25 @@ describe('Asset get tests using "admin" user ', () => {
     it('Return the Metadata for an Asset', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/metadata`)
+        .get(`/assets/${environment.testAsset.assetId}/metadata`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('object')      
       expect(res.body.testkey).to.exist
-      expect(res.body.testkey).to.eql(enviornment.testAsset.metadataValue)
+      expect(res.body.testkey).to.eql(environment.testAsset.metadataValue)
     })
   })
   describe('GET - getAssetMetadataKeys - /assets/{assetId}/metadata/keys', () => {
     it('Return the Metadata KEYS for an Asset', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/metadata/keys`)
+        .get(`/assets/${environment.testAsset.assetId}/metadata/keys`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
-      expect(res.body).to.include(enviornment.testAsset.metadataKey)
+      expect(res.body).to.include(environment.testAsset.metadataKey)
     })
   })
 
@@ -170,12 +170,12 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/metadata/keys/${enviornment.testAsset.metadataKey}`)
+        .get(`/assets/${environment.testAsset.assetId}/metadata/keys/${environment.testAsset.metadataKey}`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('string')
-      expect(res.body).to.include(enviornment.testAsset.metadataValue)
+      expect(res.body).to.include(environment.testAsset.metadataValue)
     })
   })
 
@@ -183,7 +183,7 @@ describe('Asset get tests using "admin" user ', () => {
 
     it('Assets accessible to the requester (with STIG grants projection)', async () => {
       const res = await chai
-        .request(config.baseUrl).get(`/assets?collectionId=${enviornment.testCollection.collectionId}&benchmarkId=${enviornment.testCollection.benchmark}&projection=statusStats&projection=stigs&projection=stigGrants`)
+        .request(config.baseUrl).get(`/assets?collectionId=${environment.testCollection.collectionId}&benchmarkId=${environment.testCollection.benchmark}&projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
@@ -191,7 +191,7 @@ describe('Asset get tests using "admin" user ', () => {
       expect(res.body).to.be.an('array').of.length(3)
       
       const jsonData = res.body;
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       
       for (let asset of jsonData){
@@ -199,7 +199,7 @@ describe('Asset get tests using "admin" user ', () => {
 
         if(res.request.url.includes('/projection=statusStats/')){
           expect(asset.statusStats).to.exist;
-          if(asset.assetId === enviornment.testAsset.assetId){
+          if(asset.assetId === environment.testAsset.assetId){
             if (res.request.url.includes('benchmarkId=')) {
               expect(asset.statusStats.ruleCount).to.eql(81);
             } else {
@@ -209,12 +209,12 @@ describe('Asset get tests using "admin" user ', () => {
         }
         if (res.request.url.includes('projection=stigs')) {
           for(let stig of asset.stigs){
-            expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs);
+            expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs);
           }
         }
         if (res.request.url.includes('projection=stigGrants')) {
           for(let grant of asset.stigGrants){
-            expect(grant.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs);
+            expect(grant.benchmarkId).to.be.oneOf(environment.testCollection.validStigs);
           }
         }
       }
@@ -222,7 +222,7 @@ describe('Asset get tests using "admin" user ', () => {
 
     it('Assets accessible to the requester (with STIG grants projection - no benchmark specified)', async () => {
       const res = await chai
-        .request(config.baseUrl).get(`/assets?collectionId=${enviornment.testCollection.collectionId}&projection=statusStats&projection=stigs&projection=stigGrants`)
+        .request(config.baseUrl).get(`/assets?collectionId=${environment.testCollection.collectionId}&projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
@@ -230,7 +230,7 @@ describe('Asset get tests using "admin" user ', () => {
       expect(res.body).to.be.an('array').of.length(4)
     
       const jsonData = res.body;
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       
       for (let asset of jsonData){
@@ -238,7 +238,7 @@ describe('Asset get tests using "admin" user ', () => {
 
         if(res.request.url.includes('/projection=statusStats/')){
           expect(asset.statusStats).to.exist;
-          if(asset.assetId === enviornment.testAsset.assetId){
+          if(asset.assetId === environment.testAsset.assetId){
             if (res.request.url.includes('benchmarkId=')) {
               expect(asset.statusStats.ruleCount).to.eql(81);
             } else {
@@ -248,12 +248,12 @@ describe('Asset get tests using "admin" user ', () => {
         }
         if (res.request.url.includes('projection=stigs')) {
           for(let stig of asset.stigs){
-            expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs);
+            expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs);
           }
         }
         if (res.request.url.includes('projection=stigGrants')) {
           for(let grant of asset.stigGrants){
-            expect(grant.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs);
+            expect(grant.benchmarkId).to.be.oneOf(environment.testCollection.validStigs);
           }
         }
       }
@@ -262,14 +262,14 @@ describe('Asset get tests using "admin" user ', () => {
 
     it('Assets accessible to the requester - labels', async () => {
       const res = await chai
-        .request(config.baseUrl).get(`/assets?collectionId=${enviornment.testCollection.collectionId}&labelId=${enviornment.testCollection.testLabel}`)
+        .request(config.baseUrl).get(`/assets?collectionId=${environment.testCollection.collectionId}&labelId=${environment.testCollection.testLabel}`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array').of.length(2)
 
       for(let asset of res.body){
-        expect(asset.labelIds).to.include(enviornment.testCollection.testLabel)
+        expect(asset.labelIds).to.include(environment.testCollection.testLabel)
       }
     })
 
@@ -281,7 +281,7 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/checklists?benchmarkId=${enviornment.testCollection.benchmark}`)
+        .get(`/assets/${environment.testAsset.assetId}/checklists?benchmarkId=${environment.testCollection.benchmark}`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
@@ -294,7 +294,7 @@ describe('Asset get tests using "admin" user ', () => {
       let cklHostName = cklData.CHECKLIST.ASSET[0].HOST_NAME[0]
       let cklIStigs = cklData.CHECKLIST.STIGS[0].iSTIG
    
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       expect(cklHostName).to.match(regex)
 
@@ -302,13 +302,13 @@ describe('Asset get tests using "admin" user ', () => {
         for(let stigData of stig.STIG_INFO[0].SI_DATA){
           if (stigData.SID_NAME[0] == 'stigid'){
             currentStigId = stigData.SID_DATA[0]
-            expect(currentStigId).to.be.eql(enviornment.testCollection.benchmark)
+            expect(currentStigId).to.be.eql(environment.testCollection.benchmark)
          }
         }
         let cklVulns = stig.VULN;
         expect(cklVulns).to.be.an('array');
         if (currentStigId == 'VPN_SRG_TEST') {
-            expect(cklVulns).to.be.an('array').of.length(enviornment.metrics.checklistLength);
+            expect(cklVulns).to.be.an('array').of.length(environment.metrics.checklistLength);
         }
       }
     })
@@ -317,7 +317,7 @@ describe('Asset get tests using "admin" user ', () => {
         
         const res = await chai
           .request(config.baseUrl)
-          .get(`/assets/${enviornment.testAsset.assetId}/checklists?format=cklb`)
+          .get(`/assets/${environment.testAsset.assetId}/checklists?format=cklb`)
           .set('Authorization', 'Bearer ' + user.token)
   
         expect(res).to.have.status(200)
@@ -325,17 +325,17 @@ describe('Asset get tests using "admin" user ', () => {
         let cklbHostName = cklbData.target_data.host_name
         let cklbIStigs = cklbData.stigs
 
-        const assetMatchString = enviornment.assetMatchString
+        const assetMatchString = environment.assetMatchString
         const regex = new RegExp(assetMatchString)
         expect(cklbHostName).to.match(regex)
 
         for (let stig of cklbIStigs){
           let stigId = stig.stig_id
-          expect(stigId).to.be.oneOf(enviornment.testCollection.validStigs)
+          expect(stigId).to.be.oneOf(environment.testCollection.validStigs)
           let cklbVulns = stig.rules;
           expect(cklbVulns).to.be.an('array');
           if (stigId == 'VPN_SRG_TEST') {
-              expect(cklbVulns).to.be.an('array').of.length(enviornment.metrics.checklistLength);
+              expect(cklbVulns).to.be.an('array').of.length(environment.metrics.checklistLength);
           }
         }
     })
@@ -344,7 +344,7 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/checklists?format=cklb&benchmarkId=${enviornment.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
+        .get(`/assets/${environment.testAsset.assetId}/checklists?format=cklb&benchmarkId=${environment.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
@@ -352,17 +352,17 @@ describe('Asset get tests using "admin" user ', () => {
       let cklbHostName = cklbData.target_data.host_name
       let cklbIStigs = cklbData.stigs
 
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       expect(cklbHostName).to.match(regex)
 
       for (let stig of cklbIStigs){
         let stigId = stig.stig_id
-        expect(stigId).to.be.oneOf(enviornment.testCollection.validStigs)
+        expect(stigId).to.be.oneOf(environment.testCollection.validStigs)
         let cklbVulns = stig.rules;
         expect(cklbVulns).to.be.an('array');
         if (stigId == 'VPN_SRG_TEST') {
-            expect(cklbVulns).to.be.an('array').of.length(enviornment.metrics.checklistLength);
+            expect(cklbVulns).to.be.an('array').of.length(environment.metrics.checklistLength);
         }
       }
 
@@ -372,7 +372,7 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/checklists/`)
+        .get(`/assets/${environment.testAsset.assetId}/checklists/`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
@@ -386,7 +386,7 @@ describe('Asset get tests using "admin" user ', () => {
       let cklHostName = cklData.CHECKLIST.ASSET[0].HOST_NAME[0]
       let cklIStigs = cklData.CHECKLIST.STIGS[0].iSTIG
 
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       expect(cklHostName).to.match(regex)
 
@@ -394,13 +394,13 @@ describe('Asset get tests using "admin" user ', () => {
         for(let stigData of stig.STIG_INFO[0].SI_DATA){
           if (stigData.SID_NAME[0] == 'stigid'){
             currentStigId = stigData.SID_DATA[0]
-            expect(currentStigId).to.be.oneOf(enviornment.testCollection.validStigs)
+            expect(currentStigId).to.be.oneOf(environment.testCollection.validStigs)
          }
         }
         let cklVulns = stig.VULN;
         expect(cklVulns).to.be.an('array');
         if (currentStigId == 'VPN_SRG_TEST') {
-            expect(cklVulns).to.be.an('array').of.length(enviornment.metrics.checklistLength);
+            expect(cklVulns).to.be.an('array').of.length(environment.metrics.checklistLength);
         }
       }
     })
@@ -409,7 +409,7 @@ describe('Asset get tests using "admin" user ', () => {
         
         const res = await chai
           .request(config.baseUrl)
-          .get(`/assets/${enviornment.testAsset.assetId}/checklists?benchmarkId=${enviornment.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
+          .get(`/assets/${environment.testAsset.assetId}/checklists?benchmarkId=${environment.testCollection.benchmark}&benchmarkId=Windows_10_STIG_TEST`)
           .set('Authorization', 'Bearer ' + user.token)
   
         expect(res).to.have.status(200)
@@ -423,7 +423,7 @@ describe('Asset get tests using "admin" user ', () => {
         let cklHostName = cklData.CHECKLIST.ASSET[0].HOST_NAME[0]
         let cklIStigs = cklData.CHECKLIST.STIGS[0].iSTIG
   
-        const assetMatchString = enviornment.assetMatchString
+        const assetMatchString = environment.assetMatchString
         const regex = new RegExp(assetMatchString)
         expect(cklHostName).to.match(regex)
   
@@ -431,13 +431,13 @@ describe('Asset get tests using "admin" user ', () => {
           for(let stigData of stig.STIG_INFO[0].SI_DATA){
             if (stigData.SID_NAME[0] == 'stigid'){
               currentStigId = stigData.SID_DATA[0]
-              expect(currentStigId).to.be.oneOf(enviornment.testCollection.validStigs)
+              expect(currentStigId).to.be.oneOf(environment.testCollection.validStigs)
           }
           }
           let cklVulns = stig.VULN;
           expect(cklVulns).to.be.an('array');
           if (currentStigId == 'VPN_SRG_TEST') {
-              expect(cklVulns).to.be.an('array').of.length(enviornment.metrics.checklistLength);
+              expect(cklVulns).to.be.an('array').of.length(environment.metrics.checklistLength);
           }
         }
     })
@@ -449,7 +449,7 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/checklists/${enviornment.testCollection.benchmark}/${enviornment.testCollection.revisionStr}?format=ckl`)
+        .get(`/assets/${environment.testAsset.assetId}/checklists/${environment.testCollection.benchmark}/${environment.testCollection.revisionStr}?format=ckl`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
@@ -463,7 +463,7 @@ describe('Asset get tests using "admin" user ', () => {
       let cklHostName = cklData.CHECKLIST.ASSET[0].HOST_NAME[0]
       let cklIStigs = cklData.CHECKLIST.STIGS[0].iSTIG
 
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       expect(cklHostName).to.match(regex)
 
@@ -471,13 +471,13 @@ describe('Asset get tests using "admin" user ', () => {
         for(let stigData of stig.STIG_INFO[0].SI_DATA){
           if (stigData.SID_NAME[0] == 'stigid'){
             currentStigId = stigData.SID_DATA[0]
-            expect(currentStigId).to.be.eql(enviornment.testCollection.benchmark)
+            expect(currentStigId).to.be.eql(environment.testCollection.benchmark)
          }
         }
         let cklVulns = stig.VULN;
         expect(cklVulns).to.be.an('array');
         if (currentStigId == 'VPN_SRG_TEST') {
-            expect(cklVulns).to.be.an('array').of.length(enviornment.metrics.checklistLength);
+            expect(cklVulns).to.be.an('array').of.length(environment.metrics.checklistLength);
         }
       }
     })
@@ -486,7 +486,7 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/checklists/${enviornment.testCollection.benchmark}/${enviornment.testCollection.revisionStr}?format=cklb`)
+        .get(`/assets/${environment.testAsset.assetId}/checklists/${environment.testCollection.benchmark}/${environment.testCollection.revisionStr}?format=cklb`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
@@ -495,17 +495,17 @@ describe('Asset get tests using "admin" user ', () => {
       let cklbHostName = cklbData.target_data.host_name
       let cklbIStigs = cklbData.stigs
 
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       expect(cklbHostName).to.match(regex)
 
       for (let stig of cklbIStigs){
         let stigId = stig.stig_id
-        expect(stigId).to.be.oneOf(enviornment.testCollection.validStigs)
+        expect(stigId).to.be.oneOf(environment.testCollection.validStigs)
         let cklbVulns = stig.rules;
         expect(cklbVulns).to.be.an('array');
         if (stigId == 'VPN_SRG_TEST') {
-            expect(cklbVulns).to.be.an('array').of.length(enviornment.metrics.checklistLength);
+            expect(cklbVulns).to.be.an('array').of.length(environment.metrics.checklistLength);
         }
       }
     })
@@ -514,11 +514,11 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/checklists/${enviornment.testCollection.benchmark}/${enviornment.testCollection.revisionStr}?format=json`)
+        .get(`/assets/${environment.testAsset.assetId}/checklists/${environment.testCollection.benchmark}/${environment.testCollection.revisionStr}?format=json`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.be.an('array').of.length(enviornment.metrics.checklistLength)
+      expect(res.body).to.be.an('array').of.length(environment.metrics.checklistLength)
     })
   })
 
@@ -528,14 +528,14 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/assets/${enviornment.testAsset.assetId}/stigs`)
+        .get(`/assets/${environment.testAsset.assetId}/stigs`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       
       for(let stig of res.body){
-        expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
+        expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
       }
     })
   })
@@ -546,12 +546,12 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/labels/${enviornment.testCollection.testLabel}/assets`)
+        .get(`/collections/${environment.testCollection.collectionId}/labels/${environment.testCollection.testLabel}/assets`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array').of.length(2)
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       for(let asset of res.body){
         expect(asset.name).to.match(regex)
@@ -566,13 +566,13 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
+        .get(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       expect(res.body).to.be.an('array').of.length(3)
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       for(let asset of res.body){
         expect(asset.name).to.match(regex)
@@ -586,13 +586,13 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${enviornment.lvl1.label}`)
+        .get(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${environment.lvl1.label}`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       expect(res.body).to.be.an('array').of.length(1)
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       for(let asset of res.body){
         expect(asset.name).to.match(regex)
@@ -605,13 +605,13 @@ describe('Asset get tests using "admin" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${enviornment.testCollection.testLabel}`)
+        .get(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${environment.testCollection.testLabel}`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       expect(res.body).to.be.an('array').of.length(2)
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       for(let asset of res.body){
         expect(asset.name).to.match(regex)
@@ -636,19 +636,19 @@ describe('Asset get tests using "lvl1" user ', () => {
 
     it('Assets accessible to the requester - labels', async () => {
       const res = await chai
-        .request(config.baseUrl).get(`/assets?collectionId=${enviornment.testCollection.collectionId}&labelId=${enviornment.testCollection.testLabel}`)
+        .request(config.baseUrl).get(`/assets?collectionId=${environment.testCollection.collectionId}&labelId=${environment.testCollection.testLabel}`)
         .set('Authorization', 'Bearer ' + lvl1.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array').of.length(1)
 
       for(let asset of res.body){
-        expect(asset.labelIds).to.include(enviornment.testCollection.testLabel)
+        expect(asset.labelIds).to.include(environment.testCollection.testLabel)
       }
     })
     it('Assets accessible to the requester - No StigGrants (for lvl1 user success)', async () => {
       const res = await chai
-        .request(config.baseUrl).get(`/assets?collectionId=${enviornment.testCollection.collectionId}&benchmarkId=${enviornment.testCollection.benchmark}&projection=statusStats&projection=stigs`)
+        .request(config.baseUrl).get(`/assets?collectionId=${environment.testCollection.collectionId}&benchmarkId=${environment.testCollection.benchmark}&projection=statusStats&projection=stigs`)
         .set('Authorization', 'Bearer ' + user.token)
 
       expect(res).to.have.status(200)
@@ -656,7 +656,7 @@ describe('Asset get tests using "lvl1" user ', () => {
       expect(res.body).to.be.an('array').of.length(3)
       
       const jsonData = res.body;
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       
       for (let asset of jsonData){
@@ -664,7 +664,7 @@ describe('Asset get tests using "lvl1" user ', () => {
 
         if(res.request.url.includes('/projection=statusStats/')){
           expect(asset.statusStats).to.exist;
-          if(asset.assetId === enviornment.testAsset.assetId){
+          if(asset.assetId === environment.testAsset.assetId){
             if (res.request.url.includes('benchmarkId=')) {
               expect(asset.statusStats.ruleCount).to.eql(81);
             } else {
@@ -674,7 +674,7 @@ describe('Asset get tests using "lvl1" user ', () => {
         }
         if (res.request.url.includes('projection=stigs')) {
           for(let stig of asset.stigs){
-            expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs);
+            expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs);
           }
         }
       }
@@ -689,12 +689,12 @@ describe('Asset get tests using "lvl1" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/labels/${enviornment.testCollection.testLabel}/assets`)
+        .get(`/collections/${environment.testCollection.collectionId}/labels/${environment.testCollection.testLabel}/assets`)
         .set('Authorization', 'Bearer ' + lvl1.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array').of.length(1)
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       for(let asset of res.body){
         expect(asset.name).to.match(regex)
@@ -710,13 +710,13 @@ describe('Asset get tests using "lvl1" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
+        .get(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
         .set('Authorization', 'Bearer ' + lvl1.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       expect(res.body).to.be.an('array').of.length(2)
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       for(let asset of res.body){
         expect(asset.name).to.match(regex)
@@ -730,13 +730,13 @@ describe('Asset get tests using "lvl1" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${enviornment.lvl1.label}`)
+        .get(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${environment.lvl1.label}`)
         .set('Authorization', 'Bearer ' + lvl1.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       expect(res.body).to.be.an('array').of.length(1)
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       for(let asset of res.body){
         expect(asset.name).to.match(regex)
@@ -749,13 +749,13 @@ describe('Asset get tests using "lvl1" user ', () => {
 
       const res = await chai
         .request(config.baseUrl)
-        .get(`/collections/${enviornment.testCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${enviornment.testCollection.testLabel}`)
+        .get(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess&labelId=${environment.testCollection.testLabel}`)
         .set('Authorization', 'Bearer ' + lvl1.token)
 
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('array')
       expect(res.body).to.be.an('array').of.length(1)
-      const assetMatchString = enviornment.assetMatchString
+      const assetMatchString = environment.assetMatchString
       const regex = new RegExp(assetMatchString)
       for(let asset of res.body){
         expect(asset.name).to.match(regex)

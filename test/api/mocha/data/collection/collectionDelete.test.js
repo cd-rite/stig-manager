@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const users = require('../../iterations.json')
 
 describe('DELETE - Collection ', () => {
@@ -23,7 +23,7 @@ describe('DELETE - Collection ', () => {
 
         it('Delete a Collection', async () => {
             const res = await chai.request(config.baseUrl)
-                .delete(`/collections/${enviornment.testCollection.collectionId}?elevate=true&projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
+                .delete(`/collections/${environment.testCollection.collectionId}?elevate=true&projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
                 .set('Authorization', `Bearer ${user.token}`)
 
             if(user.name !== "stigmanadmin" ){
@@ -32,36 +32,36 @@ describe('DELETE - Collection ', () => {
             }
             expect(res).to.have.status(200)
 
-            expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+            expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
 
             //assets
             for(const asset of res.body.assets){
-                expect(asset.assetId).to.be.oneOf(enviornment.testCollection.assetIDsInCollection)
+                expect(asset.assetId).to.be.oneOf(environment.testCollection.assetIDsInCollection)
             }
 
             //grants
             for(const grant of res.body.grants){
-                expect(grant.user.userId).to.be.oneOf(enviornment.testCollection.userIdsWithGrant)
+                expect(grant.user.userId).to.be.oneOf(environment.testCollection.userIdsWithGrant)
             }
 
             // owners
             for(const owner of res.body.owners){
-                expect(owner.userId).to.be.oneOf(enviornment.testCollection.owners)
+                expect(owner.userId).to.be.oneOf(environment.testCollection.owners)
             }
 
             //stigs
             for(const stig of res.body.stigs){
-                expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
+                expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
             }
 
             //confirm that it is deleted
-            const deletedCollection = await utils.getCollection(enviornment.testCollection.collectionId)
+            const deletedCollection = await utils.getCollection(environment.testCollection.collectionId)
             expect(deletedCollection).to.be.undefined
         })
 
         it('Delete a Collection no elevate', async () => {
           const res = await chai.request(config.baseUrl)
-              .delete(`/collections/${enviornment.testCollection.collectionId}?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
+              .delete(`/collections/${environment.testCollection.collectionId}?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
               .set('Authorization', `Bearer ${user.token}`)
 
           if(user.name === "lvl1" || user.name === "lvl2" || user.name === "lvl3" ){ 
@@ -70,30 +70,30 @@ describe('DELETE - Collection ', () => {
           }
           expect(res).to.have.status(200)
 
-          expect(res.body.collectionId).to.equal(enviornment.testCollection.collectionId)
+          expect(res.body.collectionId).to.equal(environment.testCollection.collectionId)
 
           //assets
           for(const asset of res.body.assets){
-              expect(asset.assetId).to.be.oneOf(enviornment.testCollection.assetIDsInCollection)
+              expect(asset.assetId).to.be.oneOf(environment.testCollection.assetIDsInCollection)
           }
 
           //grants
           for(const grant of res.body.grants){
-              expect(grant.user.userId).to.be.oneOf(enviornment.testCollection.userIdsWithGrant)
+              expect(grant.user.userId).to.be.oneOf(environment.testCollection.userIdsWithGrant)
           }
 
           // owners
           for(const owner of res.body.owners){
-              expect(owner.userId).to.be.oneOf(enviornment.testCollection.owners)
+              expect(owner.userId).to.be.oneOf(environment.testCollection.owners)
           }
 
           //stigs
           for(const stig of res.body.stigs){
-              expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
+              expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
           }
 
           //confirm that it is deleted
-          const deletedCollection = await utils.getCollection(enviornment.testCollection.collectionId)
+          const deletedCollection = await utils.getCollection(environment.testCollection.collectionId)
           expect(deletedCollection).to.be.undefined
         })
       })
@@ -102,15 +102,15 @@ describe('DELETE - Collection ', () => {
 
         it('Delete a Collection Label', async () => {
             const res = await chai.request(config.baseUrl)
-                .delete(`/collections/${enviornment.scrapCollection.collectionId}/labels/${enviornment.scrapCollection.scrapLabel}`)
+                .delete(`/collections/${environment.scrapCollection.collectionId}/labels/${environment.scrapCollection.scrapLabel}`)
                 .set('Authorization', `Bearer ${user.token}`)
             if(user.name === "lvl1" || user.name === "lvl2"){
                 expect(res).to.have.status(403)
                 return
             }
             expect(res).to.have.status(204)
-            const collection = await utils.getCollection(enviornment.scrapCollection.collectionId)
-            expect(collection.labels).to.not.include(enviornment.scrapCollection.scrapLabel)
+            const collection = await utils.getCollection(environment.scrapCollection.collectionId)
+            expect(collection.labels).to.not.include(environment.scrapCollection.scrapLabel)
         })
       })
 
@@ -118,15 +118,15 @@ describe('DELETE - Collection ', () => {
 
         it('Delete a Collection Metadata Key', async () => {
             const res = await chai.request(config.baseUrl)
-                .delete(`/collections/${enviornment.testCollection.collectionId}/metadata/keys/${enviornment.testCollection.metadataKey}`)
+                .delete(`/collections/${environment.testCollection.collectionId}/metadata/keys/${environment.testCollection.metadataKey}`)
                 .set('Authorization', `Bearer ${user.token}`)
             if(user.name === "lvl1" || user.name === "lvl2"){
               expect(res).to.have.status(403)
               return
             }
             expect(res).to.have.status(204)
-            const collection = await utils.getCollection(enviornment.testCollection.collectionId)
-            expect(collection.metadata).to.not.have.property(enviornment.testCollection.metadataKey)
+            const collection = await utils.getCollection(environment.testCollection.collectionId)
+            expect(collection.metadata).to.not.have.property(environment.testCollection.metadataKey)
         })
       })
 
@@ -134,7 +134,7 @@ describe('DELETE - Collection ', () => {
 
         it('History records - date', async () => {
             const res = await chai.request(config.baseUrl)
-                .delete(`/collections/${enviornment.testCollection.collectionId}/review-history?retentionDate=2020-10-01`)
+                .delete(`/collections/${environment.testCollection.collectionId}/review-history?retentionDate=2020-10-01`)
                 .set('Authorization', `Bearer ${user.token}`)
             if(user.name === "lvl1" || user.name === "lvl2"){
               expect(res).to.have.status(403)
@@ -146,7 +146,7 @@ describe('DELETE - Collection ', () => {
 
         it('History records - date and asset', async () => {
             const res = await chai.request(config.baseUrl)
-                .delete(`/collections/${enviornment.testCollection.collectionId}/review-history?retentionDate=2020-10-01&assetId=${enviornment.testAsset.assetId}`)
+                .delete(`/collections/${environment.testCollection.collectionId}/review-history?retentionDate=2020-10-01&assetId=${environment.testAsset.assetId}`)
                 .set('Authorization', `Bearer ${user.token}`)
             if(user.name === "lvl1" || user.name === "lvl2"){
               expect(res).to.have.status(403)

@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 
 const user =
   {
@@ -30,18 +30,18 @@ describe('Asset post tests using Admin User', () => {
         .set('Authorization', 'Bearer ' + user.token)
         .send({
           name: 'TestAsset' + Math.floor(Math.random() * 1000),
-          collectionId: enviornment.testCollection.collectionId,
+          collectionId: environment.testCollection.collectionId,
           description: 'test',
           ip: '1.1.1.1',
           noncomputing: true,
-          labelIds: [enviornment.testCollection.testLabel],
+          labelIds: [environment.testCollection.testLabel],
           metadata: {
             pocName: 'pocName',
             pocEmail: 'pocEmail@example.com',
             pocPhone: '12345',
             reqRar: 'true'
           },
-          stigs: enviornment.testCollection.validStigs
+          stigs: environment.testCollection.validStigs
         }
       )
       
@@ -50,9 +50,9 @@ describe('Asset post tests using Admin User', () => {
 
       const effectedAsset = await utils.getAsset(res.body.assetId)
 
-      expect(effectedAsset.collection.collectionId).to.equal(enviornment.testCollection.collectionId)
+      expect(effectedAsset.collection.collectionId).to.equal(environment.testCollection.collectionId)
       for(const stig of effectedAsset.stigs) { 
-        expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
+        expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
       }
       expect(effectedAsset.description).to.equal('test')
     })
@@ -64,18 +64,18 @@ describe('Asset post tests using Admin User', () => {
         .set('Authorization', 'Bearer ' + user.token)
         .send({
           name: 'TestAsset' + Math.floor(Math.random() * 1000),
-          collectionId: enviornment.testCollection.collectionId,
+          collectionId: environment.testCollection.collectionId,
           description: 'test',
           ip: '1.1.1.1',
           noncomputing: true,
-          labelIds: [enviornment.testCollection.testLabel],
+          labelIds: [environment.testCollection.testLabel],
           metadata: {
             pocName: 'pocName',
             pocEmail: 'pocEmail@example.com',
             pocPhone: '12345',
             reqRar: 'true'
           },
-          stigs: enviornment.testCollection.validStigs
+          stigs: environment.testCollection.validStigs
         })
       
         expect(res).to.have.status(201)
@@ -95,28 +95,28 @@ describe('Asset post tests using Admin User', () => {
         .set('Authorization', 'Bearer ' + user.token)
         .send({
           name: 'TestAsset' + Math.floor(Math.random() * 1000),
-          collectionId: enviornment.testCollection.collectionId,
+          collectionId: environment.testCollection.collectionId,
           description: 'test',
           ip: '1.1.1.1',
           noncomputing: true,
-          labelIds: [enviornment.testCollection.testLabel],
+          labelIds: [environment.testCollection.testLabel],
           metadata: {
             pocName: 'pocName',
             pocEmail: 'pocEmail@example.com',
             pocPhone: '12345',
             reqRar: 'true'
           },
-          stigs: enviornment.testCollection.validStigs
+          stigs: environment.testCollection.validStigs
         })
       
       expect(res).to.have.status(201)
       expect(res.body).to.have.property('stigGrants')
       for(const stig of res.body.stigGrants) {
-        expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
+        expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
       }
       const effectedAsset = await utils.getAsset(res.body.assetId)
       for(const stig of effectedAsset.stigGrants) {
-        expect(stig.benchmarkId).to.be.oneOf(enviornment.testCollection.validStigs)
+        expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
       }
     })
   })

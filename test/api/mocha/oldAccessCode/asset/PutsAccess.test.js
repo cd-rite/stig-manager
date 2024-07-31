@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const usersEnv = require('../../iterations.json')
 describe('Asset PUT tests', () => {
 
@@ -25,11 +25,11 @@ describe('Asset PUT tests', () => {
 
                 it('Set all properties of an Asset', async function () {
                     const res = await chai.request(config.baseUrl)
-                        .put(`/assets/${enviornment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+                        .put(`/assets/${environment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
                         .set('Authorization', 'Bearer ' + user.token)
                         .send({
                         "name": 'TestAsset' + Math.floor(Math.random() * 1000),
-                        "collectionId": enviornment.scrapCollection.collectionId,
+                        "collectionId": environment.scrapCollection.collectionId,
                         "description": "test desc",
                         "ip": "1.1.1.1",
                         "noncomputing": true,
@@ -57,11 +57,11 @@ describe('Asset PUT tests', () => {
 
                 it('Set all properties of an Asset - assign new STIG', async function () {
                     const res = await chai.request(config.baseUrl)
-                        .put(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+                        .put(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
                         .set('Authorization', 'Bearer ' + user.token)
                         .send({
                         "name": 'TestAsset' + Math.floor(Math.random() * 1000),
-                        "collectionId": enviornment.testCollection.collectionId,
+                        "collectionId": environment.testCollection.collectionId,
                         "description": "test desc",
                         "ip": "1.1.1.1",
                         "noncomputing": true,
@@ -87,11 +87,11 @@ describe('Asset PUT tests', () => {
 
                 it('Set all properties of an Asset - Change Collection - invalid for all users', async function () {
                 const res = await chai.request(config.baseUrl)
-                    .put(`/assets/${enviornment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+                    .put(`/assets/${environment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
                     .set('Authorization', 'Bearer ' + user.token)
                     .send({
                     "name": 'TestAsset' + Math.floor(Math.random() * 1000),
-                    "collectionId": enviornment.scrapLvl1User.userId,
+                    "collectionId": environment.scrapLvl1User.userId,
                     "description": "test desc",
                     "ip": "1.1.1.1",
                     "noncomputing": true,
@@ -117,10 +117,10 @@ describe('Asset PUT tests', () => {
 
                 it('Set all metadata of an Asset', async function () {
                     const res = await chai.request(config.baseUrl)
-                        .put(`/assets/${enviornment.scrapAsset.assetId}/metadata`)
+                        .put(`/assets/${environment.scrapAsset.assetId}/metadata`)
                         .set('Authorization', 'Bearer ' + user.token)
                         .send({
-                        [enviornment.scrapAsset.metadataKey]: enviornment.scrapAsset.metadataValue
+                        [environment.scrapAsset.metadataKey]: environment.scrapAsset.metadataValue
                         })
                     if (user.name == "lvl1" || user.name == "lvl2") {
                         expect(res).to.have.status(403)
@@ -140,10 +140,10 @@ describe('Asset PUT tests', () => {
             describe(`Testing as ${user.name}`, () => {
                 it('Set one metadata key/value of an Asset', async function () {
                     const res = await chai.request(config.baseUrl)
-                        .put(`/assets/${enviornment.scrapAsset.assetId}/metadata/keys/${enviornment.scrapAsset.metadataKey}`)
+                        .put(`/assets/${environment.scrapAsset.assetId}/metadata/keys/${environment.scrapAsset.metadataKey}`)
                         .set('Authorization', 'Bearer ' + user.token)
                         .set('Content-Type', 'application/json') 
-                        .send(`${JSON.stringify(enviornment.scrapAsset.metadataValue)}`)
+                        .send(`${JSON.stringify(environment.scrapAsset.metadataValue)}`)
 
                     if (user.name == "lvl1" || user.name == "lvl2") {
                         expect(res).to.have.status(403)
@@ -163,7 +163,7 @@ describe('Asset PUT tests', () => {
             describe(`Testing as ${user.name}`, () => {
                 it('PUT a STIG assignment to an Asset Copy 3', async function () {
                     const res = await chai.request(config.baseUrl)
-                        .put(`/assets/${enviornment.scrapAsset.assetId}/stigs/${enviornment.scrapAsset.scrapBenchmark}`)
+                        .put(`/assets/${environment.scrapAsset.assetId}/stigs/${environment.scrapAsset.scrapBenchmark}`)
                         .set('Authorization', 'Bearer ' + user.token)
                     
                     if (user.name == "lvl1" || user.name == "lvl2") {
@@ -185,9 +185,9 @@ describe('Asset PUT tests', () => {
             
                 it('Replace a Labels Asset Mappings in a Collection', async function () {
                     const res = await chai.request(config.baseUrl)
-                        .put(`/collections/${enviornment.testCollection.collectionId}/labels/${enviornment.testCollection.testLabel}/assets`)
+                        .put(`/collections/${environment.testCollection.collectionId}/labels/${environment.testCollection.testLabel}/assets`)
                         .set('Authorization', 'Bearer ' + user.token)
-                        .send([enviornment.testAsset.assetId])
+                        .send([environment.testAsset.assetId])
                     if (user.name == "lvl1" || user.name == "lvl2") {
                         expect(res).to.have.status(403)
                         return
@@ -197,7 +197,7 @@ describe('Asset PUT tests', () => {
             
                 it('Replace a Labels Asset Mappings in a Collection assign to an asset that does not exist', async function () {
                     const res = await chai.request(config.baseUrl)
-                    .put(`/collections/${enviornment.testCollection.collectionId}/labels/${enviornment.testCollection.testLabel}/assets`)
+                    .put(`/collections/${environment.testCollection.collectionId}/labels/${environment.testCollection.testLabel}/assets`)
                     .set('Authorization', 'Bearer ' + user.token)
                     .send(["9999"])
                     expect(res).to.have.status(403)
@@ -215,9 +215,9 @@ describe('Asset PUT tests', () => {
                 
                 it(' gh-756 issue. assign a benchmark used in test Collection in scrap Collection', async function () {
                     const res = await chai.request(config.baseUrl)
-                    .put(`/collections/${enviornment.scrapCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
+                    .put(`/collections/${environment.scrapCollection.collectionId}/stigs/${environment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
                     .set('Authorization', 'Bearer ' + user.token)
-                    .send([enviornment.scrapAsset.assetId])
+                    .send([environment.scrapAsset.assetId])
                     
                     if (user.name == "lvl1" || user.name == "lvl2") {
                         expect(res).to.have.status(403)

@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const usersEnv = require('../../iterations.json')
 
 describe('Access Control Testing Review puts', () => {
@@ -61,7 +61,7 @@ describe('Access Control Testing Review puts', () => {
                     }
                     
                     const res = await chai.request(config.baseUrl)
-                    .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs&projection=metadata`)
+                    .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs&projection=metadata`)
                     .set('Authorization', `Bearer ${user.token}`)
                     .send(putBody)
 
@@ -102,7 +102,7 @@ describe('Access Control Testing Review puts', () => {
                     }
                     
                     const res = await chai.request(config.baseUrl)
-                    .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAssetlvl1NoAccess.assetId}/${enviornment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs&projection=metadata`)
+                    .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAssetlvl1NoAccess.assetId}/${environment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs&projection=metadata`)
                     .set('Authorization', `Bearer ${user.token}`)
                     .send(putBody)
 
@@ -132,17 +132,17 @@ describe('Access Control Testing Review puts', () => {
         describe(`Testing as User ${user.name}`, () => {
             it('Set all metadata of a Review', async () => {
                 const res = await chai.request(config.baseUrl)
-                    .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}/metadata`)
+                    .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}/metadata`)
                     .set('Authorization', `Bearer ${user.token}`)
-                    .send({[enviornment.testCollection.metadataKey]: enviornment.testCollection.metadataValue})
+                    .send({[environment.testCollection.metadataKey]: environment.testCollection.metadataValue})
             
                 expect(res).to.have.status(200)
             })
             it('Set all metadata of a Review LVL1 no access', async () => {
                 const res = await chai.request(config.baseUrl)
-                    .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAssetlvl1NoAccess.assetId}/${enviornment.testCollection.ruleId}/metadata`)
+                    .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAssetlvl1NoAccess.assetId}/${environment.testCollection.ruleId}/metadata`)
                     .set('Authorization', `Bearer ${user.token}`)
-                    .send({[enviornment.testCollection.metadataKey]: enviornment.testCollection.metadataValue})
+                    .send({[environment.testCollection.metadataKey]: environment.testCollection.metadataValue})
             
                 if(user.name === "lvl1"){
                     expect(res).to.have.status(403)
@@ -169,19 +169,19 @@ describe('Access Control Testing Review puts', () => {
         describe(`Testing as User ${user.name}`, () => {
             it('Set one metadata key/value of a Review', async () => {
                 const res = await chai.request(config.baseUrl)
-                    .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}/metadata/keys/${enviornment.testCollection.metadataKey}`)
+                    .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}/metadata/keys/${environment.testCollection.metadataKey}`)
                     .set('Authorization', `Bearer ${user.token}`)
                     .set('Content-Type', 'application/json') 
-                    .send(`${JSON.stringify(enviornment.testCollection.metadataValue)}`)
+                    .send(`${JSON.stringify(environment.testCollection.metadataValue)}`)
             
                 expect(res).to.have.status(204)
             })
             it('Set one metadata key/value of a Review LVL1 no access', async () => {
                 const res = await chai.request(config.baseUrl)
-                    .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAssetlvl1NoAccess.assetId}/${enviornment.testCollection.ruleId}/metadata/keys/${enviornment.testCollection.metadataKey}`)
+                    .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAssetlvl1NoAccess.assetId}/${environment.testCollection.ruleId}/metadata/keys/${environment.testCollection.metadataKey}`)
                     .set('Authorization', `Bearer ${user.token}`)
                     .set('Content-Type', 'application/json') 
-                    .send(`${JSON.stringify(enviornment.testCollection.metadataValue)}`)
+                    .send(`${JSON.stringify(environment.testCollection.metadataValue)}`)
             
                 if(user.name === "lvl1"){
                     expect(res).to.have.status(403)

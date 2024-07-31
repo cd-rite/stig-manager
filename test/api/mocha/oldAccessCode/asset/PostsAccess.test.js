@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const usersEnv = require('../../iterations.json')
 describe('Access Control Testing Asset posts', () => {
   before(async function () {
@@ -28,18 +28,18 @@ describe('Access Control Testing Asset posts', () => {
             .set('Authorization', 'Bearer ' + user.token)
             .send({
               name: 'TestAsset' + Math.floor(Math.random() * 1000),
-              collectionId: enviornment.testCollection.collectionId,
+              collectionId: environment.testCollection.collectionId,
               description: 'test',
               ip: '1.1.1.1',
               noncomputing: true,
-              labelIds: [enviornment.testCollection.testLabel],
+              labelIds: [environment.testCollection.testLabel],
               metadata: {
                 pocName: 'pocName',
                 pocEmail: 'pocEmail@example.com',
                 pocPhone: '12345',
                 reqRar: 'true'
               },
-              stigs: enviornment.testCollection.validStigs
+              stigs: environment.testCollection.validStigs
             }
           )
           if(user.grant === "Restricted" || user.grant === "Full") {
@@ -56,18 +56,18 @@ describe('Access Control Testing Asset posts', () => {
             .set('Authorization', 'Bearer ' + user.token)
             .send({
               name: 'TestAsset' + Math.floor(Math.random() * 1000),
-              collectionId: enviornment.testCollection.collectionId,
+              collectionId: environment.testCollection.collectionId,
               description: 'test',
               ip: '1.1.1.1',
               noncomputing: true,
-              labelIds: [enviornment.testCollection.testLabel],
+              labelIds: [environment.testCollection.testLabel],
               metadata: {
                 pocName: 'pocName',
                 pocEmail: 'pocEmail@example.com',
                 pocPhone: '12345',
                 reqRar: 'true'
               },
-              stigs: enviornment.testCollection.validStigs
+              stigs: environment.testCollection.validStigs
             })
           
           if(user.grant === "Restricted" || user.grant === "Full") {
@@ -84,18 +84,18 @@ describe('Access Control Testing Asset posts', () => {
             .set('Authorization', 'Bearer ' + user.token)
             .send({
               name: 'TestAsset' + Math.floor(Math.random() * 1000),
-              collectionId: enviornment.testCollection.collectionId,
+              collectionId: environment.testCollection.collectionId,
               description: 'test',
               ip: '1.1.1.1',
               noncomputing: true,
-              labelIds: [enviornment.testCollection.testLabel],
+              labelIds: [environment.testCollection.testLabel],
               metadata: {
                 pocName: 'pocName',
                 pocEmail: 'pocEmail@example.com',
                 pocPhone: '12345',
                 reqRar: 'true'
               },
-              stigs: enviornment.testCollection.validStigs
+              stigs: environment.testCollection.validStigs
             })
           
           if(user.grant === "Restricted" || user.grant === "Full") {

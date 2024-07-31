@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 
 const user =
   {
@@ -28,10 +28,10 @@ describe('Asset patch tests as admin user', () => {
     it('Merge provided properties with an Asset - Change Collection - Fail for all users', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .patch(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .patch(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({ 
-          "collectionId": enviornment.scrapLvl1User.userId,
+          "collectionId": environment.scrapLvl1User.userId,
           "description": "test desc",
           "ip": "1.1.1.1",
           "noncomputing": true,
@@ -49,10 +49,10 @@ describe('Asset patch tests as admin user', () => {
     it('Merge provided properties with an Asset - Change Collection - valid for lvl3 and lvl4 only (IE works for admin for me)', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .patch(`/assets/${enviornment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .patch(`/assets/${environment.testAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({
-          "collectionId": enviornment.scrapCollection.collectionId,
+          "collectionId": environment.scrapCollection.collectionId,
           "description": "test desc",
           "ip": "1.1.1.1",
           "noncomputing": true,
@@ -64,14 +64,14 @@ describe('Asset patch tests as admin user', () => {
           ]
       })
         expect(res).to.have.status(200)
-        expect(res.body.collection.collectionId).to.equal(enviornment.scrapCollection.collectionId)
+        expect(res.body.collection.collectionId).to.equal(environment.scrapCollection.collectionId)
         expect(res.body.labelIds).to.have.lengthOf(2)
         for (const stigGrant of res.body.stigGrants) {
           expect(stigGrant.users).to.have.lengthOf(0);
       }
 
       const effectedAsset = await utils.getAsset(res.body.assetId)
-      expect(effectedAsset.collection.collectionId).to.equal(enviornment.scrapCollection.collectionId)
+      expect(effectedAsset.collection.collectionId).to.equal(environment.scrapCollection.collectionId)
       expect(effectedAsset.description).to.equal('test desc')
       expect(effectedAsset.labelIds).to.have.lengthOf(2)
       for (const stig of effectedAsset.stigs) {
@@ -88,10 +88,10 @@ describe('Asset patch tests as admin user', () => {
     
       const res = await chai
         .request(config.baseUrl)
-        .patch(`/assets/${enviornment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
+        .patch(`/assets/${environment.scrapAsset.assetId}?projection=statusStats&projection=stigs&projection=stigGrants`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({
-          "collectionId": enviornment.scrapCollection.collectionId,
+          "collectionId": environment.scrapCollection.collectionId,
           "description": "scrap",
           "ip": "1.1.1.1",
           "noncomputing": true,
@@ -109,7 +109,7 @@ describe('Asset patch tests as admin user', () => {
       })
       expect(res).to.have.status(200)
       expect(res.body).to.be.an('object')
-      expect(res.body.collection.collectionId).to.equal(enviornment.scrapCollection.collectionId)
+      expect(res.body.collection.collectionId).to.equal(environment.scrapCollection.collectionId)
       expect(res.body.metadata).to.deep.equal({
         "pocName": "poc2Put",
         "pocEmail": "pocEmailPut@email.com",
@@ -118,7 +118,7 @@ describe('Asset patch tests as admin user', () => {
       })
 
       const effectedAsset = await utils.getAsset(res.body.assetId)
-      expect(effectedAsset.collection.collectionId).to.equal(enviornment.scrapCollection.collectionId)
+      expect(effectedAsset.collection.collectionId).to.equal(environment.scrapCollection.collectionId)
       expect(effectedAsset.description).to.equal('scrap')
       expect(effectedAsset.metadata).to.deep.equal({
         "pocName": "poc2Put",
@@ -134,7 +134,7 @@ describe('Asset patch tests as admin user', () => {
     it('Delete Assets - expect success for valid users', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .patch(`/assets?collectionId=${enviornment.testCollection.collectionId}`)
+        .patch(`/assets?collectionId=${environment.testCollection.collectionId}`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({
           "operation": "delete",
@@ -157,7 +157,7 @@ describe('Asset patch tests as admin user', () => {
     it('Delete Assets - assets not in collection', async () => {
         const res = await chai
           .request(config.baseUrl)
-          .patch(`/assets?collectionId=${enviornment.testCollection.collectionId}`)
+          .patch(`/assets?collectionId=${environment.testCollection.collectionId}`)
           .set('Authorization', 'Bearer ' + user.token)
           .send({
             "operation": "delete",
@@ -183,7 +183,7 @@ describe('Asset patch tests as admin user', () => {
     it('Merge provided properties with an Asset - Change metadata', async () => {
       const res = await chai
         .request(config.baseUrl)
-        .patch(`/assets/${enviornment.scrapAsset.assetId}/metadata`)
+        .patch(`/assets/${environment.scrapAsset.assetId}/metadata`)
         .set('Authorization', 'Bearer ' + user.token)
         .send({
           "testkey":"poc2Patched"
@@ -193,7 +193,7 @@ describe('Asset patch tests as admin user', () => {
         expect(res.body).to.deep.equal({
           "testkey": "poc2Patched",
          })
-        const effectedAsset = await utils.getAsset(enviornment.scrapAsset.assetId)
+        const effectedAsset = await utils.getAsset(environment.scrapAsset.assetId)
         expect(effectedAsset.metadata).to.deep.equal({
           "testkey": "poc2Patched"
         })

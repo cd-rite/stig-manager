@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const user =
   {
     "name": "stigmanadmin",
@@ -15,12 +15,12 @@ const user =
 
 describe('Collection put tests using "admin" user ', () => {
 
-    before(async function () {
-        this.timeout(4000)
-        await utils.loadAppData()
-        await utils.uploadTestStigs()
-        await utils.createDisabledCollectionsandAssets()
-    })
+  before(async function () {
+      this.timeout(4000)
+      await utils.loadAppData()
+      await utils.uploadTestStigs()
+      await utils.createDisabledCollectionsandAssets()
+  })
     
   describe('PUT - replaceCollection - /collections/{collectionId}', () => {
 
@@ -77,7 +77,7 @@ describe('Collection put tests using "admin" user ', () => {
         }
 
         const res = await chai.request(config.baseUrl)
-            .put(`/collections/${enviornment.testCollection.collectionId}`)
+            .put(`/collections/${environment.testCollection.collectionId}`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(putRequest)
 
@@ -121,7 +121,7 @@ describe('Collection put tests using "admin" user ', () => {
 
             description: "hellodescription",
             metadata: {
-            [enviornment.testCollection.metadataKey]: enviornment.testCollection.metadataValue,
+            [environment.testCollection.metadataKey]: environment.testCollection.metadataValue,
             },
             grants: [
             {
@@ -148,7 +148,7 @@ describe('Collection put tests using "admin" user ', () => {
         }
    
         const res = await chai.request(config.baseUrl)
-            .put(`/collections/${enviornment.testCollection.collectionId}?elevate=true&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=assets`)
+            .put(`/collections/${environment.testCollection.collectionId}?elevate=true&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=assets`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(putRequest    )
         expect(res).to.have.status(200)
@@ -161,7 +161,7 @@ describe('Collection put tests using "admin" user ', () => {
         expect(res.body.settings.status.canAccept).to.equal(putRequest.settings.status.canAccept)
         expect(res.body.settings.status.minAcceptGrant).to.equal(putRequest.settings.status.minAcceptGrant)
         expect(res.body.settings.status.resetCriteria).to.equal(putRequest.settings.status.resetCriteria)
-        expect(res.body.metadata.testkey).to.equal(enviornment.testCollection.metadataValue)
+        expect(res.body.metadata.testkey).to.equal(environment.testCollection.metadataValue)
 
         // grants projection
         expect(res.body.grants).to.have.lengthOf(5)
@@ -191,17 +191,17 @@ describe('Collection put tests using "admin" user ', () => {
     it('set stig-asset grants for a lvl1 user in this collection.', async () => {
 
         const res = await chai.request(config.baseUrl)
-            .put(`/collections/${enviornment.scrapCollection.collectionId}/grants/${enviornment.scrapLvl1User.userId}/access`)
+            .put(`/collections/${environment.scrapCollection.collectionId}/grants/${environment.scrapLvl1User.userId}/access`)
             .set('Authorization', `Bearer ${user.token}`)
             .send([{
-                  "benchmarkId": enviornment.scrapAsset.scrapBenchmark,
-                  "assetId": enviornment.scrapAsset.assetId,
+                  "benchmarkId": environment.scrapAsset.scrapBenchmark,
+                  "assetId": environment.scrapAsset.assetId,
               }])
         expect(res).to.have.status(200)
         expect(res.body).to.have.lengthOf(1)
         for(const item of res.body){
-            expect(item.benchmarkId).to.equal(enviornment.scrapAsset.scrapBenchmark)
-            expect(item.asset.assetId).to.equal(enviornment.scrapAsset.assetId)
+            expect(item.benchmarkId).to.equal(environment.scrapAsset.scrapBenchmark)
+            expect(item.asset.assetId).to.equal(environment.scrapAsset.assetId)
             
         }
     })
@@ -213,15 +213,15 @@ describe('Collection put tests using "admin" user ', () => {
     it('Set all metadata of a Collection', async () => {
 
         const putRequest = {
-            [enviornment.testCollection.metadataKey]: enviornment.testCollection.metadataValue
+            [environment.testCollection.metadataKey]: environment.testCollection.metadataValue
         }
 
         const res = await chai.request(config.baseUrl)
-            .put(`/collections/${enviornment.testCollection.collectionId}/metadata`)
+            .put(`/collections/${environment.testCollection.collectionId}/metadata`)
             .set('Authorization', `Bearer ${user.token}`)
             .send(putRequest)
         expect(res).to.have.status(200)
-        expect(res.body[enviornment.testCollection.metadataKey]).to.equal(enviornment.testCollection.metadataValue)
+        expect(res.body[environment.testCollection.metadataKey]).to.equal(environment.testCollection.metadataValue)
     })
   })
 
@@ -229,10 +229,10 @@ describe('Collection put tests using "admin" user ', () => {
 
     it('Set one metadata key/value of a Collection', async () => {
           const res = await chai.request(config.baseUrl)
-              .put(`/collections/${enviornment.testCollection.collectionId}/metadata/keys/${enviornment.testCollection.metadataKey}`)
+              .put(`/collections/${environment.testCollection.collectionId}/metadata/keys/${environment.testCollection.metadataKey}`)
               .set('Authorization', `Bearer ${user.token}`)
               .set('Content-Type', 'application/json') 
-              .send(`${JSON.stringify(enviornment.testCollection.metadataValue)}`)
+              .send(`${JSON.stringify(environment.testCollection.metadataValue)}`)
           expect(res).to.have.status(204)
     })
   })

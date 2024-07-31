@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 const usersEnv = require('../../iterations.json')
 
 describe('Access Control Testing Review patch ', () => {
@@ -33,7 +33,7 @@ describe('Access Control Testing Review patch ', () => {
           const res = await chai
             .request(config.baseUrl)
             .patch(
-              `/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAssetlvl1NoAccess.assetId}/${enviornment.testCollection.ruleId}`
+              `/collections/${environment.testCollection.collectionId}/reviews/${environment.testAssetlvl1NoAccess.assetId}/${environment.testCollection.ruleId}`
             )
             .set("Authorization", `Bearer ${user.token}`)
             .send({
@@ -67,7 +67,7 @@ describe('Access Control Testing Review patch ', () => {
           const res = await chai
             .request(config.baseUrl)
             .patch(
-              `/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}`
+              `/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}`
             )
             .set("Authorization", `Bearer ${user.token}`)
             .send({
@@ -96,7 +96,7 @@ describe('Access Control Testing Review patch ', () => {
         })
         it('PATCH Review to Accepted should only work for admin and lvl3(manage)', async () => {
           const res = await chai.request(config.baseUrl)
-            .patch(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}`)
+            .patch(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}`)
             .set('Authorization', `Bearer ${user.token}`)
             .send({status: "accepted"})
           
@@ -126,17 +126,17 @@ describe('Access Control Testing Review patch ', () => {
       describe(`Testing as User ${user.name}`, () => {
         it('Merge metadata property/value into a Review', async () => {
           const res = await chai.request(config.baseUrl)
-            .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAsset.assetId}/${enviornment.testCollection.ruleId}/metadata`)
+            .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}/metadata`)
             .set('Authorization', `Bearer ${user.token}`)
-            .send({[enviornment.testCollection.metadataKey]: enviornment.testCollection.metadataValue})
+            .send({[environment.testCollection.metadataKey]: environment.testCollection.metadataValue})
     
           expect(res).to.have.status(200)
         })
         it('Merge metadata property/value into a Review asset not availble to lvl1', async () => {
           const res = await chai.request(config.baseUrl)
-            .put(`/collections/${enviornment.testCollection.collectionId}/reviews/${enviornment.testAssetlvl1NoAccess.assetId}/${enviornment.testCollection.ruleId}/metadata`)
+            .put(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAssetlvl1NoAccess.assetId}/${environment.testCollection.ruleId}/metadata`)
             .set('Authorization', `Bearer ${user.token}`)
-            .send({[enviornment.testCollection.metadataKey]: enviornment.testCollection.metadataValue})
+            .send({[environment.testCollection.metadataKey]: environment.testCollection.metadataValue})
     
           if(user.name === "lvl1"){ 
             expect(res).to.have.status(403)

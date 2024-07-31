@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const enviornment = require('../../enviornment.json')
+const environment = require('../../environment.json')
 
 const user =
   {
@@ -203,7 +203,7 @@ describe('Metrics get tests using "admin" user ', () => {
   }
     }
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/detail?collectionId=${enviornment.testCollection.collectionId}`)
+            .get(`/collections/meta/metrics/detail?collectionId=${environment.testCollection.collectionId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -290,7 +290,7 @@ describe('Metrics get tests using "admin" user ', () => {
           },
         }
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/meta/metrics/detail?benchmarkId=${enviornment.testCollection.benchmark}`)
+              .get(`/collections/meta/metrics/detail?benchmarkId=${environment.testCollection.benchmark}`)
               .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
           expect(res.body).to.deep.equal(expectedMetrics)
@@ -552,7 +552,7 @@ describe('Metrics get tests using "admin" user ', () => {
             }
         ]
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/detail/collection?collectionId=${enviornment.testCollection.collectionId}`)
+            .get(`/collections/meta/metrics/detail/collection?collectionId=${environment.testCollection.collectionId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -721,7 +721,7 @@ describe('Metrics get tests using "admin" user ', () => {
             }
         ]
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/detail/collection?benchmarkId=${enviornment.testCollection.benchmark}`)
+            .get(`/collections/meta/metrics/detail/collection?benchmarkId=${environment.testCollection.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -1238,7 +1238,7 @@ describe('Metrics get tests using "admin" user ', () => {
             }
         ]
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/detail/stig?collectionId=${enviornment.testCollection.collectionId}`)
+            .get(`/collections/meta/metrics/detail/stig?collectionId=${environment.testCollection.collectionId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -1409,7 +1409,7 @@ describe('Metrics get tests using "admin" user ', () => {
             }
         ]
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/detail/stig?benchmarkId=${enviornment.testCollection.benchmark}`)
+            .get(`/collections/meta/metrics/detail/stig?benchmarkId=${environment.testCollection.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -1487,7 +1487,7 @@ describe('Metrics get tests using "admin" user ', () => {
             }
         }
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/summary?collectionId=${enviornment.testCollection.collectionId}`)
+            .get(`/collections/meta/metrics/summary?collectionId=${environment.testCollection.collectionId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -1524,7 +1524,7 @@ describe('Metrics get tests using "admin" user ', () => {
     }
 }
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/summary?benchmarkId=${enviornment.testCollection.benchmark}`)
+            .get(`/collections/meta/metrics/summary?benchmarkId=${environment.testCollection.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -1639,7 +1639,7 @@ describe('Metrics get tests using "admin" user ', () => {
             }
         ]
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/summary/collection?collectionId=${enviornment.testCollection.collectionId}`)
+            .get(`/collections/meta/metrics/summary/collection?collectionId=${environment.testCollection.collectionId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -1710,7 +1710,7 @@ describe('Metrics get tests using "admin" user ', () => {
             }
         ]
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/summary/collection?benchmarkId=${enviornment.testCollection.benchmark}`)
+            .get(`/collections/meta/metrics/summary/collection?benchmarkId=${environment.testCollection.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -1972,7 +1972,7 @@ describe('Metrics get tests using "admin" user ', () => {
         }
     ]
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/summary/stig?collectionId=${enviornment.testCollection.collectionId}`)
+            .get(`/collections/meta/metrics/summary/stig?collectionId=${environment.testCollection.collectionId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -2045,7 +2045,7 @@ describe('Metrics get tests using "admin" user ', () => {
             }
         ]
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/summary/stig?benchmarkId=${enviornment.testCollection.benchmark}`)
+            .get(`/collections/meta/metrics/summary/stig?benchmarkId=${environment.testCollection.benchmark}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -2086,7 +2086,7 @@ describe('Metrics get tests using "admin" user ', () => {
             }
         ]
         const res = await chai.request(config.baseUrl)
-            .get(`/collections/meta/metrics/summary/stig?benchmarkId=${enviornment.testCollection.benchmark}&collectionId=${enviornment.testCollection.collectionId}`)
+            .get(`/collections/meta/metrics/summary/stig?benchmarkId=${environment.testCollection.benchmark}&collectionId=${environment.testCollection.collectionId}`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.deep.equal(expectedMetrics)
@@ -2271,7 +2271,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
             }
         }
           const res = await chai.request(config.baseUrl)
-              .get(`/collections/meta/metrics/detail?collectionId=${enviornment.testCollection.collectionId}`)
+              .get(`/collections/meta/metrics/detail?collectionId=${environment.testCollection.collectionId}`)
               .set('Authorization', `Bearer ${lvl2.token}`)
           expect(res).to.have.status(200)
           expect(res.body).to.deep.equal(expectedMetrics)
@@ -2358,7 +2358,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
             }
         }
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/detail?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -2539,7 +2539,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail/collection?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/detail/collection?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -2628,7 +2628,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail/collection?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/detail/collection?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3063,7 +3063,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail/stig?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/detail/stig?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3153,7 +3153,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail/stig?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/detail/stig?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3230,7 +3230,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             }
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/summary?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3267,7 +3267,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             }
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/summary?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3350,7 +3350,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/collection?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/summary/collection?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3390,7 +3390,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/collection?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/summary/collection?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3587,7 +3587,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/stig?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/summary/stig?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3628,7 +3628,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/stig?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/summary/stig?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3669,7 +3669,7 @@ describe('Metrics get tests using "lvl2" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/stig?benchmarkId=${enviornment.testCollection.benchmark}&collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/summary/stig?benchmarkId=${environment.testCollection.benchmark}&collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl2.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3854,7 +3854,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
             }
         }
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/detail?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -3941,7 +3941,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             }
               const res = await chai.request(config.baseUrl)
-                  .get(`/collections/meta/metrics/detail?benchmarkId=${enviornment.testCollection.benchmark}`)
+                  .get(`/collections/meta/metrics/detail?benchmarkId=${environment.testCollection.benchmark}`)
                   .set('Authorization', `Bearer ${lvl1.token}`)
               expect(res).to.have.status(200)
               expect(res.body).to.deep.equal(expectedMetrics)
@@ -4122,7 +4122,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail/collection?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/detail/collection?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -4211,7 +4211,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail/collection?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/detail/collection?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -4483,7 +4483,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail/stig?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/detail/stig?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -4573,7 +4573,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
     }
 ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/detail/stig?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/detail/stig?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -4650,7 +4650,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             }
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/summary?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -4687,7 +4687,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             }
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/summary?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -4770,7 +4770,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/collection?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/summary/collection?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -4810,7 +4810,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/collection?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/summary/collection?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -4943,7 +4943,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/stig?collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/summary/stig?collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -4984,7 +4984,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/stig?benchmarkId=${enviornment.testCollection.benchmark}`)
+                .get(`/collections/meta/metrics/summary/stig?benchmarkId=${environment.testCollection.benchmark}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
@@ -5025,7 +5025,7 @@ describe('Metrics get tests using "lvl1" user ', () => {
                 }
             ]
             const res = await chai.request(config.baseUrl)
-                .get(`/collections/meta/metrics/summary/stig?benchmarkId=${enviornment.testCollection.benchmark}&collectionId=${enviornment.testCollection.collectionId}`)
+                .get(`/collections/meta/metrics/summary/stig?benchmarkId=${environment.testCollection.benchmark}&collectionId=${environment.testCollection.collectionId}`)
                 .set('Authorization', `Bearer ${lvl1.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.deep.equal(expectedMetrics)
