@@ -1,0 +1,1324 @@
+Running command: npx mocha ./mocha/**/collectionGet.test.js
+
+
+  GET - Collections
+    stigmanadmin
+      GET - getCollections - /collections
+        ✔ Return a list of Collections accessible to the requester No Filters
+        ✔ Return a list of Collections accessible to the requester No Filters no elevate!
+        ✔ Return a list of Collections accessible to the requester METADATA
+        ✔ Return a list of Collections accessible to the requester NAME exact
+        ✔ Return a list of Collections accessible to the requester NAME starts With
+        ✔ Return a list of Collections accessible to the requester NAME ends With
+        ✔ Return a list of Collections accessible to the requester NAME contains
+      GET - getCollection - /collections/{collectionId}
+        ✔ Return a Collection
+      GET - getChecklistByCollectionStig - /collections/{collectionId}/checklists/{benchmarkId}/{revisionStr}
+        ✔ Return the Checklist for the supplied Collection and STIG-latest
+        ✔ Return the Checklist for the supplied Collection and STIG-revStr
+      GET - getFindingsByCollection - /collections/{collectionId}/findings
+        ✔ Return the Findings for the specified Collection by ruleId
+        ✔ Return the Findings for the specified Collection by groupId
+        ✔ Return the Findings for the specified Collection by cci
+        ✔ Return the Findings for the specified Collection for benchmarkId x ruleId
+        ✔ Return the Findings for the specified Collection for asset x ruleId Copy
+      GET - getStigAssetsByCollectionUser - /collections/{collectionId}/grants/{userId}/access
+        ✔ Return stig-asset grants for a lvl1 user in this collection.
+      GET - getCollectionLabels - /collections/{collectionId}/labels
+        ✔ Labels for the specified Collection
+      GET - getCollectionLabelById - /collections/{collectionId}/labels/{labelId}
+        ✔ Collection label
+      GET - getCollectionMetadata - /collections/{collectionId}/metadata
+        ✔ Metadata for the specified Collection
+      GET - getCollectionMetadataKeys - /collections/{collectionId}/metadata/keys
+        ✔ Return the Metadata KEYS for a Collection
+      GET - getCollectionMetadataValue - /collections/{collectionId}/metadata/keys/{key}
+        ✔ Return the Metadata VALUE for a Collection metadata KEY
+      GET - getPoamByCollection - /collections/{collectionId}/poam
+        ✔ Return a POAM-like spreadsheet aggregated by groupId
+        ✔ Return a POAM-like spreadsheet aggregated by ruleId
+      GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+        ✔ History records - no query params
+        ✔ History records - asset only
+        ✔ History records - endDate only
+        ✔ History records - startDate only
+        ✔ History records - rule only
+        ✔ History records - start and end dates
+        ✔ History records - status only
+        ✔ History records - all params
+      GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+        ✔ History stats - no query params
+        ✔ History stats - startDate only
+        ✔ History stats - startDate - Asset Projection
+        ✔ History stats - endDate only
+        ✔ History stats - start and end dates
+        ✔ History stats - asset only
+        ✔ History stats - rule only
+        ✔ History stats - status only
+        ✔ History stats - all params
+      GET - getStigsByCollection - /collections/{collectionId}/stigs
+        ✔ Return the STIGs mapped in the specified Collection
+        ✔ Return the STIGs mapped in the specified Collection - label
+        ✔ Return the STIGs mapped in the specified Collection - asset projection
+      GET - getStigByCollection - /collections/{collectionId}/stigs/{benchmarkId}
+        ✔ Return Pinned Revision for this STIG
+        ✔ Return the info about the specified STIG from the specified Collection - asset projection
+    lvl1
+      GET - getCollections - /collections
+        1) Return a list of Collections accessible to the requester No Filters
+        2) Return a list of Collections accessible to the requester No Filters no elevate!
+        3) Return a list of Collections accessible to the requester METADATA
+        4) Return a list of Collections accessible to the requester NAME exact
+        5) Return a list of Collections accessible to the requester NAME starts With
+        6) Return a list of Collections accessible to the requester NAME ends With
+        7) Return a list of Collections accessible to the requester NAME contains
+      GET - getCollection - /collections/{collectionId}
+        8) Return a Collection
+      GET - getChecklistByCollectionStig - /collections/{collectionId}/checklists/{benchmarkId}/{revisionStr}
+        ✔ Return the Checklist for the supplied Collection and STIG-latest
+        ✔ Return the Checklist for the supplied Collection and STIG-revStr
+      GET - getFindingsByCollection - /collections/{collectionId}/findings
+        9) Return the Findings for the specified Collection by ruleId
+        10) Return the Findings for the specified Collection by groupId
+        11) Return the Findings for the specified Collection by cci
+        ✔ Return the Findings for the specified Collection for benchmarkId x ruleId
+        12) Return the Findings for the specified Collection for asset x ruleId Copy
+      GET - getStigAssetsByCollectionUser - /collections/{collectionId}/grants/{userId}/access
+        13) Return stig-asset grants for a lvl1 user in this collection.
+      GET - getCollectionLabels - /collections/{collectionId}/labels
+        14) Labels for the specified Collection
+      GET - getCollectionLabelById - /collections/{collectionId}/labels/{labelId}
+        15) Collection label
+      GET - getCollectionMetadata - /collections/{collectionId}/metadata
+        16) Metadata for the specified Collection
+      GET - getCollectionMetadataKeys - /collections/{collectionId}/metadata/keys
+        17) Return the Metadata KEYS for a Collection
+      GET - getCollectionMetadataValue - /collections/{collectionId}/metadata/keys/{key}
+        18) Return the Metadata VALUE for a Collection metadata KEY
+      GET - getPoamByCollection - /collections/{collectionId}/poam
+        ✔ Return a POAM-like spreadsheet aggregated by groupId
+        ✔ Return a POAM-like spreadsheet aggregated by ruleId
+      GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+        19) History records - no query params
+        20) History records - asset only
+        21) History records - endDate only
+        22) History records - startDate only
+        23) History records - rule only
+        24) History records - start and end dates
+        25) History records - status only
+        26) History records - all params
+      GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+        27) History stats - no query params
+        28) History stats - startDate only
+        29) History stats - startDate - Asset Projection
+        30) History stats - endDate only
+        31) History stats - start and end dates
+        32) History stats - asset only
+        33) History stats - rule only
+        34) History stats - status only
+        35) History stats - all params
+      GET - getStigsByCollection - /collections/{collectionId}/stigs
+        36) Return the STIGs mapped in the specified Collection
+        37) Return the STIGs mapped in the specified Collection - label
+        38) Return the STIGs mapped in the specified Collection - asset projection
+      GET - getStigByCollection - /collections/{collectionId}/stigs/{benchmarkId}
+        ✔ Return Pinned Revision for this STIG
+        ✔ Return the info about the specified STIG from the specified Collection - asset projection
+    lvl2
+      GET - getCollections - /collections
+        39) Return a list of Collections accessible to the requester No Filters
+        40) Return a list of Collections accessible to the requester No Filters no elevate!
+        41) Return a list of Collections accessible to the requester METADATA
+        42) Return a list of Collections accessible to the requester NAME exact
+        43) Return a list of Collections accessible to the requester NAME starts With
+        44) Return a list of Collections accessible to the requester NAME ends With
+        45) Return a list of Collections accessible to the requester NAME contains
+      GET - getCollection - /collections/{collectionId}
+        46) Return a Collection
+      GET - getChecklistByCollectionStig - /collections/{collectionId}/checklists/{benchmarkId}/{revisionStr}
+        ✔ Return the Checklist for the supplied Collection and STIG-latest
+        ✔ Return the Checklist for the supplied Collection and STIG-revStr
+      GET - getFindingsByCollection - /collections/{collectionId}/findings
+        ✔ Return the Findings for the specified Collection by ruleId
+        ✔ Return the Findings for the specified Collection by groupId
+        ✔ Return the Findings for the specified Collection by cci
+        ✔ Return the Findings for the specified Collection for benchmarkId x ruleId
+        ✔ Return the Findings for the specified Collection for asset x ruleId Copy
+      GET - getStigAssetsByCollectionUser - /collections/{collectionId}/grants/{userId}/access
+        47) Return stig-asset grants for a lvl1 user in this collection.
+      GET - getCollectionLabels - /collections/{collectionId}/labels
+        ✔ Labels for the specified Collection
+      GET - getCollectionLabelById - /collections/{collectionId}/labels/{labelId}
+        ✔ Collection label
+      GET - getCollectionMetadata - /collections/{collectionId}/metadata
+        48) Metadata for the specified Collection
+      GET - getCollectionMetadataKeys - /collections/{collectionId}/metadata/keys
+        49) Return the Metadata KEYS for a Collection
+      GET - getCollectionMetadataValue - /collections/{collectionId}/metadata/keys/{key}
+        50) Return the Metadata VALUE for a Collection metadata KEY
+      GET - getPoamByCollection - /collections/{collectionId}/poam
+        ✔ Return a POAM-like spreadsheet aggregated by groupId
+        ✔ Return a POAM-like spreadsheet aggregated by ruleId
+      GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+        ✔ History records - no query params
+        ✔ History records - asset only
+        ✔ History records - endDate only
+        ✔ History records - startDate only
+        ✔ History records - rule only
+        ✔ History records - start and end dates
+        ✔ History records - status only
+        ✔ History records - all params
+      GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+        ✔ History stats - no query params
+        ✔ History stats - startDate only
+        ✔ History stats - startDate - Asset Projection
+        ✔ History stats - endDate only
+        ✔ History stats - start and end dates
+        ✔ History stats - asset only
+        ✔ History stats - rule only
+        ✔ History stats - status only
+        ✔ History stats - all params
+      GET - getStigsByCollection - /collections/{collectionId}/stigs
+        ✔ Return the STIGs mapped in the specified Collection
+        ✔ Return the STIGs mapped in the specified Collection - label
+        ✔ Return the STIGs mapped in the specified Collection - asset projection
+      GET - getStigByCollection - /collections/{collectionId}/stigs/{benchmarkId}
+        ✔ Return Pinned Revision for this STIG
+        ✔ Return the info about the specified STIG from the specified Collection - asset projection
+    lvl3
+      GET - getCollections - /collections
+        51) Return a list of Collections accessible to the requester No Filters
+        52) Return a list of Collections accessible to the requester No Filters no elevate!
+        53) Return a list of Collections accessible to the requester METADATA
+        54) Return a list of Collections accessible to the requester NAME exact
+        55) Return a list of Collections accessible to the requester NAME starts With
+        56) Return a list of Collections accessible to the requester NAME ends With
+        57) Return a list of Collections accessible to the requester NAME contains
+      GET - getCollection - /collections/{collectionId}
+        58) Return a Collection
+      GET - getChecklistByCollectionStig - /collections/{collectionId}/checklists/{benchmarkId}/{revisionStr}
+        ✔ Return the Checklist for the supplied Collection and STIG-latest
+        ✔ Return the Checklist for the supplied Collection and STIG-revStr
+      GET - getFindingsByCollection - /collections/{collectionId}/findings
+        ✔ Return the Findings for the specified Collection by ruleId
+        ✔ Return the Findings for the specified Collection by groupId
+        ✔ Return the Findings for the specified Collection by cci
+        ✔ Return the Findings for the specified Collection for benchmarkId x ruleId
+        ✔ Return the Findings for the specified Collection for asset x ruleId Copy
+      GET - getStigAssetsByCollectionUser - /collections/{collectionId}/grants/{userId}/access
+        ✔ Return stig-asset grants for a lvl1 user in this collection.
+      GET - getCollectionLabels - /collections/{collectionId}/labels
+        ✔ Labels for the specified Collection
+      GET - getCollectionLabelById - /collections/{collectionId}/labels/{labelId}
+        ✔ Collection label
+      GET - getCollectionMetadata - /collections/{collectionId}/metadata
+        59) Metadata for the specified Collection
+      GET - getCollectionMetadataKeys - /collections/{collectionId}/metadata/keys
+        60) Return the Metadata KEYS for a Collection
+      GET - getCollectionMetadataValue - /collections/{collectionId}/metadata/keys/{key}
+        61) Return the Metadata VALUE for a Collection metadata KEY
+      GET - getPoamByCollection - /collections/{collectionId}/poam
+        ✔ Return a POAM-like spreadsheet aggregated by groupId
+        ✔ Return a POAM-like spreadsheet aggregated by ruleId
+      GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+        ✔ History records - no query params
+        ✔ History records - asset only
+        ✔ History records - endDate only
+        ✔ History records - startDate only
+        ✔ History records - rule only
+        ✔ History records - start and end dates
+        ✔ History records - status only
+        ✔ History records - all params
+      GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+        ✔ History stats - no query params
+        ✔ History stats - startDate only
+        ✔ History stats - startDate - Asset Projection
+        ✔ History stats - endDate only
+        ✔ History stats - start and end dates
+        ✔ History stats - asset only
+        ✔ History stats - rule only
+        ✔ History stats - status only
+        ✔ History stats - all params
+      GET - getStigsByCollection - /collections/{collectionId}/stigs
+        ✔ Return the STIGs mapped in the specified Collection
+        ✔ Return the STIGs mapped in the specified Collection - label
+        ✔ Return the STIGs mapped in the specified Collection - asset projection
+      GET - getStigByCollection - /collections/{collectionId}/stigs/{benchmarkId}
+        ✔ Return Pinned Revision for this STIG
+        ✔ Return the info about the specified STIG from the specified Collection - asset projection
+    lvl4
+      GET - getCollections - /collections
+        62) Return a list of Collections accessible to the requester No Filters
+        63) Return a list of Collections accessible to the requester No Filters no elevate!
+        64) Return a list of Collections accessible to the requester METADATA
+        65) Return a list of Collections accessible to the requester NAME exact
+        66) Return a list of Collections accessible to the requester NAME starts With
+        67) Return a list of Collections accessible to the requester NAME ends With
+        68) Return a list of Collections accessible to the requester NAME contains
+      GET - getCollection - /collections/{collectionId}
+        69) Return a Collection
+      GET - getChecklistByCollectionStig - /collections/{collectionId}/checklists/{benchmarkId}/{revisionStr}
+        ✔ Return the Checklist for the supplied Collection and STIG-latest
+        ✔ Return the Checklist for the supplied Collection and STIG-revStr
+      GET - getFindingsByCollection - /collections/{collectionId}/findings
+        ✔ Return the Findings for the specified Collection by ruleId
+        ✔ Return the Findings for the specified Collection by groupId
+        ✔ Return the Findings for the specified Collection by cci
+        ✔ Return the Findings for the specified Collection for benchmarkId x ruleId
+        ✔ Return the Findings for the specified Collection for asset x ruleId Copy
+      GET - getStigAssetsByCollectionUser - /collections/{collectionId}/grants/{userId}/access
+        ✔ Return stig-asset grants for a lvl1 user in this collection.
+      GET - getCollectionLabels - /collections/{collectionId}/labels
+        ✔ Labels for the specified Collection
+      GET - getCollectionLabelById - /collections/{collectionId}/labels/{labelId}
+        ✔ Collection label
+      GET - getCollectionMetadata - /collections/{collectionId}/metadata
+        70) Metadata for the specified Collection
+      GET - getCollectionMetadataKeys - /collections/{collectionId}/metadata/keys
+        71) Return the Metadata KEYS for a Collection
+      GET - getCollectionMetadataValue - /collections/{collectionId}/metadata/keys/{key}
+        72) Return the Metadata VALUE for a Collection metadata KEY
+      GET - getPoamByCollection - /collections/{collectionId}/poam
+        ✔ Return a POAM-like spreadsheet aggregated by groupId
+        ✔ Return a POAM-like spreadsheet aggregated by ruleId
+      GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+        ✔ History records - no query params
+        ✔ History records - asset only
+        ✔ History records - endDate only
+        ✔ History records - startDate only
+        ✔ History records - rule only
+        ✔ History records - start and end dates
+        ✔ History records - status only
+        ✔ History records - all params
+      GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+        ✔ History stats - no query params
+        ✔ History stats - startDate only
+        ✔ History stats - startDate - Asset Projection
+        ✔ History stats - endDate only
+        ✔ History stats - start and end dates
+        ✔ History stats - asset only
+        ✔ History stats - rule only
+        ✔ History stats - status only
+        ✔ History stats - all params
+      GET - getStigsByCollection - /collections/{collectionId}/stigs
+        ✔ Return the STIGs mapped in the specified Collection
+        ✔ Return the STIGs mapped in the specified Collection - label
+        ✔ Return the STIGs mapped in the specified Collection - asset projection
+      GET - getStigByCollection - /collections/{collectionId}/stigs/{benchmarkId}
+        ✔ Return Pinned Revision for this STIG
+        ✔ Return the info about the specified STIG from the specified Collection - asset projection
+
+
+  153 passing (9s)
+  72 failing
+
+  1) GET - Collections
+       lvl1
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester No Filters:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:73:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  2) GET - Collections
+       lvl1
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester No Filters no elevate!:
+
+      AssertionError: expected [ { collectionId: '21', …(4) } ] to have a length of 6 but got 1
+      + expected - actual
+
+      -1
+      +6
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:94:38)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  3) GET - Collections
+       lvl1
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester METADATA:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:100:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  4) GET - Collections
+       lvl1
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME exact:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:113:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  5) GET - Collections
+       lvl1
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME starts With:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:124:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  6) GET - Collections
+       lvl1
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME ends With:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:135:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  7) GET - Collections
+       lvl1
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME contains:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:144:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  8) GET - Collections
+       lvl1
+         GET - getCollection - /collections/{collectionId}
+           Return a Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:155:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  9) GET - Collections
+       lvl1
+         GET - getFindingsByCollection - /collections/{collectionId}/findings
+           Return the Findings for the specified Collection by ruleId:
+
+      AssertionError: expected [ { cci: '000050', …(8) }, …(6) ] to have a length of 8 but got 7
+      + expected - actual
+
+      -7
+      +8
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:205:51)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  10) GET - Collections
+       lvl1
+         GET - getFindingsByCollection - /collections/{collectionId}/findings
+           Return the Findings for the specified Collection by groupId:
+
+      AssertionError: expected [ { groupId: 'V-97045', …(4) }, …(2) ] to have a length of 4 but got 3
+      + expected - actual
+
+      -3
+      +4
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:234:51)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  11) GET - Collections
+       lvl1
+         GET - getFindingsByCollection - /collections/{collectionId}/findings
+           Return the Findings for the specified Collection by cci:
+
+      AssertionError: expected [ { cci: '000050', …(4) }, …(6) ] to have a length of 8 but got 7
+      + expected - actual
+
+      -7
+      +8
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:247:51)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  12) GET - Collections
+       lvl1
+         GET - getFindingsByCollection - /collections/{collectionId}/findings
+           Return the Findings for the specified Collection for asset x ruleId Copy:
+
+      AssertionError: expected [ { …(5) }, { …(5) }, { …(5) } ] to have a length of 4 but got 3
+      + expected - actual
+
+      -3
+      +4
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:273:51)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  13) GET - Collections
+       lvl1
+         GET - getStigAssetsByCollectionUser - /collections/{collectionId}/grants/{userId}/access
+           Return stig-asset grants for a lvl1 user in this collection.:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:285:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  14) GET - Collections
+       lvl1
+         GET - getCollectionLabels - /collections/{collectionId}/labels
+           Labels for the specified Collection:
+
+      AssertionError: expected 1 to equal 2
+      + expected - actual
+
+      -1
+      +2
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:306:39)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  15) GET - Collections
+       lvl1
+         GET - getCollectionLabelById - /collections/{collectionId}/labels/{labelId}
+           Collection label:
+
+      AssertionError: expected 1 to equal 2
+      + expected - actual
+
+      -1
+      +2
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:321:38)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  16) GET - Collections
+       lvl1
+         GET - getCollectionMetadata - /collections/{collectionId}/metadata
+           Metadata for the specified Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:330:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  17) GET - Collections
+       lvl1
+         GET - getCollectionMetadataKeys - /collections/{collectionId}/metadata/keys
+           Return the Metadata KEYS for a Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:341:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  18) GET - Collections
+       lvl1
+         GET - getCollectionMetadataValue - /collections/{collectionId}/metadata/keys/{key}
+           Return the Metadata VALUE for a Collection metadata KEY:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:355:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  19) GET - Collections
+       lvl1
+         GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+           History records - no query params:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:380:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  20) GET - Collections
+       lvl1
+         GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+           History records - asset only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:400:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  21) GET - Collections
+       lvl1
+         GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+           History records - endDate only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:419:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  22) GET - Collections
+       lvl1
+         GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+           History records - startDate only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:434:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  23) GET - Collections
+       lvl1
+         GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+           History records - rule only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:448:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  24) GET - Collections
+       lvl1
+         GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+           History records - start and end dates:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:460:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  25) GET - Collections
+       lvl1
+         GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+           History records - status only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:475:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  26) GET - Collections
+       lvl1
+         GET - getReviewHistoryByCollection - /collections/{collectionId}/review-history
+           History records - all params:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:489:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  27) GET - Collections
+       lvl1
+         GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+           History stats - no query params:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:514:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  28) GET - Collections
+       lvl1
+         GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+           History stats - startDate only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:522:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  29) GET - Collections
+       lvl1
+         GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+           History stats - startDate - Asset Projection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:530:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  30) GET - Collections
+       lvl1
+         GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+           History stats - endDate only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:545:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  31) GET - Collections
+       lvl1
+         GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+           History stats - start and end dates:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:553:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  32) GET - Collections
+       lvl1
+         GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+           History stats - asset only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:561:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  33) GET - Collections
+       lvl1
+         GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+           History stats - rule only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:568:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  34) GET - Collections
+       lvl1
+         GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+           History stats - status only:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:576:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  35) GET - Collections
+       lvl1
+         GET - getReviewHistoryStatsByCollection - /collections/{collectionId}/review-history/stats
+           History stats - all params:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:584:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  36) GET - Collections
+       lvl1
+         GET - getStigsByCollection - /collections/{collectionId}/stigs
+           Return the STIGs mapped in the specified Collection:
+
+      AssertionError: expected [ { …(7) } ] to have a length of 2 but got 1
+      + expected - actual
+
+      -1
+      +2
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:597:51)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  37) GET - Collections
+       lvl1
+         GET - getStigsByCollection - /collections/{collectionId}/stigs
+           Return the STIGs mapped in the specified Collection - label:
+
+      AssertionError: expected [ { …(7) } ] to have a length of 2 but got 1
+      + expected - actual
+
+      -1
+      +2
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:608:51)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  38) GET - Collections
+       lvl1
+         GET - getStigsByCollection - /collections/{collectionId}/stigs
+           Return the STIGs mapped in the specified Collection - asset projection:
+
+      AssertionError: expected [ { …(8) } ] to have a length of 2 but got 1
+      + expected - actual
+
+      -1
+      +2
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:619:51)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  39) GET - Collections
+       lvl2
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester No Filters:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:73:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  40) GET - Collections
+       lvl2
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester No Filters no elevate!:
+
+      AssertionError: expected [ { collectionId: '21', …(4) }, …(1) ] to have a length of 6 but got 2
+      + expected - actual
+
+      -2
+      +6
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:94:38)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  41) GET - Collections
+       lvl2
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester METADATA:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:100:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  42) GET - Collections
+       lvl2
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME exact:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:113:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  43) GET - Collections
+       lvl2
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME starts With:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:124:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  44) GET - Collections
+       lvl2
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME ends With:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:135:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  45) GET - Collections
+       lvl2
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME contains:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:144:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  46) GET - Collections
+       lvl2
+         GET - getCollection - /collections/{collectionId}
+           Return a Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:155:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  47) GET - Collections
+       lvl2
+         GET - getStigAssetsByCollectionUser - /collections/{collectionId}/grants/{userId}/access
+           Return stig-asset grants for a lvl1 user in this collection.:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:285:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  48) GET - Collections
+       lvl2
+         GET - getCollectionMetadata - /collections/{collectionId}/metadata
+           Metadata for the specified Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:330:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  49) GET - Collections
+       lvl2
+         GET - getCollectionMetadataKeys - /collections/{collectionId}/metadata/keys
+           Return the Metadata KEYS for a Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:341:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  50) GET - Collections
+       lvl2
+         GET - getCollectionMetadataValue - /collections/{collectionId}/metadata/keys/{key}
+           Return the Metadata VALUE for a Collection metadata KEY:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:355:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  51) GET - Collections
+       lvl3
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester No Filters:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:73:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  52) GET - Collections
+       lvl3
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester No Filters no elevate!:
+
+      AssertionError: expected [ { collectionId: '21', …(4) }, …(1) ] to have a length of 6 but got 2
+      + expected - actual
+
+      -2
+      +6
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:94:38)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  53) GET - Collections
+       lvl3
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester METADATA:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:100:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  54) GET - Collections
+       lvl3
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME exact:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:113:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  55) GET - Collections
+       lvl3
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME starts With:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:124:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  56) GET - Collections
+       lvl3
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME ends With:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:135:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  57) GET - Collections
+       lvl3
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME contains:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:144:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  58) GET - Collections
+       lvl3
+         GET - getCollection - /collections/{collectionId}
+           Return a Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:155:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  59) GET - Collections
+       lvl3
+         GET - getCollectionMetadata - /collections/{collectionId}/metadata
+           Metadata for the specified Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:330:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  60) GET - Collections
+       lvl3
+         GET - getCollectionMetadataKeys - /collections/{collectionId}/metadata/keys
+           Return the Metadata KEYS for a Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:341:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  61) GET - Collections
+       lvl3
+         GET - getCollectionMetadataValue - /collections/{collectionId}/metadata/keys/{key}
+           Return the Metadata VALUE for a Collection metadata KEY:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:355:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  62) GET - Collections
+       lvl4
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester No Filters:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:73:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  63) GET - Collections
+       lvl4
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester No Filters no elevate!:
+
+      AssertionError: expected [ { collectionId: '21', …(4) }, …(2) ] to have a length of 6 but got 3
+      + expected - actual
+
+      -3
+      +6
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:94:38)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  64) GET - Collections
+       lvl4
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester METADATA:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:100:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  65) GET - Collections
+       lvl4
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME exact:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:113:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  66) GET - Collections
+       lvl4
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME starts With:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:124:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  67) GET - Collections
+       lvl4
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME ends With:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:135:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  68) GET - Collections
+       lvl4
+         GET - getCollections - /collections
+           Return a list of Collections accessible to the requester NAME contains:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:144:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  69) GET - Collections
+       lvl4
+         GET - getCollection - /collections/{collectionId}
+           Return a Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:155:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  70) GET - Collections
+       lvl4
+         GET - getCollectionMetadata - /collections/{collectionId}/metadata
+           Metadata for the specified Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:330:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  71) GET - Collections
+       lvl4
+         GET - getCollectionMetadataKeys - /collections/{collectionId}/metadata/keys
+           Return the Metadata KEYS for a Collection:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:341:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+  72) GET - Collections
+       lvl4
+         GET - getCollectionMetadataValue - /collections/{collectionId}/metadata/keys/{key}
+           Return the Metadata VALUE for a Collection metadata KEY:
+
+      AssertionError: expected Response{ _events: {}, …(35), …(2) } to have status code 200 but got 403
+      + expected - actual
+
+      -403
+      +200
+      
+      at Context.<anonymous> (mocha/data/collection/collectionGet.test.js:355:33)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+
+

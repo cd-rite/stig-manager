@@ -71,13 +71,15 @@
         "assignedStigs": ["VPN_SRG_TEST"],
         "assets": ["42", "154"]
     },
-   
     "testRuleId": "SV-106191r1_rule",
     "freshRuleId": "SV-106195r1_rule",
     "allStigsForAdmin": ["A10_Networks_ADC_ALG_STIG","AAA_Service_SRG", "Adobe_Acrobat_Pro_DC_Continuous_STIG",
     "RHEL_7_STIG_TEST","VPN_SRG_OTHER", "VPN_SRG_Rule-fingerprint-match-test","VPN_SRG_TEST","Windows_10_STIG_TEST"],
     "testStigfile": "U_VPN_SRG_V1R1_Manual-xccdf.xml",
+    "reviewKeyChangeFile": "U_VPN_SRG_V2R3_Manual-xccdf-reviewKeyChange.xml",
     "scrapBenchmark": "RHEL_7_STIG_TEST",
+    "reviewMatchString": "test",
+    "collectionMatchString": "Collection X",
     "collectionMetadataKey": "pocName",
     "collectionMetadataValue": "poc2Patched",
     "reviewHistory":{

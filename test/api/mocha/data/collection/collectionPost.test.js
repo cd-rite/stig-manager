@@ -884,11 +884,4 @@ describe('Collection Post tests using "admin" user ', () => {
   })
 })
 
-describe('Collection Post tests using "lvl1" user (where needed)', () => {
-  before(async function () {
-    this.timeout(4000);
-    await utils.loadAppData();
-    await utils.uploadTestStigs();
-    await utils.createDisabledCollectionsandAssets();
-  })
-})
+

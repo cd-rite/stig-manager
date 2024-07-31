@@ -2,9 +2,9 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const expect = chai.expect
-const config = require('../../testConfig.json')
-const utils = require('../../utils/testUtils')
-const stigEnv = require('../../enviornment.json')
+const config = require('../mocha/testConfig.json')
+const utils = require('../mocha/utils/testUtils')
+const stigEnv = require('../mocha/enviornment.json')
 const fs = require('fs')
 const path = require('path')
 

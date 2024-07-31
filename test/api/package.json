@@ -21,6 +21,7 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "mochawesome": "^7.1.3"
+    "mochawesome": "^7.1.3",
+    "mochawesome-report-generator": "^6.2.0"
   }
 }

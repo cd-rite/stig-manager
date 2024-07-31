@@ -24,7 +24,7 @@ describe(`PUT - attachAssetsToStig - /collections/{collectionId}/stigs/{benchmar
       await utils.createDisabledCollectionsandAssets()
     })
     
-    it(' gh-756 issue. assign a benchmark used in test Collection in scrap Collection', async function () {
+    it('gh-756 issue. assign a benchmark used in test Collection in scrap Collection', async function () {
       const res = await chai.request(config.baseUrl)
       .put(`/collections/${enviornment.scrapCollection.collectionId}/stigs/${enviornment.testCollection.benchmark}/assets?projection=restrictedUserAccess`)
       .set('Authorization', 'Bearer ' + user.token)
@@ -36,7 +36,7 @@ describe(`PUT - attachAssetsToStig - /collections/{collectionId}/stigs/{benchmar
       expect(res.body[0].assetId).to.equal(enviornment.scrapAsset.assetId)
       expect(res.body[0]).to.have.property('restrictedUserAccess')
     })
-    it(' Verify that test collection still has expected benchmark assignments', async function () {
+    it('Verify that test collection still has expected benchmark assignments', async function () {
         const res = await chai.request(config.baseUrl)
         .get(`/collections/${enviornment.testCollection.collectionId}/stigs`)
         .set('Authorization', 'Bearer ' + user.token)
