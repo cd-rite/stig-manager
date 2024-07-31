@@ -298,7 +298,7 @@ const uploadTestStigs = async () => {
 
     const axiosConfig = {
       method: 'post',
-      url: `${config.baseUrl}/stigs?clobber=true`,
+      url: `${config.baseUrl}/stigs?elevate=true&clobber=true`,
       headers: {
         ...formData.getHeaders(),
         Authorization: `Bearer ${adminToken}`

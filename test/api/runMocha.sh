@@ -7,8 +7,12 @@ usage() {
   echo "  -f file        Run specific test file."
   echo "  -d directory   Run tests in specific directory."
   echo "  -u user        Run tests for specific user or list of users."
+  echo -e "  -h help        examples: \n ./runMocha.sh -u lvl1 -u lvl2 -p getCollectionss \n ./runMocha.sh -f collectionGet.test.js \n ./runMocha.sh -d mocha/data/collection"
   exit 
 }
+
+
+
 
 DEFAULT_COMMAND="npx mocha --reporter mochawesome --no-timeouts --showFailed --exit './mocha/**/*.test.js'"
 COMMAND="npx mocha --reporter mochawesome --no-timeouts --showFailed --exit"
@@ -18,7 +22,7 @@ FILES=()
 DIRECTORIES=()
 USERS=()
 
-while getopts "p:f:d:u:" opt; do
+while getopts "p:f:d:u:h:" opt; do
   case ${opt} in
     p)
       PATTERNS+=("${OPTARG}")
@@ -31,6 +35,9 @@ while getopts "p:f:d:u:" opt; do
       ;;
     u)
       USERS+=("${OPTARG}")
+      ;;
+    h)
+      usage
       ;;
     *)
       usage
