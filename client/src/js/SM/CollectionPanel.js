@@ -263,12 +263,15 @@ SM.CollectionPanel.AggGrid = Ext.extend(Ext.grid.GridPanel, {
             filter: {
               type: 'values',
               collectionId: _this.collectionId,
+              comparer: function (a, b) {
+                return SM.ColumnFilters.CompareFns.labelIds(a, b, _this.collectionId)
+                },
               renderer: SM.ColumnFilters.Renderers.labels
             },
             renderer: function (value, metadata) {
               const labels = []
               for (const labelId of value) {
-                const label = SM.Cache.CollectionMap.get(_this.collectionId).labelMap.get(labelId)
+                const label = SM.Cache.getCollectionLabel(_this.collectionId, labelId)
                 if (label) labels.push(label)
               }
               labels.sort((a, b) => a.name.localeCompare(b.name))
@@ -338,12 +341,15 @@ SM.CollectionPanel.AggGrid = Ext.extend(Ext.grid.GridPanel, {
             filter: {
               type: 'values',
               collectionId: _this.collectionId,
+              comparer: function (a, b) {
+                return SM.ColumnFilters.CompareFns.labelIds(a, b, _this.collectionId)
+                },              
               renderer: SM.ColumnFilters.Renderers.labels
             },
             renderer: function (value, metadata) {
               const labels = []
               const labelId = value
-              const label = SM.Cache.CollectionMap.get(_this.collectionId).labelMap.get(labelId)
+              const label = SM.Cache.getCollectionLabel(_this.collectionId, labelId)
               if (label) labels.push(label)
               labels.sort((a, b) => a.name.localeCompare(b.name))
               metadata.attr = 'style="white-space:normal;"'
@@ -570,12 +576,15 @@ SM.CollectionPanel.UnaggGrid = Ext.extend(Ext.grid.GridPanel, {
             filter: {
               type: 'values',
               collectionId: _this.collectionId,
+              comparer: function (a, b) {
+                return SM.ColumnFilters.CompareFns.labelIds(a, b, _this.collectionId)
+                },              
               renderer: SM.ColumnFilters.Renderers.labels
             },
             renderer: function (value, metadata) {
               const labels = []
               for (const labelId of value) {
-                const label = SM.Cache.CollectionMap.get(_this.collectionId).labelMap.get(labelId)
+                const label = SM.Cache.getCollectionLabel(_this.collectionId, labelId)
                 if (label) labels.push(label)
               }
               labels.sort((a, b) => a.name.localeCompare(b.name))
@@ -1675,6 +1684,8 @@ SM.CollectionPanel.showCollectionTab = async function (options) {
       return
     }
 
+    SM.Cache.updateCollectionLabels(collectionId)
+
     const gState = {}
 
     gState.labelIds = initialLabelIds
@@ -1819,7 +1830,7 @@ SM.CollectionPanel.showCollectionTab = async function (options) {
       ],
       listeners: {
         tabchange: function (tp) {
-          updateData({event: 'tabchange'})
+          if (!tp.firstShow) updateData({ event: 'tabchange' })
           tp.firstShow = false
         }
       }

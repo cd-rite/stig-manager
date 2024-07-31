@@ -937,13 +937,16 @@ async function addCollectionReview ( params ) {
 					filter: {
 							type: 'values', 
 							collectionId: apiCollection.collectionId,
+							comparer: function (a, b) {
+								return SM.ColumnFilters.CompareFns.labelIds(a, b, apiCollection.collectionId)
+								},  
 							renderer: SM.ColumnFilters.Renderers.labels
 					},
 					renderer: function (value, metadata) {
 							const labels = []
 							for (const labelId of value) {
-									const label = SM.Cache.CollectionMap.get(apiCollection.collectionId).labelMap.get(labelId)
-									if (label) labels.push(label)
+								const label = SM.Cache.getCollectionLabel(apiCollection.collectionId, labelId)
+								if (label) labels.push(label)
 							}
 							labels.sort((a,b) => a.name.localeCompare(b.name))
 							metadata.attr = 'style="white-space:nowrap;text-overflow:clip;"'

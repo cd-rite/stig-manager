@@ -146,12 +146,15 @@ SM.CollectionAssetGrid = Ext.extend(Ext.grid.GridPanel, {
                 filter: {
                     type: 'values', 
                     collectionId: me.collectionId,
+                    comparer: function (a, b) {
+                        return SM.ColumnFilters.CompareFns.labelIds(a, b, me.collectionId)
+                        },                    
                     renderer: SM.ColumnFilters.Renderers.labels
                 },
                 renderer: function (value, metadata) {
                     const labels = []
                     for (const labelId of value) {
-                        const label = SM.Cache.CollectionMap.get(me.collectionId).labelMap.get(labelId)
+                        const label = SM.Cache.getCollectionLabel(me.collectionId, labelId)
                         if (label) labels.push(label)
                     }
                     labels.sort((a,b) => a.name.localeCompare(b.name))
