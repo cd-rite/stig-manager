@@ -33,7 +33,7 @@ describe(`POST - importBenchmark - /stigs`, () => {
         const filePath = path.join(directoryPath, testStigfile)
    
         const res = await chai.request(config.baseUrl)
-        .post('/stigs?clobber=true')
+        .post('/stigs?elevate=true&clobber=true')
         .set('Authorization', `Bearer ${user.token}`)
         .set('Content-Type', `multipart/form-data`)
         .attach('importFile', fs.readFileSync(filePath), testStigfile)

@@ -70,6 +70,10 @@ describe('POST - Collection', () => {
                 },
               ],
             })
+          if(user.name == "lvl1" || user.name == "lvl2" || user.name == "lvl3" || user.name == "lvl4"){
+            expect(res).to.have.status(403)
+            return
+          }
           expect(res).to.have.status(201)
         })
         it("Create a Collection and test projections", async () => {
@@ -123,7 +127,10 @@ describe('POST - Collection', () => {
             )
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
-
+            if(user.name == "lvl1" || user.name == "lvl2" || user.name == "lvl3" || user.name == "lvl4"){
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(201)
             expect(res.body.description).to.equal("Collection TEST description")
             expect(res.body.name).to.equal("TEST")
@@ -314,7 +321,7 @@ describe('POST - Collection', () => {
           ]
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${environment.testCollection.collectionId}/clone?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=labels`        )
+            .post(`/collections/${environment.testCollection.collectionId}/clone?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=labels`)
             .set("Authorization", `Bearer ${user.token}`)
             .send({
               name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -328,6 +335,11 @@ describe('POST - Collection', () => {
               },
             })
             let clonedCollectionId = null
+            if(user.name == "lvl1" || user.name == "lvl2" || user.name == "lvl3"  || user.name == "lvl4"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(200)
             const response = res.body.toString().split("\n")
             expect(response).to.be.an('array')
@@ -436,6 +448,11 @@ describe('POST - Collection', () => {
             },
           })
           let clonedCollectionId = null
+          if(user.name == "lvl1" || user.name == "lvl2" || user.name == "lvl3" || user.name == "lvl4"){
+
+            expect(res).to.have.status(403)
+            return
+          }
           expect(res).to.have.status(200)
           const response = res.body.toString().split("\n")
           expect(response).to.be.an('array')
@@ -482,6 +499,12 @@ describe('POST - Collection', () => {
             },
           })
           let clonedCollectionId = null
+         
+          if(user.name == "lvl1" || user.name == "lvl2" || user.name == "lvl3" || user.name == "lvl4"){
+
+            expect(res).to.have.status(403)
+            return
+          }
           expect(res).to.have.status(200)
           const response = res.body.toString().split("\n")
           expect(response).to.be.an('array')
@@ -520,6 +543,12 @@ describe('POST - Collection', () => {
             },
           })
           let clonedCollectionId = null
+         
+          if(user.name == "lvl1" || user.name == "lvl2" || user.name == "lvl3" || user.name == "lvl4"){
+
+            expect(res).to.have.status(403)
+            return
+          }
           expect(res).to.have.status(200)
           const response = res.body.toString().split("\n")
           expect(response).to.be.an('array')
@@ -558,6 +587,12 @@ describe('POST - Collection', () => {
             },
           })
           let clonedCollectionId = null
+         
+          if(user.name == "lvl1" || user.name == "lvl2" || user.name == "lvl3" || user.name == "lvl4"){
+
+            expect(res).to.have.status(403)
+            return
+          }
           expect(res).to.have.status(200)
           const response = res.body.toString().split("\n")
           expect(response).to.be.an('array')
@@ -597,6 +632,12 @@ describe('POST - Collection', () => {
             },
           })
           let clonedCollectionId = null
+      
+          if(user.name == "lvl1" || user.name == "lvl2" || user.name == "lvl3" || user.name == "lvl4"){
+
+            expect(res).to.have.status(403)
+            return
+          }
           expect(res).to.have.status(200)
           const response = res.body.toString().split("\n")
           expect(response).to.be.an('array')
@@ -641,6 +682,12 @@ describe('POST - Collection', () => {
             },
           })
           let clonedCollectionId = null
+         
+          if(user.name == "lvl1" || user.name == "lvl2" || user.name == "lvl3" || user.name == "lvl4"){
+
+            expect(res).to.have.status(403)
+            return
+          }
           expect(res).to.have.status(200)
           const response = res.body.toString().split("\n")
           expect(response).to.be.an('array')
@@ -685,6 +732,12 @@ describe('POST - Collection', () => {
                 assetId: environment.testAsset.assetId,
               },
             ])
+            
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(200)
             const response = res.body.toString().split("\n")
             expect(response).to.be.an('array')
@@ -713,6 +766,11 @@ describe('POST - Collection', () => {
                 assetId: environment.testAsset.assetId,
               },
             ])
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(200)
             const response = res.body.toString().split("\n")
             expect(response).to.be.an('array')
@@ -744,6 +802,11 @@ describe('POST - Collection', () => {
             .post(`/collections/${environment.scrapCollection.collectionId}/labels`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(request)
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(201)
             expect(res.body.name).to.equal(request.name)
             expect(res.body.description).to.equal(request.description)
@@ -771,6 +834,11 @@ describe('POST - Collection', () => {
             .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R1")
             expect(res.body.revisionPinned).to.equal(true)
@@ -791,6 +859,11 @@ describe('POST - Collection', () => {
             .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R1")
             expect(res.body.revisionPinned).to.equal(false)
@@ -809,6 +882,11 @@ describe('POST - Collection', () => {
             .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R1")
             expect(res.body.revisionPinned).to.equal(false)
@@ -827,6 +905,11 @@ describe('POST - Collection', () => {
             .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(422)
         })
         it("Set the Assets mapped to a STIG - default rev only", async () => {
@@ -840,6 +923,11 @@ describe('POST - Collection', () => {
             .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R0")
             expect(res.body.revisionPinned).to.equal(true)
@@ -858,6 +946,11 @@ describe('POST - Collection', () => {
             .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(204)
         })
         it("Set the Assets mapped to a STIG - after pinned delete", async () => {
@@ -871,6 +964,11 @@ describe('POST - Collection', () => {
             .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
             .set("Authorization", `Bearer ${user.token}`)
             .send(post)
+            if(user.name == "lvl1" || user.name == "lvl2"){
+
+              expect(res).to.have.status(403)
+              return
+            }
             expect(res).to.have.status(200)
             expect(res.body.revisionStr).to.equal("V1R1")
             expect(res.body.revisionPinned).to.equal(false)
