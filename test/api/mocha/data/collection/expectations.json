@@ -58,8 +58,29 @@
       "reviewHistory_startDateCnt": 2,
       "reviewHistory_byStatusCnt": 3,
       "reviewHistory_testAssetCnt": 5,
-      "reviewHistory_ruleIdCnt": 4
+      "reviewHistory_ruleIdCnt": 4,
+    },
+    "deleteCollection":{
+      "collectionId_adminOnly": "84",
+      "collectionId": "85"
+    },
+    "scrapCollection":{
+      "collectionId": "1",
+      "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST", "RHEL_7_STIG_TEST"],
+      "scrapLabel": "df4e6836-a003-11ec-b1bc-0242ac110002"
+    },
+    "scrapLvl1User":{
+        "userId": "86",
+        "username": "bizarroLvl1"
+    },
+    "scrapAsset":{
+        "assetId": "34",
+        "scrapBenchmark": "RHEL_7_STIG_TEST",
+        "metadataKey": "testkey",
+        "metadataValue": "testvalue"
+      
     }
+
   },
   "stigmanadmin": {
     "user": "admin",
@@ -84,7 +105,8 @@
     "assetIDs_testCollection":["29","62","42","154"],
     "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
     "collectionIds": ["21"],
-    "testBenchmarkAssignedCount": 3
+    "testBenchmarkAssignedCount": 3,
+    "deleteCollectionId_admin": "84"
     },
   "lvl1":{
     "user": "lvl1",

@@ -26,7 +26,7 @@ describe('GET - Collection', () => {
       describe('getCollections - /collections', () => {
         if (user.name === 'stigmanadmin' ){
 
-          it('Return a list of Collections accessible to the requester No Filters elevated', async () => {
+          it('Return Collections accessible to the requester No Filters - elevated stigmanadmin only', async () => {
 
             const res = await chai.request(config.baseUrl)
               .get('/collections?projection=owners&projection=statistics&elevate=true')
