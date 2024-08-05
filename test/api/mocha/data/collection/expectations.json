@@ -17,6 +17,7 @@
       "owners": ["87", "1", "45"],
       "assetIDs_testCollection":["29","62","42","154"],
       "assetsWithHistory":["42","154"],
+      "testAssetId": "42",
       "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
       "labelCount": 2,
       "lvl1LabelName": "test-label-lvl1",
@@ -67,7 +68,9 @@
     "scrapCollection":{
       "collectionId": "1",
       "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST", "RHEL_7_STIG_TEST"],
-      "scrapLabel": "df4e6836-a003-11ec-b1bc-0242ac110002"
+      "scrapLabel": "df4e6836-a003-11ec-b1bc-0242ac110002",
+      "collectionMetadataKey": "pocName",
+      "collectionMetadataValue": "poc2Patched"
     },
     "scrapLvl1User":{
         "userId": "86",
@@ -106,7 +109,9 @@
     "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
     "collectionIds": ["21"],
     "testBenchmarkAssignedCount": 3,
-    "deleteCollectionId_admin": "84"
+    "deleteCollectionId_admin": "84",
+    "canDeleteCollection": true,
+    "canModifyCollection": true
     },
   "lvl1":{
     "user": "lvl1",
@@ -130,7 +135,9 @@
     "assetIDs_testCollection":["42","154"],
     "validStigs": ["VPN_SRG_TEST"],
     "collectionIds": ["21"],
-    "testBenchmarkAssignedCount": 2
+    "testBenchmarkAssignedCount": 2,
+    "canDeleteCollection": false,
+    "canModifyCollection": false
   },
   "lvl2": {
     "user": "admin",
@@ -154,7 +161,9 @@
     "assetIDs_testCollection":["29","62","42","154"],
     "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
     "collectionIds": ["21"],
-    "testBenchmarkAssignedCount": 3
+    "testBenchmarkAssignedCount": 3,
+    "canDeleteCollection": false,
+    "canModifyCollection": false
     },
   "lvl3": {
     "user": "admin",
@@ -178,7 +187,9 @@
     "assetIDs_testCollection":["29","62","42","154"],
     "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
     "collectionIds": ["21"],
-    "testBenchmarkAssignedCount": 3
+    "testBenchmarkAssignedCount": 3,
+    "canDeleteCollection": false,
+    "canModifyCollection": true
     },
   "lvl4": {
     "user": "admin",
@@ -202,6 +213,8 @@
     "assetIDs_testCollection":["29","62","42","154"],
     "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
     "collectionIds": ["21"],
-    "testBenchmarkAssignedCount": 3
+    "testBenchmarkAssignedCount": 3,
+    "canDeleteCollection": true,
+    "canModifyCollection": true
     }
   }

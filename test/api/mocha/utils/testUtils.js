@@ -326,7 +326,7 @@ const replaceStigRevision = async (stigFile = "U_VPN_SRG_V1R1_Manual-xccdf-repla
 
   const axiosConfig = {
     method: 'post',
-    url: `${config.baseUrl}/stigs?clobber=true`,
+    url: `${config.baseUrl}/stigs?elevate=true&clobber=true`,
     headers: {
       ...formData.getHeaders(),
       Authorization: `Bearer ${adminToken}`
