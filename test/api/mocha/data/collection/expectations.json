@@ -58,7 +58,7 @@
       "reviewHistory_startDateCnt": 2,
       "reviewHistory_byStatusCnt": 3,
       "reviewHistory_testAssetCnt": 5,
-      "reviewHistory_ruleIdCnt": 4,
+      "reviewHistory_ruleIdCnt": 4
     },
     "deleteCollection":{
       "collectionId_adminOnly": "84",
