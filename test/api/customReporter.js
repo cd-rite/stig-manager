@@ -48,6 +48,10 @@ class CustomReporter extends SpecReporter {
       operationId = parts[1]
       apiPath = parts[2]
     })
+    
+    runner.on('test end', (test) => {
+     // console.log(test)
+    })
 
     runner.on('test', (test) => {
       
