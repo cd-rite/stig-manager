@@ -51,6 +51,8 @@ const reference = {
         "assetId": "42",
         "startDate": "1900-10-01",
         "endDate": "2020-10-01",
+        "deletedEntriesByDate": 6,
+        "deletedEntriesByDateAsset": 4,
         "ruleId": "SV-106179r1_rule",
         "status": "submitted"
       },

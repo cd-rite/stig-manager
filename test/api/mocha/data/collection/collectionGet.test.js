@@ -22,7 +22,6 @@ describe('GET - Collection', () => {
     
     describe(`user:${user.name}`, () => {
       const distinct = expectations[user.name]
-      // const common = expectations.common // or stigmanadmin expectations?
     
       describe('getCollections - /collections', () => {
         if (user.name === 'stigmanadmin' ){
