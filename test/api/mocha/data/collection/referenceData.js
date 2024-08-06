@@ -18,7 +18,7 @@ const reference = {
       "collectionMetadataKey": "pocName",
       "collectionMetadataValue": "poc2Patched",
       "owners": ["87", "1", "45"],
-      "assetIDs_testCollection":["29","62","42","154"],
+      "assetIds":["29","62","42","154"],
       "assetsWithHistory":["42","154"],
       "testAssetId": "42",
       "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
@@ -85,7 +85,21 @@ const reference = {
         "metadataKey": "testkey",
         "metadataValue": "testvalue"
       
-    }
+    },
+    "testAsset":{
+      "name": "Collection_X_lvl1_asset-1",
+      "assetId": "42",
+      "collectionId": "21",
+      "usersWithGrant":["86,85"],
+      "benchmark": "VPN_SRG_TEST",
+      "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
+      "metadataKey": "testkey",
+      "metadataValue": "testvalue",
+      "labels": [
+          "755b8a28-9a68-11ec-b1bc-0242ac110002",
+          "5130dc84-9a68-11ec-b1bc-0242ac110002"
+        ]
+     }    
   }
 
 module.exports = reference;

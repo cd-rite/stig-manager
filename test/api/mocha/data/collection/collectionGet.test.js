@@ -41,7 +41,7 @@ describe('GET - Collection', () => {
             const testCollectionOwnerArray = testCollection.owners.map(owner => owner.userId)
 
             expect(testCollectionOwnerArray, "proper owners").to.have.members(reference.testCollection.owners)
-            expect(testCollection.statistics.assetCount, "asset count").to.equal(distinct.assetCnt_testCollection)
+            expect(testCollection.statistics.assetCount, "asset count").to.equal(distinct.assetIds.length)
             expect(testCollection.statistics.checklistCount, "checklist count").to.equal(distinct.checklistCnt_testCollection)
             expect(testCollection.statistics.grantCount, "grant count").to.equal(distinct.grantCnt_testCollection)
           })
@@ -150,7 +150,7 @@ describe('GET - Collection', () => {
           expect(res.body.name).to.match(regex)
 
           // assets projection
-          expect(res.body.statistics.assetCount).to.eql(distinct.assetIDs_testCollection.length)
+          expect(res.body.statistics.assetCount).to.eql(distinct.assetIds.length)
           
           // grants projection
           // todo: lvl1 user seems to be getting all grants
@@ -194,7 +194,7 @@ describe('GET - Collection', () => {
           for(const finding of res.body){
               expect(finding.assetCount).to.equal(finding.assets.length)
               for(const asset of finding.assets){
-                  expect(distinct.assetIDs_testCollection).to.include(asset.assetId)
+                  expect(distinct.assetIds).to.include(asset.assetId)
               }
           }
           // groups projection
@@ -224,7 +224,7 @@ describe('GET - Collection', () => {
           for(const finding of res.body){
             expect(finding.assetCount).to.equal(finding.assets.length)
             for(const asset of finding.assets){
-                expect(distinct.assetIDs_testCollection).to.include(asset.assetId)
+                expect(distinct.assetIds).to.include(asset.assetId)
             }
           }
       })
@@ -241,7 +241,7 @@ describe('GET - Collection', () => {
           for(const finding of res.body){
             expect(finding.assetCount).to.equal(finding.assets.length)
             for(const asset of finding.assets){
-                expect(distinct.assetIDs_testCollection).to.include(asset.assetId)
+                expect(distinct.assetIds).to.include(asset.assetId)
             }
           }
       })
@@ -257,14 +257,14 @@ describe('GET - Collection', () => {
           for(const finding of res.body){
             expect(finding.assetCount).to.equal(finding.assets.length)
             for(const asset of finding.assets){
-                expect(distinct.assetIDs_testCollection).to.include(asset.assetId)
+                expect(distinct.assetIds).to.include(asset.assetId)
             }
           }
       })
 
       it('Return the Findings for the specified Collection for asset x ruleId Copy', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${reference.testCollection.collectionId}/findings?aggregator=ruleId&acceptedOnly=false&assetId=${environment.testAsset.assetId}&projection=assets`)
+          .get(`/collections/${reference.testCollection.collectionId}/findings?aggregator=ruleId&acceptedOnly=false&assetId=${reference.testAsset.assetId}&projection=assets`)
           .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
           expect(res).to.have.status(200)
@@ -273,7 +273,7 @@ describe('GET - Collection', () => {
 
           for(const finding of res.body){
             expect(finding.assetCount).to.equal(1)
-            expect(finding.assets[0].assetId).to.equal(environment.testAsset.assetId)
+            expect(finding.assets[0].assetId).to.equal(reference.testAsset.assetId)
           }
       })
     })
@@ -295,7 +295,7 @@ describe('GET - Collection', () => {
           for (const stigAssetGrant of res.body) {
             expect(stigAssetGrant.asset.name).to.match(regex)
             expect(stigAssetGrant.benchmarkId).to.be.oneOf(reference.testCollection.validStigs)
-            expect(stigAssetGrant.asset.assetId).to.be.oneOf(distinct.assetIDs_testCollection)
+            expect(stigAssetGrant.asset.assetId).to.be.oneOf(distinct.assetIds)
           }
       })
     })
@@ -617,7 +617,7 @@ describe('GET - Collection', () => {
                 expect(res.body.assetHistoryEntryCounts.length).to.eql(reference.testCollection.reviewHistory_startDateCnt)
                 let totalHistoryEntries = 0
                 for(const asset of res.body.assetHistoryEntryCounts){
-                  expect(distinct.assetIDs_testCollection).to.include(asset.assetId)
+                  expect(distinct.assetIds).to.include(asset.assetId)
                   totalHistoryEntries += asset.historyEntryCount
                 }
                 expect(reference.testCollection.reviewHistoryTotalCnt).to.equal(res.body.collectionHistoryEntryCount)
@@ -750,7 +750,7 @@ describe('GET - Collection', () => {
                   expect(distinct.validStigs).to.include(stig.benchmarkId)
                   const regex = new RegExp("asset")
                   for(const asset of stig.assets){
-                    expect(distinct.assetIDs_testCollection).to.include(asset.assetId)
+                    expect(distinct.assetIds).to.include(asset.assetId)
                     expect(asset.name).to.match(regex)
                   }
                 }
@@ -781,7 +781,7 @@ describe('GET - Collection', () => {
                 expect(res.body.revisionPinned).to.equal(false)
                 const regex = new RegExp("asset")
                 for(const asset of res.body.assets){
-                  expect(distinct.assetIDs_testCollection).to.include(asset.assetId)
+                  expect(distinct.assetIds).to.include(asset.assetId)
                   expect(asset.name).to.match(regex)
                 }
             })
