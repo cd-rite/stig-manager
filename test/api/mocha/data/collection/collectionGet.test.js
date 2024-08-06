@@ -4,9 +4,10 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const environment = require('../../environment.json')
+// const environment = require('../../environment.json')
 const users = require('../../iterations.json')
-const expectations = require('./expectations.json')
+const expectations = require('./expectations.js')
+const reference = require('./referenceData.js')
 
 describe('GET - Collection', () => {
 
@@ -21,7 +22,7 @@ describe('GET - Collection', () => {
     
     describe(`user:${user.name}`, () => {
       const distinct = expectations[user.name]
-      const common = expectations.common // or stigmanadmin expectations?
+      // const common = expectations.common // or stigmanadmin expectations?
     
       describe('getCollections - /collections', () => {
         if (user.name === 'stigmanadmin' ){
@@ -36,10 +37,10 @@ describe('GET - Collection', () => {
             // expect(res.body).to.be.an('array')
             expect(res.body).to.have.lengthOf(distinct.collectionCountElevated)
             //check statistics projection
-            const testCollection = res.body.find(collection => collection.collectionId === common.testCollection.collectionId)
+            const testCollection = res.body.find(collection => collection.collectionId === reference.testCollection.collectionId)
             const testCollectionOwnerArray = testCollection.owners.map(owner => owner.userId)
 
-            expect(testCollectionOwnerArray, "proper owners").to.have.members(common.testCollection.owners)
+            expect(testCollectionOwnerArray, "proper owners").to.have.members(reference.testCollection.owners)
             expect(testCollection.statistics.assetCount, "asset count").to.equal(distinct.assetCnt_testCollection)
             expect(testCollection.statistics.checklistCount, "checklist count").to.equal(distinct.checklistCnt_testCollection)
             expect(testCollection.statistics.grantCount, "grant count").to.equal(distinct.grantCnt_testCollection)
@@ -59,27 +60,27 @@ describe('GET - Collection', () => {
 
         it('Return a list of Collections accessible to the requester METADATA', async () => {
             const res = await chai.request(config.baseUrl)
-              .get(`/collections?metadata=${common.testCollection.collectionMetadataKey}%3A${common.testCollection.collectionMetadataValue}`)
+              .get(`/collections?metadata=${reference.testCollection.collectionMetadataKey}%3A${reference.testCollection.collectionMetadataValue}`)
               .set('Authorization', `Bearer ${user.token}`)
             expect(res).to.have.status(200)
             expect(res.body).to.be.an('array')
-            const regex  = new RegExp(common.testCollection.name)
+            const regex  = new RegExp(reference.testCollection.name)
             expect(res.body[0].name).to.match(regex)
             expect(res.body).to.have.lengthOf(1)
-            expect(res.body[0].collectionId).to.equal(common.testCollection.collectionId)
-            expect(res.body[0].metadata[common.testCollection.collectionMetadataKey]).to.equal(common.testCollection.collectionMetadataValue)
+            expect(res.body[0].collectionId).to.equal(reference.testCollection.collectionId)
+            expect(res.body[0].metadata[reference.testCollection.collectionMetadataKey]).to.equal(reference.testCollection.collectionMetadataValue)
 
         })
         it('Return a list of Collections accessible to the requester NAME exact', async () => {
         const res = await chai.request(config.baseUrl)
-            .get(`/collections?name=${common.testCollection.name}&name-match=exact`)
+            .get(`/collections?name=${reference.testCollection.name}&name-match=exact`)
             .set('Authorization', `Bearer ${user.token}`)
         expect(res).to.have.status(200)
         expect(res.body).to.be.an('array')
-        const regex  = new RegExp(common.testCollection.name)
+        const regex  = new RegExp(reference.testCollection.name)
         expect(res.body[0].name).to.match(regex)
         expect(res.body).to.have.lengthOf(1)
-        expect(res.body[0].collectionId).to.equal(common.testCollection.collectionId)
+        expect(res.body[0].collectionId).to.equal(reference.testCollection.collectionId)
         })
 
         it('Return a list of Collections accessible to the requester NAME starts With', async () => {
@@ -141,11 +142,11 @@ describe('GET - Collection', () => {
     describe('getCollection - /collections/{collectionId}', () => {
       it('Return a Collection', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${common.testCollection.collectionId}?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=labels`)
+          .get(`/collections/${reference.testCollection.collectionId}?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=labels`)
           .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
-          expect(res.body.collectionId).to.equal(common.testCollection.collectionId)
-          const regex  = new RegExp(common.testCollection.name)
+          expect(res.body.collectionId).to.equal(reference.testCollection.collectionId)
+          const regex  = new RegExp(reference.testCollection.name)
           expect(res.body.name).to.match(regex)
 
           // assets projection
@@ -156,7 +157,7 @@ describe('GET - Collection', () => {
           expect(res.body.grants).to.be.an('array').of.length(distinct.grantCnt_testCollection)
 
           const testCollectionOwnerArray = res.body.owners.map(owner => owner.userId)
-          expect(testCollectionOwnerArray, "proper owners").to.have.members(common.testCollection.owners)
+          expect(testCollectionOwnerArray, "proper owners").to.have.members(reference.testCollection.owners)
           
       })
     })
@@ -164,17 +165,17 @@ describe('GET - Collection', () => {
     describe('getChecklistByCollectionStig - /collections/{collectionId}/checklists/{benchmarkId}/{revisionStr}', () => {
       it('Return the Checklist for the supplied Collection and STIG-latest', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${common.testCollection.collectionId}/checklists/${common.benchmark}/${'latest'}`)
+          .get(`/collections/${reference.testCollection.collectionId}/checklists/${reference.benchmark}/${'latest'}`)
           .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
-          expect(res.body).to.be.an('array').of.length(common.checklistLength)
+          expect(res.body).to.be.an('array').of.length(reference.checklistLength)
       })
       it('Return the Checklist for the supplied Collection and STIG-revStr', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${common.testCollection.collectionId}/checklists/${common.benchmark}/${common.revisionStr}`)
+          .get(`/collections/${reference.testCollection.collectionId}/checklists/${reference.benchmark}/${reference.revisionStr}`)
           .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
-          expect(res.body).to.be.an('array').of.length(common.checklistLength)
+          expect(res.body).to.be.an('array').of.length(reference.checklistLength)
       })
     })
 
@@ -183,7 +184,7 @@ describe('GET - Collection', () => {
       
       it('Return the Findings for the specified Collection by ruleId', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${common.testCollection.collectionId}/findings?aggregator=cci&acceptedOnly=false&projection=assets&projection=groups&projection=rules&projection=stigs&projection=ccis`)
+          .get(`/collections/${reference.testCollection.collectionId}/findings?aggregator=cci&acceptedOnly=false&projection=assets&projection=groups&projection=rules&projection=stigs&projection=ccis`)
           .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
 
@@ -205,8 +206,8 @@ describe('GET - Collection', () => {
           // stigs projection
           expect(res.body[0].stigs).to.be.an('array').of.length(1)
           expect(res.body[0].stigs[0].ruleCount).to.equal(81)
-          expect(res.body[0].stigs[0].benchmarkId).to.equal(common.benchmark)
-          expect(res.body[0].stigs[0].revisionStr).to.equal(common.revisionStr)
+          expect(res.body[0].stigs[0].benchmarkId).to.equal(reference.benchmark)
+          expect(res.body[0].stigs[0].revisionStr).to.equal(reference.revisionStr)
 
           // ccis projection
           expect(res.body[0].ccis).to.be.an('array').of.length(1)
@@ -214,7 +215,7 @@ describe('GET - Collection', () => {
 
       it('Return the Findings for the specified Collection by groupId', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${common.testCollection.collectionId}/findings?aggregator=groupId&acceptedOnly=false&projection=assets`)
+          .get(`/collections/${reference.testCollection.collectionId}/findings?aggregator=groupId&acceptedOnly=false&projection=assets`)
           .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
 
@@ -230,7 +231,7 @@ describe('GET - Collection', () => {
 
       it('Return the Findings for the specified Collection by cci', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${common.testCollection.collectionId}/findings?aggregator=cci&acceptedOnly=false&projection=assets`)
+          .get(`/collections/${reference.testCollection.collectionId}/findings?aggregator=cci&acceptedOnly=false&projection=assets`)
           .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
           expect(res).to.have.status(200)
@@ -247,7 +248,7 @@ describe('GET - Collection', () => {
 
       it('Return the Findings for the specified Collection for benchmarkId x ruleId', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${common.testCollection.collectionId}/findings?aggregator=ruleId&acceptedOnly=false&benchmarkId=${common.benchmark}&projection=assets`)
+          .get(`/collections/${reference.testCollection.collectionId}/findings?aggregator=ruleId&acceptedOnly=false&benchmarkId=${reference.benchmark}&projection=assets`)
           .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
 
@@ -263,7 +264,7 @@ describe('GET - Collection', () => {
 
       it('Return the Findings for the specified Collection for asset x ruleId Copy', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${common.testCollection.collectionId}/findings?aggregator=ruleId&acceptedOnly=false&assetId=${environment.testAsset.assetId}&projection=assets`)
+          .get(`/collections/${reference.testCollection.collectionId}/findings?aggregator=ruleId&acceptedOnly=false&assetId=${environment.testAsset.assetId}&projection=assets`)
           .set('Authorization', `Bearer ${user.token}`)
           expect(res).to.have.status(200)
           expect(res).to.have.status(200)
@@ -280,7 +281,7 @@ describe('GET - Collection', () => {
 
       it('Return stig-asset grants for a lvl1 user in this collection.', async () => {
         const res = await chai.request(config.baseUrl)
-          .get(`/collections/${common.testCollection.collectionId}/grants/${common.grantCheckUserId}/access`)
+          .get(`/collections/${reference.testCollection.collectionId}/grants/${reference.grantCheckUserId}/access`)
           .set('Authorization', `Bearer ${user.token}`)
           if(user.name === 'lvl1' || user.name === 'lvl2'){
             expect(res).to.have.status(403)
@@ -293,7 +294,7 @@ describe('GET - Collection', () => {
           const regex = new RegExp("asset")
           for (const stigAssetGrant of res.body) {
             expect(stigAssetGrant.asset.name).to.match(regex)
-            expect(stigAssetGrant.benchmarkId).to.be.oneOf(common.testCollection.validStigs)
+            expect(stigAssetGrant.benchmarkId).to.be.oneOf(reference.testCollection.validStigs)
             expect(stigAssetGrant.asset.assetId).to.be.oneOf(distinct.assetIDs_testCollection)
           }
       })
@@ -303,16 +304,16 @@ describe('GET - Collection', () => {
 
         it('Labels for the specified Collection', async () => {
           const res = await chai.request(config.baseUrl)
-            .get(`/collections/${common.testCollection.collectionId}/labels`)
+            .get(`/collections/${reference.testCollection.collectionId}/labels`)
             .set('Authorization', `Bearer ${user.token}`)
             expect(res).to.have.status(200)
-            expect(res.body).to.be.an('array').of.length(common.testCollection.labels.length)
+            expect(res.body).to.be.an('array').of.length(reference.testCollection.labels.length)
             for(const label of res.body){
-              expect(common.testCollection.labels).to.include(label.labelId)
-              if (label.name == common.testCollection.fullLabelName){
+              expect(reference.testCollection.labels).to.include(label.labelId)
+              if (label.name == reference.testCollection.fullLabelName){
                   expect(label.uses).to.equal(distinct.fullLabelUses)
                 }
-              if (label.name == common.testCollection.lvl1LabelName){
+              if (label.name == reference.testCollection.lvl1LabelName){
                   expect(label.uses).to.equal(distinct.lvl1LabelUses)
               }
               
@@ -323,20 +324,20 @@ describe('GET - Collection', () => {
         describe('getCollectionLabelById - /collections/{collectionId}/labels/{labelId}', () => {
           it('Collection label', async () => {
             const res = await chai.request(config.baseUrl)
-              .get(`/collections/${common.testCollection.collectionId}/labels/${common.testCollection.fullLabel}`)
+              .get(`/collections/${reference.testCollection.collectionId}/labels/${reference.testCollection.fullLabel}`)
               .set('Authorization', `Bearer ${user.token}`)
               expect(res).to.have.status(200)
-              expect(res.body.labelId).to.equal(common.testCollection.fullLabel)
+              expect(res.body.labelId).to.equal(reference.testCollection.fullLabel)
               expect(res.body.uses).to.equal(distinct.fullLabelUses)
 
-              expect(res.body.name).to.equal(common.testCollection.fullLabelName)
+              expect(res.body.name).to.equal(reference.testCollection.fullLabelName)
           })
         })
 
           describe('getCollectionMetadata - /collections/{collectionId}/metadata', () => {
             it('Metadata for the specified Collection', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/metadata`)
+                .get(`/collections/${reference.testCollection.collectionId}/metadata`)
                 .set('Authorization', `Bearer ${user.token}`)
                 if(user.name === 'lvl1' || user.name === 'lvl2'){
                   expect(res).to.have.status(403)
@@ -344,7 +345,7 @@ describe('GET - Collection', () => {
                 }
                 expect(res).to.have.status(200)
                 expect(res.body).to.be.an('object')
-                expect(res.body[common.testCollection.collectionMetadataKey]).to.equal(common.testCollection.collectionMetadataValue)
+                expect(res.body[reference.testCollection.collectionMetadataKey]).to.equal(reference.testCollection.collectionMetadataValue)
             })
           })
 
@@ -352,15 +353,15 @@ describe('GET - Collection', () => {
 
             it('Return the Metadata KEYS for a Collection', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/metadata/keys?`)
+                .get(`/collections/${reference.testCollection.collectionId}/metadata/keys?`)
                 .set('Authorization', `Bearer ${user.token}`)
                 if(user.name === 'lvl1' || user.name === 'lvl2'){
                   expect(res).to.have.status(403)
                   return
                 }
                 expect(res).to.have.status(200)
-                expect(res.body).to.be.an('array').of.length(common.testCollection.allMetadata.length)
-                const keys = common.testCollection.allMetadata.map(meta => meta.key)
+                expect(res.body).to.be.an('array').of.length(reference.testCollection.allMetadata.length)
+                const keys = reference.testCollection.allMetadata.map(meta => meta.key)
                 for(const key of res.body){
                   expect(keys).to.include(key)
                 }
@@ -371,14 +372,14 @@ describe('GET - Collection', () => {
 
             it('Return the Metadata VALUE for a Collection metadata KEY', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/metadata/keys/${common.testCollection.collectionMetadataKey}`)
+                .get(`/collections/${reference.testCollection.collectionId}/metadata/keys/${reference.testCollection.collectionMetadataKey}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 if(user.name === 'lvl1' || user.name === 'lvl2'){
                   expect(res).to.have.status(403)
                   return
                 }
                 expect(res).to.have.status(200)
-                expect(res.body).to.equal(common.testCollection.collectionMetadataValue)
+                expect(res.body).to.equal(reference.testCollection.collectionMetadataValue)
             })
           })
 
@@ -386,14 +387,14 @@ describe('GET - Collection', () => {
 
             it('Return a POAM-like spreadsheet aggregated by groupId', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/poam?aggregator=groupId&date=01%2F01%2F1970&office=MyOffice&status=Ongoing&acceptedOnly=true`)
+                .get(`/collections/${reference.testCollection.collectionId}/poam?aggregator=groupId&date=01%2F01%2F1970&office=MyOffice&status=Ongoing&acceptedOnly=true`)
                 .set('Authorization', `Bearer ${user.token}`)
                 expect(res).to.have.status(200)
             })
 
             it('Return a POAM-like spreadsheet aggregated by ruleId', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/poam?aggregator=ruleId&date=01%2F01%2F1970&office=MyOffice&status=Ongoing&acceptedOnly=true`)
+                .get(`/collections/${reference.testCollection.collectionId}/poam?aggregator=ruleId&date=01%2F01%2F1970&office=MyOffice&status=Ongoing&acceptedOnly=true`)
                 .set('Authorization', `Bearer ${user.token}`)
                 expect(res).to.have.status(200)
             })
@@ -403,21 +404,21 @@ describe('GET - Collection', () => {
 
             it('History records - no query params', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body).to.be.an('array').of.length(common.testCollection.assetsWithHistory.length)
+                expect(res.body).to.be.an('array').of.length(reference.testCollection.assetsWithHistory.length)
 
                 for(asset of res.body){
-                  if(asset.assetId === common.testCollection.reviewHistory.assetId){
-                    expect(asset.reviewHistories).to.be.an('array').of.length(common.testCollection.reviewHistoryRuleCnt)
+                  if(asset.assetId === reference.testCollection.reviewHistory.assetId){
+                    expect(asset.reviewHistories).to.be.an('array').of.length(reference.testCollection.reviewHistoryRuleCnt)
                     for(const history of asset.reviewHistories){
-                      if(history.ruleId === common.testCollection.reviewHistory.ruleId){
-                        expect(history.history).to.be.an('array').of.length(common.testCollection.reviewHistoryRuleCnt)
+                      if(history.ruleId === reference.testCollection.reviewHistory.ruleId){
+                        expect(history.history).to.be.an('array').of.length(reference.testCollection.reviewHistoryRuleCnt)
                         for(const record of history.history){
                           expect(record.result).to.be.equal('pass')
                         }
@@ -429,7 +430,7 @@ describe('GET - Collection', () => {
 
             it('History records - asset only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history?assetId=${common.testCollection.reviewHistory.assetId}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history?assetId=${reference.testCollection.reviewHistory.assetId}`)
                 .set('Authorization', `Bearer ${user.token}`)
 
                 expect(res).to.have.status(distinct.historyResponseStatus)
@@ -439,11 +440,11 @@ describe('GET - Collection', () => {
                 //requesting one assets history
                 expect(res.body).to.be.an('array').of.length(1)
                 for(asset of res.body){
-                  expect(asset.assetId).to.equal(common.testCollection.reviewHistory.assetId)
-                  expect(asset.reviewHistories).to.be.an('array').of.length(common.testCollection.rulesWithHistoryCnt)
+                  expect(asset.assetId).to.equal(reference.testCollection.reviewHistory.assetId)
+                  expect(asset.reviewHistories).to.be.an('array').of.length(reference.testCollection.rulesWithHistoryCnt)
                   for(const history of asset.reviewHistories){
-                    if(history.ruleId === common.testCollection.reviewHistory.ruleId){
-                      expect(history.history).to.be.an('array').of.length(common.testCollection.reviewHistoryRuleCnt)
+                    if(history.ruleId === reference.testCollection.reviewHistory.ruleId){
+                      expect(history.history).to.be.an('array').of.length(reference.testCollection.reviewHistoryRuleCnt)
                       for(const record of history.history){
                         expect(record.result).to.be.equal('pass')
                       }
@@ -454,19 +455,19 @@ describe('GET - Collection', () => {
 
             it('History records - endDate only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history?endDate=${common.testCollection.reviewHistory.endDate}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history?endDate=${reference.testCollection.reviewHistory.endDate}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body).to.be.an('array').of.length(common.testCollection.assetsWithHistory.length)
+                expect(res.body).to.be.an('array').of.length(reference.testCollection.assetsWithHistory.length)
                 for(asset of res.body){
                   for(const history of asset.reviewHistories){
                     expect(history.history).to.be.an('array').of.length(2)
                     for(const record of history.history){
-                      expect(Date.parse(record.ts)).to.be.below(Date.parse(common.testCollection.reviewHistory.endDate))
+                      expect(Date.parse(record.ts)).to.be.below(Date.parse(reference.testCollection.reviewHistory.endDate))
                     }
                   }
                 }
@@ -474,18 +475,18 @@ describe('GET - Collection', () => {
 
             it('History records - startDate only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history?startDate=${common.testCollection.reviewHistory.startDate}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history?startDate=${reference.testCollection.reviewHistory.startDate}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body).to.be.an('array').of.length(common.testCollection.assetsWithHistory.length)
+                expect(res.body).to.be.an('array').of.length(reference.testCollection.assetsWithHistory.length)
                 for(asset of res.body){
                   for(const history of asset.reviewHistories){
                     for(const record of history.history){
-                      expect(Date.parse(record.ts)).to.be.above(Date.parse(common.testCollection.reviewHistory.startDate))
+                      expect(Date.parse(record.ts)).to.be.above(Date.parse(reference.testCollection.reviewHistory.startDate))
                     }
                   }
                 }
@@ -493,36 +494,36 @@ describe('GET - Collection', () => {
 
             it('History records - rule only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history?ruleId=${common.testCollection.reviewHistory.ruleId}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history?ruleId=${reference.testCollection.reviewHistory.ruleId}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body).to.be.an('array').of.length(common.testCollection.assetsWithHistory.length)
+                expect(res.body).to.be.an('array').of.length(reference.testCollection.assetsWithHistory.length)
                 for(asset of res.body){
                   for(const history of asset.reviewHistories){
-                    expect(history.ruleId).to.equal(common.testCollection.reviewHistory.ruleId)
+                    expect(history.ruleId).to.equal(reference.testCollection.reviewHistory.ruleId)
                   }
                 }
             })
 
             it('History records - start and end dates', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history?startDate=${common.testCollection.reviewHistory.startDate}&endDate=${common.testCollection.reviewHistory.endDate}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history?startDate=${reference.testCollection.reviewHistory.startDate}&endDate=${reference.testCollection.reviewHistory.endDate}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body).to.be.an('array').of.length(common.testCollection.assetsWithHistory.length)
+                expect(res.body).to.be.an('array').of.length(reference.testCollection.assetsWithHistory.length)
                 for(asset of res.body){
                   for(const history of asset.reviewHistories){
                     for(const record of history.history){
-                      expect(Date.parse(record.ts)).to.be.above(Date.parse(common.testCollection.reviewHistory.startDate))
-                      expect(Date.parse(record.ts)).to.be.below(Date.parse(common.testCollection.reviewHistory.endDate))
+                      expect(Date.parse(record.ts)).to.be.above(Date.parse(reference.testCollection.reviewHistory.startDate))
+                      expect(Date.parse(record.ts)).to.be.below(Date.parse(reference.testCollection.reviewHistory.endDate))
                     }
                   }
                 }
@@ -530,18 +531,18 @@ describe('GET - Collection', () => {
 
             it('History records - status only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history?status=${common.testCollection.reviewHistory.status}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history?status=${reference.testCollection.reviewHistory.status}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body).to.be.an('array').of.length(common.testCollection.assetsWithHistory.length)
+                expect(res.body).to.be.an('array').of.length(reference.testCollection.assetsWithHistory.length)
                 for(asset of res.body){
                   for(const history of asset.reviewHistories){
                     for(const record of history.history){
-                      expect(record.status.label).to.equal(common.testCollection.reviewHistory.status)
+                      expect(record.status.label).to.equal(reference.testCollection.reviewHistory.status)
                     }
                   }
                 }
@@ -549,7 +550,7 @@ describe('GET - Collection', () => {
 
             it('History records - all params', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history?status=${common.testCollection.reviewHistory.status}&assetId=${common.testCollection.reviewHistory.assetId}&ruleId=${common.testCollection.reviewHistory.ruleId}&startDate=${common.testCollection.reviewHistory.startDate}&endDate=${common.testCollection.reviewHistory.endDate}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history?status=${reference.testCollection.reviewHistory.status}&assetId=${reference.testCollection.reviewHistory.assetId}&ruleId=${reference.testCollection.reviewHistory.ruleId}&startDate=${reference.testCollection.reviewHistory.startDate}&endDate=${reference.testCollection.reviewHistory.endDate}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
@@ -559,16 +560,16 @@ describe('GET - Collection', () => {
                 expect(res.body).to.be.an('array').of.length(1)
                 //asset
                 //expect just one item in response array
-                expect(res.body[0].assetId).to.equal(common.testCollection.reviewHistory.assetId)
+                expect(res.body[0].assetId).to.equal(reference.testCollection.reviewHistory.assetId)
                 for(const history of res.body[0].reviewHistories){
                   //rule 
-                  expect(history.ruleId).to.equal(common.testCollection.reviewHistory.ruleId)
+                  expect(history.ruleId).to.equal(reference.testCollection.reviewHistory.ruleId)
                   for(const record of history.history){
                     // start/end date
-                    expect(Date.parse(record.ts)).to.be.above(Date.parse(common.testCollection.reviewHistory.startDate))
-                    expect(Date.parse(record.ts)).to.be.below(Date.parse(common.testCollection.reviewHistory.endDate))
+                    expect(Date.parse(record.ts)).to.be.above(Date.parse(reference.testCollection.reviewHistory.startDate))
+                    expect(Date.parse(record.ts)).to.be.below(Date.parse(reference.testCollection.reviewHistory.endDate))
                     // status
-                    expect(record.status.label).to.equal(common.testCollection.reviewHistory.status)
+                    expect(record.status.label).to.equal(reference.testCollection.reviewHistory.status)
                   }
                 }
             })
@@ -577,33 +578,33 @@ describe('GET - Collection', () => {
 
             it('History stats - no query params', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history/stats`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history/stats`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body.collectionHistoryEntryCount).to.equal(common.testCollection.reviewHistoryTotalCnt)
+                expect(res.body.collectionHistoryEntryCount).to.equal(reference.testCollection.reviewHistoryTotalCnt)
                 expect(Date.parse(res.body.oldestHistoryEntryDate)).to.equal(Date.parse("2020-08-11T22:26:50.000Z"))
             })
 
             it('History stats - startDate only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history/stats?startDate=${common.testCollection.reviewHistory.startDate}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history/stats?startDate=${reference.testCollection.reviewHistory.startDate}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body.collectionHistoryEntryCount).to.equal(common.testCollection.reviewHistoryTotalCnt)
+                expect(res.body.collectionHistoryEntryCount).to.equal(reference.testCollection.reviewHistoryTotalCnt)
                 expect(Date.parse(res.body.oldestHistoryEntryDate)).to.equal(Date.parse("2020-08-11T22:26:50.000Z"))
             })
 
             it('History stats - startDate - Asset Projection', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history/stats?startDate=${common.testCollection.reviewHistory.startDate}&projection=asset`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history/stats?startDate=${reference.testCollection.reviewHistory.startDate}&projection=asset`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
@@ -611,33 +612,33 @@ describe('GET - Collection', () => {
                   return
                 }
 
-                expect(res.body.collectionHistoryEntryCount).to.equal(common.testCollection.reviewHistoryTotalCnt)
+                expect(res.body.collectionHistoryEntryCount).to.equal(reference.testCollection.reviewHistoryTotalCnt)
                 expect(Date.parse(res.body.oldestHistoryEntryDate)).to.equal(Date.parse("2020-08-11T22:26:50.000Z"))
-                expect(res.body.assetHistoryEntryCounts.length).to.eql(common.testCollection.reviewHistory_startDateCnt)
+                expect(res.body.assetHistoryEntryCounts.length).to.eql(reference.testCollection.reviewHistory_startDateCnt)
                 let totalHistoryEntries = 0
                 for(const asset of res.body.assetHistoryEntryCounts){
                   expect(distinct.assetIDs_testCollection).to.include(asset.assetId)
                   totalHistoryEntries += asset.historyEntryCount
                 }
-                expect(common.testCollection.reviewHistoryTotalCnt).to.equal(res.body.collectionHistoryEntryCount)
+                expect(reference.testCollection.reviewHistoryTotalCnt).to.equal(res.body.collectionHistoryEntryCount)
             })
 
             it('History stats - endDate only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history/stats?endDate=${common.testCollection.reviewHistory.endDate}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history/stats?endDate=${reference.testCollection.reviewHistory.endDate}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body.collectionHistoryEntryCount).to.equal(common.testCollection.reviewHistory_endDateCnt)
+                expect(res.body.collectionHistoryEntryCount).to.equal(reference.testCollection.reviewHistory_endDateCnt)
                 expect(Date.parse(res.body.oldestHistoryEntryDate)).to.equal(Date.parse("2020-08-11T22:26:50.000Z"))
             })
 
             it('History stats - start and end dates', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history/stats?endDate=${common.testCollection.reviewHistory.endDate}&startDate=${common.testCollection.reviewHistory.startDate}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history/stats?endDate=${reference.testCollection.reviewHistory.endDate}&startDate=${reference.testCollection.reviewHistory.startDate}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
@@ -650,31 +651,31 @@ describe('GET - Collection', () => {
 
             it('History stats - asset only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history/stats?assetId=${common.testCollection.reviewHistory.assetId}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history/stats?assetId=${reference.testCollection.reviewHistory.assetId}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body.collectionHistoryEntryCount).to.equal(common.testCollection.reviewHistory_testAssetCnt)
+                expect(res.body.collectionHistoryEntryCount).to.equal(reference.testCollection.reviewHistory_testAssetCnt)
             })
             it('History stats - rule only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history/stats?ruleId=${common.testCollection.reviewHistory.ruleId}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history/stats?ruleId=${reference.testCollection.reviewHistory.ruleId}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
                 if (res.status !== 200){
                   return
                 }
-                expect(res.body.collectionHistoryEntryCount).to.equal(common.testCollection.reviewHistory_ruleIdCnt)
+                expect(res.body.collectionHistoryEntryCount).to.equal(reference.testCollection.reviewHistory_ruleIdCnt)
                 expect(Date.parse(res.body.oldestHistoryEntryDate)).to.equal(Date.parse("2020-08-11T22:30:38.000Z"))
             })
 
             it('History stats - status only', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history/stats?status=${common.testCollection.reviewHistory.status}`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history/stats?status=${reference.testCollection.reviewHistory.status}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
@@ -682,13 +683,13 @@ describe('GET - Collection', () => {
                   return
                 }
 
-                expect(res.body.collectionHistoryEntryCount).to.equal(common.testCollection.reviewHistory_byStatusCnt)
+                expect(res.body.collectionHistoryEntryCount).to.equal(reference.testCollection.reviewHistory_byStatusCnt)
                 expect(Date.parse(res.body.oldestHistoryEntryDate)).to.equal(Date.parse("2020-08-11T22:26:50.000Z"))
             })
 
             it('History stats - all params', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/review-history/stats?endDate=${common.testCollection.reviewHistory.endDate}&startDate=${common.testCollection.reviewHistory.startDate}&assetId=${common.testCollection.reviewHistory.assetId}&status=${common.testCollection.reviewHistory.status}&ruleId=${common.testCollection.reviewHistory.ruleId}&projection=asset`)
+                .get(`/collections/${reference.testCollection.collectionId}/review-history/stats?endDate=${reference.testCollection.reviewHistory.endDate}&startDate=${reference.testCollection.reviewHistory.startDate}&assetId=${reference.testCollection.reviewHistory.assetId}&status=${reference.testCollection.reviewHistory.status}&ruleId=${reference.testCollection.reviewHistory.ruleId}&projection=asset`)
                 .set('Authorization', `Bearer ${user.token}`)
                 
                 expect(res).to.have.status(distinct.historyResponseStatus)
@@ -706,7 +707,7 @@ describe('GET - Collection', () => {
 
             it('Return the STIGs mapped in the specified Collection', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/stigs`)
+                .get(`/collections/${reference.testCollection.collectionId}/stigs`)
                 .set('Authorization', `Bearer ${user.token}`)
                 expect(res).to.have.status(200)
                 // if(user.name === 'lvl1'){
@@ -722,7 +723,7 @@ describe('GET - Collection', () => {
 
             it('Return the STIGs mapped in the specified Collection - label', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/stigs?labelId=${common.testCollection.fullLabel}`)
+                .get(`/collections/${reference.testCollection.collectionId}/stigs?labelId=${reference.testCollection.fullLabel}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 expect(res).to.have.status(200)
 
@@ -737,7 +738,7 @@ describe('GET - Collection', () => {
 
             it('Return the STIGs mapped in the specified Collection - asset projection', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/stigs?projection=assets`)
+                .get(`/collections/${reference.testCollection.collectionId}/stigs?projection=assets`)
                 .set('Authorization', `Bearer ${user.token}`)
                 expect(res).to.have.status(200)
                 // if(user.name === 'lvl1'){
@@ -760,11 +761,11 @@ describe('GET - Collection', () => {
 
             it('Return Pinned Revision for this STIG', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/stigs/${common.benchmark}`)
+                .get(`/collections/${reference.testCollection.collectionId}/stigs/${reference.benchmark}`)
                 .set('Authorization', `Bearer ${user.token}`)
                 expect(res).to.have.status(200)
-                expect(res.body.benchmarkId).to.equal(common.benchmark)
-                expect(res.body.revisionStr).to.equal(common.revisionStr)
+                expect(res.body.benchmarkId).to.equal(reference.benchmark)
+                expect(res.body.revisionStr).to.equal(reference.revisionStr)
                 expect(res.body.revisionPinned).to.equal(false)
                 expect(res.body.assetCount).to.eql(distinct.testBenchmarkAssignedCount)
 
@@ -772,11 +773,11 @@ describe('GET - Collection', () => {
 
             it('Return the info about the specified STIG from the specified Collection - asset projection', async () => {
               const res = await chai.request(config.baseUrl)
-                .get(`/collections/${common.testCollection.collectionId}/stigs/${common.benchmark}?projection=assets`)
+                .get(`/collections/${reference.testCollection.collectionId}/stigs/${reference.benchmark}?projection=assets`)
                 .set('Authorization', `Bearer ${user.token}`)
                 expect(res).to.have.status(200)
-                expect(res.body.benchmarkId).to.equal(common.benchmark)
-                expect(res.body.revisionStr).to.equal(common.revisionStr)
+                expect(res.body.benchmarkId).to.equal(reference.benchmark)
+                expect(res.body.revisionStr).to.equal(reference.revisionStr)
                 expect(res.body.revisionPinned).to.equal(false)
                 const regex = new RegExp("asset")
                 for(const asset of res.body.assets){

@@ -1,90 +1,7 @@
-{
-  "common": {
-    "collectionId": "21",
-    "collectionName": "Test Collection",
-    "collectionDescription": "This is a test collection",
-    "collectionOwner": "admin",
-    "collectionOwnerID": "87",
-    "benchmark": "VPN_SRG_TEST",
-    "checklistLength": "81",
-    "revisionStr": "V1R1",
-    "grantCheckUserId": "85",
-    "testCollection":{
-      "name": "Collection X",
-      "collectionId": "21",
-      "collectionMetadataKey": "pocName",
-      "collectionMetadataValue": "poc2Patched",
-      "owners": ["87", "1", "45"],
-      "assetIDs_testCollection":["29","62","42","154"],
-      "assetsWithHistory":["42","154"],
-      "testAssetId": "42",
-      "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST"],
-      "labelCount": 2,
-      "lvl1LabelName": "test-label-lvl1",
-      "lvl1Label":"5130dc84-9a68-11ec-b1bc-0242ac110002",
-      "fullLabel":"755b8a28-9a68-11ec-b1bc-0242ac110002",
-      "fullLabelName": "test-label-full",
-      "labels": [
-          "755b8a28-9a68-11ec-b1bc-0242ac110002",
-          "5130dc84-9a68-11ec-b1bc-0242ac110002"
-      ],
-      "allMetadata": [{
-        "key": "pocEmail",
-        "value": "pocEmail@email.com"
-        },
-        {
-        "key": "pocName",               
-        "value": "poc2Patched"
-        },
-        {
-        "key": "pocPhone",
-        "value": "12342"
-        },
-        {
-        "key": "reqRar",
-        "value": "true"
-      }],
-      "reviewHistory":{
-        "assetId": "42",
-        "startDate": "1900-10-01",
-        "endDate": "2020-10-01",
-        "ruleId": "SV-106179r1_rule",
-        "status": "submitted"
-      },
-      "rulesWithHistoryCnt": 2,
-      "reviewHistoryRuleCnt": 2,
-      "reviewHistoryTotalCnt": 7,
-      "reviewHistory_endDateCnt": 6,
-      "reviewHistory_startAndEndDateCnt": 2,
-      "reviewHistory_startDateCnt": 2,
-      "reviewHistory_byStatusCnt": 3,
-      "reviewHistory_testAssetCnt": 5,
-      "reviewHistory_ruleIdCnt": 4
-    },
-    "deleteCollection":{
-      "collectionId_adminOnly": "84",
-      "collectionId": "85"
-    },
-    "scrapCollection":{
-      "collectionId": "1",
-      "validStigs": ["VPN_SRG_TEST","Windows_10_STIG_TEST", "RHEL_7_STIG_TEST"],
-      "scrapLabel": "df4e6836-a003-11ec-b1bc-0242ac110002",
-      "collectionMetadataKey": "pocName",
-      "collectionMetadataValue": "poc2Patched"
-    },
-    "scrapLvl1User":{
-        "userId": "86",
-        "username": "bizarroLvl1"
-    },
-    "scrapAsset":{
-        "assetId": "34",
-        "scrapBenchmark": "RHEL_7_STIG_TEST",
-        "metadataKey": "testkey",
-        "metadataValue": "testvalue"
-      
-    }
+//This data contains expected response data that varies by iteration "scenario" or "user" for each test case. These expectations are relative to the "referenceData.js" data used to construct the API requests. 
 
-  },
+
+const distinct = {
   "stigmanadmin": {
     "user": "admin",
     "userId": "87",
@@ -217,4 +134,5 @@
     "canDeleteCollection": true,
     "canModifyCollection": true
     }
-  }
+}
+module.exports = distinct;

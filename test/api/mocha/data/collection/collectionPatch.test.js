@@ -6,16 +6,20 @@ const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
 const environment = require('../../environment.json')
 const users = require('../../iterations.json')
+const expectations = require('./expectations.js')
+const reference = require('./referenceData.js')
 
 describe('PATCH - Collection', () => {
 
     before(async function () {
         this.timeout(4000)
-        await utils.loadAppData()
         await utils.uploadTestStigs()
+        await utils.loadAppData()
     })
 
     for(const user of users) {
+      const distinct = expectations[user.name]
+
 
       describe(`user:${user.name}`, () => {
         describe('updateCollection - /collections/{collectionId}', () => {
