@@ -20,7 +20,11 @@ describe('PATCH - Collection', () => {
 
     for(const user of users) {
       const distinct = expectations[user.name]
-
+      if (expectations[user.name] === undefined){
+        it(`No expectations for this iteration scenario: ${user.name}`, async () => {})
+        return
+      }
+  
 
       describe(`user:${user.name}`, () => {
 

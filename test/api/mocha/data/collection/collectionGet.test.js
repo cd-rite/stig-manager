@@ -13,14 +13,19 @@ describe('GET - Collection', () => {
 
   before(async function () {
     this.timeout(4000)
-    await utils.loadAppData()
     await utils.uploadTestStigs()
+    await utils.loadAppData()
     await utils.createDisabledCollectionsandAssets()
   })
 
   for(const user of users){
+    if (expectations[user.name] === undefined){
+      it(`No expectations for this iteration scenario: ${user.name}`, async () => {})
+      return
+    }
+
     
-    describe(`user:${user.name}`, () => {
+    describe(`user: ${user.name}`, () => {
       const distinct = expectations[user.name]
     
       describe('getCollections - /collections', () => {
