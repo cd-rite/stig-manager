@@ -5,7 +5,7 @@ const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
 // const environment = require('../../environment.json')
-const users = require('../../iterations.json')
+const users = require('../../iterations')
 const expectations = require('./expectations')
 const reference = require('./referenceData')
 
