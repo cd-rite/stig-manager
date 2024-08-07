@@ -4,7 +4,7 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require("../../testConfig.json")
 const utils = require("../../utils/testUtils")
-const environment = require("../../environment.json")
+// const environment = require("../../environment.json")
 const users = require("../../iterations.js")
 const expectations = require('./expectations.js')
 const reference = require('./referenceData.js')
@@ -30,7 +30,7 @@ describe('POST - Collection - not all tests run for all iterations', () => {
       const distinct = expectations[user.name]
       
       before(async function () {
-        this.timeout(4000)
+        // this.timeout(4000)
         await utils.uploadTestStigs()
         await utils.loadAppData()
         await utils.createDisabledCollectionsandAssets()
@@ -169,8 +169,8 @@ describe('POST - Collection - not all tests run for all iterations', () => {
       describe("cloneCollection - /collections/{collectionId}/clone", () => {
 
         before(async function () {
-          this.timeout(4000)
-          await utils.setDefaultRevision(environment.testCollection.collectionId, environment.testCollection.benchmark, "V1R0")
+          // this.timeout(4000)
+          await utils.setDefaultRevision(reference.testCollection.collectionId, reference.benchmark, reference.pinRevision)
         })
 
         // this test is dependant on the endpoints of the util functions to be working correctly. 
@@ -178,7 +178,7 @@ describe('POST - Collection - not all tests run for all iterations', () => {
 
           const res = await chai
             .request(config.baseUrl)
-            .post(`/collections/${environment.testCollection.collectionId}/clone?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=labels`)
+            .post(`/collections/${reference.testCollection.collectionId}/clone?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs&projection=labels`)
             .set("Authorization", `Bearer ${user.token}`)
             .send({
               name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -283,7 +283,7 @@ describe('POST - Collection - not all tests run for all iterations', () => {
 
       //     const res = await chai
       //     .request(config.baseUrl)
-      //     .post(`/collections/${environment.testCollection.collectionId}/clone?projection=grants&projection=owners`        )
+      //     .post(`/collections/${reference.testCollection.collectionId}/clone?projection=grants&projection=owners`        )
       //     .set("Authorization", `Bearer ${user.token}`)
       //     .send({
       //       name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -336,7 +336,7 @@ describe('POST - Collection - not all tests run for all iterations', () => {
 
       //     const res = await chai
       //     .request(config.baseUrl)
-      //     .post(`/collections/${environment.testCollection.collectionId}/clone?projection=labels`        )
+      //     .post(`/collections/${reference.testCollection.collectionId}/clone?projection=labels`        )
       //     .set("Authorization", `Bearer ${user.token}`)
       //     .send({
       //       name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -380,7 +380,7 @@ describe('POST - Collection - not all tests run for all iterations', () => {
 
       //     const res = await chai
       //     .request(config.baseUrl)
-      //     .post(`/collections/${environment.testCollection.collectionId}/clone?projection=assets`        )
+      //     .post(`/collections/${reference.testCollection.collectionId}/clone?projection=assets`        )
       //     .set("Authorization", `Bearer ${user.token}`)
       //     .send({
       //       name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -424,7 +424,7 @@ describe('POST - Collection - not all tests run for all iterations', () => {
 
       //     const res = await chai
       //     .request(config.baseUrl)
-      //     .post(`/collections/${environment.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
+      //     .post(`/collections/${reference.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
       //     .set("Authorization", `Bearer ${user.token}`)
       //     .send({
       //       name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -469,7 +469,7 @@ describe('POST - Collection - not all tests run for all iterations', () => {
 
       //     const res = await chai
       //     .request(config.baseUrl)
-      //     .post(`/collections/${environment.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
+      //     .post(`/collections/${reference.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
       //     .set("Authorization", `Bearer ${user.token}`)
       //     .send({
       //       name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -519,7 +519,7 @@ describe('POST - Collection - not all tests run for all iterations', () => {
 
       //     const res = await chai
       //     .request(config.baseUrl)
-      //     .post(`/collections/${environment.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
+      //     .post(`/collections/${reference.testCollection.collectionId}/clone?projection=statistics&projection=stigs`)
       //     .set("Authorization", `Bearer ${user.token}`)
       //     .send({
       //       name:"Clone_" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100) + "_X",
@@ -567,12 +567,12 @@ describe('POST - Collection - not all tests run for all iterations', () => {
 
       describe("exportToCollection - /collections/{collectionId}/export-to/{dstCollectionId}", () => {
 
-        // before(async function () {
-        //   this.timeout(4000)
-        //   // await utils.uploadTestStigs()
-        //   // await utils.loadAppData()
-        //   // await utils.createDisabledCollectionsandAssets()
-        // })
+        before(async function () {
+          // this.timeout(4000)
+          await utils.uploadTestStigs()
+          await utils.loadAppData()
+          await utils.createDisabledCollectionsandAssets()
+        })
         
         it("export results to another collection - entire asset - create asset in destination", async () => {
 
@@ -608,232 +608,251 @@ describe('POST - Collection - not all tests run for all iterations', () => {
             }
         })
 
-      //   it("export results to another collection - entire asset - asset exists", async () => {
+        it("export results to another collection - entire asset - asset exists", async () => {
 
-      //     const res = await chai
-      //       .request(config.baseUrl)
-      //       .post(`/collections/${environment.testCollection.collectionId}/export-to/${environment.scrapCollection.collectionId}`)
-      //       .set("Authorization", `Bearer ${user.token}`)
-      //       .send([
-      //         {
-      //           assetId: environment.testAsset.assetId,
-      //         },
-      //       ])
-      //       if(user.name == "lvl1" || user.name == "lvl2"){
+          const res = await chai
+            .request(config.baseUrl)
+            .post(`/collections/${reference.testCollection.collectionId}/export-to/${reference.scrapCollection.collectionId}`)
+            .set("Authorization", `Bearer ${user.token}`)
+            .send([
+              {
+                assetId: reference.testAsset.assetId,
+              },
+            ])
 
-      //         expect(res).to.have.status(403)
-      //         return
-      //       }
-      //       expect(res).to.have.status(200)
-      //       const response = res.body.toString().split("\n")
-      //       expect(response).to.be.an('array')
-      //       expect(response).to.have.lengthOf.at.least(1)
-      //       for(const message of response){ 
-      //           if(message.length > 0){
-      //               let messageObj = JSON.parse(message)
-      //               if(messageObj.stage == "result"){
-      //                 expect(messageObj.counts.assetsCreated).to.eql(0)
-      //                 expect(messageObj.counts.stigsMapped).to.eql(0)
-      //                 expect(messageObj.counts.reviewsInserted).to.eql(0)
-      //                 expect(messageObj.counts.reviewsUpdated).to.eql(9)
-      //               }
-      //           }
-      //       }
-      //   })
+            if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+            }
+
+            expect(res).to.have.status(200)
+            const response = res.body.toString().split("\n")
+            expect(response).to.be.an('array')
+            expect(response).to.have.lengthOf.at.least(1)
+            for(const message of response){ 
+                if(message.length > 0){
+                    let messageObj = JSON.parse(message)
+                    if(messageObj.stage == "result"){
+                      expect(messageObj.counts.assetsCreated).to.eql(0)
+                      expect(messageObj.counts.stigsMapped).to.eql(0)
+                      expect(messageObj.counts.reviewsInserted).to.eql(0)
+                      expect(messageObj.counts.reviewsUpdated).to.eql(9)
+                    }
+                }
+            }
+        })
       })
 
 
-      // describe("createCollectionLabel - /collections/{collectionId}/labels", () => {
+      describe("createCollectionLabel - /collections/{collectionId}/labels", () => {
 
-      //   it("Create Label in a Collection", async () => {
+        it("Create Label in a Collection", async () => {
 
-      //     const request = {
-      //         "name": "test-label-POST",
-      //         "description": "test label POSTED",
-      //         "color": "aa34cc"
-      //       }
-      //     const res = await chai
-      //       .request(config.baseUrl)
-      //       .post(`/collections/${environment.scrapCollection.collectionId}/labels`)
-      //       .set("Authorization", `Bearer ${user.token}`)
-      //       .send(request)
-      //       if(user.name == "lvl1" || user.name == "lvl2"){
+          const request = {
+              "name": "test-label-POST",
+              "description": "test label POSTED",
+              "color": "aa34cc"
+            }
+          const res = await chai
+            .request(config.baseUrl)
+            .post(`/collections/${reference.scrapCollection.collectionId}/labels`)
+            .set("Authorization", `Bearer ${user.token}`)
+            .send(request)
 
-      //         expect(res).to.have.status(403)
-      //         return
-      //       }
-      //       expect(res).to.have.status(201)
-      //       expect(res.body.name).to.equal(request.name)
-      //       expect(res.body.description).to.equal(request.description)
-      //       expect(res.body.color).to.equal(request.color)
-      //       expect(res.body.uses).to.equal(0)
-      //   })
-      // })
+            if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+            }
+
+            expect(res).to.have.status(201)
+            expect(res.body.name).to.equal(request.name)
+            expect(res.body.description).to.equal(request.description)
+            expect(res.body.color).to.equal(request.color)
+            expect(res.body.uses).to.equal(0)
+        })
+      })
 
 
-      // describe("writeStigPropsByCollectionStig - /collections/{collectionId}/stigs/{benchmarkId}", () => {
-      //   before(async function () {
-      //     this.timeout(4000)
-      //     await utils.uploadTestStigs()
-      //     await utils.loadAppData()
-      //     await utils.createDisabledCollectionsandAssets()
-      //   })
+      describe("writeStigPropsByCollectionStig - /collections/{collectionId}/stigs/{benchmarkId}", () => {
+        before(async function () {
+          this.timeout(4000)
+          await utils.uploadTestStigs()
+          await utils.loadAppData()
+          await utils.createDisabledCollectionsandAssets()
+        })
 
-      //   it("Set the Assets mapped to a STIG - default rev and assets", async () => {
+        it("Set the Assets mapped to a STIG - default rev and assets", async () => {
 
-      //     const post = {
-      //       defaultRevisionStr: "V1R1",
-      //       assetIds: ["62", "42", "154"],
-      //     }
+          const post = requestBodies.writeStigPropsByCollectionStig
+          // {
+          //   defaultRevisionStr: "V1R1",
+          //   assetIds: ["62", "42", "154"],
+          // }
 
-      //     const res = await chai
-      //       .request(config.baseUrl)
-      //       .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
-      //       .set("Authorization", `Bearer ${user.token}`)
-      //       .send(post)
-      //       if(user.name == "lvl1" || user.name == "lvl2"){
+          const res = await chai
+            .request(config.baseUrl)
+            .post(`/collections/${reference.testCollection.collectionId}/stigs/${reference.testCollection.benchmark}`)
+            .set("Authorization", `Bearer ${user.token}`)
+            .send(post)
 
-      //         expect(res).to.have.status(403)
-      //         return
-      //       }
-      //       expect(res).to.have.status(200)
-      //       expect(res.body.revisionStr).to.equal("V1R1")
-      //       expect(res.body.revisionPinned).to.equal(true)
-      //       expect(res.body.ruleCount).to.equal(81)
-      //       expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
-      //       expect(res.body.assetCount).to.equal(3)
-      //   })
+            if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+            }
 
-      //   it("Set the Assets mapped to a STIG - default latest and assets", async () => {
+            expect(res).to.have.status(200)
+            expect(res.body.revisionStr).to.eql(requestBodies.writeStigPropsByCollectionStig.defaultRevisionStr)
+            expect(res.body.revisionPinned).to.eql(true)
+            expect(res.body.ruleCount).to.eql(reference.checklistLength)
+            expect(res.body.benchmarkId).to.eql(reference.testCollection.benchmark)
+            expect(res.body.assetCount).to.eql(requestBodies.writeStigPropsByCollectionStig.assetIds.length)
+        })
 
-      //     const post = {
-      //       defaultRevisionStr: "latest",
-      //       assetIds: ["62", "42", "154"],
-      //     }
+        it("Set the Assets mapped to a STIG - default latest and assets", async () => {
 
-      //     const res = await chai
-      //       .request(config.baseUrl)
-      //       .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
-      //       .set("Authorization", `Bearer ${user.token}`)
-      //       .send(post)
-      //       if(user.name == "lvl1" || user.name == "lvl2"){
+          const post = {
+            defaultRevisionStr: "latest",
+            assetIds: requestBodies.writeStigPropsByCollectionStig.assetIds,
+          }
 
-      //         expect(res).to.have.status(403)
-      //         return
-      //       }
-      //       expect(res).to.have.status(200)
-      //       expect(res.body.revisionStr).to.equal("V1R1")
-      //       expect(res.body.revisionPinned).to.equal(false)
-      //       expect(res.body.ruleCount).to.equal(81)
-      //       expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
-      //       expect(res.body.assetCount).to.equal(3)
-      //   })
-      //   it("Set the Assets mapped to a STIG - assets only", async () => {
+          const res = await chai
+            .request(config.baseUrl)
+            .post(`/collections/${reference.testCollection.collectionId}/stigs/${reference.testCollection.benchmark}`)
+            .set("Authorization", `Bearer ${user.token}`)
+            .send(post)
 
-      //     const post = {
-      //       assetIds: ["62", "42", "154"],
-      //     }
+            if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+            }
 
-      //     const res = await chai
-      //       .request(config.baseUrl)
-      //       .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
-      //       .set("Authorization", `Bearer ${user.token}`)
-      //       .send(post)
-      //       if(user.name == "lvl1" || user.name == "lvl2"){
+            expect(res).to.have.status(200)
+            expect(res.body.revisionStr).to.equal(requestBodies.writeStigPropsByCollectionStig.defaultRevisionStr)
+            expect(res.body.revisionPinned).to.equal(false)
+            expect(res.body.ruleCount).to.eql(reference.checklistLength)
+            expect(res.body.benchmarkId).to.equal(reference.testCollection.benchmark)
+            expect(res.body.assetCount).to.eql(requestBodies.writeStigPropsByCollectionStig.assetIds.length)
+        })
 
-      //         expect(res).to.have.status(403)
-      //         return
-      //       }
-      //       expect(res).to.have.status(200)
-      //       expect(res.body.revisionStr).to.equal("V1R1")
-      //       expect(res.body.revisionPinned).to.equal(false)
-      //       expect(res.body.ruleCount).to.equal(81)
-      //       expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
-      //       expect(res.body.assetCount).to.equal(3)
-      //   })
-      //   it("Set the Assets mapped to a STIG - invalid rev - expect 422", async () => {
 
-      //     const post = {
-      //     "defaultRevisionStr": "V1R5"
-      //     }
+        it("Set the Assets mapped to a STIG - assets only", async () => {
 
-      //     const res = await chai
-      //       .request(config.baseUrl)
-      //       .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
-      //       .set("Authorization", `Bearer ${user.token}`)
-      //       .send(post)
-      //       if(user.name == "lvl1" || user.name == "lvl2"){
+          const post = {
+            assetIds: requestBodies.writeStigPropsByCollectionStig.assetIds,
+          }
 
-      //         expect(res).to.have.status(403)
-      //         return
-      //       }
-      //       expect(res).to.have.status(422)
-      //   })
-      //   it("Set the Assets mapped to a STIG - default rev only", async () => {
+          const res = await chai
+            .request(config.baseUrl)
+            .post(`/collections/${reference.testCollection.collectionId}/stigs/${reference.testCollection.benchmark}`)
+            .set("Authorization", `Bearer ${user.token}`)
+            .send(post)
 
-      //     const post = {
-      //     defaultRevisionStr: "V1R0"
-      //     }
+            if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+            }
 
-      //     const res = await chai
-      //       .request(config.baseUrl)
-      //       .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
-      //       .set("Authorization", `Bearer ${user.token}`)
-      //       .send(post)
-      //       if(user.name == "lvl1" || user.name == "lvl2"){
+            expect(res).to.have.status(200)
+            expect(res.body.revisionStr).to.equal(requestBodies.writeStigPropsByCollectionStig.defaultRevisionStr)
+            expect(res.body.revisionPinned).to.equal(false)
+            expect(res.body.ruleCount).to.eql(reference.checklistLength)
+            expect(res.body.benchmarkId).to.equal(reference.testCollection.benchmark)
+            expect(res.body.assetCount).to.eql(requestBodies.writeStigPropsByCollectionStig.assetIds.length)
+        })
 
-      //         expect(res).to.have.status(403)
-      //         return
-      //       }
-      //       expect(res).to.have.status(200)
-      //       expect(res.body.revisionStr).to.equal("V1R0")
-      //       expect(res.body.revisionPinned).to.equal(true)
-      //       expect(res.body.ruleCount).to.equal(81)
-      //       expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
-      //       expect(res.body.assetCount).to.equal(3)
-      //   })
-      //   it("Set the Assets mapped to a STIG - clear assets", async () => {
 
-      //     const post = {
-      //     assetIds: []
-      //     }
+        it("Set the Assets mapped to a STIG - invalid rev - expect 422", async () => {
 
-      //     const res = await chai
-      //       .request(config.baseUrl)
-      //       .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
-      //       .set("Authorization", `Bearer ${user.token}`)
-      //       .send(post)
-      //       if(user.name == "lvl1" || user.name == "lvl2"){
+          const post = {
+          defaultRevisionStr: "V1R5"
+          }
 
-      //         expect(res).to.have.status(403)
-      //         return
-      //       }
-      //       expect(res).to.have.status(204)
-      //   })
-      //   it("Set the Assets mapped to a STIG - after pinned delete", async () => {
+          const res = await chai
+            .request(config.baseUrl)
+            .post(`/collections/${reference.testCollection.collectionId}/stigs/${reference.testCollection.benchmark}`)
+            .set("Authorization", `Bearer ${user.token}`)
+            .send(post)
 
-      //     const post = {
-      //     "assetIds": ["62","42","154"]
-      //     }
+            if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+            }
 
-      //     const res = await chai
-      //       .request(config.baseUrl)
-      //       .post(`/collections/${environment.testCollection.collectionId}/stigs/${environment.testCollection.benchmark}`)
-      //       .set("Authorization", `Bearer ${user.token}`)
-      //       .send(post)
-      //       if(user.name == "lvl1" || user.name == "lvl2"){
+            expect(res).to.have.status(422)
+        })
 
-      //         expect(res).to.have.status(403)
-      //         return
-      //       }
-      //       expect(res).to.have.status(200)
-      //       expect(res.body.revisionStr).to.equal("V1R1")
-      //       expect(res.body.revisionPinned).to.equal(false)
-      //       expect(res.body.ruleCount).to.equal(81)
-      //       expect(res.body.benchmarkId).to.equal(environment.testCollection.benchmark)
-      //       expect(res.body.assetCount).to.equal(3)
-      //   })
-      // })
+        it("Set the Assets mapped to a STIG - default rev only", async () => {
+
+          const post = {
+          defaultRevisionStr: reference.testCollection.pinRevision
+          }
+
+          const res = await chai
+            .request(config.baseUrl)
+            .post(`/collections/${reference.testCollection.collectionId}/stigs/${reference.testCollection.benchmark}`)
+            .set("Authorization", `Bearer ${user.token}`)
+            .send(post)
+
+            if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+            }
+
+            expect(res).to.have.status(200)
+            expect(res.body.revisionStr).to.equal(reference.testCollection.pinRevision)
+            expect(res.body.revisionPinned).to.equal(true)
+            expect(res.body.ruleCount).to.eql(reference.checklistLength)
+            expect(res.body.benchmarkId).to.equal(reference.testCollection.benchmark)
+            expect(res.body.assetCount).to.eql(requestBodies.writeStigPropsByCollectionStig.assetIds.length)
+        })
+
+
+        it("Set the Assets mapped to a STIG - clear assets", async () => {
+
+          const post = {
+          assetIds: []
+          }
+
+          const res = await chai
+            .request(config.baseUrl)
+            .post(`/collections/${reference.testCollection.collectionId}/stigs/${reference.testCollection.benchmark}`)
+            .set("Authorization", `Bearer ${user.token}`)
+            .send(post)
+
+            if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+            }
+
+            expect(res).to.have.status(204)
+        })
+
+
+        it("Set the Assets mapped to a STIG - after pinned delete", async () => {
+
+          const post = {
+            assetIds: requestBodies.writeStigPropsByCollectionStig.assetIds,
+          }
+
+          const res = await chai
+            .request(config.baseUrl)
+            .post(`/collections/${reference.testCollection.collectionId}/stigs/${reference.testCollection.benchmark}`)
+            .set("Authorization", `Bearer ${user.token}`)
+            .send(post)
+
+            if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+            }
+
+            expect(res).to.have.status(200)
+            expect(res.body.revisionStr).to.equal(reference.testCollection.defaultRevision)
+            expect(res.body.revisionPinned).to.equal(false)
+            expect(res.body.ruleCount).to.eql(reference.checklistLength)
+            expect(res.body.benchmarkId).to.equal(reference.testCollection.benchmark)
+            expect(res.body.assetCount).to.eql(requestBodies.writeStigPropsByCollectionStig.assetIds.length)
+        })
+      })
     })
   }
 })

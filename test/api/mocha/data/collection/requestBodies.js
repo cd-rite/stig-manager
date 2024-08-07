@@ -128,7 +128,11 @@ const requestBodies = {
           color: "ffffff",
         },
       ],
-    }
+    },
+  writeStigPropsByCollectionStig: {
+    defaultRevisionStr: "V1R1",
+    assetIds: ["62", "42", "154"]
+  }
   
 }
 module.exports = requestBodies;
