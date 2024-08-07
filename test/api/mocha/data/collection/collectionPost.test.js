@@ -28,10 +28,6 @@ describe('POST - Collection - not all tests run for all iterations', () => {
 
     describe(`user:${user.name}`, () => {
       const distinct = expectations[user.name]
-      if (expectations[user.name] === undefined){
-        it(`No expectations for this iteration scenario: ${user.name}`, async () => {})
-        return
-      }
   
       describe("createCollection - /collections", () => {
 
