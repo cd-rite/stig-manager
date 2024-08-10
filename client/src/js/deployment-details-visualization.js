@@ -148,7 +148,7 @@ function renderDistributionCharts(collectionsData) {
         window.React.createElement(Tooltip, { cursor: false,   
           contentStyle: { backgroundColor: "#181a1b", color: "#fff" },
         }),  
-        window.React.createElement(Legend, { verticalAlign: "top", height: 36 }),
+        // window.React.createElement(Legend, { verticalAlign: "top", height: 36 }),
         window.React.createElement(Bar, {
           dataKey: "value",
           fill: "#8884d8",
@@ -180,7 +180,7 @@ function renderDistributionCharts(collectionsData) {
         window.React.createElement(Tooltip, { cursor: false,   
           contentStyle: { backgroundColor: "#181a1b", color: "#fff" },
         }),  
-        window.React.createElement(Legend, { verticalAlign: "top", height: 36 }),
+        // window.React.createElement(Legend, { verticalAlign: "top", height: 36 }),
         window.React.createElement(Bar, {
           dataKey: "value",
           fill: "#82ca9d",
