@@ -19,6 +19,23 @@ function getScopeStr() {
 }
 
 async function loadResources() {
+    // Load Recharts
+  // Load React and ReactDOM
+  const ReactModule = await import('https://esm.sh/react@17.0.2')
+  const ReactDOMModule = await import('https://esm.sh/react-dom@17.0.2')
+  
+  // Make React and ReactDOM available globally
+  window.React = ReactModule.default;
+  window.ReactDOM = ReactDOMModule.default;
+
+  // Load Recharts
+  const RechartsModule = await import('https://esm.sh/recharts@2.1.9')
+  window.Recharts = RechartsModule;
+
+  // Load our visualization script as a module and make it globally available
+  const VisualizationModule = await import('./deployment-details-visualization.js')
+  window.createVisualizationComponent = VisualizationModule.createVisualizationComponent;
+
   for (const href of stylesheets) {
     const link = document.createElement('link')
     link.href = href
@@ -31,6 +48,9 @@ async function loadResources() {
     document.head.appendChild(link)
   }
   
+    // Load our visualization script as a module
+  //  await import('./deployment-details-visualization.js')
+
   const { Chart } = await import('./modules/node_modules/chart.js/auto/auto.js')
   window.Chart = Chart
 

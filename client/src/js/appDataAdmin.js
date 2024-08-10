@@ -1,3 +1,5 @@
+// import { createVisualizationComponent } from './deployment-visualization.js';
+
 async function addAppDataAdmin( params ) {
   let detailBodyWrapEl
   try {
@@ -15,19 +17,31 @@ async function addAppDataAdmin( params ) {
       margins: { top: SM.Margin.top, right: SM.Margin.edge, bottom: SM.Margin.adjacent, left: SM.Margin.edge },
       autoScroll: true,
       buttonAlign: 'left',
+      items: [
+        {
+          xtype: 'panel',
+          id: 'visualization-container',
+          border: false
+        },
+        {
+          xtype: 'panel',
+          id: 'json-view-container',
+          border: false
+        }
+      ],
       bbar: [
         {
           text: 'JSON',
           iconCls: 'sm-export-icon',
           handler: function (btn) {
-            if (detailResponseText) {
-              const blob = new Blob([detailResponseText], {type: 'application/json'})
+            if (window.detailResponseText) {
+              const blob = new Blob([window.detailResponseText], {type: 'application/json'})
               downloadBlob(blob, SM.Global.filenameEscaped(`stig-manager-details_${SM.Global.filenameComponentFromDate()}.json`))
             }
           }
         }
       ]
-    })
+    });
 
     const appDataPanel = new Ext.Panel({
       region: 'north',
@@ -216,15 +230,49 @@ async function addAppDataAdmin( params ) {
       }
     }
 
-    async function getDetail () {
-      return Ext.Ajax.requestPromise({
-        url: `${STIGMAN.Env.apiBase}/op/details`,
-        params: {
-          elevate: curUser.privileges.canAdmin
-        },
-        method: 'GET'
-      })
+    async function getDetail() {
+      try {
+        detailBodyWrapEl.mask('Getting data...')
+        const response = await Ext.Ajax.requestPromise({
+          url: `${STIGMAN.Env.apiBase}/op/details`,
+          params: {
+            elevate: curUser.privileges.canAdmin
+          },
+          method: 'GET'
+        });
+        
+        window.detailResponseText = response.response.responseText;
+        const detailData = JSON.parse(window.detailResponseText);
+    
+        // Create and render the visualization component
+        if (typeof window.createVisualizationComponent === 'function') {
+          const visualizationComponent = window.createVisualizationComponent(detailData);
+          const container = Ext.getCmp('visualization-container');
+          container.body.dom.innerHTML = '';
+          container.body.dom.appendChild(visualizationComponent);
+        } else {
+          console.error('createVisualizationComponent is not available');
+        }
+    
+        // Keep the existing JSON tree view
+        const detailTree = JsonView.createTree(detailData);
+        detailTree.key = `GET ${STIGMAN.Env.apiBase}/op/details?elevate=true`
+        detailTree.isExpanded = true
+        detailTree.children[0].isExpanded = true
+    
+        const jsonViewContainer = Ext.getCmp('json-view-container');
+        JsonView.render(detailTree, jsonViewContainer.body)
+    
+        return response;
+      }
+      catch (e) {
+        SM.Error.handleError(e)
+      }
+      finally {
+        detailBodyWrapEl.unmask()
+      }
     }
+    
 
     function downloadBlob (blob, filename) {
       let a = document.createElement('a')
@@ -254,14 +302,14 @@ async function addAppDataAdmin( params ) {
     detailBodyWrapEl = detailJson.getEl().child('.x-panel-bwrap')
     detailBodyWrapEl.mask('Getting data...')
     const detailResponseText = (await getDetail()).response.responseText //used by downloadBlob
-    const detailTree = JsonView.createTree(JSON.parse(detailResponseText))
-    // adjust for rendering
-    // the parent and first child (dbInfo) are expanded
-    detailTree.key = `GET ${STIGMAN.Env.apiBase}/op/details?elevate=true`
-    detailTree.isExpanded = true
-    detailTree.children[0].isExpanded = true
+    // const detailTree = JsonView.createTree(JSON.parse(detailResponseText))
+    // // adjust for rendering
+    // // the parent and first child (dbInfo) are expanded
+    // detailTree.key = `GET ${STIGMAN.Env.apiBase}/op/details?elevate=true`
+    // detailTree.isExpanded = true
+    // detailTree.children[0].isExpanded = true
 
-    JsonView.render(detailTree, detailJson.body)
+    // JsonView.render(detailTree, detailJson.body)
   }
   catch (e) {
     SM.Error.handleError(e)

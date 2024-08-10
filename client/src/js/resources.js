@@ -73,7 +73,8 @@ const scripts = [
   'js/jszip.min.js',
   'js/FileSaver.js',
   'js/jsonview.bundle.js',
-  'js/stigman.js'
+  'js/stigman.js',
+  // 'js/deployment-details-visualization.js',
 ]
 
 const isMinimizedSource = false
