@@ -68,7 +68,10 @@ function renderPerformanceChart(data) {
         window.React.createElement(CartesianGrid, { strokeDasharray: "3 3" }),
         window.React.createElement(XAxis, { dataKey: "id" }),
         window.React.createElement(YAxis),
-        window.React.createElement(Tooltip),
+        // window.React.createElement(Tooltip),
+        window.React.createElement(Tooltip, { cursor: false,   
+          contentStyle: { backgroundColor: "#181a1b", color: "#fff" },
+        }),  
         window.React.createElement(Legend),
         window.React.createElement(Bar, { dataKey: "maxDuration", fill: "#8884d8" })
       )
@@ -114,49 +117,47 @@ function renderDistributionCharts(collectionsData) {
     else ruleCountDistribution[4].value++;
   });
 
-  const { PieChart, Pie, Tooltip, ResponsiveContainer, Legend, Cell } = window.Recharts;
+  const { PieChart, Pie, Tooltip, ResponsiveContainer, Legend, Cell, BarChart, Bar, XAxis, YAxis } = window.Recharts;
+
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
   const renderCustomizedLabel = (props) => {
-    const { cx, cy, midAngle, innerRadius, outerRadius, percent, index } = props;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
-    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
-
+    const { x, y, width, value } = props;
     return (
-      percent > 0 ? (
-        window.React.createElement('text', {
-          x: x,
-          y: y,
-          fill: 'white',
-          textAnchor: 'middle',
-          dominantBaseline: 'central',
-        }, `${(percent * 100).toFixed(0)}%`)
-      ) : null
+      window.React.createElement('text', {
+        x: x + width / 2,
+        y: y,
+        dy: -6 - width / 2,
+        textAnchor: 'middle',
+        fill: '#000',
+      }, `${value}`)
     );
   };
 
   window.ReactDOM.render(
-    window.React.createElement(ResponsiveContainer, { width: '100%', height: 300 },
-      window.React.createElement(PieChart,
-        {},
-        window.React.createElement(Pie, {
-          data: assetCountDistribution,
+    window.React.createElement(ResponsiveContainer, { width: '100%', height: 400 },
+      window.React.createElement(BarChart, {
+        data: assetCountDistribution,
+        layout: "vertical",
+        margin: { top: 20, right: 30, left: 100, bottom: 5 },
+      },
+        window.React.createElement(XAxis, { type: "number" }),
+        window.React.createElement(YAxis, { type: "category", dataKey: "name" }),
+        // window.React.createElement(Tooltip),
+        window.React.createElement(Tooltip, { cursor: false,   
+          contentStyle: { backgroundColor: "#181a1b", color: "#fff" },
+        }),  
+        window.React.createElement(Legend, { verticalAlign: "top", height: 36 }),
+        window.React.createElement(Bar, {
           dataKey: "value",
-          nameKey: "name",
-          cx: "50%",
-          cy: "50%",
-          outerRadius: 80,
-          label: renderCustomizedLabel,
-          labelLine: false,
+          fill: "#8884d8",
+          // label: renderCustomizedLabel,
         }, 
           assetCountDistribution.map((entry, index) => 
             window.React.createElement(Cell, { key: `cell-${index}`, fill: COLORS[index % COLORS.length] })
           )
-        ),
-        window.React.createElement(Tooltip),
-        window.React.createElement(Legend),
+        )
       )
     ),
     document.getElementById('asset-distribution-chart')
@@ -167,25 +168,28 @@ function renderDistributionCharts(collectionsData) {
   document.getElementById('asset-distribution-chart').prepend(assetTitle);
 
   window.ReactDOM.render(
-    window.React.createElement(ResponsiveContainer, { width: '100%', height: 300 },
-      window.React.createElement(PieChart,
-        {},
-        window.React.createElement(Pie, {
-          data: ruleCountDistribution,
+    window.React.createElement(ResponsiveContainer, { width: '100%', height: 400 },
+      window.React.createElement(BarChart, {
+        data: ruleCountDistribution,
+        layout: "vertical",
+        margin: { top: 20, right: 30, left: 100, bottom: 5 },
+      },
+        window.React.createElement(XAxis, { type: "number" }),
+        window.React.createElement(YAxis, { type: "category", dataKey: "name" }),
+        // window.React.createElement(Tooltip),
+        window.React.createElement(Tooltip, { cursor: false,   
+          contentStyle: { backgroundColor: "#181a1b", color: "#fff" },
+        }),  
+        window.React.createElement(Legend, { verticalAlign: "top", height: 36 }),
+        window.React.createElement(Bar, {
           dataKey: "value",
-          nameKey: "name",
-          cx: "50%",
-          cy: "50%",
-          outerRadius: 80,
-          label: renderCustomizedLabel,
-          labelLine: false,
+          fill: "#82ca9d",
+          // label: renderCustomizedLabel,
         },
           ruleCountDistribution.map((entry, index) => 
             window.React.createElement(Cell, { key: `cell-${index}`, fill: COLORS[index % COLORS.length] })
           )
-        ),
-        window.React.createElement(Tooltip),
-        window.React.createElement(Legend),
+        )
       )
     ),
     document.getElementById('rule-distribution-chart')

@@ -21,7 +21,8 @@ async function addAppDataAdmin( params ) {
         {
           xtype: 'panel',
           id: 'visualization-container',
-          border: false
+          border: false,
+          height: 900
         },
         {
           xtype: 'panel',
