@@ -79,32 +79,63 @@ function renderPerformanceChart(data) {
 
 function renderDistributionCharts(collectionsData) {
   const assetCountDistribution = [
-    { name: '1-5 assets', value: 0 },
-    { name: '6-10 assets', value: 0 },
-    { name: '11-15 assets', value: 0 },
-    { name: '16+ assets', value: 0 }
+    { name: '1-10 assets', value: 0 },
+    { name: '11-50 assets', value: 0 },
+    { name: '51-100 assets', value: 0 },
+    { name: '101-500 assets', value: 0 },
+    { name: '501+ assets', value: 0 }
   ];
 
   const ruleCountDistribution = [
-    { name: '1-1000 rules', value: 0 },
-    { name: '1001-10000 rules', value: 0 },
-    { name: '10001-100000 rules', value: 0 },
-    { name: '100001+ rules', value: 0 }
+    { name: '1-1,000 rules', value: 0 },
+    { name: '1,001-10,000 rules', value: 0 },
+    { name: '10,001-50,000 rules', value: 0 },
+    { name: '50,001-100,000 rules', value: 0 },
+    { name: '100,001+ rules', value: 0 }
   ];
 
+  let maxAssets = 0;
+  let maxRules = 0;
+
   Object.values(collectionsData).forEach(col => {
-    if (col.assetsTotal <= 5) assetCountDistribution[0].value++;
-    else if (col.assetsTotal <= 10) assetCountDistribution[1].value++;
-    else if (col.assetsTotal <= 15) assetCountDistribution[2].value++;
-    else assetCountDistribution[3].value++;
+    maxAssets = Math.max(maxAssets, col.assetsTotal);
+    maxRules = Math.max(maxRules, col.ruleCnt);
+
+    if (col.assetsTotal <= 10) assetCountDistribution[0].value++;
+    else if (col.assetsTotal <= 50) assetCountDistribution[1].value++;
+    else if (col.assetsTotal <= 100) assetCountDistribution[2].value++;
+    else if (col.assetsTotal <= 500) assetCountDistribution[3].value++;
+    else assetCountDistribution[4].value++;
 
     if (col.ruleCnt <= 1000) ruleCountDistribution[0].value++;
     else if (col.ruleCnt <= 10000) ruleCountDistribution[1].value++;
-    else if (col.ruleCnt <= 100000) ruleCountDistribution[2].value++;
-    else ruleCountDistribution[3].value++;
+    else if (col.ruleCnt <= 50000) ruleCountDistribution[2].value++;
+    else if (col.ruleCnt <= 100000) ruleCountDistribution[3].value++;
+    else ruleCountDistribution[4].value++;
   });
 
-  const { PieChart, Pie, Tooltip, ResponsiveContainer } = window.Recharts;
+  const { PieChart, Pie, Tooltip, ResponsiveContainer, Legend, Cell } = window.Recharts;
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+
+  const renderCustomizedLabel = (props) => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent, index } = props;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
+    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
+
+    return (
+      percent > 0 ? (
+        window.React.createElement('text', {
+          x: x,
+          y: y,
+          fill: 'white',
+          textAnchor: 'middle',
+          dominantBaseline: 'central',
+        }, `${(percent * 100).toFixed(0)}%`)
+      ) : null
+    );
+  };
 
   window.ReactDOM.render(
     window.React.createElement(ResponsiveContainer, { width: '100%', height: 300 },
@@ -117,14 +148,23 @@ function renderDistributionCharts(collectionsData) {
           cx: "50%",
           cy: "50%",
           outerRadius: 80,
-          fill: "#8884d8",
-          label: true
-        }),
-        window.React.createElement(Tooltip)
+          label: renderCustomizedLabel,
+          labelLine: false,
+        }, 
+          assetCountDistribution.map((entry, index) => 
+            window.React.createElement(Cell, { key: `cell-${index}`, fill: COLORS[index % COLORS.length] })
+          )
+        ),
+        window.React.createElement(Tooltip),
+        window.React.createElement(Legend),
       )
     ),
     document.getElementById('asset-distribution-chart')
   );
+
+  const assetTitle = document.createElement('h4');
+  assetTitle.textContent = `Asset Distribution (Max: ${maxAssets} assets)`;
+  document.getElementById('asset-distribution-chart').prepend(assetTitle);
 
   window.ReactDOM.render(
     window.React.createElement(ResponsiveContainer, { width: '100%', height: 300 },
@@ -137,12 +177,21 @@ function renderDistributionCharts(collectionsData) {
           cx: "50%",
           cy: "50%",
           outerRadius: 80,
-          fill: "#82ca9d",
-          label: true
-        }),
-        window.React.createElement(Tooltip)
+          label: renderCustomizedLabel,
+          labelLine: false,
+        },
+          ruleCountDistribution.map((entry, index) => 
+            window.React.createElement(Cell, { key: `cell-${index}`, fill: COLORS[index % COLORS.length] })
+          )
+        ),
+        window.React.createElement(Tooltip),
+        window.React.createElement(Legend),
       )
     ),
     document.getElementById('rule-distribution-chart')
   );
+
+  const ruleTitle = document.createElement('h4');
+  ruleTitle.textContent = `Rule Distribution (Max: ${maxRules.toLocaleString()} rules)`;
+  document.getElementById('rule-distribution-chart').prepend(ruleTitle);
 }
