@@ -1,7 +1,15 @@
 const MigrationHandler = require('./lib/MigrationHandler')
 
 const upMigration = [
-  // `DROP TABLE IF EXISTS user_group_stig_asset_map`,
+  `DROP TABLE IF EXISTS user_group_stig_asset_map`,
+  `ALTER TABLE collection_grant DROP FOREIGN KEY fk_collection_grant_1`,
+  `ALTER TABLE collection_grant DROP FOREIGN KEY fk_collection_grant_3`,
+  `ALTER TABLE asset DROP INDEX idx_asset_state`,
+  `ALTER TABLE collection DROP INDEX index4`,
+  `ALTER TABLE collection_grant DROP INDEX INDEX_USER_GROUP`,
+  `ALTER TABLE collection_grant DROP COLUMN userGroupId`,
+
+
   `DROP TABLE IF EXISTS collection_grant_acl`,
   `DROP TABLE IF EXISTS collection_grant_group_acl`,
   `DROP TABLE IF EXISTS collection_grant_group`,
@@ -57,7 +65,6 @@ const upMigration = [
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci`,
 
   // table collection_grant
-  `ALTER TABLE collection_grant DROP FOREIGN KEY fk_collection_grant_1`,
   `ALTER TABLE collection_grant ADD COLUMN userGroupId INT NULL AFTER userId, CHANGE COLUMN userId userId INT NULL`,
   `ALTER TABLE collection_grant ADD UNIQUE INDEX INDEX_USER_GROUP (userGroupId ASC, collectionId ASC) VISIBLE`,
   `ALTER TABLE collection_grant ADD CONSTRAINT fk_collection_grant_1 FOREIGN KEY (userId) REFERENCES user_data (userId) ON DELETE CASCADE ON UPDATE CASCADE`,
