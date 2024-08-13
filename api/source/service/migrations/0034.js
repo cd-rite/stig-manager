@@ -98,10 +98,11 @@ const upMigration = [
 FROM
   user_stig_asset_map usa
   left join stig_asset_map sa using (saId)
-  left join asset a on sa.assetId = a.assetId
+  left join asset a on sa.assetId = a.assetId and a.state = 'enabled'
   left join collection_grant cg on (a.collectionId = cg.collectionId and usa.userId = cg.userId )
+  left join collection c on cg.collectionId = c.collectionId and c.state = 'enabled'
 WHERE
-  cg.cgId is not null`,
+  cg.cgId is not null `,
 
   // `DROP TABLE user_stig_asset_map`
 ]
