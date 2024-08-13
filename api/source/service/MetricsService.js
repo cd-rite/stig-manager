@@ -38,7 +38,7 @@ module.exports.queryMetrics = async function ({
   const columns = returnType === 'csv' ? [...baseColsFlat[aggregation]] : [...baseCols[aggregation]]
   const joins = [
     'asset a',
-    'left join stig_asset_map sa on (a.assetId = sa.assetId and a.state = "enabled")',
+    'right join stig_asset_map sa on (a.assetId = sa.assetId and a.state = "enabled")',
     'left join default_rev dr on a.collectionId = dr.collectionId and sa.benchmarkId = dr.benchmarkId',
     'left join revision rev on dr.revId = rev.revId',
     'left join stig on rev.benchmarkId = stig.benchmarkId'
