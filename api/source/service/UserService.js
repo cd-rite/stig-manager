@@ -10,7 +10,9 @@ Generalized queries for users
 exports.queryUsers = async function (inProjection, inPredicates, elevate, userObject) {
   let connection
   try {
-    let columns = [
+    const ctes = []
+    let needsCollectionGrantees = false
+    const columns = [
       'CAST(ud.userId as char) as userId',
       'ud.username',
       `json_extract(
@@ -18,38 +20,40 @@ exports.queryUsers = async function (inProjection, inPredicates, elevate, userOb
       ) as email`,
       `COALESCE(json_unquote(json_extract(
         ud.lastClaims, :name
-      )), ud.username) as displayName`,  
+      )), ud.username) as displayName`
     ]
-    let joins = [
-      'user_data ud',
-      'left join (select cgi.cgId, cgi.collectionId, cgi.userId, cgi.accessLevel from collection_grant cgi inner join collection c on cgi.collectionId = c.collectionId and c.state = "enabled") cg on ud.userId = cg.userId'
-    ]
-    let groupBy = [
-      'ud.userId',
-      'ud.username'
-    ]
+    const joins = new Set([
+      'user_data ud'
+    ])
+    const groupBy = ['ud.userId']
 
     const orderBy = ['ud.username']
 
     // PROJECTIONS
     if (inProjection?.includes('collectionGrants')) {
-      joins.push('left join collection c on cg.collectionId = c.collectionId')
-      columns.push(`case when count(cg.cgId) > 0 then 
-      json_arrayagg(
-        json_object(
+      needsCollectionGrantees = true
+      joins.add('left join cteGrantees cgs on ud.userId = cgs.userId')
+      joins.add('left join collection c on cgs.collectionId = c.collectionId')
+      columns.push(`case when count(cgs.collectionId) > 0
+      then 
+        ${dbUtils.jsonArrayAggDistinct(`json_object(
           'collection', json_object(
-            'collectionId', CAST(cg.collectionId as char),
+            'collectionId', CAST(cgs.collectionId as char),
             'name', c.name
           ),
-          'accessLevel', cg.accessLevel
-        )
-      ) else json_array() end as collectionGrants`)
+          'accessLevel', cgs.accessLevel,
+          'grantees', cgs.grantees
+        )`)}
+      else json_array() 
+      end as collectionGrants`)
     }
 
     if (inProjection?.includes('statistics')) {
+      needsCollectionGrantees = true
+      joins.add('left join cteGrantees cgs on ud.userId = cgs.userId')
       columns.push(`json_object(
           'created', date_format(ud.created, '%Y-%m-%dT%TZ'),
-          'collectionGrantCount', count(cg.cgId),
+          'collectionGrantCount', count(distinct cgs.collectionId),
           'lastAccess', ud.lastAccess,
           'lastClaims', ud.lastClaims
         ) as statistics`)
@@ -57,6 +61,17 @@ exports.queryUsers = async function (inProjection, inPredicates, elevate, userOb
         'ud.lastAccess',
         'ud.lastClaims'
       )
+    }
+    if (inProjection?.includes('userGroups')) {
+      joins.add('left join user_group_user_map ugu on ud.userId = ugu.userId')
+      joins.add('left join user_group ug on ugu.userGroupId = ug.userGroupId')
+      columns.push(`CASE WHEN COUNT(ugu.userGroupId) > 0
+      THEN cast(concat('[', group_concat( distinct JSON_OBJECT(
+        'userGroupId', cast(ugu.userGroupId as char),
+        'name', ug.name
+      )), ']') as json)
+      ELSE json_array()
+      END as userGroups`)
     }
 
     // PREDICATES
@@ -90,9 +105,12 @@ exports.queryUsers = async function (inProjection, inPredicates, elevate, userOb
       predicates.statements.push(`ud.username ${matchStr}`)
       predicates.binds.username = `${inPredicates.username}`
     }
+    if (needsCollectionGrantees) {
+      ctes.push(dbUtils.sqlGrantees({userId: inPredicates.userId, username: inPredicates.username, returnCte: true}))
+    }
 
     // CONSTRUCT MAIN QUERY
-    const sql = dbUtils.makeQueryString({columns, joins, predicates, groupBy, orderBy})
+    const sql = dbUtils.makeQueryString({ctes, columns, joins, predicates, groupBy, orderBy})
   
     connection = await dbUtils.pool.getConnection()
     connection.config.namedPlaceholders = true
@@ -113,18 +131,7 @@ exports.addOrUpdateUser = async function (writeAction, userId, body, projection,
     // REPLACE/UPDATE: userId is not null
 
     // Extract or initialize non-scalar properties to separate variables
-    let { collectionGrants, ...userFields } = body
-
-    // Handle userFields.privileges object
-    if (userFields.hasOwnProperty('privileges')) {
-      userFields.canCreateCollection = userFields.privileges.canCreateCollection ? 1 : 0
-      userFields.canAdmin = userFields.privileges.canAdmin ? 1 : 0
-      delete userFields.privileges
-    }
-    // Stringify metadata
-    if (userFields.hasOwnProperty('metadata')) {
-      userFields.metadata = JSON.stringify(userFields.metadata)
-    }
+    let { collectionGrants, userGroups, ...userFields } = body
 
     connection = await dbUtils.pool.getConnection()
     connection.config.namedPlaceholders = true
@@ -162,7 +169,7 @@ exports.addOrUpdateUser = async function (writeAction, userId, body, projection,
         }
       }
       else {
-        throw('Invalid writeAction')
+        throw new Error('Invalid writeAction')
       }
   
       // Process grants if present
@@ -181,6 +188,17 @@ exports.addOrUpdateUser = async function (writeAction, userId, body, projection,
           binds = collectionGrants.map( grant => [userId, grant.collectionId, grant.accessLevel])
           // INSERT into collection_grant
           await connection.query(sqlInsertCollGrant, [ binds] )
+        }
+      }
+      if (userGroups) {
+        if ( writeAction !== dbUtils.WRITE_ACTION.CREATE ) {
+          await connection.query('DELETE FROM user_group_user_map where userId = ?', [userId])
+        }
+        if (userGroups.length > 0) {
+          await connection.query(
+            `INSERT INTO user_group_user_map (userGroupId, userId) VALUES ?`, 
+            [userGroups.map( userGroup => [userGroup, userId])]
+          )
         }
       }
       // Commit the changes
@@ -217,11 +235,8 @@ exports.addOrUpdateUser = async function (writeAction, userId, body, projection,
  * returns List
  **/
 exports.createUser = async function(body, projection, elevate, userObject, svcStatus = {}) {
-  try {
-    let row = await _this.addOrUpdateUser(dbUtils.WRITE_ACTION.CREATE, null, body, projection, elevate, userObject, svcStatus)
-    return (row)
-  }
-  finally {}
+  let row = await _this.addOrUpdateUser(dbUtils.WRITE_ACTION.CREATE, null, body, projection, elevate, userObject, svcStatus)
+  return (row)
 }
 
 
@@ -325,13 +340,13 @@ exports.setLastAccess = async function (userId, timestamp) {
     return true
 }
 
-exports.setUserData = async function (userObject, fields) {
+exports.setUserData = async function (username, fields) {
   let insertColumns = ['username']
   // Apparently the standard MySQL practice to ensure insertId is valid even on non-updating updates
   // See: https://chrisguitarguy.com/2020/01/26/mysql-last-insert-id-on-duplicate-key-update/
   let updateColumns = ['userId = LAST_INSERT_ID(userId)']
   // let updateColumns = []
-  let binds = [userObject.username]
+  let binds = [username]
   if (fields.lastAccess) {
     insertColumns.push('lastAccess')
     updateColumns.push('lastAccess = VALUES(lastAccess)')
@@ -350,3 +365,177 @@ exports.setUserData = async function (userObject, fields) {
   return result.insertId
 }
 
+exports.addOrUpdateUserGroup = async function ({userGroupId, userGroupFields, userIds, createdUserId, modifiedUserId, svcStatus = {}}) {
+  // CREATE: userGroupId is falsey
+  // REPLACE/UPDATE: userGroupId is not falsey
+  const isUpdate = !!userGroupId
+
+  const sqlInsertUserGroup = `INSERT into user_group (name, description, createdUserId, modifiedUserId) VALUES (?,?,?,?)`
+  const sqlUpdateUserGroup = `UPDATE user_group SET ? WHERE userGroupId = ?`
+  const sqlInsertUserGroupUserMap = `INSERT into user_group_user_map (userGroupId, userId) VALUES ?`
+  const sqlDeleteUserGroupUserMap = `DELETE from user_group_user_map WHERE userGroupId = ?`
+
+  async function transactionFn (connection) {
+    if (Object.keys(userGroupFields).length) {
+      const sql = isUpdate ? sqlUpdateUserGroup : sqlInsertUserGroup
+      const binds = isUpdate ? [userGroupFields, userGroupId] : [userGroupFields.name, userGroupFields.description, createdUserId, modifiedUserId]
+      const [resultUserGroup] = await connection.query(sql, binds)
+      userGroupId = isUpdate ? userGroupId : resultUserGroup.insertId
+    }
+    if (userIds) {
+      if (isUpdate) {
+        await connection.query(sqlDeleteUserGroupUserMap, [userGroupId])
+      }
+      if (userIds.length) {
+        const binds = userIds.map( userId => [userGroupId, userId])
+        await connection.query(
+          sqlInsertUserGroupUserMap,
+          [binds]
+        ) 
+      }
+    }
+    return userGroupId
+  }
+
+  return dbUtils.retryOnDeadlock2({
+    transactionFn, 
+    statusObj: svcStatus
+  })
+}
+
+exports.queryUserGroups = async function ({projections = [], filters = {}, elevate = false, userObject = {}}) {
+  // query components
+  const columns = [
+    'CAST(ug.userGroupId as char) as userGroupId',
+    'ug.name',
+    'ug.description'
+  ]
+  const joins = new Set([`user_group ug`])
+  const groupBy = new Set()
+  const orderBy = ['name']
+  const predicates = {
+    statements: [],
+    binds: []
+  }
+
+  // predicates
+  if (filters.userGroupId) {
+    predicates.statements.push('ug.userGroupId = ?')
+    predicates.binds.push(filters.userGroupId)
+  }
+
+  // projections
+  if (projections.includes('attributions')) {
+    joins.add('left join user_data udCreated on ug.createdUserId = udCreated.userId')
+    joins.add('left join user_data udModified on ug.modifiedUserId = udModified.userId')
+    columns.push(`json_object(
+      'created', json_object(
+        'userId', ug.createdUserId,
+        'username', udCreated.username,
+        'ts', DATE_FORMAT(ug.createdDate, '%Y-%m-%dT%H:%i:%sZ') 
+        ),
+      'modified', json_object(
+        'userId', ug.modifiedUserId,
+        'username', udModified.username,
+        'ts', DATE_FORMAT(ug.modifiedDate, '%Y-%m-%dT%H:%i:%sZ')
+        )
+    ) as attributions`)
+  }
+  if (projections.includes('users')) {
+    joins.add('left join user_group_user_map ugu using (userGroupId)')
+    joins.add('left join user_data udUser on ugu.userId = udUser.userId')
+    groupBy.add('ug.userGroupId')
+    columns.push(`CASE WHEN count(ugu.userId)=0 
+    THEN json_array()
+    ELSE cast(concat('[', group_concat(distinct json_object(
+      'userId', cast(ugu.userId as char),
+      'username', udUser.username,
+      'displayName', COALESCE(json_unquote(json_extract(
+        udUser.lastClaims, '$.${config.oauth.claims.name}'
+      )), udUser.username)
+      )
+    ), ']') as json)
+    END as users`)
+  }
+  if (projections.includes('collections')) {
+    joins.add('left join collection_grant cgg using (userGroupId)')
+    joins.add('left join collection on cgg.collectionId = collection.collectionId and collection.state = "enabled"')
+    groupBy.add('ug.userGroupId')
+    columns.push(`CASE WHEN count(cgg.collectionId)=0 
+    THEN json_array()
+    ELSE cast(concat('[', group_concat(distinct json_object(
+      'collectionId', cast(cgg.collectionId as char),
+      'name', collection.name)
+    ), ']') as json)
+    END as collections`)
+  }
+  const sql = dbUtils.makeQueryString({columns, joins, predicates, groupBy, orderBy, format: true})
+  const [rows] = await dbUtils.pool.query(sql)
+  return rows
+}
+
+exports.deleteUserGroup = async function({userGroupId}) {
+    const sqlDeleteUserGroup = `DELETE from user_group WHERE userGroupId = ?`
+    await dbUtils.pool.query(sqlDeleteUserGroup, [userGroupId])
+    return userGroupId
+}
+
+exports.getUserObject = async function (username) {
+  const sql = `
+  select
+    userId,
+    username,
+    lastAccess,
+    lastClaims,
+    (select
+      coalesce(json_objectagg(
+        dt2.collectionId, json_object(
+          'collectionId', dt2.collectionId,
+          'name', dt2.name,
+          'accessLevel', dt2.accessLevel, 
+          'grantIds', dt2.grantIds)), json_object())
+    from   
+      (select 
+        cg.collectionId,
+        c.name,
+        cg.accessLevel,
+        json_array(cg.cgId) as grantIds
+      from
+        collection_grant cg
+        inner join collection c on (cg.collectionId = c.collectionId and c.state = 'enabled')
+        left join user_data ud2 on cg.userId = ud2.userId
+      where
+        ud2.userId = ud.userId
+      union 
+      select
+        collectionId,
+        name,
+        accessLevel,
+        grantIds
+      from
+        (select
+          ROW_NUMBER() OVER(PARTITION BY ugu.userId, cg.collectionId ORDER BY cg.accessLevel desc) as rn,
+          cg.collectionId,
+          c.name, 
+          cg.accessLevel,
+          json_arrayagg(cg.cgId) OVER (PARTITION BY ugu.userId, cg.collectionId, cg.accessLevel) as grantIds
+        from 
+          collection_grant cg
+          inner join collection c on (cg.collectionId = c.collectionId and c.state = 'enabled')
+          left join user_group_user_map ugu on cg.userGroupId = ugu.userGroupId
+          left join user_group ug on ugu.userGroupId = ug.userGroupId
+          left join user_data ud3 on ugu.userId = ud3.userId
+          left join collection_grant cgDirect on (cg.collectionId = cgDirect.collectionId and ugu.userId = cgDirect.userId)
+        where
+        cg.userGroupId is not null
+        and cgDirect.userId is null
+        and ud3.userId = ud.userId) dt
+    where
+      dt.rn = 1) dt2) as grants                               
+  from
+    user_data ud
+  where
+    ud.username = ?`
+  const [rows] = await dbUtils.pool.query(sql, [username])
+  return rows[0]
+}

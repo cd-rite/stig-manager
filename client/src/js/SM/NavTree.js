@@ -250,7 +250,13 @@ SM.NavTree.TreePanel = Ext.extend(Ext.tree.TreePanel, {
                     },
                     {
                       id: 'user-admin',
-                      text: 'User Grants',
+                      text: 'Users',
+                      leaf: true,
+                      iconCls: 'sm-user-icon'
+                    },
+                    {
+                      id: 'user-group-admin',
+                      text: 'User Groups',
                       leaf: true,
                       iconCls: 'sm-users-icon'
                     },
@@ -453,7 +459,7 @@ SM.NavTree.TreePanel = Ext.extend(Ext.tree.TreePanel, {
             items: fp
           })
 
-          appwindow.show(document.body)
+          appwindow.show(Ext.getBody())
         }
         if (n.attributes.action == 'collection-management') {
           addCollectionManager({
@@ -469,6 +475,9 @@ SM.NavTree.TreePanel = Ext.extend(Ext.tree.TreePanel, {
             break
           case 'user-admin':
             addUserAdmin( { treePath: n.getPath() })
+            break
+          case 'user-group-admin':
+            SM.UserGroup.addUserGroupAdmin({treePath: n.getPath()})
             break
           case 'stig-admin':
             addStigAdmin( { treePath: n.getPath() })

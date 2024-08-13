@@ -144,7 +144,7 @@ SM.Review.Form.ResultEngineSprite = Ext.extend(Ext.form.DisplayField, {
                 delegate: 'span', // target of the mouseover
                 showDelay: 0,
                 dismissDelay: 0,
-                renderTo: document.body,
+                renderTo: Ext.getBody(),
                 tplResultEngine: new Ext.XTemplate(
                   '<span>',
                   '<tpl if="values.version">',
@@ -299,6 +299,7 @@ SM.Review.Form.Panel = Ext.extend(Ext.form.FormPanel, {
     })
 
     let statusLabel = ''
+    let access = 'r'
 
     function reviewChanged () {
       return (
@@ -317,6 +318,7 @@ SM.Review.Form.Panel = Ext.extend(Ext.form.FormPanel, {
       const form = _this.getForm()
       form.setValues.call(form, values)
       statusLabel = values.status?.label ?? ''
+      access = values.access ?? 'r'
       if (values.ts && values.username) {
         mdf.formatValue(values)
       }
@@ -341,6 +343,7 @@ SM.Review.Form.Panel = Ext.extend(Ext.form.FormPanel, {
     }
 
     function isReviewSubmittable () {
+      if (access != 'rw') return false
       if (!rcb.value) return false
       if (rcb.value !== 'pass' && rcb.value !== 'fail' && rcb.value !== 'notapplicable') return false
       if (_this.fieldSettings.detail.required === 'always' && !dta.getValue()) return false
@@ -379,7 +382,7 @@ SM.Review.Form.Panel = Ext.extend(Ext.form.FormPanel, {
       const fieldSettings = _this.fieldSettings
 
       // Initial state: Enable the entry fields if the review status is 'In progress' or 'Rejected', disable them otherwise
-      const editable = (statusLabel === '' || statusLabel === 'saved' || statusLabel === 'rejected')
+      const editable = access == 'rw' && (statusLabel === '' || statusLabel === 'saved' || statusLabel === 'rejected')
       resultCombo.setDisabled(!editable) // disable if not editable
       resultCombo.setReadOnly(!editable) // disable if not editable
       detailTextArea.setDisabled(!editable)
@@ -417,8 +420,17 @@ SM.Review.Form.Panel = Ext.extend(Ext.form.FormPanel, {
           commentTextArea.disable()
         }
       }
-
-      if (isReviewSubmittable()) {
+      if (access != 'rw') {
+        // button 1
+        button1.disable();
+        button1.setText('Read only');
+        button1.setIconClass('sm-disk-icon');
+        // button 2
+        button2.disable();
+        button2.setText('Read only');
+        button2.setIconClass('sm-disk-icon');
+      }
+      else if (isReviewSubmittable()) {
         if (fp.reviewChanged()) {
           // review has been changed (is dirty)
           switch (statusLabel) {

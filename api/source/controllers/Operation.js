@@ -1,11 +1,12 @@
 const writer = require('../utils/writer.js')
 const config = require('../utils/config')
 const OperationService = require(`../service/OperationService`)
+const CollectionService = require(`../service/CollectionService`)
 const Asset = require(`./Asset`)
 const Collection = require(`./Collection`)
 const User = require(`./User`)
 const Review = require(`./Review`)
-const JSZip = require("jszip");
+const JSZip = require("jszip")
 const {JSONPath} = require('jsonpath-plus')
 const SmError = require('../utils/error.js')
 
@@ -35,32 +36,42 @@ module.exports.getAppData = async function getAppData (req, res, next) {
   try {
     let elevate = req.query.elevate
     if ( elevate ) {
-      let collections = await Collection.exportCollections( ['grants', 'labels', 'stigs'], elevate, req.userObject )
-      for (const collection of collections) {
-          for (const grant of collection.grants) {
-            grant.userId = grant.user.userId
-            delete grant.user
-          }
-      }
-      let users = await User.exportUsers( ['statistics'], elevate, req.userObject)
-      let assets = await Asset.exportAssets( ['stigGrants'], elevate, req.userObject)
-      assets.forEach(asset => {
-        asset.collectionId = asset.collection.collectionId
-        delete asset.collection
-        asset.stigGrants = asset.stigGrants.map( s => ({
-          benchmarkId: s.benchmarkId,
-          userIds: s.users.map( r => r.userId )
-        }))
-      })
-      let reviews = await Review.exportReviews(true)
-      let response = {
-        users: users,
-        collections: collections,
-        assets: assets,
-        reviews: reviews
-      }
+      // let collections = await Collection.exportCollections( ['grants', 'labels', 'stigs'], elevate, req.userObject )
+      // for (const collection of collections) {
+      //     for (const grant of collection.grants) {
+      //       if (grant.user) {
+      //        grant.userId = grant.user.userId
+      //          delete grant.user     
+      //       }
+      //        else if (grant.userGroup) {
+      //         grant.userGroupId = grant.userGroup.userGroupId
+      //         delete grant.userGroup                     
+      //       }
+      //     }
+      // }
+      // let users = await User.exportUsers( ['statistics'], elevate, req.userObject)
+      // let assets = await Asset.exportAssets( {projections: ['stigGrants']})
+      // let userGroups = await User.exportUserGroups(['users', 'attributions'], elevate)
+      // assets.forEach(asset => {
+      //   asset.collectionId = asset.collection.collectionId
+      //   delete asset.collection
+      //   asset.stigGrants = asset.stigGrants.map( s => ({
+      //     benchmarkId: s.benchmarkId,
+      //     userIds: s.users.map( r => r.userId ),
+      //     userGroupIds: s.userGroups?.map( r => r.userGroupId )
+      //   }))
+      // })
+      // let reviews = await Review.exportReviews(true)
+      // let response = {
+      //   users: users,
+      //   collections: collections,
+      //   assets: assets,
+      //   reviews: reviews,
+      //   userGroups: userGroups
+      // }
       let zip = new JSZip()
-      zip.file("stig-manager-appdata.json", JSON.stringify(response))
+      // zip.file("stig-manager-appdata.json", JSON.stringify(response))
+      zip.file("stig-manager-appdata.json", JSON.stringify({}))
       let buffer = await zip.generateAsync({
         type: 'nodebuffer',
         compression: "DEFLATE",

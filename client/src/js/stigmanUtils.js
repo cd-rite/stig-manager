@@ -148,7 +148,7 @@ function initProgress (title,text,storeId,iframe) {
 		items: [pb,st]
 	});
 	statusText = '';
-	pbWindow.show(document.body);
+	pbWindow.show(Ext.getBody());
 
 }
 

@@ -26,6 +26,7 @@ async function addOrUpdateCollection( collectionId, collectionObj, options = {} 
       },
       jsonData: collectionObj
     })
+    SM.Cache.updateCollection(apiCollection)
     // Refresh the curUser global
     await SM.GetUserObject()
     

@@ -2037,7 +2037,7 @@ async function showImportResultFiles(collectionId, createObjects = true) {
             buttonAlign: 'center',
             items: fp
         })
-        fpwindow.show(document.body)
+        fpwindow.show(Ext.getBody())
 
         function warnOnExcessFiles(files) {
             if (files.length >= 250) {

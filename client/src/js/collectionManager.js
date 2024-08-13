@@ -13,7 +13,7 @@ async function addCollectionManager( params ) {
 			responseType: 'json',
 			url: `${STIGMAN.Env.apiBase}/collections/${collectionId}`,
 			params: {
-				projection: ['grants', 'labels']
+				projection: ['grants', 'users', 'labels']
 			},
 			method: 'GET'
 		})
@@ -28,8 +28,8 @@ async function addCollectionManager( params ) {
 		}
 	
 		let collectionPanel = new SM.Collection.ManagePanel({
-			collectionId: collectionId,
-			apiCollection: apiCollection,
+			collectionId,
+			apiCollection,
 			title: `Manage Collection (${collectionId})`,
 			cls: 'sm-round-panel',
 			margins: { top: SM.Margin.top, right: SM.Margin.adjacent, bottom: SM.Margin.bottom, left: SM.Margin.edge },

@@ -665,7 +665,7 @@ SM.Exports.showExportTree = async function (collectionId, collectionName, treeba
       ]
     })
     fpwindow.render(Ext.getBody())
-    fpwindow.show(document.body)
+    fpwindow.show(Ext.getBody())
 
     // functions
     function getInitialOptions (dstCollectionData) {

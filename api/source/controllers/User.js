@@ -8,36 +8,32 @@ const SmError = require('../utils/error')
 /*  */
 module.exports.createUser = async function createUser (req, res, next) {
   try {
-    let elevate = req.query.elevate
-    if (elevate) {
-      let body = req.body
-      let projection = req.query.projection
+    const elevate = req.query.elevate
+    if (!elevate) throw new SmError.PrivilegeError()
+    let body = req.body
+    let projection = req.query.projection
 
-      if (body.hasOwnProperty('collectionGrants') ) {
-        // Verify each grant for a valid collectionId
-        let requestedIds = body.collectionGrants.map( g => g.collectionId )
-        let availableCollections = await CollectionService.getCollections({}, [], elevate, req.userObject)
-        let availableIds = availableCollections.map( c => c.collectionId)
-        if (! requestedIds.every( id => availableIds.includes(id) ) ) {
-          throw new SmError.UnprocessableError('One or more collectionIds are invalid.')
-        }
-      }
-      try {
-        let response = await UserService.createUser(body, projection, elevate, req.userObject, res.svcStatus)
-        res.status(201).json(response)
-      }
-      catch (err) {
-        // This is MySQL specific, should abstract
-        if (err.code === 'ER_DUP_ENTRY') {
-          throw new SmError.UnprocessableError('Duplicate name exists.')
-        }
-        else {
-          throw err
-        }
+    if (body.hasOwnProperty('collectionGrants') ) {
+      // Verify each grant for a valid collectionId
+      let requestedIds = body.collectionGrants.map( g => g.collectionId )
+      let availableCollections = await CollectionService.queryCollections({elevate})
+      let availableIds = availableCollections.map( c => c.collectionId)
+      if (! requestedIds.every( id => availableIds.includes(id) ) ) {
+        throw new SmError.UnprocessableError('One or more collectionIds are invalid.')
       }
     }
-    else {
-     throw new SmError.PrivilegeError()    
+    try {
+      let response = await UserService.createUser(body, projection, elevate, req.userObject, res.svcStatus)
+      res.status(201).json(response)
+    }
+    catch (err) {
+      // This is MySQL specific, should abstract
+      if (err.code === 'ER_DUP_ENTRY') {
+        throw new SmError.UnprocessableError('Duplicate name exists.')
+      }
+      else {
+        throw err
+      }
     }
   }
   catch(err) {
@@ -77,10 +73,22 @@ module.exports.exportUsers = async function exportUsers (projection, elevate, us
   }
 } 
 
-module.exports.getUserObject = async function getUserObject (req, res, next) {
-  try {
-    res.json(req.userObject)
+module.exports.exportUserGroups = async function exportUserGroups (projections, elevate) {
+
+  if (elevate) {
+    return await UserService.queryUserGroups({projections})
   }
+  else {
+    throw new SmError.PrivilegeError()    
+  }
+}
+
+module.exports.getUser = async function getUser (req, res, next) {
+  try {
+    let response = await UserService.getUserByUserId(req.userObject.userId, ['collectionGrants', 'statistics', 'userGroups'])
+    response.privileges = req.userObject.privileges
+    res.json(response)
+}
   catch(err) {
     next(err)
   }
@@ -110,7 +118,7 @@ module.exports.getUsers = async function getUsers (req, res, next) {
     let username = req.query.username
     let usernameMatch = req.query['username-match']
     let projection = req.query.projection
-    if ( !elevate && projection && projection.length > 0) {
+    if ( !elevate && projection?.length > 0) {
       throw new SmError.PrivilegeError()
     }
     let response = await UserService.getUsers( username, usernameMatch, projection, elevate, req.userObject)
@@ -125,26 +133,22 @@ module.exports.replaceUser = async function replaceUser (req, res, next) {
   try {
     let elevate = req.query.elevate
     let userId = req.params.userId
-    if (elevate) {
-      let body = req.body
-      let projection = req.query.projection
+    if (!elevate) throw new SmError.PrivilegeError() 
+    let body = req.body
+    let projection = req.query.projection
 
-      if (body.hasOwnProperty('collectionGrants') ) {
-        // Verify each grant for a valid collectionId
-        let requestedIds = body.collectionGrants.map( g => g.collectionId )
-        let availableCollections = await CollectionService.getCollections({}, [], elevate, req.userObject)
-        let availableIds = availableCollections.map( c => c.collectionId)
-        if (! requestedIds.every( id => availableIds.includes(id) ) ) {
-          throw new SmError.UnprocessableError('One or more collectionIds are invalid.')
-        }
+    if (body.hasOwnProperty('collectionGrants') ) {
+      // Verify each grant for a valid collectionId
+      let requestedIds = body.collectionGrants.map( g => g.collectionId )
+      let availableCollections = await CollectionService.queryCollections({elevate})
+      let availableIds = availableCollections.map( c => c.collectionId)
+      if (! requestedIds.every( id => availableIds.includes(id) ) ) {
+        throw new SmError.UnprocessableError('One or more collectionIds are invalid.')
       }
+    }
 
-      let response = await UserService.replaceUser(userId, body, projection, elevate, req.userObject, res.svcStatus)
-      res.json(response)
-    }
-    else {
-     throw new SmError.PrivilegeError()    
-    }
+    let response = await UserService.replaceUser(userId, body, projection, elevate, req.userObject, res.svcStatus)
+    res.json(response)
   }
   catch(err) {
     next(err)
@@ -162,7 +166,7 @@ module.exports.updateUser = async function updateUser (req, res, next) {
       if (body.hasOwnProperty('collectionGrants') ) {
         // Verify each grant for a valid collectionId
         let requestedIds = body.collectionGrants.map( g => g.collectionId )
-        let availableCollections = await CollectionService.getCollections({}, [], elevate, req.userObject)
+        let availableCollections = await CollectionService.queryCollections({elevate})
         let availableIds = availableCollections.map( c => c.collectionId)
         if (! requestedIds.every( id => availableIds.includes(id) ) ) {
           throw new SmError.UnprocessableError('One or more collectionIds are invalid.')
@@ -193,3 +197,98 @@ module.exports.setUserData = async function setUserData (username, fields) {
   }
 }
 /* c8 ignore end */
+
+module.exports.createUserGroup = async (req, res, next) => {
+  try {
+    if (!req.query.elevate) throw new SmError.PrivilegeError()
+    const {userIds, ...userGroupFields} = req.body
+    const userGroupId = await UserService.addOrUpdateUserGroup({
+      userGroupFields,
+      userIds,
+      createdUserId: req.userObject.userId,
+      modifiedUserId: req.userObject.userId
+    })
+    const response = await UserService.queryUserGroups({
+      projections: req.query.projection,
+      filters: {userGroupId}
+    })
+    res.status(201).json(response[0])
+  }
+  catch (err) {
+    next(err)
+  }
+}
+
+module.exports.getUserGroups = async (req, res, next) => {
+  try {
+    if (req.query.projection?.includes('collections') && !req.query.elevate) {
+      throw new SmError.PrivilegeError('collections projection requires elevation')
+    }
+    const response = await UserService.queryUserGroups({
+      projections: req.query.projection
+    })
+    res.json(response)
+  }
+  catch (err) {
+    next(err)
+  }
+}
+
+module.exports.getUserGroup = async (req, res, next) => {
+  try {
+    if (req.query.projection?.includes('collections') && !req.query.elevate) {
+      throw new SmError.PrivilegeError('collections projection requires elevation')
+    }
+    const response = await UserService.queryUserGroups({
+      projections: req.query.projection,
+      filters: {userGroupId: req.params.userGroupId}
+    })
+    if (!response[0]) throw new SmError.NotFoundError()
+    res.json(response[0])
+  }
+  catch (err) {
+    next(err)
+  }
+}
+
+async function putOrPatchUserGroup (req, res, next) {
+  try {
+    if (!req.query.elevate) throw new SmError.PrivilegeError()
+    const {userIds, ...userGroupFields} = req.body
+    const userGroupId = await UserService.addOrUpdateUserGroup({
+      userGroupId: req.params.userGroupId,
+      userGroupFields,
+      userIds,
+      modifiedUserId: req.userObject.userId
+    })
+    const response = await UserService.queryUserGroups({
+      projections: req.query.projection,
+      filters: {userGroupId}
+    })
+    res.json(response[0])
+  }
+  catch (err) {
+    next(err)
+  }
+}
+
+module.exports.patchUserGroup = putOrPatchUserGroup
+module.exports.putUserGroup = putOrPatchUserGroup
+
+module.exports.deleteUserGroup = async (req, res, next) => {
+  try{
+    if (!req.query.elevate) throw new SmError.PrivilegeError()
+    const response = await UserService.queryUserGroups({
+      projections: req.query.projection,
+      filters: {userGroupId: req.params.userGroupId}
+    })
+    await UserService.deleteUserGroup({
+      userGroupId: req.params.userGroupId,
+    })
+    res.json(response[0])
+  }
+  catch (err) {
+    next(err)
+  }
+}
+

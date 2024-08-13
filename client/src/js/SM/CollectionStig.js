@@ -518,7 +518,7 @@ async function showCollectionStigProps( benchmarkId, defaultRevisionStr, parentG
             items: stigPropsFormPanel
         });
         
-        appwindow.show(document.body)
+        appwindow.show(Ext.getBody())
 
         await stigPropsFormPanel.initPanel({
             benchmarkId,

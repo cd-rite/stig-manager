@@ -4,7 +4,7 @@
 		"name": "STIGMan OSS",
 		"description": "An API for managing evaluations of Security Technical Implementation Guide (STIG) assessments.\n\nContact Support:  \nName: Carl Smigielski  \nEmail: [carl.a.smigielski@saic.com](https://mailto:carl.a.smigielski@saic.com)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "9301046"
+		"_exporter_id": "28917726"
 	},
 	"item": [
 		{
@@ -34401,7 +34401,7 @@
 											"\r",
 											"//Collection creator cannot see labels on collection it did not give itself a grant for\r",
 											"if (user == \"collectioncreator\") { \r",
-											"    requestToTest.labels = []\r",
+											"    //XXX requestToTest.labels = []\r",
 											"}\r",
 											"console.log(\"requestToTest: \" + JSON.stringify(requestToTest));\r",
 											"\r",

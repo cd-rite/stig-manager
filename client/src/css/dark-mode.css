@@ -2287,6 +2287,12 @@ a.x-menu-item {
     border-color: hsl(202deg 30% 25%)
 }
 
+/* .x-form-search:read-only, .x-form-text:read-only, textarea.x-form-field:read-only {
+    border: none;
+    background-color: transparent;
+} */
+
+
 .sm-home-title {
     background-image: url("../img/shield-green-check.svg");
     color: #c8c3bc;
@@ -2612,10 +2618,6 @@ td.sort-asc, td.sort-desc, td.x-grid3-hd-menu-open, td.x-grid3-hd-over {
 
 .sm-department-icon {
     background-image: url("../img/department-16.png")!important
-}
-
-.sm-users-icon {
-    background-image: url("../img/user.svg")!important
 }
 
 .sm-stig-icon {

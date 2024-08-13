@@ -773,7 +773,7 @@ SM.GeneratePoamButton = Ext.extend(Ext.Button, {
 				buttonAlign: 'right',
 				items: poamOptionsPanel
 			})
-			appwindow.show(document.body);
+			appwindow.show(Ext.getBody());
 		}
 
 		const config = {
