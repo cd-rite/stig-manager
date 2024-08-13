@@ -1,179 +1,243 @@
-//This data contains expected response data that varies by iteration "scenario" or "user" for each test case. These expectations are relative to the "referenceData.js" data used to construct the API requests.
+// This data represents components of the primary test Collections, Assets, etc. contained in the standard appData.json file without regard to access controls being exercised by the tests.  These Ids, etc. should be used to construct test case API requests. This data should only be used as expectations in cases where all test scenarios exercised are expected to return the same data. 
 
-const distinct = {
-    stigmanadmin: {
-      user: 'admin',
-      testAssetStigs: ['VPN_SRG_TEST', 'Windows_10_STIG_TEST'],
-      userId: '87',
-      testAssetStats: {
-        ruleCount: 368,
-        stigCount: 2,
-        savedCount: 2,
-        acceptedCount: 0,
-        rejectedCount: 0,
-        submittedCount: 7
+// The standard "testCollection" includes users named after the roles they have for that specific Collection, is used in most "GET" tests or tests not expected to change data that could alter expectations for subsequent tests. "scrapCollection" is used for tests that alter Collection data in some way.
+
+const reference = {
+  collectionId: "21",
+  collectionName: "Test Collection",
+  collectionDescription: "This is a test collection",
+  collectionOwner: "admin",
+  collectionOwnerID: "87",
+  benchmark: "VPN_SRG_TEST",
+  pinRevision: "V1R0",
+  checklistLength: 81,
+  revisionStr: "V1R1",
+  grantCheckUserId: "85",
+  testCollection: {
+    name: "Collection X",
+    collectionId: "21",
+    benchmark: "VPN_SRG_TEST",
+    defaultRevision: "V1R1",    
+    pinRevision: "V1R0",    
+    collectionMetadataKey: "pocName",
+    collectionMetadataValue: "poc2Patched",
+    owners: ["87", "1", "45"],
+    assetIds: ["29", "62", "42", "154"],
+    assetsWithHistory: ["42", "154"],
+    testAssetId: "42",
+    validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
+    labelCount: 2,
+    lvl1LabelName: "test-label-lvl1",
+    lvl1Label: "5130dc84-9a68-11ec-b1bc-0242ac110002",
+    fullLabel: "755b8a28-9a68-11ec-b1bc-0242ac110002",
+    fullLabelName: "test-label-full",
+    labels: [
+      "755b8a28-9a68-11ec-b1bc-0242ac110002",
+      "5130dc84-9a68-11ec-b1bc-0242ac110002"
+    ],
+    allMetadata: [
+      {
+        key: "pocEmail",
+        value: "pocEmail@email.com"
       },
-      grant: 'admin',
-      collectionCount: 6,
-      collectionMatchCnt: 3,
-      collectionCountElevated: 7,
-      findingsCnt: 8,
-      findingsByGroupCnt: 4,
-      findingsByRuleCnt: 3,
-      findingsByRuleAndAssetCnt: 4,
-      findingsByCciCnt: 8,
-      labelCount: 2,
-      fullLabelUses: 2,
-      lvl1LabelUses: 1,
-      historyResponseStatus: 200,
-      assignedStigs: ['VPN_SRG_TEST'],
-      checklistCnt_testCollection: 6,
-      grantCnt_testCollection: 7,
-      assetIds: ['29', '62', '42', '154'],
-      validStigs: ['VPN_SRG_TEST', 'Windows_10_STIG_TEST'],
-      collectionIds: ['21'],
-      testBenchmarkAssignedCount: 3,
-      deleteCollectionId_admin: '84',
-      canDeleteCollection: true,
-      canModifyCollection: true
+      {
+        key: "pocName",
+        value: "poc2Patched"
+      },
+      {
+        key: "pocPhone",
+        value: "12342"
+      },
+      {
+        key: "reqRar",
+        value: "true"
+      }
+    ],
+    reviewHistory: {
+      assetId: "42",
+      startDate: "1900-10-01",
+      endDate: "2020-10-01",
+      deletedEntriesByDate: 6,
+      deletedEntriesByDateAsset: 4,
+      ruleId: "SV-106179r1_rule",
+      status: "submitted"
     },
-    lvl1: {
-      testAssetStigs: ['VPN_SRG_TEST'],
-      testAssetStats: {
+    rulesWithHistoryCnt: 2,
+    reviewHistoryRuleCnt: 2,
+    reviewHistoryTotalCnt: 7,
+    reviewHistory_endDateCnt: 6,
+    reviewHistory_startAndEndDateCnt: 2,
+    reviewHistory_startDateCnt: 2,
+    reviewHistory_byStatusCnt: 3,
+    reviewHistory_testAssetCnt: 5,
+    reviewHistory_ruleIdCnt: 4,
+    assetsProjected: [
+      {
+        name: "ACHERNAR_Collection_X_asset",
+        assetId: "403",
+      },
+      {
+        name: "Collection_X_asset",
+        assetId: "405",
+      },
+      {
+        name: "Collection_X_lvl1_asset-1",
+        assetId: "404",
+      },
+      {
+        name: "Collection_X_lvl1_asset-2",
+        assetId: "406",
+      },
+    ],
+    grantsProjected: [
+      {
+        user: {
+          userId: "86",
+          username: "bizarroLvl1",
+          displayName: "bizarroLvl1"
+          },
+        accessLevel: 1
+      },
+      {
+        user: {
+          userId: "85",
+          username: "lvl1",
+          displayName: "lvl1"
+        },
+        accessLevel: 1
+      },
+      {
+        user: {
+          userId: "21",
+          username: "lvl2",
+          displayName: "lvl2"
+        },
+        accessLevel: 2
+      },
+      {
+        user: {
+          userId: "44",
+          username: "lvl3",
+          displayName: "lvl3"
+        },
+        accessLevel: 3
+      },
+      {
+        user: {
+          userId: "87",
+          username: "admin",
+          displayName: "Admin Burke"
+        },
+        accessLevel: 4
+      },
+      {
+        user: {
+          userId: "1",
+          username: "stigmanadmin",
+          displayName: "STIGMAN Admin"
+        },
+        accessLevel: 4
+      },
+      {
+        user: {
+          userId: "45",
+          username: "lvl4",
+          displayName: "lvl4"
+        },
+        accessLevel: 4
+      }
+    ],
+    ownersProjected: [
+      {
+        email: "admin@admin.com",
+        userId: "87",
+        username: "admin",
+        displayName: "Admin Burke"
+      },
+      {
+        email: null,
+        userId: "1",
+        username: "stigmanadmin",
+        displayName: "STIGMAN Admin"
+      },
+      {
+        email: null,
+        userId: "45",
+        username: "lvl4",
+        displayName: null
+      }
+    ],
+    stigsProjected: [
+      {
         ruleCount: 81,
-        stigCount: 1,
-        savedCount: 1,
-        acceptedCount: 0,
-        rejectedCount: 0,
-        submittedCount: 5
+        benchmarkId: "VPN_SRG_TEST",
+        revisionStr: "V1R0",
+        benchmarkDate: "2010-07-19",
+        revisionPinned: true
       },
-      user: 'lvl1',
-      userId: '85',
-      grant: 'restricted',
-      collectionCount: 1,
-      collectionMatchCnt: 1,
-      findingsCnt: 7,
-      findingsByGroupCnt: 3,
-      findingsByRuleCnt: 3,
-      findingsByRuleAndAssetCnt: 3,
-      findingsByCciCnt: 7,
-      labelCount: 1,
-      fullLabelUses: 1,
-      lvl1LabelUses: 1,
-      historyResponseStatus: 403,
-      checklistCnt_testCollection: 3,
-      grantCnt_testCollection: 7,
-      assignedStigs: ['VPN_SRG_TEST'],
-      assetIds: ['42', '154'],
-      validStigs: ['VPN_SRG_TEST'],
-      collectionIds: ['21'],
-      testBenchmarkAssignedCount: 2,
-      canDeleteCollection: false,
-      canModifyCollection: false
+      {
+        ruleCount: 287,
+        benchmarkId: "Windows_10_STIG_TEST",
+        revisionStr: "V1R23",
+        benchmarkDate: "2020-06-17",
+        revisionPinned: false
+      }
+    ],
+    statisticsProjected: {
+      assetCount: 4,
+      grantCount: 7,
+      checklistCount: 6
     },
-    lvl2: {
-      testAssetStigs: ['VPN_SRG_TEST', 'Windows_10_STIG_TEST'],
-      testAssetStats: {
-        ruleCount: 368,
-        stigCount: 2,
-        savedCount: 2,
-        acceptedCount: 0,
-        rejectedCount: 0,
-        submittedCount: 7
+    labelsProjected: [
+      {
+        name: "test-label-full",
+        description: "",
+        color: "FF99CC",
+        uses: 2
       },
-      user: 'admin',
-      userId: '87',
-      grant: 'admin',
-      collectionCount: 2,
-      collectionMatchCnt: 2,
-      findingsCnt: 8,
-      findingsByGroupCnt: 4,
-      findingsByRuleCnt: 3,
-      findingsByRuleAndAssetCnt: 4,
-      findingsByCciCnt: 8,
-      labelCount: 2,
-      fullLabelUses: 2,
-      lvl1LabelUses: 1,
-      historyResponseStatus: 200,
-      assignedStigs: ['VPN_SRG_TEST'],
-      checklistCnt_testCollection: 6,
-      grantCnt_testCollection: 7,
-      assetIds: ['29', '62', '42', '154'],
-      validStigs: ['VPN_SRG_TEST', 'Windows_10_STIG_TEST'],
-      collectionIds: ['21'],
-      testBenchmarkAssignedCount: 3,
-      canDeleteCollection: false,
-      canModifyCollection: false
-    },
-    lvl3: {
-      testAssetStigs: ['VPN_SRG_TEST', 'Windows_10_STIG_TEST'],
-      testAssetStats: {
-        ruleCount: 368,
-        stigCount: 2,
-        savedCount: 2,
-        acceptedCount: 0,
-        rejectedCount: 0,
-        submittedCount: 7
-      },
-      user: 'admin',
-      userId: '87',
-      grant: 'admin',
-      collectionCount: 2,
-      collectionMatchCnt: 2,
-      findingsCnt: 8,
-      findingsByGroupCnt: 4,
-      findingsByRuleCnt: 3,
-      findingsByRuleAndAssetCnt: 4,
-      findingsByCciCnt: 8,
-      labelCount: 2,
-      fullLabelUses: 2,
-      lvl1LabelUses: 1,
-      historyResponseStatus: 200,
-      assignedStigs: ['VPN_SRG_TEST'],
-      checklistCnt_testCollection: 6,
-      grantCnt_testCollection: 7,
-      assetIds: ['29', '62', '42', '154'],
-      validStigs: ['VPN_SRG_TEST', 'Windows_10_STIG_TEST'],
-      collectionIds: ['21'],
-      testBenchmarkAssignedCount: 3,
-      canDeleteCollection: false,
-      canModifyCollection: true
-    },
-    lvl4: {
-      testAssetStigs: ['VPN_SRG_TEST', 'Windows_10_STIG_TEST'],
-      testAssetStats: {
-        ruleCount: 368,
-        stigCount: 2,
-        savedCount: 2,
-        acceptedCount: 0,
-        rejectedCount: 0,
-        submittedCount: 7
-      },
-      user: 'admin',
-      userId: '87',
-      grant: 'admin',
-      collectionCount: 3,
-      collectionMatchCnt: 2,
-      findingsCnt: 8,
-      findingsByGroupCnt: 4,
-      findingsByRuleCnt: 3,
-      findingsByRuleAndAssetCnt: 4,
-      findingsByCciCnt: 8,
-      labelCount: 2,
-      fullLabelUses: 2,
-      lvl1LabelUses: 1,
-      historyResponseStatus: 200,
-      assignedStigs: ['VPN_SRG_TEST'],
-      checklistCnt_testCollection: 6,
-      grantCnt_testCollection: 7,
-      assetIds: ['29', '62', '42', '154'],
-      validStigs: ['VPN_SRG_TEST', 'Windows_10_STIG_TEST'],
-      collectionIds: ['21'],
-      testBenchmarkAssignedCount: 3,
-      canDeleteCollection: true,
-      canModifyCollection: true
-    },
-    collectioncreator: {}
+      {
+        name: "test-label-lvl1",
+        description: "",
+        color: "99CCFF",
+        uses: 1
+      }
+    ]
+  },
+  deleteCollection: {
+    collectionId_adminOnly: "84",
+    collectionId: "85"
+  },
+  scrapCollection: {
+    collectionId: "1",
+    validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST", "RHEL_7_STIG_TEST"],
+    scrapLabel: "df4e6836-a003-11ec-b1bc-0242ac110002",
+    collectionMetadataKey: "pocName",
+    collectionMetadataValue: "poc2Patched"
+  },
+  scrapLvl1User: {
+    userId: "86",
+    username: "bizarroLvl1"
+  },
+  scrapAsset: {
+    assetId: "34",
+    scrapBenchmark: "RHEL_7_STIG_TEST",
+    metadataKey: "testkey",
+    metadataValue: "testvalue"
+  },
+  testAsset: {
+    name: "Collection_X_lvl1_asset-1",
+    assetId: "42",
+    collectionId: "21",
+    usersWithGrant: ["86,85"],
+    benchmark: "VPN_SRG_TEST",
+    validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
+    metadataKey: "testkey",
+    metadataValue: "testvalue",
+    labels: [
+      "755b8a28-9a68-11ec-b1bc-0242ac110002",
+      "5130dc84-9a68-11ec-b1bc-0242ac110002"
+    ]
   }
-  module.exports = distinct
-  
+};
+
+module.exports = reference;
