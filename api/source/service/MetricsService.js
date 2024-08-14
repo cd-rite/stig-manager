@@ -31,14 +31,17 @@ module.exports.queryMetrics = async function ({
 }) {
 
   const predicates = {
-    statements: ['a.collectionId = ? '],
+    statements: [
+      'a.collectionId = ? ',
+      'a.state = "enabled"',
+    ],
     binds: [collectionId]
   }
   const ctes = []
   const columns = returnType === 'csv' ? [...baseColsFlat[aggregation]] : [...baseCols[aggregation]]
   const joins = [
     'asset a',
-    'right join stig_asset_map sa on (a.assetId = sa.assetId and a.state = "enabled")',
+    'left join stig_asset_map sa on (a.assetId = sa.assetId and a.state = "enabled")',
     'left join default_rev dr on a.collectionId = dr.collectionId and sa.benchmarkId = dr.benchmarkId',
     'left join revision rev on dr.revId = rev.revId',
     'left join stig on rev.benchmarkId = stig.benchmarkId'
