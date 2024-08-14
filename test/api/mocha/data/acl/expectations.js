@@ -105,7 +105,7 @@ const distinct = {
     canDeleteCollection: false,
     canModifyCollection: false
   },  
-  acl_mix: {
+  acl_labelPlusRestricted: {
     testAssetStigs: ['VPN_SRG_TEST'],
     testAssetStats: {
       ruleCount: 81,
@@ -131,9 +131,9 @@ const distinct = {
     historyResponseStatus: 403,
     checklistCnt_testCollection: 3,
     grantCnt_testCollection: 7,
-    assignedStigs: ['VPN_SRG_TEST'],
-    assetIds: ['42', '154'],
-    validStigs: ['VPN_SRG_TEST'],
+    assignedStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
+    assetIds: ['42', '62'],
+    validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
     collectionIds: ['21'],
     testBenchmarkAssignedCount: 2,
     canDeleteCollection: false,

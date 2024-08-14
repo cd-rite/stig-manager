@@ -12,7 +12,13 @@ const requestBodies = {
       [{"benchmarkId":"VPN_SRG_TEST","access":"rw"}],
     acl_oldRestrictedStyle: 
      [{"benchmarkId":"VPN_SRG_TEST","assetId":"42","access":"rw"},{"benchmarkId":"VPN_SRG_TEST","assetId":"154","access":"rw"}],
-    acl_mix: 
+     acl_labelPlusRestricted: 
+      [{"benchmarkId":"VPN_SRG_TEST","assetId":"42","access":"rw"},{"benchmarkId":"VPN_SRG_TEST","assetId":"154","access":"rw"},{"labelId":"755b8a28-9a68-11ec-b1bc-0242ac110002","access":"rw"}],
+    acl_labelStig: 
+      [{"benchmarkId":"VPN_SRG_TEST","assetId":"42","access":"rw"},{"benchmarkId":"VPN_SRG_TEST","assetId":"154","access":"rw"},{"labelId":"755b8a28-9a68-11ec-b1bc-0242ac110002","access":"rw"}],
+    acl_labelAsset: 
+      [{"benchmarkId":"VPN_SRG_TEST","assetId":"42","access":"rw"},{"benchmarkId":"VPN_SRG_TEST","assetId":"154","access":"rw"},{"labelId":"755b8a28-9a68-11ec-b1bc-0242ac110002","access":"rw"}],
+    acl_labelStig: 
       [{"benchmarkId":"VPN_SRG_TEST","assetId":"42","access":"rw"},{"benchmarkId":"VPN_SRG_TEST","assetId":"154","access":"rw"},{"labelId":"755b8a28-9a68-11ec-b1bc-0242ac110002","access":"rw"}]
   },
 
