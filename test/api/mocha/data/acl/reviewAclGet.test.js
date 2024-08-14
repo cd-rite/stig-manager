@@ -78,46 +78,43 @@ describe('GET - Review ACL', () => {
       })
 
 
-        // it('Return a list of reviews accessible to the requester, assetId Projection.', async () => {
-        //   const res = await chai.request(config.baseUrl)
-        //     .get(`/collections/${environment.testCollection.collectionId}/reviews?assetId=${environment.testAsset.assetId}&projection=rule&projection=stigs&projection=metadata`)
-        //     .set('Authorization', `Bearer ${user.token}`)
-        //   if(user.name === 'collectioncreator') {
-        //     expect(res).to.have.status(403)
-        //     return
-        //   }
-        //   expect(res).to.have.status(200)
+        it('Return a list of reviews accessible to the requester, assetId Projection.', async () => {
+          const res = await chai.request(config.baseUrl)
+            .get(`/collections/${reference.testCollection.collectionId}/reviews?assetId=${reference.testAsset.assetId}&projection=rule&projection=stigs&projection=metadata`)
+            .set('Authorization', `Bearer ${user.token}`)
+
+          expect(res).to.have.status(200)
       
-        //   if(user.name === 'lvl1'){
-        //     expect(res.body).to.be.lengthOf(6)
-        //   }
-        //   else{
-        //     expect(res.body).to.be.lengthOf(9)
-        //   }
+          // if(user.name === 'lvl1'){
+          //   expect(res.body).to.be.lengthOf(6)
+          // }
+          // else{
+            expect(res.body).to.be.lengthOf(9)
+          // }
 
           
-        //   for(let review of res.body){
-        //     // checking for basic properties
-        //     expect(review).to.have.property('assetId')
-        //     expect(review.assetId).to.be.equal(environment.testAsset.assetId)
+          for(let review of res.body){
+            // checking for basic properties
+            // expect(review).to.have.property('assetId')
+            expect(review.assetId).to.be.equal(reference.testAsset.assetId)
 
-        //     expect(review).to.have.property('assetLabelIds')
+            expect(review).to.have.property('assetLabelIds')
 
-        //     for(let assetLabelId of review.assetLabelIds){
-        //       expect(assetLabelId).to.be.oneOf(environment.testAsset.labels)
-        //     }
+            for(let assetLabelId of review.assetLabelIds){
+              expect(assetLabelId).to.be.oneOf(reference.testAsset.labels)
+            }
 
-        //     expect(review.metadata).to.be.an('object')
+            expect(review.metadata).to.be.an('object')
             
-        //     for(let stig of review.stigs){
-        //       expect(stig).to.have.property('benchmarkId')
-        //       expect(stig.benchmarkId).to.be.oneOf(environment.testCollection.validStigs)
-        //     }
-        //     expect(review.rule).to.be.an('object')
-        //     expect(review.rule).to.have.property('ruleId')
+            for(let stig of review.stigs){
+              expect(stig).to.have.property('benchmarkId')
+              expect(stig.benchmarkId).to.be.oneOf(distinct.validStigs)
+            }
+            expect(review.rule).to.be.an('object')
+            expect(review.rule).to.have.property('ruleId')
             
-        //   }
-        // })
+          }
+        })
 
 
       //   it('Return a list of reviews accessible to the requester, benchmarkId Projection.', async () => {

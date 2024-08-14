@@ -27,13 +27,11 @@ const distinct = {
     historyResponseStatus: 403,
     checklistCnt_testCollection: 3,
     grantCnt_testCollection: 7,
-    assignedStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
     assetIds: ['42', '62'],
     validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
     collectionIds: ['21'],
     testBenchmarkAssignedCount: 2,
-    canDeleteCollection: false,
-    canModifyCollection: false
+
   },   
 
   acl_StigOnly: {
@@ -62,13 +60,11 @@ const distinct = {
     historyResponseStatus: 403,
     checklistCnt_testCollection: 3,
     grantCnt_testCollection: 7,
-    assignedStigs: ['VPN_SRG_TEST'],
     assetIds: ['42', '154', '62'],
     validStigs: ['VPN_SRG_TEST'],
     collectionIds: ['21'],
     testBenchmarkAssignedCount: 2,
-    canDeleteCollection: false,
-    canModifyCollection: false
+
   },
 
   acl_oldRestrictedStyle: {
@@ -97,13 +93,11 @@ const distinct = {
     historyResponseStatus: 403,
     checklistCnt_testCollection: 3,
     grantCnt_testCollection: 7,
-    assignedStigs: ['VPN_SRG_TEST'],
     assetIds: ['42', '154'],
     validStigs: ['VPN_SRG_TEST'],
     collectionIds: ['21'],
     testBenchmarkAssignedCount: 2,
-    canDeleteCollection: false,
-    canModifyCollection: false
+
   },  
   acl_labelPlusRestricted: {
     testAssetStigs: ['VPN_SRG_TEST'],
@@ -131,15 +125,108 @@ const distinct = {
     historyResponseStatus: 403,
     checklistCnt_testCollection: 3,
     grantCnt_testCollection: 7,
-    assignedStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
-    assetIds: ['42', '62'],
+    assetIds: ['42', '154', '62'],
     validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
     collectionIds: ['21'],
     testBenchmarkAssignedCount: 2,
-    canDeleteCollection: false,
-    canModifyCollection: false
-  },  
 
+  },  
+  acl_labelStig: {
+    testAssetStigs: ['VPN_SRG_TEST'],
+    testAssetStats: {
+      ruleCount: 81,
+      stigCount: 1,
+      savedCount: 1,
+      acceptedCount: 0,
+      rejectedCount: 0,
+      submittedCount: 5
+    },
+    user: 'lvl1',
+    userId: '85',
+    grant: 'restricted',
+    collectionCount: 1,
+    collectionMatchCnt: 1,
+    findingsCnt: 7,
+    findingsByGroupCnt: 3,
+    findingsByRuleCnt: 3,
+    findingsByRuleAndAssetCnt: 3,
+    findingsByCciCnt: 7,
+    labelCount: 1,
+    fullLabelUses: 1,
+    lvl1LabelUses: 1,
+    historyResponseStatus: 403,
+    checklistCnt_testCollection: 3,
+    grantCnt_testCollection: 7,
+    assetIds: ['42', '154', '62'],
+    validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
+    collectionIds: ['21'],
+    testBenchmarkAssignedCount: 2,
+
+  },
+  acl_labelAsset: {
+    testAssetStigs: ['VPN_SRG_TEST'],
+    testAssetStats: {
+      ruleCount: 81,
+      stigCount: 1,
+      savedCount: 1,
+      acceptedCount: 0,
+      rejectedCount: 0,
+      submittedCount: 5
+    },
+    user: 'lvl1',
+    userId: '85',
+    grant: 'restricted',
+    collectionCount: 1,
+    collectionMatchCnt: 1,
+    findingsCnt: 7,
+    findingsByGroupCnt: 3,
+    findingsByRuleCnt: 3,
+    findingsByRuleAndAssetCnt: 3,
+    findingsByCciCnt: 7,
+    labelCount: 1,
+    fullLabelUses: 1,
+    lvl1LabelUses: 1,
+    historyResponseStatus: 403,
+    checklistCnt_testCollection: 3,
+    grantCnt_testCollection: 7,
+    assetIds: ['42', '154', '62'],
+    validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
+    collectionIds: ['21'],
+    testBenchmarkAssignedCount: 2,
+
+  },  
+  acl_labelMinusRestricted: {
+    testAssetStigs: ['VPN_SRG_TEST'],
+    testAssetStats: {
+      ruleCount: 81,
+      stigCount: 1,
+      savedCount: 1,
+      acceptedCount: 0,
+      rejectedCount: 0,
+      submittedCount: 5
+    },
+    user: 'lvl1',
+    userId: '85',
+    grant: 'restricted',
+    collectionCount: 1,
+    collectionMatchCnt: 1,
+    findingsCnt: 7,
+    findingsByGroupCnt: 3,
+    findingsByRuleCnt: 3,
+    findingsByRuleAndAssetCnt: 3,
+    findingsByCciCnt: 7,
+    labelCount: 1,
+    fullLabelUses: 1,
+    lvl1LabelUses: 1,
+    historyResponseStatus: 403,
+    checklistCnt_testCollection: 3,
+    grantCnt_testCollection: 7,
+    assetIds: ['42', '62'],
+    validStigs: ["VPN_SRG_TEST"],
+    collectionIds: ['21'],
+    testBenchmarkAssignedCount: 2,
+
+  },  
 
 
 
