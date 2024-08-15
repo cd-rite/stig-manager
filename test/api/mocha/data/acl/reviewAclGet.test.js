@@ -13,12 +13,12 @@ const requestBodies = require('./requestBodies.js')
 const users = require('../../iterations.js')
 
 describe('GET - Review ACL', () => {
-  // before(async function () {
-  //   this.timeout(4000)
-  //   await utils.loadAppData()
-  //   await utils.uploadTestStigs()
-  //   await utils.createDisabledCollectionsandAssets()
-  // })
+  before(async function () {
+    // this.timeout(4000)
+    // await utils.loadAppData()
+    // await utils.uploadTestStigs()
+    await utils.createDisabledCollectionsandAssets()
+  })
 
   for(const user of users){
     if (expectations[user.name] === undefined){
@@ -89,7 +89,7 @@ describe('GET - Review ACL', () => {
           //   expect(res.body).to.be.lengthOf(6)
           // }
           // else{
-            expect(res.body).to.be.lengthOf(9)
+            expect(res.body).to.be.lengthOf(distinct.testAssetStats.reviewCount)
           // }
 
           
@@ -435,58 +435,110 @@ describe('GET - Review ACL', () => {
       //     }
       //   })
       // })
-      // describe('GET - getReviewByAssetRule - /collections/{collectionId}/reviews/{assetId}/{ruleId}', () => {
+      describe('GET - getReviewByAssetRule - /collections/{collectionId}/reviews/{assetId}/{ruleId}', () => {
 
-      //   it('Return the Review for an Asset and Rule', async () => {
-      //     const res = await chai.request(config.baseUrl)
-      //       .get(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}?projection=rule&projection=stigs&projection=metadata&projection=history`)
-      //       .set('Authorization', `Bearer ${user.token}`)
-      //     if(user.name === 'collectioncreator') {
-      //       expect(res).to.have.status(403)
-      //       return
-      //     }
-      //     expect(res).to.have.status(200)
-      //     expect(res.body).to.be.an('object')
+        it('Return the Review for an Asset and Rule - VPN rule, expect 200 response in most test cases', async () => {
+          const res = await chai.request(config.baseUrl)
+            .get(`/collections/${reference.testCollection.collectionId}/reviews/${reference.testAsset.assetId}/${reference.testRuleIdVPN}?projection=rule&projection=stigs&projection=metadata&projection=history`)
+            .set('Authorization', `Bearer ${user.token}`)
 
-      //     const review = res.body
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('object')
+
+          const review = res.body
         
-      //     // checking for basic properties
-      //     expect(review).to.have.property('assetId')
-      //     expect(review.assetId).to.be.equal(environment.testAsset.assetId)
+          // checking for basic properties
+          expect(review).to.have.property('assetId')
+          expect(review.assetId).to.be.equal(reference.testAsset.assetId)
 
-      //     expect(review).to.have.property('assetLabelIds')
-      //     expect(review).to.have.property('assetName')
-      //     expect(review).to.have.property('resultEngine')
-      //     expect(review).to.have.property('detail')
-      //     expect(review).to.have.property('status')
+          // expect(review).to.have.property('assetLabelIds')
+          // expect(review).to.have.property('assetName')
+          // expect(review).to.have.property('resultEngine')
+          // expect(review).to.have.property('detail')
+          // expect(review).to.have.property('status')
 
-      //     //check projectrions 
-      //     expect(review).to.have.property('rule')
-      //     expect(review.rule).to.be.an('object')
-      //     expect(review.rule).to.have.property('ruleId')
-      //     expect(review.rule.ruleId).to.be.equal(environment.testCollection.ruleId)
+          //check projectrions 
+          expect(review).to.have.property('rule')
+          expect(review.rule).to.be.an('object')
+          expect(review.rule).to.have.property('ruleId')
+          expect(review.rule.ruleId).to.be.equal(reference.testRuleIdVPN)
 
-      //     expect(review).to.have.property('stigs')
-      //     expect(review.stigs).to.be.an('array')  
+          expect(review).to.have.property('stigs')
+          expect(review.stigs).to.be.an('array')  
 
-      //     expect(review).to.have.property('metadata')
-      //     expect(review.metadata).to.be.an('object')
-      //     expect(review.metadata).to.have.property(environment.testCollection.metadataKey)
-      //     expect(review.metadata[environment.testCollection.metadataKey]).to.be.equal(environment.testCollection.metadataValue)
+          expect(review).to.have.property('metadata')
+          expect(review.metadata).to.be.an('object')
+          // expect(review.metadata).to.have.property(environment.testCollection.metadataKey)
+          // expect(review.metadata[environment.testCollection.metadataKey]).to.be.equal(environment.testCollection.metadataValue)
 
-      //     expect(review).to.have.property('history')
-      //     expect(review.history).to.be.an('array')  
-      //     for(let history of review.history){
-      //       expect(history).to.have.property('result')
-      //       expect(history).to.have.property('ruleId')
-      //       expect(history).to.have.property('status')
-      //     }
-      //     for(let stig of review.stigs){
-      //       expect(stig).to.have.property('benchmarkId')
-      //       expect(stig.benchmarkId).to.be.oneOf(environment.testAsset.validStigs)
-      //     } 
-      //   })
-      // })
+          expect(review).to.have.property('history')
+          expect(review.history).to.be.an('array')  
+          // for(let history of review.history){
+          //   expect(history).to.have.property('result')
+          //   expect(history).to.have.property('ruleId')
+          //   expect(history).to.have.property('status')
+          // }
+          for(let stig of review.stigs){
+            expect(stig).to.have.property('benchmarkId')
+            expect(stig.benchmarkId).to.be.oneOf(distinct.validStigs)
+          } 
+        })
+
+        it('Return the Review for an Asset and Rule - WIN rule, excluded in many test cases', async () => {
+          const res = await chai.request(config.baseUrl)
+            .get(`/collections/${reference.testCollection.collectionId}/reviews/${reference.testAsset.assetId}/${reference.testRuleIdWin}?projection=rule&projection=stigs&projection=metadata&projection=history`)
+            .set('Authorization', `Bearer ${user.token}`)
+
+          if (distinct.validStigs.includes('Windows_10_STIG_TEST') === false){
+            expect(res).to.have.status(204)
+            return
+          }
+
+          expect(res).to.have.status(200)
+
+          expect(res.body).to.be.an('object')
+
+          const review = res.body
+        
+          // checking for basic properties
+          expect(review).to.have.property('assetId')
+          expect(review.assetId).to.be.equal(reference.testAsset.assetId)
+
+          // expect(review).to.have.property('assetLabelIds')
+          // expect(review).to.have.property('assetName')
+          // expect(review).to.have.property('resultEngine')
+          // expect(review).to.have.property('detail')
+          // expect(review).to.have.property('status')
+
+          //check projectrions 
+          expect(review).to.have.property('rule')
+          expect(review.rule).to.be.an('object')
+          expect(review.rule).to.have.property('ruleId')
+          expect(review.rule.ruleId).to.be.equal(reference.testRuleIdWin)
+
+          expect(review).to.have.property('stigs')
+          expect(review.stigs).to.be.an('array')  
+
+          expect(review).to.have.property('metadata')
+          expect(review.metadata).to.be.an('object')
+          // expect(review.metadata).to.have.property(environment.testCollection.metadataKey)
+          // expect(review.metadata[environment.testCollection.metadataKey]).to.be.equal(environment.testCollection.metadataValue)
+
+          expect(review).to.have.property('history')
+          expect(review.history).to.be.an('array')  
+          // for(let history of review.history){
+          //   expect(history).to.have.property('result')
+          //   expect(history).to.have.property('ruleId')
+          //   expect(history).to.have.property('status')
+          // }
+          for(let stig of review.stigs){
+            expect(stig).to.have.property('benchmarkId')
+            expect(stig.benchmarkId).to.be.oneOf(distinct.validStigs)
+          } 
+        })
+
+
+      })
       // describe('GET - getReviewMetadata - /collections/{collectionId}/reviews/{assetId}/{ruleId}/metadata', () => {
 
       //   it('Return the metadata for a Review', async () => {

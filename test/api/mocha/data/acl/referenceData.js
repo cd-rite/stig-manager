@@ -237,7 +237,9 @@ const reference = {
       "755b8a28-9a68-11ec-b1bc-0242ac110002",
       "5130dc84-9a68-11ec-b1bc-0242ac110002"
     ]
-  }
+  },
+  testRuleIdVPN: "SV-106179r1_rule",
+  testRuleIdWin: "SV-77809r3_rule",
 };
 
 module.exports = reference;

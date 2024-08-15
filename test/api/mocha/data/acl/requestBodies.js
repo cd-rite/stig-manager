@@ -20,7 +20,10 @@ const requestBodies = {
       [{"labelId":"755b8a28-9a68-11ec-b1bc-0242ac110002","access":"rw"},{"assetId":"154","access":"rw"}],
     acl_labelMinusRestricted: 
       [{"labelId":"755b8a28-9a68-11ec-b1bc-0242ac110002","access":"rw"},{"benchmarkId":"Windows_10_STIG_TEST","assetId":"42","access":"none"},{"benchmarkId":"Windows_10_STIG_TEST","assetId":"62","access":"none"}],
-
+    acl_labelMinusStig: 
+      [{"labelId":"755b8a28-9a68-11ec-b1bc-0242ac110002","access":"rw"},{"benchmarkId":"Windows_10_STIG_TEST","access":"none"}],      
+    acl_labelMinusAsset: 
+      [{"labelId":"755b8a28-9a68-11ec-b1bc-0242ac110002","access":"rw"},{"assetId":"154","access":"none"}],
   },
 
   updateCollection: {
