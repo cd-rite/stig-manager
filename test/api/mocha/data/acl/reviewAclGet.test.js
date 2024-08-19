@@ -40,6 +40,8 @@ describe('GET - Review ACL', () => {
        expect(res).to.have.status(200)
       })
 
+      // check effective ACLs here
+
 
       describe('GET - getReviewsByCollection - /collections/{collectionId}/reviews', () => {
         
@@ -52,12 +54,23 @@ describe('GET - Review ACL', () => {
           expect(res).to.have.status(200)
           expect(res.body).to.be.an('array')
 
-          for(let review of res.body){
+          // Extract all ruleIds
+          const allRuleIds = res.body.flatMap(item => item.ruleId);
+          // Extract all assetIds
+          const allAssetIds = res.body.map(item => item.assetId);
+          // Extract all benchmarkIds
+          const allBenchmarkIds = res.body.flatMap(item => item.stigs.map(stig => stig.benchmarkId));
 
+          // rule id set:
+          let ruleIdSet =  [...new Set(allRuleIds)]
+          // add review count check
+          // check against expected rule set
+
+          for(const review of res.body){
 
             expect(review.assetId, "assetIds").to.be.oneOf(distinct.assetIds)
 
-            for(let stig of review.stigs){
+            for(const stig of review.stigs){
               expect(stig).to.have.property('benchmarkId')
               expect(stig.benchmarkId, "benchmarkIds").to.be.oneOf(distinct.validStigs)
             }
@@ -68,31 +81,22 @@ describe('GET - Review ACL', () => {
 
 
 
-
-
-
-
-
-
-
       })
 
 
-        it('Return a list of reviews accessible to the requester, assetId Projection.', async () => {
+        it('reviews with assetId param and Projections.', async () => {
           const res = await chai.request(config.baseUrl)
             .get(`/collections/${reference.testCollection.collectionId}/reviews?assetId=${reference.testAsset.assetId}&projection=rule&projection=stigs&projection=metadata`)
             .set('Authorization', `Bearer ${user.token}`)
 
           expect(res).to.have.status(200)
       
-          // if(user.name === 'lvl1'){
-          //   expect(res.body).to.be.lengthOf(6)
-          // }
-          // else{
-            expect(res.body).to.be.lengthOf(distinct.testAssetStats.reviewCount)
-          // }
 
-          
+          expect(res.body).to.be.lengthOf(distinct.testAssetStats.reviewCount)
+
+
+          // check for appropriate ruleIds
+
           for(let review of res.body){
             // checking for basic properties
             // expect(review).to.have.property('assetId')
