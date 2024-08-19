@@ -199,31 +199,30 @@ module.exports.getGrantByAssetId = async function (assetId, grants) {
   return rows.length ? grants[rows[0].collectionId] : null
 }
 
-module.exports.getUserAssetStigs = async function ({assetId, grant, grants}) {
-  if (!grant && grants) {
-    grant = await _this.getGrantByAssetId(assetId, grants)
-  }
-  if (!grant) return [[]]
+module.exports.getUserAssetStigAccess = async function ({assetId, benchmarkId, grants}) {
+  const grant = await _this.getGrantByAssetId(assetId, grants)
+  if (!grant) return 'none'
+  const binds = [assetId, benchmarkId]
   const sql = `with ${_this.cteAclEffective({cgIds: grant.grantIds})} select
-    distinct sa.benchmarkId,
     coalesce(ae.access, 'rw') as access
   from
 	  stig_asset_map sa
     ${grant.accessLevel === 1 ? 'inner' : 'left'} join cteAclEffective ae using (saId)
   where
-	  sa.assetId = ?`
-    return _this.pool.query(sql, [assetId])
+	  sa.assetId = ? and sa.benchmarkId = ?`
+    const [rows] = await _this.pool.query(sql, binds)
+    return rows[0]?.access ?? 'none'
 }
 
-// Returns Boolean
-module.exports.userHasAssetStigs = async function (assetId, requestedBenchmarkIds, elevate, userObject) {
-  const [rows] = await _this.getUserAssetStigs({
-    assetId,
-    grants: userObject.grants
-  })
-  const availableBenchmarkIds = rows.map( row => row.benchmarkId )
-  return requestedBenchmarkIds.every( requestedBenchmarkId => availableBenchmarkIds.includes(requestedBenchmarkId))   
-}
+// // Returns Boolean
+// module.exports.userHasAssetStigs = async function (assetId, requestedBenchmarkIds, elevate, userObject) {
+//   const [rows] = await _this.getUserAssetStigs({
+//     assetId,
+//     grants: userObject.grants
+//   })
+//   const availableBenchmarkIds = rows.map( row => row.benchmarkId )
+//   return requestedBenchmarkIds.every( requestedBenchmarkId => availableBenchmarkIds.includes(requestedBenchmarkId))   
+// }
 
 /**
  * updateStatsAssetStig

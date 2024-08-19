@@ -280,7 +280,7 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/ChecklistAssetStig'
+                  - $ref: '#/components/schemas/ChecklistJson'
                   - $ref: '#/components/schemas/ChecklistCklb'
             application/xml:
               schema:
@@ -4863,6 +4863,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/StigCklb'
+    ChecklistJson:
+      type: object
+      properties:
+        access:
+          $ref: '#/components/schemas/AclRuleAccess'
+        checklist:
+          $ref: '#/components/schemas/ChecklistAssetStig'
     TargetData:
       type: object
       properties:

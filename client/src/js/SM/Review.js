@@ -299,7 +299,7 @@ SM.Review.Form.Panel = Ext.extend(Ext.form.FormPanel, {
     })
 
     let statusLabel = ''
-    let access = 'r'
+    let access = _this.defaultAccess
 
     function reviewChanged () {
       return (
@@ -318,7 +318,7 @@ SM.Review.Form.Panel = Ext.extend(Ext.form.FormPanel, {
       const form = _this.getForm()
       form.setValues.call(form, values)
       statusLabel = values.status?.label ?? ''
-      access = values.access ?? 'r'
+      access = values.access ?? _this.defaultAccess
       if (values.ts && values.username) {
         mdf.formatValue(values)
       }

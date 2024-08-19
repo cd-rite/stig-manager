@@ -98,7 +98,7 @@ async function addReview( params ) {
       url: `${STIGMAN.Env.apiBase}/assets/${leaf.assetId}/checklists/${leaf.benchmarkId}/${leaf.revisionStr}`,
       method: 'GET'
     }),
-    root: '',
+    root: 'checklist',
     storeId: 'groupStore' + idAppend,
     fields: groupFields,
     idProperty: 'ruleId',
@@ -108,6 +108,7 @@ async function addReview( params ) {
     },
     listeners: {
       load: function (store, records) {
+        reviewForm.defaultAccess = store.reader.jsonData.access
         // Were we passed a specific rule to select?
         if ('undefined' !== typeof selectedRule) {
           var index = store.find('ruleId', selectedRule);

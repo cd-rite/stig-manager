@@ -80,8 +80,6 @@ const upMigration = [
     access enum('none','r', 'rw') NOT NULL,
     modifiedUserId int NULL,
     modifiedDate datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    isRead tinyint GENERATED ALWAYS AS (case when (access = 'r' or access = 'rw') then 1 else NULL end) VIRTUAL,
-    isWrite tinyint GENERATED ALWAYS AS (case when (access = 'rw') then 1 else NULL end) VIRTUAL,
     PRIMARY KEY (cgAclId),
     KEY fk_collection_grant_acl_1 (cgId),
     KEY fk_collection_grant_acl_2 (assetId, benchmarkId),

@@ -147,56 +147,55 @@ module.exports.getChecklistByAssetStig = async function getChecklistByAssetStig 
     const benchmarkId = req.params.benchmarkId
     const revisionStr = req.params.revisionStr
     const format = req.query.format || 'json'
-    if (await dbUtils.userHasAssetStigs(assetId, [benchmarkId], false, req.userObject)) {
-      const response = await AssetService.getChecklistByAssetStig(assetId, benchmarkId, revisionStr, format, req.userObject )
-      if (format === 'json') {
-        res.json(response)
-        return
-      }
-      
-      const dateString = escape.filenameComponentFromDate()
-      const fileBasename = `${response.assetName}-${benchmarkId}-${response.revisionStrResolved}`
-      if (format === 'cklb') {
-        response.cklb.title = fileBasename
-        writer.writeInlineFile(res, JSON.stringify(response.cklb), `${fileBasename}_${dateString}.cklb`, 'application/json')  // revisionStrResolved provides specific rev string, if "latest" was asked for.
-      }
-      else if (format === 'ckl') {
-        const builder = new XMLBuilder({
-          attributeNamePrefix : "@_",
-          textNodeName : "#text",
-          ignoreAttributes : true,
-          format: true,
-          indentBy: "  ",
-          supressEmptyNode: false,
-          processEntities: false,
-          tagValueProcessor: escapeForXml,
-          attrValueProcessor: escapeForXml
-        })
-        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<!-- STIG Manager ${config.version} -->\n<!-- Classification: ${config.settings.setClassification} -->\n`
-        xml += builder.build(response.xmlJs)
-        writer.writeInlineFile(res, xml, `${fileBasename}_${dateString}.ckl`, 'application/xml')  // revisionStrResolved provides specific rev string, if "latest" was asked for.
-      }
-      else if (format === 'xccdf') {
-        const builder = new XMLBuilder({
-          attributeNamePrefix : "@_",
-          textNodeName : "#text",
-          ignoreAttributes : false,
-          cdataTagName: "__cdata",
-          cdataPositionChar: "\\c",
-          format: true,
-          indentBy: "  ",
-          supressEmptyNode: true,
-          processEntities: false,
-          tagValueProcessor: escapeForXml,
-          attrValueProcessor: escapeForXml
-        })
-        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<!-- STIG Manager ${config.version} -->\n<!-- Classification: ${config.settings.setClassification} -->\n`
-        xml += builder.build(response.xmlJs)
-        writer.writeInlineFile(res, xml, `${fileBasename}-xccdf_${dateString}.xml`, 'application/xml')  // revisionStrResolved provides specific rev string, if "latest" was asked for.
-      }
+
+    const access = await dbUtils.getUserAssetStigAccess({assetId, benchmarkId, grants: req.userObject.grants})
+    if (access === 'none') throw new SmError.PrivilegeError()
+
+    const checklist = await AssetService.getChecklistByAssetStig(assetId, benchmarkId, revisionStr, format, req.userObject )
+    if (format === 'json') {
+      res.json({access, checklist})
+      return
     }
-    else {
-      res.status(204).end()
+    
+    const dateString = escape.filenameComponentFromDate()
+    const fileBasename = `${checklist.assetName}-${benchmarkId}-${checklist.revisionStrResolved}`
+    if (format === 'cklb') {
+      checklist.cklb.title = fileBasename
+      writer.writeInlineFile(res, JSON.stringify(checklist.cklb), `${fileBasename}_${dateString}.cklb`, 'application/json')  // revisionStrResolved provides specific rev string, if "latest" was asked for.
+    }
+    else if (format === 'ckl') {
+      const builder = new XMLBuilder({
+        attributeNamePrefix : "@_",
+        textNodeName : "#text",
+        ignoreAttributes : true,
+        format: true,
+        indentBy: "  ",
+        supressEmptyNode: false,
+        processEntities: false,
+        tagValueProcessor: escapeForXml,
+        attrValueProcessor: escapeForXml
+      })
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<!-- STIG Manager ${config.version} -->\n<!-- Classification: ${config.settings.setClassification} -->\n`
+      xml += builder.build(checklist.xmlJs)
+      writer.writeInlineFile(res, xml, `${fileBasename}_${dateString}.ckl`, 'application/xml')  // revisionStrResolved provides specific rev string, if "latest" was asked for.
+    }
+    else if (format === 'xccdf') {
+      const builder = new XMLBuilder({
+        attributeNamePrefix : "@_",
+        textNodeName : "#text",
+        ignoreAttributes : false,
+        cdataTagName: "__cdata",
+        cdataPositionChar: "\\c",
+        format: true,
+        indentBy: "  ",
+        supressEmptyNode: true,
+        processEntities: false,
+        tagValueProcessor: escapeForXml,
+        attrValueProcessor: escapeForXml
+      })
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<!-- STIG Manager ${config.version} -->\n<!-- Classification: ${config.settings.setClassification} -->\n`
+      xml += builder.build(checklist.xmlJs)
+      writer.writeInlineFile(res, xml, `${fileBasename}-xccdf_${dateString}.xml`, 'application/xml')  // revisionStrResolved provides specific rev string, if "latest" was asked for.
     }
   }
   catch (err) {
