@@ -38,6 +38,9 @@ function addUserAdmin(params ) {
 			name: 'statistics'
 		}
 	])
+
+	let showAllUsers = false; // New variable to track filter state
+
 	const userStore = new Ext.data.JsonStore({
 		proxy: new Ext.data.HttpProxy({
 			url: `${STIGMAN.Env.apiBase}/users`,
@@ -58,10 +61,22 @@ function addUserAdmin(params ) {
 		listeners: {
 			load: function (store,records) {
 				store.isLoaded = true;
+				applyGrantFilter(store);
 				userGrid.getSelectionModel().selectFirstRow();
 			}
 		}
 	})
+
+	// Function to apply the grant filter
+	function applyGrantFilter(store) {
+		if (!showAllUsers) {
+			store.filterBy(function(record) {
+				return record.get('collectionGrantCount') > 0;
+			});
+		} else {
+			store.clearFilter();
+		}
+	}
 
 	const privilegeGetter = new Function("obj", "return obj?." + STIGMAN.Env.oauth.claims.privileges + " || [];");
 	const totalTextCmp = new SM.RowCountTextItem({store:userStore})
@@ -233,6 +248,16 @@ function addUserAdmin(params ) {
 					Ext.getBody().mask('Getting properties...');
 					showUserProps(r.get('userId'));
 				}
+			},
+			'->',  // This pushes the following items to the right
+			{
+				xtype: 'button',
+				text: 'Show All Users',
+				handler: function() {
+					showAllUsers = !showAllUsers;
+					this.setText(showAllUsers ? 'Hide Users with 0 Grants' : 'Show All Users');
+					applyGrantFilter(userStore);
+				}
 			}
 		],
 		bbar: new Ext.Toolbar({
@@ -243,7 +268,11 @@ function addUserAdmin(params ) {
 				tooltip: 'Reload this grid',
 				width: 20,
 				handler: function(btn){
-					userGrid.getStore().reload();
+					userGrid.getStore().reload({
+						callback: function() {
+							applyGrantFilter(userStore)
+						}
+					})
 				}
 			},
 			{
@@ -273,6 +302,7 @@ function addUserAdmin(params ) {
 		userStore.loadData(apiUser, true)
 		const sortState = userStore.getSortState()
 		userStore.sort(sortState.field, sortState.direction)
+		applyGrantFilter(userStore);
 		userGrid.getSelectionModel().selectRow(userStore.findExact('userId',apiUser.userId))
 	}
 	SM.Dispatcher.addListener('userchanged', onUserChanged)
@@ -281,6 +311,7 @@ function addUserAdmin(params ) {
 		userStore.loadData(apiUser, true)
 		const sortState = userStore.getSortState()
 		userStore.sort(sortState.field, sortState.direction)
+		applyGrantFilter(userStore);
 		userGrid.getSelectionModel().selectRow(userStore.findExact('userId',apiUser.userId))
 	}
 	SM.Dispatcher.addListener('usercreated', onUserCreated)
@@ -304,6 +335,10 @@ function addUserAdmin(params ) {
 	})
 	thisTab.show()
 	
-	userGrid.getStore().load()
+	userGrid.getStore().load({
+		callback: function() {
+			applyGrantFilter(userStore);
+		}
+	})
 }
 
