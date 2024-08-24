@@ -39,7 +39,7 @@ function addUserAdmin(params ) {
 		}
 	])
 
-	let showAllUsers = false; // New variable to track filter state
+	let showAllUsers = false // track filter state
 
 	const userStore = new Ext.data.JsonStore({
 		proxy: new Ext.data.HttpProxy({
@@ -60,25 +60,25 @@ function addUserAdmin(params ) {
 		},
 		listeners: {
 			load: function (store,records) {
-				store.isLoaded = true;
-				applyGrantFilter(store);
-				userGrid.getSelectionModel().selectFirstRow();
+				userStore.isLoaded = true
+				applyGrantFilters()
+				userGrid.getSelectionModel().selectFirstRow()
 			}
 		}
 	})
 
 	// Function to apply the grant filter
-	function applyGrantFilter(store) {
+	function applyGrantFilters() {
 		if (!showAllUsers) {
-			store.filterBy(function(record) {
-				return record.get('collectionGrantCount') > 0;
-			});
+			userStore.filterBy(function(record) {
+				return record.get('collectionGrantCount') > 0
+			})
 		} else {
-			store.clearFilter();
+			userStore.clearFilter()
 		}
 	}
 
-	const privilegeGetter = new Function("obj", "return obj?." + STIGMAN.Env.oauth.claims.privileges + " || [];");
+	const privilegeGetter = new Function("obj", "return obj?." + STIGMAN.Env.oauth.claims.privileges + " || [];")
 	const totalTextCmp = new SM.RowCountTextItem({store:userStore})
 
 	const userGrid = new Ext.grid.GridPanel({
@@ -158,13 +158,13 @@ function addUserAdmin(params ) {
           userStore.filter(view.getFilterFns())  
         },
 				beforerefresh: function(v) {
-				   v.scrollTop = v.scroller.dom.scrollTop;
-				   v.scrollHeight = v.scroller.dom.scrollHeight;
+				   v.scrollTop = v.scroller.dom.scrollTop
+				   v.scrollHeight = v.scroller.dom.scrollHeight
 				},
 				refresh: function(v) {
 					setTimeout(function() { 
-						v.scroller.dom.scrollTop = v.scrollTop + (v.scrollTop == 0 ? 0 : v.scroller.dom.scrollHeight - v.scrollHeight);
-					}, 100);
+						v.scroller.dom.scrollTop = v.scrollTop + (v.scrollTop == 0 ? 0 : v.scroller.dom.scrollHeight - v.scrollHeight)
+					}, 100)
 				}
 			},
 			deferEmptyText:false
@@ -172,9 +172,9 @@ function addUserAdmin(params ) {
 		listeners: {
 			rowdblclick: {
 				fn: function(grid,rowIndex,e) {
-					var r = grid.getStore().getAt(rowIndex);
-					Ext.getBody().mask('Getting grants for ' + r.get('name') + '...');
-					showUserProps(r.get('userId'));
+					var r = userStore.getAt(rowIndex)
+					Ext.getBody().mask('Getting grants for ' + r.get('name') + '...')
+					showUserProps(r.get('userId'))
 				}
 			}
 		},
@@ -184,8 +184,8 @@ function addUserAdmin(params ) {
 				text: 'Pre-register User',
 				disabled: !(curUser.privileges.canAdmin),
 				handler: function() {
-					Ext.getBody().mask('');
-					showUserProps(0);            
+					Ext.getBody().mask('')
+					showUserProps(0)            
 				}
 			},
 			'-',
@@ -195,7 +195,7 @@ function addUserAdmin(params ) {
 				text: 'Unregister User',
 				disabled: !(curUser.privileges.canAdmin),
 				handler: function() {
-					let user = userGrid.getSelectionModel().getSelected();
+					let user = userGrid.getSelectionModel().getSelected()
 					let buttons = {yes: 'Unregister', no: 'Cancel'}
 					let confirmStr=`Unregister user ${user.data.username}?<br><br>This action will remove all Collection Grants for the user. A record will be retained in the system for auditing and attribution purposes.`;
 					if (user.data.lastAccess === 0){
@@ -244,9 +244,9 @@ function addUserAdmin(params ) {
 				iconCls: 'icon-edit',
 				text: 'Modify User',
 				handler: function() {
-					var r = userGrid.getSelectionModel().getSelected();
-					Ext.getBody().mask('Getting properties...');
-					showUserProps(r.get('userId'));
+					var r = userGrid.getSelectionModel().getSelected()
+					Ext.getBody().mask('Getting properties...')
+					showUserProps(r.get('userId'))
 				}
 			},
 			'->',  // This pushes the following items to the right
@@ -254,9 +254,9 @@ function addUserAdmin(params ) {
 				xtype: 'button',
 				text: 'Show All Users',
 				handler: function() {
-					showAllUsers = !showAllUsers;
-					this.setText(showAllUsers ? 'Hide Users with 0 Grants' : 'Show All Users');
-					applyGrantFilter(userStore);
+					showAllUsers = !showAllUsers
+					this.setText(showAllUsers ? 'Hide Users with 0 Grants' : 'Show All Users')
+					applyGrantFilters()
 				}
 			}
 		],
@@ -268,9 +268,9 @@ function addUserAdmin(params ) {
 				tooltip: 'Reload this grid',
 				width: 20,
 				handler: function(btn){
-					userGrid.getStore().reload({
+					userStore.reload({
 						callback: function() {
-							applyGrantFilter(userStore)
+							applyGrantFilters()
 						}
 					})
 				}
@@ -302,7 +302,7 @@ function addUserAdmin(params ) {
 		userStore.loadData(apiUser, true)
 		const sortState = userStore.getSortState()
 		userStore.sort(sortState.field, sortState.direction)
-		applyGrantFilter(userStore);
+		applyGrantFilters()
 		userGrid.getSelectionModel().selectRow(userStore.findExact('userId',apiUser.userId))
 	}
 	SM.Dispatcher.addListener('userchanged', onUserChanged)
@@ -311,7 +311,7 @@ function addUserAdmin(params ) {
 		userStore.loadData(apiUser, true)
 		const sortState = userStore.getSortState()
 		userStore.sort(sortState.field, sortState.direction)
-		applyGrantFilter(userStore);
+		applyGrantFilters()
 		userGrid.getSelectionModel().selectRow(userStore.findExact('userId',apiUser.userId))
 	}
 	SM.Dispatcher.addListener('usercreated', onUserCreated)
@@ -337,7 +337,7 @@ function addUserAdmin(params ) {
 	
 	userGrid.getStore().load({
 		callback: function() {
-			applyGrantFilter(userStore);
+			applyGrantFilters()
 		}
 	})
 }
