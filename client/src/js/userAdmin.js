@@ -61,22 +61,10 @@ function addUserAdmin(params ) {
 		listeners: {
 			load: function (store,records) {
 				userStore.isLoaded = true
-				applyGrantFilters()
 				userGrid.getSelectionModel().selectFirstRow()
 			}
 		}
 	})
-
-	// Function to apply the grant filter
-	function applyGrantFilters() {
-		if (!showAllUsers) {
-			userStore.filterBy(function(record) {
-				return record.get('collectionGrantCount') > 0
-			})
-		} else {
-			userStore.clearFilter()
-		}
-	}
 
 	const privilegeGetter = new Function("obj", "return obj?." + STIGMAN.Env.oauth.claims.privileges + " || [];")
 	const totalTextCmp = new SM.RowCountTextItem({store:userStore})
@@ -155,7 +143,15 @@ function addUserAdmin(params ) {
 			// These listeners keep the grid in the same scroll position after the store is reloaded
 			listeners: {
         filterschanged: function (view) {
-          userStore.filter(view.getFilterFns())  
+					const filterFns = view.getFilterFns() ?? []
+					if (!showAllUsers) {
+						filterFns.push({
+							fn: function (record) {
+								return record.get('collectionGrantCount') > 0
+							}
+						})
+					}
+          userStore.filter(filterFns)  
         },
 				beforerefresh: function(v) {
 				   v.scrollTop = v.scroller.dom.scrollTop
@@ -256,7 +252,7 @@ function addUserAdmin(params ) {
 				handler: function() {
 					showAllUsers = !showAllUsers
 					this.setText(showAllUsers ? 'Hide Users with 0 Grants' : 'Show All Users')
-					applyGrantFilters()
+					userGrid.view.fireEvent('filterschanged', userGrid.view)
 				}
 			}
 		],
@@ -268,11 +264,7 @@ function addUserAdmin(params ) {
 				tooltip: 'Reload this grid',
 				width: 20,
 				handler: function(btn){
-					userStore.reload({
-						callback: function() {
-							applyGrantFilters()
-						}
-					})
+					userStore.reload()
 				}
 			},
 			{
@@ -302,7 +294,6 @@ function addUserAdmin(params ) {
 		userStore.loadData(apiUser, true)
 		const sortState = userStore.getSortState()
 		userStore.sort(sortState.field, sortState.direction)
-		applyGrantFilters()
 		userGrid.getSelectionModel().selectRow(userStore.findExact('userId',apiUser.userId))
 	}
 	SM.Dispatcher.addListener('userchanged', onUserChanged)
@@ -311,7 +302,6 @@ function addUserAdmin(params ) {
 		userStore.loadData(apiUser, true)
 		const sortState = userStore.getSortState()
 		userStore.sort(sortState.field, sortState.direction)
-		applyGrantFilters()
 		userGrid.getSelectionModel().selectRow(userStore.findExact('userId',apiUser.userId))
 	}
 	SM.Dispatcher.addListener('usercreated', onUserCreated)
@@ -335,10 +325,6 @@ function addUserAdmin(params ) {
 	})
 	thisTab.show()
 	
-	userGrid.getStore().load({
-		callback: function() {
-			applyGrantFilters()
-		}
-	})
+	userGrid.getStore().load()
 }
 
