@@ -39,7 +39,7 @@ function addUserAdmin(params ) {
 		}
 	])
 
-	let showAllUsers = false // track filter state
+	let hideUsersWithNoGrants = true // track filter state
 
 	const userStore = new Ext.data.JsonStore({
 		proxy: new Ext.data.HttpProxy({
@@ -144,7 +144,7 @@ function addUserAdmin(params ) {
 			listeners: {
         filterschanged: function (view) {
 					const filterFns = view.getFilterFns() ?? []
-					if (!showAllUsers) {
+					if (hideUsersWithNoGrants) {
 						filterFns.push({
 							fn: function (record) {
 								return record.get('collectionGrantCount') > 0
@@ -198,7 +198,7 @@ function addUserAdmin(params ) {
 						confirmStr=`Delete user ${user.data.username}?<br><br>This user has never accessed the system, and will be deleted from the system entirely.`;
 						buttons.yes = 'Delete'
 					}
-					
+
 					Ext.Msg.show({
 						title: 'Confirm unregister action',
 						icon: Ext.Msg.WARNING,
@@ -247,12 +247,14 @@ function addUserAdmin(params ) {
 			},
 			'->',  // This pushes the following items to the right
 			{
-				xtype: 'button',
-				text: 'Show All Users',
-				handler: function() {
-					showAllUsers = !showAllUsers
-					this.setText(showAllUsers ? 'Hide Users with 0 Grants' : 'Show All Users')
-					userGrid.view.fireEvent('filterschanged', userGrid.view)
+				xtype: 'checkbox',
+				boxLabel: 'Hide Users with No Grants',
+				checked: hideUsersWithNoGrants,
+				listeners: {
+					check: function(cb, checked) {
+						hideUsersWithNoGrants = checked;
+						userGrid.view.fireEvent('filterschanged', userGrid.view);
+					}
 				}
 			}
 		],
@@ -324,7 +326,6 @@ function addUserAdmin(params ) {
 		}
 	})
 	thisTab.show()
-	
+
 	userGrid.getStore().load()
 }
-
