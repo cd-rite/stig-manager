@@ -4,50 +4,52 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const environment = require('../../environment.json')
-const users = require('../../iterations.js')
+const iterations = require('../../iterations.js')
 const expectations = require('./expectations.js')
-const reference = require('./referenceData.js')
+const reference = require('../../referenceData.js')
 
 describe('DELETE - Review', () => {
+  before(async function () {
+    // this.timeout(4000)
+    // await utils.loadAppData()
+    await utils.uploadTestStigs()
+  })
     
-  for(const user of users) {
-    if (expectations[user.name] === undefined){
-      it(`No expectations for this iteration scenario: ${user.name}`, async () => {})
-      return
+  for(const iteration of iterations) {
+    if (expectations[iteration.name] === undefined){
+      it(`No expectations for this iteration scenario: ${iteration.name}`, async () => {})
+      continue
     }
-    describe(`user:${user.name}`, () => {
+    describe(`iteration:${iteration.name}`, () => {
+      const distinct = expectations[iteration.name]
       describe('DELETE - deleteReviewByAssetRule - /collections/{collectionId}/reviews/{assetId}/{ruleId}', () => {
 
         beforeEach(async function () {
           this.timeout(4000)
           await utils.loadAppData()
-          await utils.uploadTestStigs()
-      })
+          // await utils.uploadTestStigs()
+        })
         
         it('Delete a Review', async () => {
           const res = await chai.request(config.baseUrl)
-            .delete(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}?projection=rule&projection=history&projection=stigs`)
-            .set('Authorization', `Bearer ${user.token}`)
+            .delete(`/collections/${reference.testCollection.collectionId}/reviews/${reference.testAsset.assetId}/${reference.testAsset.testRuleId}?projection=rule&projection=history&projection=stigs`)
+            .set('Authorization', `Bearer ${iteration.token}`)
 
-          if(user.name === 'collectioncreator') {
-            expect(res).to.have.status(403)
-            return
-          }
           expect(res).to.have.status(200)
-          expect(res.body).to.have.property('rule')
-          expect(res.body).to.have.property('history')
-          expect(res.body).to.have.property('stigs')
-        })
-        it('Delete a Review - freshRuleId - review may or may not exist', async () => {
-          const res = await chai.request(config.baseUrl)
-            .delete(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.freshRuleId}?projection=rule&projection=history&projection=stigs`)
-            .set('Authorization', `Bearer ${user.token}`)
-          if(user.name === 'collectioncreator') {
-            expect(res).to.have.status(403)
-            return
+
+          expect(res.body.assetId).to.equal(reference.testAsset.assetId)
+          expect(res.body.rule.ruleId).to.equal(reference.testAsset.testRuleId)
+          expect(res.body.history).to.be.an('array').of.length(reference.testAsset.testRuleIdHistoryCount)
+          expect(res.body.stigs).to.be.an('array').of.length(reference.testAsset.testRuleIdStigCount)
+
+          for(const history of res.body.history) {
+            expect(history.ruleId).to.equal(reference.testAsset.testRuleId)
           }
-          expect(res).to.have.status(204)
+
+          for(const stig of res.body.stigs) { 
+            expect(reference.testAsset.validStigs).to.include(stig.benchmarkId)
+          }
+       
         })
       })
 
@@ -56,19 +58,15 @@ describe('DELETE - Review', () => {
         before(async function () {
           this.timeout(4000)
           await utils.loadAppData()
-          await utils.uploadTestStigs()
-          await utils.createDisabledCollectionsandAssets()
+          // await utils.uploadTestStigs()
         })
 
         it('Delete one metadata key/value of a Review', async () => {
           const res = await chai.request(config.baseUrl)
-            .delete(`/collections/${environment.testCollection.collectionId}/reviews/${environment.testAsset.assetId}/${environment.testCollection.ruleId}/metadata/keys/${environment.testCollection.metadataKey}`)
-            .set('Authorization', `Bearer ${user.token}`)
-            .send(`${JSON.stringify(environment.testCollection.metadataValue)}`)
-          if(user.name === 'collectioncreator') {
-            expect(res).to.have.status(403)
-            return
-          }
+            .delete(`/collections/${reference.testCollection.collectionId}/reviews/${reference.testAsset.assetId}/${reference.testAsset.testRuleId}/metadata/keys/${reference.reviewMetadataKey}`)
+            .set('Authorization', `Bearer ${iteration.token}`)
+            .send(`${JSON.stringify(reference.reviewMetadataValue)}`)
+        
           expect(res).to.have.status(204)
         })
       })

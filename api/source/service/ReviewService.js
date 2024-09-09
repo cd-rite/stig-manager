@@ -772,9 +772,9 @@ exports.getReviews = async function ({projections = [], filter = {}, grant}) {
       predicates.statements.push(`revision.benchmarkId = ?`)
       predicates.binds.push(filter.benchmarkId)
   }
-  if ( filter.metadata ) {
-    for (const pair of filter.metadata) {
-      const [key, value] = pair.split(':')
+  if ( inPredicates.metadata ) {
+    for (const pair of inPredicates.metadata) {
+      const [key, value] = pair.split(/:(.*)/s)
       predicates.statements.push('JSON_CONTAINS(r.metadata, ?, ?)')
       predicates.binds.push( `"${value}"`,  `$.${key}`)
     }

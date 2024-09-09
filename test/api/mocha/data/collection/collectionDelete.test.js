@@ -1,16 +1,17 @@
 const chai = require('chai')
 const chaiHttp = require('chai-http')
+const { v4: uuidv4 } = require('uuid');
 chai.use(chaiHttp)
 const expect = chai.expect
+const deepEqualInAnyOrder = require('deep-equal-in-any-order')
+chai.use(deepEqualInAnyOrder)
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-// const environment = require('../../environment.json')
-const users = require('../../iterations')
+const iterations = require('../../iterations')
 const expectations = require('./expectations')
-const reference = require('./referenceData')
+const reference = require('../../referenceData.js')
 
-
-describe('DELETE - Collection ', () => {
+describe('DELETE - Collection ', function () {
 
   before(async function () {
     this.timeout(4000)
@@ -22,62 +23,57 @@ describe('DELETE - Collection ', () => {
       await utils.loadAppData()
   })
 
-  for(const user of users){
+  for(const iteration of iterations){
     
-    if (expectations[user.name] === undefined){
-      it(`No expectations for this iteration scenario: ${user.name}`, async () => {})
+    if (expectations[iteration.name] === undefined){
+      it(`No expectations for this iteration scenario: ${iteration.name}`,async function () {})
       continue
     }
 
-    describe(`user:${user.name}`, () => {
-      const distinct = expectations[user.name]
+    describe(`iteration:${iteration.name}`, function () {
+      const distinct = expectations[iteration.name]
 
-      describe('deleteCollection - /collections/{collectionId}', () => {
-        if (user.name === 'stigmanadmin' ){
+      describe('deleteCollection - /collections/{collectionId}', function () {
+        if (iteration.name === 'stigmanadmin' ){
 
-          it('Delete a Collection - elevated stigmanadmin only', async () => {
+          it('Delete test Collection, test projections - elevated stigmanadmin only',async function () {
               const res = await chai.request(config.baseUrl)
-                  .delete(`/collections/${distinct.deleteCollectionId_admin}?elevate=true&projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
-                  .set('Authorization', `Bearer ${user.token}`)
+                  .delete(`/collections/${reference.testCollection.collectionId}?elevate=true&projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
+                  .set('Authorization', `Bearer ${iteration.token}`)
 
-              // if(user.name !== "stigmanadmin" ){
-              //     expect(res).to.have.status(403)
-              //     return
-              // }
               expect(res).to.have.status(200)
+              expect(res.body.collectionId).to.equal(reference.testCollection.collectionId) 
 
-              expect(res.body.collectionId).to.equal(distinct.deleteCollectionId_admin)
+              expect(res.body.assets).to.have.lengthOf(reference.testCollection.assetIds.length)
+              for(const asset of res.body.assets){
+                expect(reference.testCollection.assetIds).to.include(asset.assetId)
+              }
+              expect(res.body.grants).to.have.lengthOf(reference.testCollection.grantsProjected.length)
+              for(const grant of res.body.grants){
+                const userIds = reference.testCollection.grantsProjected.map(grant => grant.user.userId)
+                expect(userIds).to.include(grant.user.userId)
+              }
 
-              // //assets
-              // for(const asset of res.body.assets){
-              //     expect(asset.assetId).to.be.oneOf(reference.testCollection.assetIDsInCollection)
-              // }
+              expect(res.body.owners).to.have.lengthOf(reference.testCollection.owners.length)
+              for(const owner of res.body.owners){
+                expect(reference.testCollection.owners).to.include(owner.userId)
+              }
 
-              // //grants
-              // for(const grant of res.body.grants){
-              //     expect(grant.user.userId).to.be.oneOf(reference.testCollection.userIdsWithGrant)
-              // }
+              expect(res.body.stigs).to.have.lengthOf(reference.testCollection.validStigs.length)
+              for(const stig of res.body.stigs){
+                expect(reference.testCollection.validStigs).to.include(stig.benchmarkId)
+              }
 
-              // // owners
-              // for(const owner of res.body.owners){
-              //     expect(owner.userId).to.be.oneOf(reference.testCollection.owners)
-              // }
-
-              // //stigs
-              // for(const stig of res.body.stigs){
-              //     expect(stig.benchmarkId).to.be.oneOf(reference.testCollection.validStigs)
-              // }
-
-              //confirm that it is deleted
-              const deletedCollection = await utils.getCollection(distinct.deleteCollectionId_admin)
+              expect(res.body.statistics).to.have.property('assetCount', reference.testCollection.assetIds.length)
+              expect(res.body.statistics).to.have.property('grantCount', reference.testCollection.grantsProjected.length)
+              const deletedCollection = await utils.getCollection(reference.testCollection.collectionId)
               expect(deletedCollection).to.be.undefined
           })
         }
-
-        it('Delete a Collection no elevate', async () => {
+        it('Delete deleteCollection collection (stigmanadmin only)',async function () {
           const res = await chai.request(config.baseUrl)
-              .delete(`/collections/${reference.deleteCollection.collectionId}?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
-              .set('Authorization', `Bearer ${user.token}`)
+              .delete(`/collections/${reference.deleteCollection.collectionId}`)
+              .set('Authorization', `Bearer ${iteration.token}`)
 
           if(distinct.canDeleteCollection === false){ 
             expect(res).to.have.status(403)
@@ -87,38 +83,18 @@ describe('DELETE - Collection ', () => {
 
           expect(res.body.collectionId).to.equal(reference.deleteCollection.collectionId)
 
-          //assets
-          // for(const asset of res.body.assets){
-          //     expect(asset.assetId).to.be.oneOf(reference.testCollection.assetIDsInCollection)
-          // }
-
-          // //grants
-          // for(const grant of res.body.grants){
-          //     expect(grant.user.userId).to.be.oneOf(reference.testCollection.userIdsWithGrant)
-          // }
-
-          // // owners
-          // for(const owner of res.body.owners){
-          //     expect(owner.userId).to.be.oneOf(reference.testCollection.owners)
-          // }
-
-          // //stigs
-          // for(const stig of res.body.stigs){
-          //     expect(stig.benchmarkId).to.be.oneOf(reference.testCollection.validStigs)
-          // }
-
           //confirm that it is deleted
           const deletedCollection = await utils.getCollection(reference.deleteCollection.collectionId)
           expect(deletedCollection).to.be.undefined
         })
       })
 
-      describe('deleteCollectionLabelById - /collections/{collectionId}/labels/{labelId}', () => {
+      describe('deleteCollectionLabelById - /collections/{collectionId}/labels/{labelId}', function () {
 
-        it('Delete a Collection Label', async () => {
+        it('Delete a scrap collection scrap Label',async function () {
             const res = await chai.request(config.baseUrl)
                 .delete(`/collections/${reference.scrapCollection.collectionId}/labels/${reference.scrapCollection.scrapLabel}`)
-                .set('Authorization', `Bearer ${user.token}`)
+                .set('Authorization', `Bearer ${iteration.token}`)
             if(distinct.canModifyCollection === false){
                 expect(res).to.have.status(403)
                 return
@@ -127,14 +103,26 @@ describe('DELETE - Collection ', () => {
             const collection = await utils.getCollection(reference.scrapCollection.collectionId)
             expect(collection.labels).to.not.include(reference.scrapCollection.scrapLabel)
         })
+        it("should throw SmError.NotFoundError when deleting a non-existent label.",async function () {
+          const labelId = uuidv4()
+          const res = await chai.request(config.baseUrl)
+              .delete(`/collections/${reference.scrapCollection.collectionId}/labels/${labelId}`)
+              .set('Authorization', `Bearer ${iteration.token}`)
+          if(distinct.canModifyCollection === false){
+              expect(res).to.have.status(403)
+              return
+          }
+          expect(res).to.have.status(404)
+          expect(res.body.error).to.equal("Resource not found.")
+        })
       })
 
-      describe('deleteCollectionMetadataKey - /collections/{collectionId}/metadata/keys/{key}', () => {
+      describe('deleteCollectionMetadataKey - /collections/{collectionId}/metadata/keys/{key}', function () {
 
-        it('Delete a Collection Metadata Key', async () => {
+        it('Delete a scrap collection Metadata Key',async function () {
             const res = await chai.request(config.baseUrl)
                 .delete(`/collections/${reference.scrapCollection.collectionId}/metadata/keys/${reference.scrapCollection.collectionMetadataKey}`)
-                .set('Authorization', `Bearer ${user.token}`)
+                .set('Authorization', `Bearer ${iteration.token}`)
 
               if(distinct.canModifyCollection === false){
                 expect(res).to.have.status(403)
@@ -147,12 +135,12 @@ describe('DELETE - Collection ', () => {
         })
       })
 
-      describe('deleteReviewHistoryByCollection - /collections/{collectionId}/review-history', () => {
+      describe('deleteReviewHistoryByCollection - /collections/{collectionId}/review-history', function () {
 
-        it('History records - date', async () => {
+        it('Delete review History records - retentionDate',async function () {
             const res = await chai.request(config.baseUrl)
                 .delete(`/collections/${reference.testCollection.collectionId}/review-history?retentionDate=${reference.testCollection.reviewHistory.endDate}`)
-                .set('Authorization', `Bearer ${user.token}`)
+                .set('Authorization', `Bearer ${iteration.token}`)
                 
             if(distinct.canModifyCollection === false){
               expect(res).to.have.status(403)
@@ -163,10 +151,10 @@ describe('DELETE - Collection ', () => {
             expect(res.body.HistoryEntriesDeleted).to.be.equal(reference.testCollection.reviewHistory.deletedEntriesByDate)
         })
 
-        it('History records - date and asset', async () => {
+        it('Delete review History records - date and assetId',async function () {
             const res = await chai.request(config.baseUrl)
                 .delete(`/collections/${reference.testCollection.collectionId}/review-history?retentionDate=${reference.testCollection.reviewHistory.endDate}&assetId=${reference.testCollection.testAssetId}`)
-                .set('Authorization', `Bearer ${user.token}`)
+                .set('Authorization', `Bearer ${iteration.token}`)
 
               if(distinct.canModifyCollection === false){
                 expect(res).to.have.status(403)

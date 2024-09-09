@@ -3,16 +3,17 @@
 // The standard "testCollection" includes users named after the roles they have for that specific Collection, is used in most "GET" tests or tests not expected to change data that could alter expectations for subsequent tests. "scrapCollection" is used for tests that alter Collection data in some way.
 
 const reference = {
-  collectionId: "21",
-  collectionName: "Test Collection",
-  collectionDescription: "This is a test collection",
-  collectionOwner: "admin",
-  collectionOwnerID: "87",
-  benchmark: "VPN_SRG_TEST",
-  pinRevision: "V1R0",
-  checklistLength: 81,
-  revisionStr: "V1R1",
-  grantCheckUserId: "85",
+  // collectionId: "21",
+  // collectionName: "Test Collection",
+  // collectionDescription: "This is a test collection",
+  // collectionOwner: "admin",
+  //
+  // benchmark: "VPN_SRG_TEST",
+  // checklistLength: 81,
+  // revisionStr: "V1R1",
+  // grantCheckUserId: "85",
+  // lvl1ValidStigs: ["VPN_SRG_TEST"],
+  // testAssetLvl1NoAccess: "62",
   testCollection: {
     name: "Collection X",
     collectionId: "21",
@@ -21,16 +22,20 @@ const reference = {
     pinRevision: "V1R0",    
     collectionMetadataKey: "pocName",
     collectionMetadataValue: "poc2Patched",
+    collectionOwnerID: "87",
     owners: ["87", "1", "45"],
+    grantCheckUserId: "85",
     assetIds: ["29", "62", "42", "154"],
     assetsWithHistory: ["42", "154"],
     testAssetId: "42",
+    ruleId: 'SV-106179r1_rule',
     validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
     labelCount: 2,
     lvl1LabelName: "test-label-lvl1",
     lvl1Label: "5130dc84-9a68-11ec-b1bc-0242ac110002",
-    fullLabel: "755b8a28-9a68-11ec-b1bc-0242ac110002",
+    lvl1LabelAssetIds: ["42"],
     fullLabelName: "test-label-full",
+    fullLabel: "755b8a28-9a68-11ec-b1bc-0242ac110002",
     labels: [
       "755b8a28-9a68-11ec-b1bc-0242ac110002",
       "5130dc84-9a68-11ec-b1bc-0242ac110002"
@@ -60,33 +65,33 @@ const reference = {
       deletedEntriesByDate: 6,
       deletedEntriesByDateAsset: 4,
       ruleId: "SV-106179r1_rule",
-      status: "submitted"
+      status: "submitted",
+      rulesWithHistoryCnt: 2,
+      reviewHistoryRuleCnt: 2,
+      reviewHistoryTotalEntryCnt: 7,
+      reviewHistory_endDateCnt: 6,
+      reviewHistory_startAndEndDateCnt: 6,
+      reviewHistory_startDateCnt: 2,
+      reviewHistory_byStatusCnt: 3,
+      reviewHistory_testAssetCnt: 5,
+      reviewHistory_entriesByRuleIdCnt: 4,
     },
-    rulesWithHistoryCnt: 2,
-    reviewHistoryRuleCnt: 2,
-    reviewHistoryTotalCnt: 7,
-    reviewHistory_endDateCnt: 6,
-    reviewHistory_startAndEndDateCnt: 2,
-    reviewHistory_startDateCnt: 2,
-    reviewHistory_byStatusCnt: 3,
-    reviewHistory_testAssetCnt: 5,
-    reviewHistory_ruleIdCnt: 4,
     assetsProjected: [
       {
         name: "ACHERNAR_Collection_X_asset",
-        assetId: "403",
+        assetId: "29",
       },
       {
         name: "Collection_X_asset",
-        assetId: "405",
+        assetId: "62",
       },
       {
         name: "Collection_X_lvl1_asset-1",
-        assetId: "404",
+        assetId: "42",
       },
       {
         name: "Collection_X_lvl1_asset-2",
-        assetId: "406",
+        assetId: "154",
       },
     ],
     grantsProjected: [
@@ -214,30 +219,159 @@ const reference = {
     collectionMetadataKey: "pocName",
     collectionMetadataValue: "poc2Patched"
   },
-  scrapLvl1User: {
-    userId: "86",
-    username: "bizarroLvl1"
+
+
+  // Reference Asset data
+
+  testAssetLvl1NoAccess: "62",
+  testAsset: {
+    name: "Collection_X_lvl1_asset-1",
+    assetId: "42",
+    collectionId: "21",
+    usersWithGrant: ["86","85"],
+    // benchmark: "VPN_SRG_TEST",
+    validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
+    reviewCnt: 9,
+    metadataKey: "testkey",
+    metadataValue: "testvalue",
+    labels: [
+      "755b8a28-9a68-11ec-b1bc-0242ac110002",
+      "5130dc84-9a68-11ec-b1bc-0242ac110002"
+    ],
+    stats: {
+      ruleCount: 368,
+      stigCount: 2,
+      savedCount: 2,
+      acceptedCount: 0,
+      rejectedCount: 0,
+      submittedCount: 7,
+    },
+    testRuleId: 'SV-106179r1_rule',
+    freshRuleId: 'SV-106195r1_rule',
+    testRuleIdHistoryCount: 2,
+    testRuleIdStig: 'VPN_SRG_TEST',
+    testRuleIdStigCount: 1,
+    testBenchmarkReviews: 6,
+    reviewRuleIds: [
+      "SV-106179r1_rule",
+      "SV-106181r1_rule",
+      "SV-106183r1_rule",
+      "SV-106185r1_rule",
+      "SV-106187r1_rule",
+      "SV-106189r1_rule",
+      'SV-77813r6_rule',
+      'SV-77811r1_rule',
+      'SV-77809r3_rule'
+    ],    
   },
   scrapAsset: {
     assetId: "34",
     scrapBenchmark: "RHEL_7_STIG_TEST",
     metadataKey: "testkey",
     metadataValue: "testvalue"
-  },
-  testAsset: {
-    name: "Collection_X_lvl1_asset-1",
-    assetId: "42",
+  },  
+  testAssetNoStigs: {
+    name: "ACHERNAR_Collection_X_asset",
+    assetId: "29",
     collectionId: "21",
-    usersWithGrant: ["86,85"],
-    benchmark: "VPN_SRG_TEST",
-    validStigs: ["VPN_SRG_TEST", "Windows_10_STIG_TEST"],
-    metadataKey: "testkey",
-    metadataValue: "testvalue",
-    labels: [
-      "755b8a28-9a68-11ec-b1bc-0242ac110002",
-      "5130dc84-9a68-11ec-b1bc-0242ac110002"
-    ]
-  }
+    labels: [],
+    stigs: [],
+    stats: {
+        ruleCount: null,
+        stigCount: 0,
+        savedCount: null,
+        acceptedCount: null,
+        rejectedCount: null,
+        submittedCount: null,
+      },
+  },  
+  testAssetNoMetadata: {
+    "collectionId": "21",
+    "assetId": "154",
+  },
+
+
+  //Reference User data
+  allUserIds: ['87', '86', '82', '85', '21', '44', '45', '1', '22', '43'],
+  lvl1User:{
+    username: "lvl1",
+    userId: "85"
+  },
+  stigmanadmin: {
+    username: 'stigmanadmin',
+    userId: '1'
+  },
+  wfTest: {
+    username: 'wf-test',
+    userId: '22'
+  },
+  deleteUser: {
+    username: 'workforce-60',
+    userId: '43'
+  },  
+
+  scrapLvl1User: {
+    userId: "86",
+    username: "bizarroLvl1"
+  },
+
+  //review data
+  ruleId: "SV-106179r1_rule",
+  ruleIdPinnedRev: "SV-106179r123456789_rule",
+  reviewKeyChangeFile: "U_VPN_SRG_V2R3_Manual-xccdf-reviewKeyChange.xml",
+  ruleIdLvl1NoAccess: "SV-77809r3_rule",
+  writeStigPropsByCollectionStig: ['62', '42', '154'],
+  reviewMatchString: "test",
+  freshRuleId: "SV-106195r1_rule",
+  testGroupId: "V-97041",
+  reviewMetadataKey: 'testkey',
+  reviewMetadataValue: 'testvalue',
+  scrapRuleIdWindows10: "SV-77809r3_rule",
+
+  //Reference Stig and Rule data
+  benchmark: "VPN_SRG_TEST",
+  revisionStr: "V1R1",
+  checklistLength: 81,
+  testBenchmarkAllRevisions: ['V1R1', 'V1R0'],
+  lvl1ValidStigs: ["VPN_SRG_TEST"],
+  scrapBenchmark: 'RHEL_7_STIG_TEST',
+  testStigfile: 'U_VPN_SRG_V1R1_Manual-xccdf.xml',
+  testStigfileNonLatest: 'U_VPN_SRG_V1R0_Manual-xccdf.xml',
+  rulesMatchingFingerprints: "U_VPN_SRG-OTHER_V1R1_twoRules-matchingFingerprints.xml",  
+  testRule: {
+    ruleId: "SV-106179r1_rule",
+    groupId: "V-97041",
+    version: "SRG-NET-000019-VPN-000040",
+  },
+  testRuleNoMetadata: {
+    ruleId: "SV-106191r1_rule",
+  },
+
+  vpnStigs: [
+    'VPN_SRG_TEST',
+    'VPN_SRG_OTHER',
+    'VPN_SRG_Rule-fingerprint-match-test'
+  ],
+  allStigsForAdmin: [
+    'A10_Networks_ADC_ALG_STIG',
+    'AAA_Service_SRG',
+    'Adobe_Acrobat_Pro_DC_Continuous_STIG',
+    'RHEL_7_STIG_TEST',
+    'VPN_SRG_OTHER',
+    'VPN_SRG_Rule-fingerprint-match-test',
+    'VPN_SRG_TEST',
+    'Windows_10_STIG_TEST'
+  ],  
+  testCci: {
+    id: "000015",
+    status: "draft",
+  },  
+  // stigmanadmin: {
+  //   username: 'stigmanadmin',
+  //   userId: '1'
+  // },
+  // reviewMetadataKey: 'testkey',
+  // reviewMetadataValue: 'testvalue',  
 };
 
 module.exports = reference;

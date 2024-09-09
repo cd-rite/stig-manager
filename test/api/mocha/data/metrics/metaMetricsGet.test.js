@@ -5,35 +5,28 @@ chai.use(chaiHttp)
 chai.use(deepEqualInAnyOrder)
 const expect = chai.expect
 const config = require('../../testConfig.json')
-const utils = require('../../utils/testUtils')
-const environment = require('../../environment.json')
-const users = require('../../iterations.js')
-const fs = require('fs')
-const path = require('path')
-const expectations = require('./expectations.js')
-const reference = require('./referenceData.js')
-
-
-function loadExpectedData(testName) {
-    const filePath = path.join(__dirname, 'metaMetricsGet.json');
-    const allExpectedData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    return allExpectedData[testName];
-}
+const utils = require('../../utils/testUtils.js')
+const iterations = require('../../iterations.js')
+const reference = require('../../referenceData.js')
+const metrics = require('./metaMetricsGet.js')
 
 describe('GET - MetaMetrics', function () { 
   before(async function () {
     this.timeout(4000)
     await utils.uploadTestStigs()
     await utils.loadAppData("appdata-meta-metrics-with-pin.json")
+    try{
+        await utils.uploadTestStig("U_VPN_SRG_V1R0_Manual-xccdf.xml")
+    }
+    catch(err){
+        console.log("no stig to upload")
+    }
     await utils.createDisabledCollectionsandAssets()
   })
 
-  for(let user of users) {
-    if (expectations[user.name] === undefined){
-        it(`No expectations for this iteration scenario: ${user.name}`, async () => {})
-        return
-    }
-    describe(`user:${user.name}`, function () {
+  for(let iteration of iterations) {
+   
+    describe(`iteration:${iteration.name}`, function () {
         
         describe('GET - getMetricsDetailByMeta - /collections/meta/metrics/detail', function () {
 
@@ -41,18 +34,18 @@ describe('GET - MetaMetrics', function () {
                
                 const res = await chai.request(config.baseUrl)
                     .get('/collections/meta/metrics/detail')
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
 
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['collectioncreator'])
                 }
                 else 
@@ -64,18 +57,18 @@ describe('GET - MetaMetrics', function () {
             it('meta metrics detail - no agg - coll param', async function () {
            
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/detail?collectionId=${environment.testCollection.collectionId}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/detail?collectionId=${reference.testCollection.collectionId}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['collectioncreator'])
                 }
                 else 
@@ -87,18 +80,18 @@ describe('GET - MetaMetrics', function () {
             it('meta metrics detail - no agg - bench param', async function () {
 
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/detail?benchmarkId=${environment.testCollection.benchmark}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/detail?benchmarkId=${reference.benchmark}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['collectioncreator'])
                 }
                 else 
@@ -114,17 +107,17 @@ describe('GET - MetaMetrics', function () {
                
                 const res = await chai.request(config.baseUrl)
                     .get('/collections/meta/metrics/detail/collection')
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -135,18 +128,18 @@ describe('GET - MetaMetrics', function () {
             it('meta metrics detail - collection agg - coll param', async function () { 
                
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/detail/collection?collectionId=${environment.testCollection.collectionId}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/detail/collection?collectionId=${reference.testCollection.collectionId}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -157,18 +150,18 @@ describe('GET - MetaMetrics', function () {
             it('meta metrics detail - collection agg - bench param', async function () { 
                 
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/detail/collection?benchmarkId=${environment.testCollection.benchmark}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/detail/collection?benchmarkId=${reference.benchmark}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -180,17 +173,17 @@ describe('GET - MetaMetrics', function () {
        
                 const res = await chai.request(config.baseUrl)
                     .get(`/collections/meta/metrics/detail/collection?revisionId=${'VPN_SRG_TEST-1-1'}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -206,17 +199,17 @@ describe('GET - MetaMetrics', function () {
               
                 const res = await chai.request(config.baseUrl)
                     .get('/collections/meta/metrics/detail/stig')
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -227,18 +220,18 @@ describe('GET - MetaMetrics', function () {
             it('meta metrics detail - stig agg - coll param', async function () {
                
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/detail/stig?collectionId=${environment.testCollection.collectionId}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/detail/stig?collectionId=${reference.testCollection.collectionId}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -249,18 +242,18 @@ describe('GET - MetaMetrics', function () {
             it('meta metrics detail - stig agg - bench param', async function () {
               
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/detail/stig?benchmarkId=${environment.testCollection.benchmark}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/detail/stig?benchmarkId=${reference.benchmark}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -276,17 +269,17 @@ describe('GET - MetaMetrics', function () {
               
                 const res = await chai.request(config.baseUrl)
                     .get('/collections/meta/metrics/summary')
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['collectioncreator'])
                 }
                 else 
@@ -297,18 +290,18 @@ describe('GET - MetaMetrics', function () {
             it('meta metrics summary - no agg - collectionId param', async function () {
               
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/summary?collectionId=${environment.testCollection.collectionId}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/summary?collectionId=${reference.testCollection.collectionId}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['collectioncreator'])
                 }
                 else 
@@ -319,18 +312,18 @@ describe('GET - MetaMetrics', function () {
             it('meta metrics summary - no agg - benchmark param', async function () {
             
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/summary?benchmarkId=${environment.testCollection.benchmark}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/summary?benchmarkId=${reference.benchmark}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['collectioncreator'])
                 }
                 else 
@@ -346,17 +339,17 @@ describe('GET - MetaMetrics', function () {
                   
                 const res = await chai.request(config.baseUrl)
                     .get('/collections/meta/metrics/summary/collection')
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -367,18 +360,18 @@ describe('GET - MetaMetrics', function () {
             it('Return meta metrics summary - collection agg - collection param', async function () {
                 
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/summary/collection?collectionId=${environment.testCollection.collectionId}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/summary/collection?collectionId=${reference.testCollection.collectionId}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -389,18 +382,18 @@ describe('GET - MetaMetrics', function () {
             it('Return meta metrics summary - collection agg - benchmark param', async function () {
               
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/summary/collection?benchmarkId=${environment.testCollection.benchmark}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/summary/collection?benchmarkId=${reference.benchmark}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -412,17 +405,17 @@ describe('GET - MetaMetrics', function () {
               
                 const res = await chai.request(config.baseUrl)
                     .get(`/collections/meta/metrics/summary/collection?revisionId=${'VPN_SRG_TEST'}-1-0`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -434,17 +427,17 @@ describe('GET - MetaMetrics', function () {
               
                 const res = await chai.request(config.baseUrl)
                     .get(`/collections/meta/metrics/summary/collection?revisionId=${'VPN_SRG_TEST'}-1-1`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -460,17 +453,17 @@ describe('GET - MetaMetrics', function () {
                
                 const res = await chai.request(config.baseUrl)
                     .get('/collections/meta/metrics/summary/stig')
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -481,18 +474,18 @@ describe('GET - MetaMetrics', function () {
             it('Return meta metrics summary - stig agg - collection param', async function () {  
               
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/summary/stig?collectionId=${environment.testCollection.collectionId}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/summary/stig?collectionId=${reference.testCollection.collectionId}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -503,18 +496,18 @@ describe('GET - MetaMetrics', function () {
             it('Return meta metrics summary - stig agg - benchmark param', async function () {  
               
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/summary/stig?benchmarkId=${environment.testCollection.benchmark}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/summary/stig?benchmarkId=${reference.benchmark}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 
@@ -525,18 +518,18 @@ describe('GET - MetaMetrics', function () {
             it('Return meta metrics summary - stig agg - benchmark param and collection param', async function () {  
                
                 const res = await chai.request(config.baseUrl)
-                    .get(`/collections/meta/metrics/summary/stig?benchmarkId=${environment.testCollection.benchmark}&collectionId=${environment.testCollection.collectionId}`)
-                    .set('Authorization', `Bearer ${user.token}`)
-                const expectedData = loadExpectedData(this.test.title)
+                    .get(`/collections/meta/metrics/summary/stig?benchmarkId=${reference.benchmark}&collectionId=${reference.testCollection.collectionId}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                const expectedData = metrics[this.test.title]
                 expect(res).to.have.status(200)
-                if(user.name === 'lvl1'){
+                if(iteration.name === 'lvl1'){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl1'])
                 }
-                else if(user.name === 'stigmanadmin')
+                else if(iteration.name === 'stigmanadmin')
                 {
                     expect(res.body).to.deep.equalInAnyOrder(expectedData['stigmanadmin'])
                 }
-                else if(user.name === "collectioncreator"){
+                else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.eql([])
                 }
                 else 

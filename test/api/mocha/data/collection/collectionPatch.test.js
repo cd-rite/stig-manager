@@ -1,16 +1,16 @@
 const chai = require('chai')
 const chaiHttp = require('chai-http')
+const { v4: uuidv4 } = require('uuid')
 chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-// const environment = require('../../environment.json')
-const users = require('../../iterations.js')
+const iterations = require('../../iterations.js')
 const expectations = require('./expectations.js')
-const reference = require('./referenceData.js')
+const reference = require('../../referenceData.js')
 const requestBodies = require('./requestBodies.js')
 
-describe('PATCH - Collection', () => {
+describe('PATCH - Collection', function () {
 
     before(async function () {
         this.timeout(4000)
@@ -18,62 +18,29 @@ describe('PATCH - Collection', () => {
         await utils.loadAppData()
     })
 
-    for(const user of users) {
-      const distinct = expectations[user.name]
-      if (expectations[user.name] === undefined){
-        it(`No expectations for this iteration scenario: ${user.name}`, async () => {})
+    for(const iteration of iterations) {
+      const distinct = expectations[iteration.name]
+      if (expectations[iteration.name] === undefined){
+        it(`No expectations for this iteration scenario: ${iteration.name}`,async function () {})
         return
       }
-  
 
-      describe(`user:${user.name}`, () => {
+      describe(`iteration:${iteration.name}`, function () {
 
-        describe('updateCollection - /collections/{collectionId}', () => {
+        describe('updateCollection - /collections/{collectionId}', function () {
+          it('Patch scrap collection, send 5 new grants and metadata.',async function () {
 
-          it('Merge provided properties with a Collection', async () => {
-
-            const patchRequest = requestBodies.updateCollection
-            // const patchRequest = {
-            //     metadata: {
-            //         pocName: "poc2Patched",
-            //         pocEmail: "pocEmail@email.com",
-            //         pocPhone: "12342",
-            //         reqRar: "true",
-            //     },
-            //     grants: [
-            //         {
-            //         userId: "1",
-            //         accessLevel: 4,
-            //         },
-            //         {
-            //         userId: "21",
-            //         accessLevel: 1,
-            //         },
-            //         {
-            //         userId: "44",
-            //         accessLevel: 3,
-            //         },
-            //         {
-            //         userId: "45",
-            //         accessLevel: 4,
-            //         },
-            //         {
-            //         userId: "87",
-            //         accessLevel: 4,
-            //         },
-            //     ],
-            //     }
-            
+            const patchRequest = requestBodies.updateCollection            
             const res = await chai.request(config.baseUrl)
-                  .patch(`/collections/${reference.scrapCollection.collectionId}?projection=assets&projection=grants&projection=owners&projection=statistics&projection=stigs`)
-                  .set('Authorization', `Bearer ${user.token}`)
+                  .patch(`/collections/${reference.scrapCollection.collectionId}?&projection=grants&projection=stigs`)
+                  .set('Authorization', `Bearer ${iteration.token}`)
                   .send(patchRequest)
             
                 if(distinct.canModifyCollection === false){
                     expect(res).to.have.status(403)
                     return
                 }
-                expect(res).to.have.status(200)
+            expect(res).to.have.status(200)
 
             expect(res.body.metadata.pocName).to.equal(patchRequest.metadata.pocName)
             expect(res.body.metadata.pocEmail).to.equal(patchRequest.metadata.pocEmail)
@@ -81,30 +48,38 @@ describe('PATCH - Collection', () => {
             expect(res.body.metadata.reqRar).to.equal(patchRequest.metadata.reqRar)
 
             expect(res.body.grants).to.have.lengthOf(patchRequest.grants.length)
-            
-            // make sure userids are the same 
-            for(const grant of res.body.grants) {
-                expect(grant.user.userId).to.be.oneOf(patchRequest.grants.map(g => g.userId))
-            }
-
-            // projections  --- TODO:  these responses call the GET service, which is tested elsewhere, so do we need to double-check it here?
-            // expect(res.body.assets).to.have.lengthOf(3)
-            // expect(res.body.owners).to.have.lengthOf(3)
-            expect(res.body.statistics).to.have.property("assetCount").to.equal(res.body.assets.length)
-
             for(let stig of res.body.stigs) {
                 expect(stig.benchmarkId).to.be.oneOf(reference.scrapCollection.validStigs)
+                if(stig.benchmarkId === reference.benchmark){
+                    expect(stig.ruleCount).to.equal(reference.checklistLength)
+                }
             }
+          })
+          it("should throw SmError.UnprocessableError when updating due to duplicate user in grant array.",async function () {
+
+            const patchRequest = JSON.parse(JSON.stringify(requestBodies.updateCollection))
+            patchRequest.grants.push(patchRequest.grants[0])
+            patchRequest.name = "TEST" + Math.floor(Math.random() * 100) + "-" + Math.floor(Math.random() * 100)
+            const res = await chai.request(config.baseUrl)
+                .patch(`/collections/${reference.testCollection.collectionId}`)
+                .set('Authorization', `Bearer ${iteration.token}`)
+                .send(patchRequest)
+              if(distinct.canModifyCollection === false){
+                  expect(res).to.have.status(403)
+                  return
+              }
+              expect(res).to.have.status(422)
+              expect(res.body.error).to.equal("Unprocessable Entity.")
+              expect(res.body.detail).to.equal("Duplicate user in grant array")
           })
         })
 
-        describe('patchCollectionLabelById - /collections/{collectionId}/labels/{labelId}', () => {
-
-          it('Merge provided properties with a Collection Label', async () => {
+        describe('patchCollectionLabelById - /collections/{collectionId}/labels/{labelId}', function () {
+          it('Patch scrap collection label, change color, description and name ',async function () {
             const body = requestBodies.patchCollectionLabelById
             const res = await chai.request(config.baseUrl)
                 .patch(`/collections/${reference.scrapCollection.collectionId}/labels/${reference.scrapCollection.scrapLabel}`)
-                .set('Authorization', `Bearer ${user.token}`)
+                .set('Authorization', `Bearer ${iteration.token}`)
                 .send(body)
                 
               if(distinct.canModifyCollection === false){
@@ -118,15 +93,29 @@ describe('PATCH - Collection', () => {
               expect(res.body.color).to.equal(body.color)
               expect(res.body.name).to.equal(body.name)
           })
+          it("should throw SmError.NotFoundError when updating a label that doesn't exist.",async function () {
+
+            const body = requestBodies.patchCollectionLabelById
+            const res = await chai.request(config.baseUrl)
+                .patch(`/collections/${reference.scrapCollection.collectionId}/labels/${uuidv4()}`)
+                .set('Authorization', `Bearer ${iteration.token}`)
+                .send(body)
+              if(distinct.canModifyCollection === false){
+                  expect(res).to.have.status(403)
+                  return
+              }
+              expect(res).to.have.status(404)
+              expect(res.body.error).to.equal("Resource not found.")
+          })
         })
 
-        describe('patchCollectionMetadata - /collections/{collectionId}/metadata', () => {
+        describe('patchCollectionMetadata - /collections/{collectionId}/metadata', function () {
 
-          it('Merge metadata property/value into a Collection', async () => {
+          it('Patch scrap collection metadata',async function () {
               
               const res = await chai.request(config.baseUrl)
                   .patch(`/collections/${reference.scrapCollection.collectionId}/metadata`)
-                  .set('Authorization', `Bearer ${user.token}`)
+                  .set('Authorization', `Bearer ${iteration.token}`)
                   .send({[reference.scrapCollection.collectionMetadataKey]: reference.scrapCollection.collectionMetadataValue})
 
                 if(distinct.canModifyCollection === false){

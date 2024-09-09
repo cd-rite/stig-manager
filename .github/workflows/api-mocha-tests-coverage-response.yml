@@ -5,6 +5,7 @@ on:
         branches:
             - main
             - test-coverage
+            - testing-new-iterations
         paths:
             - "api/source/**"
             - "test/api/**"
@@ -13,7 +14,7 @@ on:
         branches:
             - main
             - test-coverage
-            - new-code-testing
+            - testing-new-iterations
         paths:
             - "api/source/**"
             - "test/api/**"

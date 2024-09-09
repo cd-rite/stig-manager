@@ -4,39 +4,38 @@ chai.use(chaiHttp)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const environment = require('../../environment.json')
 const fs = require('fs')
 const path = require('path')
-const users = require("../../iterations.js")
+const iterations = require("../../iterations.js")
+const reference = require('../../referenceData.js')
 const expectations = require('./expectations.js')
-const reference = require('./referenceData.js')
 
 describe('POST - Stig', () => {
     before(async function () {
     this.timeout(4000)
-    await utils.loadAppData()
     await utils.uploadTestStigs()
-    await utils.createDisabledCollectionsandAssets()
-    await utils.deleteStig(environment.testCollection.benchmark)
+    await utils.loadAppData()
+    // await utils.createDisabledCollectionsandAssets()
+    await utils.deleteStig(reference.benchmark)
     })
 
-    for(const user of users){
-        if (expectations[user.name] === undefined){
-            it(`No expectations for this iteration scenario: ${user.name}`, async () => {})
-            return
-          }
-        describe(`user:${user.name}`, () => {
+    for(const iteration of iterations){
+        if (expectations[iteration.name] === undefined){
+            it(`No expectations for this iteration scenario: ${iteration.name}`, async () => {})
+            continue
+        }
+        describe(`iteration:${iteration.name}`, () => {
             describe('POST - importBenchmark - /stigs', () => {
 
                 it('Import a new STIG - new', async () => {
                 
                     const directoryPath = path.join(__dirname, '../../../form-data-files/')
-                    const testStigfile = environment.testStigfile
+                    const testStigfile = reference.testStigfile
                     const filePath = path.join(directoryPath, testStigfile)
             
                     const res = await chai.request(config.baseUrl)
                     .post('/stigs?elevate=true&clobber=false')
-                    .set('Authorization', `Bearer ${user.token}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
                     .set('Content-Type', `multipart/form-data`)
                     .attach('importFile', fs.readFileSync(filePath), testStigfile) // Attach the file here
                     let expectedRevData = {
@@ -44,22 +43,52 @@ describe('POST - Stig', () => {
                         revisionStr: "V1R1",
                         action: "inserted",
                     }
-                    if(user.name !== "stigmanadmin"){
+                    if(iteration.name !== "stigmanadmin"){
                         expect(res).to.have.status(403)
                         return
                     }
                     expect(res).to.have.status(200)
                     expect(res.body).to.deep.eql(expectedRevData)
                 })
-                it('Import a new STIG - preserve', async () => {
+                it('should throw SmError.PrivilegeError() no elevate', async () => {
                 
                     const directoryPath = path.join(__dirname, '../../../form-data-files/')
-                    const testStigfile = environment.testStigfile
+                    const testStigfile = reference.testStigfile
+                    const filePath = path.join(directoryPath, testStigfile)
+            
+                    const res = await chai.request(config.baseUrl)
+                    .post('/stigs?clobber=false')
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                    .set('Content-Type', `multipart/form-data`)
+                    .attach('importFile', fs.readFileSync(filePath), testStigfile) // Attach the file here
+                    expect(res).to.have.status(403)
+                })
+                it('should throw SmError.ClientError not xml file', async () => {
+                
+                    const directoryPath = path.join(__dirname, '../../../form-data-files/')
+                    const testStigfile = 'appdata.json'
                     const filePath = path.join(directoryPath, testStigfile)
             
                     const res = await chai.request(config.baseUrl)
                     .post('/stigs?elevate=true&clobber=false')
-                    .set('Authorization', `Bearer ${user.token}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
+                    .set('Content-Type', `multipart/form-data`)
+                    .attach('importFile', fs.readFileSync(filePath), testStigfile) // Attach the file here
+                    if(iteration.name !== "stigmanadmin"){
+                        expect(res).to.have.status(403)
+                        return
+                    }
+                    expect(res).to.have.status(400)
+                })
+                it('Import a new STIG - preserve', async () => {
+                
+                    const directoryPath = path.join(__dirname, '../../../form-data-files/')
+                    const testStigfile = reference.testStigfile
+                    const filePath = path.join(directoryPath, testStigfile)
+            
+                    const res = await chai.request(config.baseUrl)
+                    .post('/stigs?elevate=true&clobber=false')
+                    .set('Authorization', `Bearer ${iteration.token}`)
                     .set('Content-Type', `multipart/form-data`)
                     .attach('importFile', fs.readFileSync(filePath), testStigfile) // Attach the file here
                     let expectedRevData = 
@@ -68,7 +97,7 @@ describe('POST - Stig', () => {
                         "revisionStr": "V1R1",
                         "action": "preserved"
                     }
-                    if(user.name !== "stigmanadmin"){
+                    if(iteration.name !== "stigmanadmin"){
                         expect(res).to.have.status(403)
                         return
                     }
@@ -78,12 +107,12 @@ describe('POST - Stig', () => {
                 it('Import a new STIG - clobber', async () => {
                 
                     const directoryPath = path.join(__dirname, '../../../form-data-files/')
-                    const testStigfile = environment.testStigfile
+                    const testStigfile = reference.testStigfile
                     const filePath = path.join(directoryPath, testStigfile)
             
                     const res = await chai.request(config.baseUrl)
                     .post('/stigs?elevate=true&clobber=true')
-                    .set('Authorization', `Bearer ${user.token}`)
+                    .set('Authorization', `Bearer ${iteration.token}`)
                     .set('Content-Type', `multipart/form-data`)
                     .attach('importFile', fs.readFileSync(filePath), testStigfile) // Attach the file here
                     let expectedRevData = 
@@ -92,7 +121,7 @@ describe('POST - Stig', () => {
                         "revisionStr": "V1R1",
                         "action": "replaced"
                     }
-                    if(user.name !== "stigmanadmin"){
+                    if(iteration.name !== "stigmanadmin"){
                         expect(res).to.have.status(403)
                         return
                     }

@@ -101,6 +101,9 @@ module.exports.getUserByUserId = async function getUserByUserId (req, res, next)
       let userId = req.params.userId
       let projection = req.query.projection
       let response = await UserService.getUserByUserId(userId, projection, elevate, req.userObject)
+      if(!response) {
+        throw new SmError.NotFoundError()
+      }
       res.json(response)
     }
     else {

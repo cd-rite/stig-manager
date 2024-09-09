@@ -1,75 +1,37 @@
 const chai = require('chai')
+const deepEqualInAnyOrder = require('deep-equal-in-any-order')
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
+chai.use(deepEqualInAnyOrder)
 const expect = chai.expect
 const config = require('../../testConfig.json')
 const utils = require('../../utils/testUtils')
-const environment = require('../../environment.json')
-const users = require('../../iterations.js')
+const iterations = require('../../iterations.js')
 const expectations = require('./expectations.js')
-const reference = require('./referenceData.js')
+const reference = require('../../referenceData.js')
 
-describe('POST - Asset', () => {
+describe('POST - Asset', function () {
   before(async function () {
     this.timeout(4000)
     await utils.uploadTestStigs()
     await utils.loadAppData()
-    await utils.createDisabledCollectionsandAssets()
+    // await utils.createDisabledCollectionsandAssets()
   })
 
-  for (const user of users) {
-    if (expectations[user.name] === undefined){
-      it(`No expectations for this iteration scenario: ${user.name}`, async () => {})
-      return
+  for (const iteration of iterations) {
+    if (expectations[iteration.name] === undefined){
+      it(`No expectations for this iteration scenario: ${iteration.name}`, async function () {})
+      continue
     }
-    describe(`user:${user.name}`, () => {
-      const distinct = expectations[user.name]
-      describe(`createAsset - /assets`, () => {
+    describe(`iteration:${iteration.name}`, function () {
+      const distinct = expectations[iteration.name]
+      describe(`createAsset - /assets`, function () {
 
-        it('Create an Asset (with stigs projection)', async () => {
+        it('Create an Asset (with statusStats and stigs projection', async function () {
           const res = await chai
             .request(config.baseUrl)
-            .post('/assets?projection=stigs')
-            .set('Authorization', 'Bearer ' + user.token)
-            .send({
-              name: 'TestAsset' + Math.floor(Math.random() * 1000),
-              collectionId: reference.testCollection.collectionId,
-              description: 'test',
-              ip: '1.1.1.1',
-              noncomputing: true,
-              labelIds: [reference.testCollection.fullLabel],
-              metadata: {
-                pocName: 'pocName',
-                pocEmail: 'pocEmail@example.com',
-                pocPhone: '12345',
-                reqRar: 'true'
-              },
-              stigs: reference.testCollection.validStigs
-            }
-          )
-          
-          if(!distinct.canModifyAssets){
-            expect(res).to.have.status(403)
-            return
-          }
-            expect(res).to.have.status(201)
-          
-          expect(assetGetToPost(res.body)).to.eql(res.request._data)
-
-          const effectedAsset = await utils.getAsset(res.body.assetId)
-
-          expect(effectedAsset.collection.collectionId).to.equal(reference.testCollection.collectionId)
-          for(const stig of effectedAsset.stigs) { 
-            expect(stig.benchmarkId).to.be.oneOf(reference.testCollection.validStigs)
-          }
-          expect(effectedAsset.description).to.equal('test')
-        })
-
-        it('Create an Asset (with statusStats projection', async () => {
-          const res = await chai
-            .request(config.baseUrl)
-            .post('/assets?projection=statusStats')
-            .set('Authorization', 'Bearer ' + user.token)
+            .post('/assets?projection=statusStats&projection=stigs')
+            .set('Authorization', 'Bearer ' + iteration.token)
             .send({
               name: 'TestAsset' + Math.floor(Math.random() * 1000),
               collectionId: reference.testCollection.collectionId,
@@ -86,14 +48,30 @@ describe('POST - Asset', () => {
               stigs: reference.testCollection.validStigs
             })
           
-            if(!distinct.canModifyAssets){
+            if(!distinct.canModifyCollection){
               expect(res).to.have.status(403)
               return
             }
             expect(res).to.have.status(201)
             
+            expect(res.body.collection.collectionId).to.equal(reference.testCollection.collectionId)
+            expect(res.body.name).to.be.a('string')
+            expect(res.body.ip).to.equal('1.1.1.1')
+            expect(res.body.noncomputing).to.equal(true)
+            expect(res.body.labelIds).to.eql([reference.testCollection.fullLabel])
+            expect(res.body.metadata.pocName).to.equal('pocName')
+            expect(res.body.metadata.pocEmail).to.equal('pocEmail@example.com')
+            expect(res.body.stigs).to.be.an('array').of.length(reference.testCollection.validStigs.length)
             expect(res.body).to.have.property('statusStats')
             expect(res.body.statusStats.ruleCount).to.equal(reference.testAsset.stats.ruleCount)
+            expect(res.body.statusStats.stigCount).to.equal(reference.testAsset.stats.stigCount)
+            expect(res.body.statusStats.savedCount).to.equal(0)
+            expect(res.body.statusStats.acceptedCount).to.equal(0)
+            expect(res.body.statusStats.rejectedCount).to.equal(0)
+
+            for(const stig of res.body.stigs) {
+              expect(stig.benchmarkId).to.be.oneOf(reference.testCollection.validStigs)
+            }
 
             const effectedAsset = await utils.getAsset(res.body.assetId)
 
@@ -101,11 +79,35 @@ describe('POST - Asset', () => {
 
         })
 
-        it('Create an Asset (with stigGrants projection)', async () => {
+        it('should fail, duplicate asset name', async function () {
+
+          const res = await chai
+            .request(config.baseUrl)
+            .post('/assets')
+            .set('Authorization', 'Bearer ' + iteration.token)
+            .send({
+              name: reference.testAsset.name,
+              collectionId: reference.testCollection.collectionId,
+              description: 'test',
+              ip: '1.1.1.1',
+              noncomputing: true,
+              labelIds: [reference.testCollection.fullLabel],
+              metadata: {
+                pocName: 'pocName',
+              },
+              stigs: reference.testCollection.validStigs
+          })
+          if(!distinct.canModifyCollection){
+            expect(res).to.have.status(403)
+            return
+          }
+          expect(res).to.have.status(422)
+        })
+        it('Create an Asset (with stigGrants projection)', async function () {
           const res = await chai
             .request(config.baseUrl)
             .post('/assets?projection=stigGrants')
-            .set('Authorization', 'Bearer ' + user.token)
+            .set('Authorization', 'Bearer ' + iteration.token)
             .send({
               name: 'TestAsset' + Math.floor(Math.random() * 1000),
               collectionId: reference.testCollection.collectionId,
@@ -122,7 +124,7 @@ describe('POST - Asset', () => {
               stigs: reference.testCollection.validStigs
             })
           
-          if(!distinct.canModifyAssets){
+          if(!distinct.canModifyCollection){
             expect(res).to.have.status(403)
             return
           }

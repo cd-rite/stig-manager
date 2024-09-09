@@ -2,17 +2,14 @@
 #!/bin/bash
 
 usage() {
-  echo "Usage: $0 [-p pattern ...] [-f file ...] [-d directory ...] [-u user_level ...]"
+  echo "Usage: $0 [-p pattern ...] [-f file ...] [-d directory ...] [-i iteration name ...]"
   echo "  -p pattern     Run tests matching the whole word."
   echo "  -f file        Run specific test file."
   echo "  -d directory   Run tests in specific directory."
-  echo "  -u user        Run tests for specific user or list of users."
-  echo -e "  -h help        examples: \n ./runMocha.sh -u lvl1 -u lvl2 -p getCollectionss \n ./runMocha.sh -f collectionGet.test.js \n ./runMocha.sh -d mocha/data/collection"
+  echo "  -i iteration   Run tests for specific iteration.name (see iterations.js)" 
+  echo -e "  -h help        examples: \n ./runMocha.sh -p \"the name of my test\" \n ./runMocha.sh -i lvl1 -i lvl2 -p getCollections \n ./runMocha.sh -f collectionGet.test.js \n ./runMocha.sh -d mocha/data/collection"
   exit 
 }
-
-
-
 
 DEFAULT_COMMAND="npx mocha --reporter mochawesome --no-timeouts --showFailed --exit './mocha/**/*.test.js'"
 COMMAND="npx mocha --reporter mochawesome --no-timeouts --showFailed --exit"
@@ -22,7 +19,7 @@ FILES=()
 DIRECTORIES=()
 USERS=()
 
-while getopts "p:f:d:u:h:" opt; do
+while getopts "p:f:d:i:h:" opt; do
   case ${opt} in
     p)
       PATTERNS+=("${OPTARG}")
@@ -33,7 +30,7 @@ while getopts "p:f:d:u:h:" opt; do
     d)
       DIRECTORIES+=("${OPTARG}")
       ;;
-    u)
+    i)
       USERS+=("${OPTARG}")
       ;;
     h)
@@ -61,7 +58,7 @@ fi
 GREP_PATTERN=""
 if [ ${#USERS[@]} -gt 0 ]; then
   USER_PATTERN=$(IFS='|'; echo "${USERS[*]}")
-  GREP_PATTERN="\\buser:(${USER_PATTERN})\\b"
+  GREP_PATTERN="\\biteration:(${USER_PATTERN})\\b"
 fi
 
 if [ ${#PATTERNS[@]} -gt 0 ]; then
