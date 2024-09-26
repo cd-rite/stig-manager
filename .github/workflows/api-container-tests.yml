@@ -21,7 +21,7 @@ jobs:
         container:
             - name: "stig-manager-alpine"
               build_arg: "node:lts-alpine"
-        mysql_version: ["8.0.0", "8.0.1", "8.0.13", "8.0.14", "8.0.21"]
+        mysql_version: ["8.0.14", "8.0.15", "8.0.20", "8.0.21", "8.0.22"]
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
