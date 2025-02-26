@@ -164,7 +164,14 @@ const setupJwks = async function (jwksUri) {
     
     // Check for insecure kids in the signing keys
     if (!config.oauth.allowInsecureTokens && containsInsecureKids(signingKeys)) {
-        throw new Error('JWKS contains insecure key IDs and STIGMAN_DEV_ALLOW_INSECURE_TOKENS is false')
+        const errorMsg = 'JWKS contains insecure key IDs and STIGMAN_DEV_ALLOW_INSECURE_TOKENS is false';
+        logger.writeError('oidc', 'discovery', { 
+            success: false, 
+            jwksUri,
+            message: errorMsg,
+            allowInsecureTokens: config.oauth.allowInsecureTokens
+        });
+        throw new Error(errorMsg);
     }
 
     logger.writeDebug('oidc', 'discovery', { jwksUri, signingKeys })
@@ -178,48 +185,39 @@ async function initializeAuth(setDepStatus) {
     const retries = 24
     const metadataUri = `${config.oauth.authority}/.well-known/openid-configuration`
     let jwksUri
-    async function getJwks() {
+    
+    async function getJwks(bail) {
         logger.writeDebug('oidc', 'discovery', { metadataUri, attempt: ++initAttempt })
         const openidConfig = (await axios.get(metadataUri)).data
         logger.writeDebug('oidc', 'discovery', { metadataUri, metadata: openidConfig})
         
         if (!openidConfig.jwks_uri) {
-            throw( new Error('No jwks_uri property found') )
+            throw new Error('No jwks_uri property found')
         }
         jwksUri = openidConfig.jwks_uri
-        await setupJwks(jwksUri)
+        
+        try {
+            await setupJwks(jwksUri)
+        } catch (error) {
+            // If the error is from insecure kids detection, bail immediately
+            if (error.message.includes('JWKS contains insecure key IDs')) {
+                bail(error); // This will immediately stop retrying
+                return; // Make sure to return after bail
+            }
+            throw error; // Other errors will be retried
+        }
     }
     
-    try {
-        await retry(getJwks, {
-            retries,
-            factor: 1,
-            minTimeout: 5 * 1000,
-            maxTimeout: 5 * 1000,
-            onRetry: (error) => {
-                // Don't retry if the error is related to insecure kids
-                if (error.message.includes('JWKS contains insecure key IDs')) {
-                    throw error; // This will break out of the retry loop
-                }
-                logger.writeError('oidc', 'discovery', { success: false, metadataUri, message: error.message })
-            }
-        })
-    } catch (error) {
-        // If error is due to insecure kids, log it and don't set the dependency status to 'up'
-        if (error.message.includes('JWKS contains insecure key IDs')) {
-            logger.writeError('oidc', 'discovery', { 
-                success: false, 
-                metadataUri,
-                jwksUri,
-                message: error.message,
-                allowInsecureTokens: config.oauth.allowInsecureTokens
-            })
-            return;
+    await retry(getJwks, {
+        retries,
+        factor: 1,
+        minTimeout: 5 * 1000,
+        maxTimeout: 5 * 1000,
+        onRetry: (error) => {
+            logger.writeError('oidc', 'discovery', { success: false, metadataUri, message: error.message })
         }
-        // For other errors, just re-throw
-        throw error;
-    }
-
+    })
+    
     logger.writeInfo('oidc', 'discovery', { success: true, metadataUri, jwksUri })
     setDepStatus('auth', 'up')
 }
