@@ -70,7 +70,7 @@ jobs:
           echo "Test passed: 403 error with 'Insecure token presented' message"
 
   test_api_test_kid:
-      name: test insecure KID behavior
+      name: test insecure KID in jwks behavior
       runs-on: ubuntu-latest
       steps:
         - name: Check out the repo
