@@ -1,0 +1,124 @@
+name: API containers
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "api/source/**"
+      - "test/api/**"
+      - "Dockerfile"
+      - ".github/workflows/api-container-tests.yml"
+
+jobs:
+  test_api_non_test_kid:
+    name: test behavior with "secure" jwks KID, insecure token
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - name: Build image for stig-manager-alpine
+        id: image-build
+        run: |
+          docker build -t stig-manager-alpine --build-arg BASE_IMAGE=node:lts-alpine .
+      - name: Run mock Keycloak with non-standard test KID, api should bootstrap
+        id: id-run
+        working-directory: ./test/api/mock-keycloak-jwks-test
+        run: |
+          python3 -m http.server 8080 &
+      - name: Run MySQL container 
+        id: mysql-run
+        run: |
+          docker run -d --name stig-manager-db \
+          -p 3306:3306 \
+          -e MYSQL_ROOT_PASSWORD=rootpw \
+          -e MYSQL_DATABASE=stigman \
+          -e MYSQL_USER=stigman \
+          -e MYSQL_PASSWORD=stigman \
+          mysql:8.0
+      - name: Run STIG Manager container stig-manager-alpine
+        id: api-run
+        run: |
+          docker run -d --name stig-manager-api \
+          --net=host \
+          -e STIGMAN_API_PORT=64001 \
+          -e STIGMAN_DB_HOST=localhost \
+          -e STIGMAN_DB_PORT=3306 \
+          -e STIGMAN_DB_PASSWORD=stigman \
+          -e STIGMAN_API_AUTHORITY=http://127.0.0.1:8080/auth/realms/stigman \
+          -e STIGMAN_DEV_RESPONSE_VALIDATION=logOnly \
+          -e STIGMAN_EXPERIMENTAL_APPDATA=true \
+          -e STIGMAN_DEV_ALLOW_INSECURE_TOKENS=false
+          stig-manager-alpine
+
+      - name: Wait for bootstrap
+        run: for i in {1..10}; do [ $i -gt 1 ] && sleep 5; curl --output /dev/null --silent --fail http://localhost:64001/api/op/configuration && s=0 && break || s=$?; printf '.'; done; (exit $s)
+      - name: Send request to API with insecure KID
+        run: |
+          response=$(curl -s -o response.txt -w "%{http_code}" -X 'GET' \
+          'http://localhost:64001/api/user' \
+          -H 'accept: application/json' \
+          -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJGSjg2R2NGM2pUYk5MT2NvNE52WmtVQ0lVbWZZQ3FvcXRPUWVNZmJoTmxFIn0.eyJleHAiOjE4NjQ2ODEwMzUsImlhdCI6MTY3MDU0MDIzNiwiYXV0aF90aW1lIjoxNjcwNTQwMjM1LCJqdGkiOiI0N2Y5YWE3ZC1iYWM0LTQwOTgtOWJlOC1hY2U3NTUxM2FhN2YiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvc3RpZ21hbiIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiJiN2M3OGE2Mi1iODRmLTQ1NzgtYTk4My0yZWJjNjZmZDllZmUiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzdGlnLW1hbmFnZXIiLCJub25jZSI6IjMzNzhkYWZmLTA0MDQtNDNiMy1iNGFiLWVlMzFmZjczNDBhYyIsInNlc3Npb25fc3RhdGUiOiI4NzM2NWIzMy0yYzc2LTRiM2MtODQ4NS1mYmE1ZGJmZjRiOWYiLCJhY3IiOiIwIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImNyZWF0ZV9jb2xsZWN0aW9uIiwiZGVmYXVsdC1yb2xlcy1zdGlnbWFuIiwiYWRtaW4iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctdXNlcnMiLCJxdWVyeS1ncm91cHMiLCJxdWVyeS11c2VycyJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgc3RpZy1tYW5hZ2VyOmNvbGxlY3Rpb24gc3RpZy1tYW5hZ2VyOnN0aWc6cmVhZCBzdGlnLW1hbmFnZXI6dXNlcjpyZWFkIHN0aWctbWFuYWdlcjpvcCBzdGlnLW1hbmFnZXI6Y29sbGVjdGlvbjpyZWFkIHN0aWctbWFuYWdlcjpvcDpyZWFkIHN0aWctbWFuYWdlcjp1c2VyIHN0aWctbWFuYWdlciBzdGlnLW1hbmFnZXI6c3RpZyIsInNpZCI6Ijg3MzY1YjMzLTJjNzYtNGIzYy04NDg1LWZiYTVkYmZmNGI5ZiIsIm5hbWUiOiJTVElHTUFOIEFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoic3RpZ21hbmFkbWluIiwiZ2l2ZW5fbmFtZSI6IlNUSUdNQU4iLCJmYW1pbHlfbmFtZSI6IkFkbWluIn0.a1XwJZw_FIzwMXKo-Dr-n11me5ut-SF9ni7ylX-7t7AVrH1eAqyBxX9DXaxFK0xs6YOhoPsh9NyW8UFVaYgtF68Ps6yzoiqFEeiRXkpN5ygICN3H3z6r-YwanLlEeaYR3P2EtHRcrBtCnt0VEKKbGPWOfeiNCVe3etlp9-NQo44')
+          if [ "$response" -ne 403 ]; then
+            echo "Expected 403 response, got $response"
+            exit 1
+          fi
+          if ! grep -q "Insecure token presented" response.txt; then
+            echo "Expected error message not found in response"
+            exit 1
+          fi
+          echo "Test passed: 403 error with 'Insecure token presented' message"
+
+  test_api_test_kid:
+      name: test insecure KID behavior
+      runs-on: ubuntu-latest
+      steps:
+        - name: Check out the repo
+          uses: actions/checkout@v4
+        - name: Build image for stig-manager-alpine
+          id: image-build
+          run: |
+            docker build -t stig-manager-alpine --build-arg BASE_IMAGE=node:lts-alpine .
+        - name: Run mock Keycloak with non-standard test KID, api should bootstrap
+          id: id-run
+          working-directory: ./test/api/mock-keycloak
+          run: |
+            python3 -m http.server 8080 &
+        - name: Run MySQL container 
+          id: mysql-run
+          run: |
+            docker run -d --name stig-manager-db \
+            -p 3306:3306 \
+            -e MYSQL_ROOT_PASSWORD=rootpw \
+            -e MYSQL_DATABASE=stigman \
+            -e MYSQL_USER=stigman \
+            -e MYSQL_PASSWORD=stigman \
+            mysql:8.0
+        - name: Run STIG Manager container stig-manager-alpine
+          id: api-run
+          run: |
+            docker run -d --name stig-manager-api \
+            --net=host \
+            -e STIGMAN_API_PORT=64001 \
+            -e STIGMAN_DB_HOST=localhost \
+            -e STIGMAN_DB_PORT=3306 \
+            -e STIGMAN_DB_PASSWORD=stigman \
+            -e STIGMAN_API_AUTHORITY=http://127.0.0.1:8080/auth/realms/stigman \
+            -e STIGMAN_DEV_RESPONSE_VALIDATION=logOnly \
+            -e STIGMAN_EXPERIMENTAL_APPDATA=true \
+            -e STIGMAN_DEV_ALLOW_INSECURE_TOKENS=false
+            stig-manager-alpine
+
+        - name: Wait for bootstrap
+          run: |
+            for i in {1..10}; do 
+              [ $i -gt 1 ] && sleep 5
+              if curl --output /dev/null --silent --fail http://localhost:64001/api/op/configuration; then
+            echo "API should not have bootstrapped successfully"
+            exit 1
+                fi
+                printf '.'
+              done
+              echo "API did not bootstrap as expected"
+              exit 0
+
