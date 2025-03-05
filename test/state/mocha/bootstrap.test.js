@@ -1,5 +1,8 @@
 import { expect } from 'chai'
 import { spawnApiPromise, spawnHttpServer, spawnMySQL, simpleRequest, waitChildClose } from './lib.js'
+import { executeRequest} from '../../api/mocha/utils/testUtils.js'
+import {config } from '../../api/mocha/testConfig.js'
+const adminToken = config.adminToken
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -384,6 +387,14 @@ describe('Boot with both dependencies, "secure" kid - boots, rejects request w/ 
     it('should return 200 when dependencies are available', async function () {
       const res = await simpleRequest('http://localhost:54000/api/op/configuration')
       expect(res.status).to.equal(200)
+    })
+  })
+
+  describe('GET /user', function () {
+    it('Return the requesters user information - should fail with insecure kid', async () => {
+      const res = await executeRequest(`http://localhost:54000/api/user`, 'GET', adminToken)
+      expect(res.status).to.eql(403)
+      expect(res.body).to.eql({message: 'Unknown signing key, unable to validate token.'})
     })
   })
 
