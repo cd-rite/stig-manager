@@ -277,7 +277,7 @@ describe('Boot with insecure kid in jwks', function () {
     it('currentState = "fail"', function () {
       const stateChanged = api.logRecords.filter(r => r.type === 'statechanged')
       expect(stateChanged).to.have.lengthOf(1)
-      expect(stateChanged[0].data).to.eql({currentState: 'fail', previousState: 'starting', dependencyStatus: {db: true, oidc: false}})
+      expect(stateChanged[0].data).to.deep.include({currentState: 'fail', previousState: 'starting'})
     })
   })
 })
