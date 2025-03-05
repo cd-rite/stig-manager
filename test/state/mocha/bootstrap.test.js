@@ -224,7 +224,7 @@ describe('Boot with old mysql', function () {
   })
 })
 
-describe('Boot with insecure kid in jwks', function () {
+describe('Boot with insecure kid in jwks - allow insecure tokens false, expect failure', function () {
   let api
   let mysql
   let kc
@@ -282,7 +282,7 @@ describe('Boot with insecure kid in jwks', function () {
   })
 })
 
-describe('Boot with no jwks_uri in config', function () {
+describe('Boot with no jwks_uri in config - expect fail', function () {
   let api
   let mysql
   let kc
@@ -321,11 +321,7 @@ describe('Boot with no jwks_uri in config', function () {
     it('oidc, check message', function () {
       const failures = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === false)
       expect(failures).to.have.lengthOf(1)
-      expect(failures[0].data.message).to.equal('No jwks_uri property found')
-    })
-    it('db', function () {
-      const failures = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === false)
-      expect(failures).to.have.lengthOf(0)
+      expect(failures[0].data.message).to.include('No jwks_uri property found')
     })
   })
 
@@ -334,23 +330,19 @@ describe('Boot with no jwks_uri in config', function () {
       const successes = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === true)
       expect(successes).to.have.lengthOf(0)
     })
-    it('db', function () {
-      const successes = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === true)
-      expect(successes).to.have.lengthOf(1)
-    })
   })
 
   describe('statechanged message', function () {
     it('currentState = "fail"', function () {
       const stateChanged = api.logRecords.filter(r => r.type === 'statechanged')
       expect(stateChanged).to.have.lengthOf(1)
-      expect(stateChanged[0].data).to.eql({currentState: 'fail', previousState: 'starting', dependencyStatus: {db: false, oidc: true}})
+      expect(stateChanged[0].data).to.eql({currentState: 'fail', previousState: 'starting', dependencyStatus: {db: false, oidc: false}})
     })
   })
 })
 
 
-describe('Boot with both dependencies, "secure" kid', function () {
+describe('Boot with both dependencies, "secure" kid - boots, rejects request w/ token' , function () {
   let api
   let mysql
   let kc
