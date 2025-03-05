@@ -289,7 +289,8 @@ describe('Boot with no jwks_uri in config', function () {
    
   before(async function () {
     this.timeout(60000)
-    kc = spawnHttpServer({port:'8080', cwd: `${__dirname}/../../api/mock-keycloak-test-cases/no-jwks`})
+    const cwd = `${__dirname}/../../api/mock-keycloak-test-cases/no-jwks`
+    kc = spawnHttpServer({port:'8080', cwd})    
     mysql = await spawnMySQL({tag:'8.0.24'})
     api = await spawnApiPromise({
       resolveOnClose: true,
@@ -356,8 +357,8 @@ describe('Boot with both dependencies, "secure" kid', function () {
    
   before(async function () {
     this.timeout(60000)
-    kc = spawnHttpServer({port:'8080', cwd: `${__dirname}/../../api/mock-keycloak-test-cases/secure-kid`})
-
+    const cwd = `${__dirname}/../../api/mock-keycloak-test-cases/secure-kid`
+    kc = spawnHttpServer({port:'8080', cwd})
     mysql = await spawnMySQL({tag:'8.0.24'})
     api = await spawnApiPromise({
       resolveOnType: 'started',
