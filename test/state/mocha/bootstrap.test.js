@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import { spawnApiPromise, spawnHttpServer, spawnMySQL, simpleRequest, waitChildClose } from './lib.js'
-import { executeRequest} from '../../api/mocha/utils/testUtils.js'
 import {config } from '../../api/mocha/testConfig.js'
 const adminToken = config.adminToken
 import { dirname } from 'path'
@@ -392,9 +391,17 @@ describe('Boot with both dependencies, "secure" kid - boots, rejects request w/ 
 
   describe('GET /user', function () {
     it('Return the requesters user information - should fail with insecure kid', async () => {
-      const res = await executeRequest(`http://localhost:54000/api/user`, 'GET', adminToken)
+      const options = {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+      const res = await fetch(`http://localhost:54000/api/user`, options)
       expect(res.status).to.eql(403)
-      expect(res.body).to.eql({message: 'Unknown signing key, unable to validate token.'})
+      const responseBody = await res.json();
+      expect(responseBody).to.eql({message: 'Insecure token presented and STIGMAN_DEV_ALLOW_INSECURE_TOKENS is false.'});
     })
   })
 
