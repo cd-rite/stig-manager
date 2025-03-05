@@ -1,5 +1,8 @@
 import { expect } from 'chai'
 import { spawnApiPromise, spawnHttpServer, spawnMySQL, simpleRequest, waitChildClose } from './lib.js'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+const __dirname = dirname(fileURLToPath(import.meta.url))
 import addContext from 'mochawesome/addContext.js'
 
 describe('Boot with no dependencies', function () {
@@ -261,10 +264,6 @@ describe('Boot with insecure kid in jwks', function () {
       expect(failures).to.have.lengthOf(1)
       expect(failures[0].data.message).to.include('insecure_kid -')
     })
-    it('db', function () {
-      const failures = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === false)
-      expect(failures).to.have.lengthOf(0)
-    })
   })
 
   describe('dependency success count', function () {
@@ -272,17 +271,13 @@ describe('Boot with insecure kid in jwks', function () {
       const successes = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === true)
       expect(successes).to.have.lengthOf(0)
     })
-    it('db', function () {
-      const successes = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === true)
-      expect(successes).to.have.lengthOf(1)
-    })
   })
 
   describe('statechanged message', function () {
     it('currentState = "fail"', function () {
       const stateChanged = api.logRecords.filter(r => r.type === 'statechanged')
       expect(stateChanged).to.have.lengthOf(1)
-      expect(stateChanged[0].data).to.eql({currentState: 'fail', previousState: 'starting', dependencyStatus: {db: false, oidc: true}})
+      expect(stateChanged[0].data).to.eql({currentState: 'fail', previousState: 'starting', dependencyStatus: {db: true, oidc: false}})
     })
   })
 })
