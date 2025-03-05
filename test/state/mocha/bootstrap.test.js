@@ -232,7 +232,7 @@ describe('Boot with insecure kid in jwks - allow insecure tokens false, expect f
   before(async function () {
     this.timeout(60000)
     kc = spawnHttpServer({port:'8080'})
-    mysql = await spawnMySQL({tag:'8.0.23', port:'3308'})
+    mysql = await spawnMySQL({tag:'8.0.24', port:'3308'})
     api = await spawnApiPromise({
       resolveOnClose: true,
       env: {
@@ -291,7 +291,7 @@ describe('Boot with no jwks_uri in config - expect fail', function () {
     this.timeout(60000)
     const cwd = `${__dirname}/../../api/mock-keycloak-test-cases/no-jwks`
     kc = spawnHttpServer({port:'8080', cwd})    
-    mysql = await spawnMySQL({tag:'8.0.23', port:'3309'})
+    mysql = await spawnMySQL({tag:'8.0.24', port:'3309'})
     api = await spawnApiPromise({
       resolveOnClose: true,
       env: {
@@ -351,7 +351,7 @@ describe('Boot with both dependencies, "secure" kid - boots, rejects request w/ 
     this.timeout(60000)
     const cwd = `${__dirname}/../../api/mock-keycloak-test-cases/secure-kid`
     kc = spawnHttpServer({port:'8080', cwd})
-    mysql = await spawnMySQL({tag:'8.0.23', port:'3310'})
+    mysql = await spawnMySQL({tag:'8.0.24', port:'3310'})
     api = await spawnApiPromise({
       resolveOnType: 'started',
       env: {
