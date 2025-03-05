@@ -191,7 +191,9 @@ async function initializeAuth() {
         logger.writeDebug('oidc', 'discovery', { metadataUri, metadata: openidConfig})
         
         if (!openidConfig.jwks_uri) {
-            bail(new Error('No jwks_uri property found')); // Bail if jwks_uri is not found
+            const message = "No jwks_uri property found in oidcConfig"
+            logger.writeError('oidc', 'discovery', { success: false, metadataUri, message })
+            bail(new Error(message)); // Bail if jwks_uri is not found
             return; // return after bail
         }
         jwksUri = openidConfig.jwks_uri
@@ -201,6 +203,7 @@ async function initializeAuth() {
         } catch (error) {
             // If the error is from insecure kids detection, bail immediately
             if (error.message.includes('insecure_kid -')) {
+                logger.writeError('oidc', 'discovery', { success: false, metadataUri, message: error.message })
                 bail(error); // This will immediately stop retrying
                 return; // Make sure to return after bail
             }
