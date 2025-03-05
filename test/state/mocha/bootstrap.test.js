@@ -221,3 +221,211 @@ describe('Boot with old mysql', function () {
   })
 })
 
+describe('Boot with insecure kid in jwks', function () {
+  let api
+  let mysql
+  let kc
+   
+  before(async function () {
+    this.timeout(60000)
+    kc = spawnHttpServer({port:'8080'})
+    mysql = await spawnMySQL({tag:'8.0.24'})
+    api = await spawnApiPromise({
+      resolveOnClose: true,
+      env: {
+        STIGMAN_DEPENDENCY_RETRIES: 2,
+        STIGMAN_DB_PASSWORD: 'stigman',
+        STIGMAN_DB_PORT: '3306',
+        STIGMAN_OIDC_PROVIDER: `http://localhost:8080/auth/realms/stigman`,
+        STIGMAN_DEV_ALLOW_INSECURE_TOKENS: 'false'
+      }
+    })
+  })
+
+  after(function () {
+    api.process.kill()
+    mysql.kill()
+    kc.kill()
+    addContext(this, {title: 'api-log', value: api.logRecords})
+  })
+
+  describe('exit code', function () {
+    it('should have exited with code 1', function () {
+      expect(api.process.exitCode).to.equal(1)
+    })
+  })  
+
+  describe('dependency failure count', function () {
+    it('oidc, check message', function () {
+      const failures = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === false)
+      expect(failures).to.have.lengthOf(1)
+      expect(failures[0].data.message).to.include('insecure_kid -')
+    })
+    it('db', function () {
+      const failures = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === false)
+      expect(failures).to.have.lengthOf(0)
+    })
+  })
+
+  describe('dependency success count', function () {
+    it('oidc', function () {
+      const successes = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === true)
+      expect(successes).to.have.lengthOf(0)
+    })
+    it('db', function () {
+      const successes = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === true)
+      expect(successes).to.have.lengthOf(1)
+    })
+  })
+
+  describe('statechanged message', function () {
+    it('currentState = "fail"', function () {
+      const stateChanged = api.logRecords.filter(r => r.type === 'statechanged')
+      expect(stateChanged).to.have.lengthOf(1)
+      expect(stateChanged[0].data).to.eql({currentState: 'fail', previousState: 'starting', dependencyStatus: {db: false, oidc: true}})
+    })
+  })
+})
+
+describe('Boot with no jwks_uri in config', function () {
+  let api
+  let mysql
+  let kc
+   
+  before(async function () {
+    this.timeout(60000)
+    kc = spawnHttpServer({port:'8080', cwd: `${__dirname}/../../api/mock-keycloak-test-cases/no-jwks`})
+    mysql = await spawnMySQL({tag:'8.0.24'})
+    api = await spawnApiPromise({
+      resolveOnClose: true,
+      env: {
+        STIGMAN_DEPENDENCY_RETRIES: 2,
+        STIGMAN_DB_PASSWORD: 'stigman',
+        STIGMAN_DB_PORT: '3306',
+        STIGMAN_OIDC_PROVIDER: `http://localhost:8080/auth/realms/stigman`,
+        STIGMAN_DEV_ALLOW_INSECURE_TOKENS: 'false'
+      }
+    })
+  })
+
+  after(function () {
+    api.process.kill()
+    mysql.kill()
+    kc.kill()
+    addContext(this, {title: 'api-log', value: api.logRecords})
+  })
+
+  describe('exit code', function () {
+    it('should have exited with code 1', function () {
+      expect(api.process.exitCode).to.equal(1)
+    })
+  })  
+
+  describe('dependency failure count', function () {
+    it('oidc, check message', function () {
+      const failures = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === false)
+      expect(failures).to.have.lengthOf(1)
+      expect(failures[0].data.message).to.equal('No jwks_uri property found')
+    })
+    it('db', function () {
+      const failures = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === false)
+      expect(failures).to.have.lengthOf(0)
+    })
+  })
+
+  describe('dependency success count', function () {
+    it('oidc', function () {
+      const successes = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === true)
+      expect(successes).to.have.lengthOf(0)
+    })
+    it('db', function () {
+      const successes = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === true)
+      expect(successes).to.have.lengthOf(1)
+    })
+  })
+
+  describe('statechanged message', function () {
+    it('currentState = "fail"', function () {
+      const stateChanged = api.logRecords.filter(r => r.type === 'statechanged')
+      expect(stateChanged).to.have.lengthOf(1)
+      expect(stateChanged[0].data).to.eql({currentState: 'fail', previousState: 'starting', dependencyStatus: {db: false, oidc: true}})
+    })
+  })
+})
+
+
+describe('Boot with both dependencies, "secure" kid', function () {
+  let api
+  let mysql
+  let kc
+   
+  before(async function () {
+    this.timeout(60000)
+    kc = spawnHttpServer({port:'8080', cwd: `${__dirname}/../../api/mock-keycloak-test-cases/secure-kid`})
+
+    mysql = await spawnMySQL({tag:'8.0.24'})
+    api = await spawnApiPromise({
+      resolveOnType: 'started',
+      env: {
+        STIGMAN_DEPENDENCY_RETRIES: 2,
+        STIGMAN_DB_PASSWORD: 'stigman',
+        STIGMAN_DB_PORT: '3306',
+        STIGMAN_OIDC_PROVIDER: `http://localhost:8080/auth/realms/stigman`,
+        STIGMAN_DEV_ALLOW_INSECURE_TOKENS: 'false'
+      }
+    })
+  })
+
+  after(function () {
+    api.process.kill()
+    mysql.kill()
+    kc.kill()
+    addContext(this, {title: 'api-log', value: api.logRecords})
+  })
+
+  describe('GET /op/state', function () {
+    it('should return state "available"', async function () {
+      const res = await simpleRequest('http://localhost:54000/api/op/state')
+      expect(res.status).to.equal(200)
+      expect(res.body.state).to.equal('available')
+      expect(res.body.dependencies).to.eql({db: true, oidc: true})
+    })
+  })
+  
+  describe('GET /op/configuration', function () {
+    it('should return 200 when dependencies are available', async function () {
+      const res = await simpleRequest('http://localhost:54000/api/op/configuration')
+      expect(res.status).to.equal(200)
+    })
+  })
+
+  describe('dependency failure count', function () {
+    it('db', function () {
+      const failures = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === false)
+      expect(failures).to.have.lengthOf(0)
+    })
+    it('oidc', function () {
+      const failures = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === false)
+      expect(failures).to.have.lengthOf(0)
+    })
+  })
+
+  describe('dependency success count', function () {
+    it('db', function () {
+      const successes = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === true)
+      expect(successes).to.have.lengthOf(1)
+    })
+    it('oidc', function () {
+      const successes = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === true)
+      expect(successes).to.have.lengthOf(1)
+    })
+  })
+
+  describe('statechanged message', function () {
+    it('currentState = "available"', function () {
+      const stateChanged = api.logRecords.filter(r => r.type === 'statechanged')
+      expect(stateChanged).to.have.lengthOf(1)
+      expect(stateChanged[0].data).to.eql({currentState: 'available', previousState: 'starting', dependencyStatus: {db: true, oidc: true}})
+    })
+  })
+})
