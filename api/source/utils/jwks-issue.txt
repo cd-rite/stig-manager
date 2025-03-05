@@ -1,0 +1,33 @@
+JWKS kid FJ86GcF3jTbNLOco4NvZkUCIUmfYCqoqtOQeMfbhNlE is a known insecure artifact that is distributed in container images published by our Organization.
+In order to prevent the unintentional use of this insecure artifact, we will:
+
+In config.js, add property oauth.allowInsecureTokens
+
+value is taken from envvar STIGMAN_DEV_ALLOW_INSECURE_TOKENS
+valid values are enum[true, false]
+default false
+In error.js, add SMError.InsecureToken having status 403 and message Insecure token presented and STIGMAN_DEV_ALLOW_INSECURE_TOKENS is false. Set detail to report the value of the insecure kid
+
+In config.js, initialize and export array insecureKids to contain insecure kid values with the insecure kid above as the only item
+
+During OIDC preflight, IF config.oauth.allowInsecureTokens = false THEN
+
+IF all items from insecureKids are not present THEN bootstrap continues
+ELSE fail the preflight routine without retrying, output log entry describing this reason.
+During token validation, IF config.oauth.allowInsecureTokens = false THEN
+
+IF token kid is present in insecureKids deny the request with SMError.InsecureToken
+In the documentation, update envvars.csv to document STIGMAN_DEV_ALLOW_INSECURE_TOKENS
+
+Create a new GitHub workflow and test suite to verify correct behavior as defined above.
+
+Simulate jwks_uri responses having a keys array as follows:
+contains exactly one item which IS NOT one of the the insecure kids
+contains exactly one item which IS one of the insecure kids
+contains two or more items where ONE item is one of the insecure kids
+contains two or more items where NO item is one of the insecure kids
+Validate correct behavior against an API started with STIGMAN_DEV_ALLOW_INSECURE_TOKENS = true
+Validate correct behavior against an API started with STIGMAN_DEV_ALLOW_INSECURE_TOKENS = false
+Note:
+We will not pass preflight if JWKS uri includes the insecure kid, but I left in the processing that compares the token kid to the insecure kid.
+This is a reach, but if the OIDC provider is swapped after bootstrap to one providing the insecure kid at the jwks uri (due to some sort of failover or load balancing scenario, perhaps), then to handle this we should still reject any requests with tokens that include the insecure kid (unless the envvar is set appropriately).
