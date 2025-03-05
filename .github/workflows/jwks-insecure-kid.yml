@@ -12,7 +12,7 @@ on:
 
 jobs:
   test_api_non_test_kid:
-    name: test behavior with "secure" jwks KID, insecure token
+    name: non-test "secure" jwks KID, insecure token
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -21,9 +21,9 @@ jobs:
         id: image-build
         run: |
           docker build -t stig-manager-alpine --build-arg BASE_IMAGE=node:lts-alpine .
-      - name: Run mock Keycloak with non-standard test KID, api should bootstrap
+      - name: Run mock Keycloak with "secure" KID not used for test tokens, api should bootstrap
         id: id-run
-        working-directory: ./test/api/mock-keycloak-jwks-test
+        working-directory: ./test/api/mock-keycloak-test-cases/secure-kid
         run: |
           python3 -m http.server 8080 &
       - name: Run MySQL container 
@@ -68,9 +68,8 @@ jobs:
             exit 1
           fi
           echo "Test passed: 403 error with 'Insecure token presented' message"
-
-  test_api_test_kid:
-      name: test insecure KID in jwks behavior
+  test_missing_jwks_uri:
+      name: config missing jwks_uri
       runs-on: ubuntu-latest
       steps:
         - name: Check out the repo
@@ -81,7 +80,7 @@ jobs:
             docker build -t stig-manager-alpine --build-arg BASE_IMAGE=node:lts-alpine .
         - name: Run mock Keycloak with non-standard test KID, api should bootstrap
           id: id-run
-          working-directory: ./test/api/mock-keycloak
+          working-directory: ./test/api/mock-keycloak-test-cases/no-jwks
           run: |
             python3 -m http.server 8080 &
         - name: Run MySQL container 
@@ -121,4 +120,56 @@ jobs:
               done
               echo "API did not bootstrap as expected"
               exit 0
-
+              test_api_test_kid:
+                name: test insecure KID in jwks behavior
+                runs-on: ubuntu-latest
+                steps:
+                  - name: Check out the repo
+                    uses: actions/checkout@v4
+                  - name: Build image for stig-manager-alpine
+                    id: image-build
+                    run: |
+                      docker build -t stig-manager-alpine --build-arg BASE_IMAGE=node:lts-alpine .
+                  - name: Run mock Keycloak with non-standard test KID, api should bootstrap
+                    id: id-run
+                    working-directory: ./test/api/mock-keycloak
+                    run: |
+                      python3 -m http.server 8080 &
+                  - name: Run MySQL container 
+                    id: mysql-run
+                    run: |
+                      docker run -d --name stig-manager-db \
+                      -p 3306:3306 \
+                      -e MYSQL_ROOT_PASSWORD=rootpw \
+                      -e MYSQL_DATABASE=stigman \
+                      -e MYSQL_USER=stigman \
+                      -e MYSQL_PASSWORD=stigman \
+                      mysql:8.0
+                  - name: Run STIG Manager container stig-manager-alpine
+                    id: api-run
+                    run: |
+                      docker run -d --name stig-manager-api \
+                      --net=host \
+                      -e STIGMAN_API_PORT=64001 \
+                      -e STIGMAN_DB_HOST=localhost \
+                      -e STIGMAN_DB_PORT=3306 \
+                      -e STIGMAN_DB_PASSWORD=stigman \
+                      -e STIGMAN_API_AUTHORITY=http://127.0.0.1:8080/auth/realms/stigman \
+                      -e STIGMAN_DEV_RESPONSE_VALIDATION=logOnly \
+                      -e STIGMAN_EXPERIMENTAL_APPDATA=true \
+                      -e STIGMAN_DEV_ALLOW_INSECURE_TOKENS=false \
+                      stig-manager-alpine
+          
+                  - name: Wait for bootstrap
+                    run: |
+                      for i in {1..10}; do 
+                        [ $i -gt 1 ] && sleep 5
+                        if curl --output /dev/null --silent --fail http://localhost:64001/api/op/configuration; then
+                      echo "API should not have bootstrapped successfully"
+                      exit 1
+                          fi
+                          printf '.'
+                        done
+                        echo "API did not bootstrap as expected"
+                        exit 0
+          
