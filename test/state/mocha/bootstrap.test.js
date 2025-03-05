@@ -232,13 +232,13 @@ describe('Boot with insecure kid in jwks', function () {
   before(async function () {
     this.timeout(60000)
     kc = spawnHttpServer({port:'8080'})
-    mysql = await spawnMySQL({tag:'8.0.24'})
+    mysql = await spawnMySQL({tag:'8.0.23', port:'3308'})
     api = await spawnApiPromise({
       resolveOnClose: true,
       env: {
         STIGMAN_DEPENDENCY_RETRIES: 2,
         STIGMAN_DB_PASSWORD: 'stigman',
-        STIGMAN_DB_PORT: '3306',
+        STIGMAN_DB_PORT: '3308',
         STIGMAN_OIDC_PROVIDER: `http://localhost:8080/auth/realms/stigman`,
         STIGMAN_DEV_ALLOW_INSECURE_TOKENS: 'false'
       }
@@ -291,13 +291,13 @@ describe('Boot with no jwks_uri in config', function () {
     this.timeout(60000)
     const cwd = `${__dirname}/../../api/mock-keycloak-test-cases/no-jwks`
     kc = spawnHttpServer({port:'8080', cwd})    
-    mysql = await spawnMySQL({tag:'8.0.24'})
+    mysql = await spawnMySQL({tag:'8.0.23', port:'3309'})
     api = await spawnApiPromise({
       resolveOnClose: true,
       env: {
         STIGMAN_DEPENDENCY_RETRIES: 2,
         STIGMAN_DB_PASSWORD: 'stigman',
-        STIGMAN_DB_PORT: '3306',
+        STIGMAN_DB_PORT: '3309',
         STIGMAN_OIDC_PROVIDER: `http://localhost:8080/auth/realms/stigman`,
         STIGMAN_DEV_ALLOW_INSECURE_TOKENS: 'false'
       }
@@ -359,13 +359,13 @@ describe('Boot with both dependencies, "secure" kid', function () {
     this.timeout(60000)
     const cwd = `${__dirname}/../../api/mock-keycloak-test-cases/secure-kid`
     kc = spawnHttpServer({port:'8080', cwd})
-    mysql = await spawnMySQL({tag:'8.0.24'})
+    mysql = await spawnMySQL({tag:'8.0.23', port:'3310'})
     api = await spawnApiPromise({
       resolveOnType: 'started',
       env: {
         STIGMAN_DEPENDENCY_RETRIES: 2,
         STIGMAN_DB_PASSWORD: 'stigman',
-        STIGMAN_DB_PORT: '3306',
+        STIGMAN_DB_PORT: '3310',
         STIGMAN_OIDC_PROVIDER: `http://localhost:8080/auth/realms/stigman`,
         STIGMAN_DEV_ALLOW_INSECURE_TOKENS: 'false'
       }
