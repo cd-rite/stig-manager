@@ -400,31 +400,12 @@ describe('Boot with both dependencies, "secure" kid - boots, rejects request w/ 
       }
       const res = await fetch(`http://localhost:54000/api/user`, options)
       expect(res.status).to.eql(403)
-      const responseBody = await res.json();
-      expect(responseBody).to.eql({message: 'Insecure token presented and STIGMAN_DEV_ALLOW_INSECURE_TOKENS is false.'});
+      const responseBody = await res.json()
+      expect(responseBody).to.have.property('error')
+        .that.equals('Insecure token presented and STIGMAN_DEV_ALLOW_INSECURE_TOKENS is false.')
+      expect(responseBody).to.have.property('detail')
+        .that.includes('Insecure kid found:')
     })
   })
-
-  // describe('dependency failure count', function () {
-  //   it('db', function () {
-  //     const failures = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === false)
-  //     expect(failures).to.have.lengthOf(0)
-  //   })
-  //   it('oidc', function () {
-  //     const failures = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === false)
-  //     expect(failures).to.have.lengthOf(0)
-  //   })
-  // })
-
-  // describe('dependency success count', function () {
-  //   it('db', function () {
-  //     const successes = api.logRecords.filter(r => r.type === 'preflight' && r.component === 'mysql' && r.data.success === true)
-  //     expect(successes).to.have.lengthOf(1)
-  //   })
-  //   it('oidc', function () {
-  //     const successes = api.logRecords.filter(r => r.type === 'discovery' && r.component === 'oidc' && r.data.success === true)
-  //     expect(successes).to.have.lengthOf(1)
-  //   })
-  // })
 
 })
