@@ -276,6 +276,11 @@ const sqlMetricsDetail = `json_object(
     'medium', sa.mediumCount,
     'high', sa.highCount
   ),
+  'unreviewed', json_object(
+    'low', sa.unreviewedLowCount,
+    'medium', sa.unreviewedMediumCount,
+    'high', sa.unreviewedHighCount
+  ),
   'statuses', json_object(
     'saved', json_object('total',sa.saved,'resultEngine',sa.savedResultEngine),
     'submitted', json_object('total',sa.submitted,'resultEngine',sa.submittedResultEngine),
@@ -309,6 +314,11 @@ const sqlMetricsDetailAgg = `json_object(
     'low', coalesce(sum(sa.lowCount),0),
     'medium', coalesce(sum(sa.mediumCount),0),
     'high', coalesce(sum(sa.highCount),0)
+  ),
+  'unreviewed', json_object(
+    'low', coalesce(sum(sa.unreviewedLowCount),0),
+    'medium', coalesce(sum(sa.unreviewedMediumCount),0),
+    'high', coalesce(sum(sa.unreviewedHighCount),0)
   ),
   'statuses', json_object(
     'saved', json_object('total',coalesce(sum(sa.saved),0),'resultEngine',coalesce(sum(sa.savedResultEngine),0)),
@@ -350,6 +360,11 @@ const sqlMetricsSummary = `json_object(
     'low', sa.lowCount,
     'medium', sa.mediumCount,
     'high', sa.highCount
+  ),
+  'unreviewed', json_object(
+    'low', sa.unreviewedLowCount,
+    'medium', sa.unreviewedMediumCount,
+    'high', sa.unreviewedHighCount
   )
 ) as metrics`
 const sqlMetricsSummaryAgg = `json_object(
@@ -374,6 +389,11 @@ const sqlMetricsSummaryAgg = `json_object(
     'low', coalesce(sum(sa.lowCount),0),
     'medium', coalesce(sum(sa.mediumCount),0),
     'high', coalesce(sum(sa.highCount),0)
+  ),
+  'unreviewed', json_object(
+    'low', coalesce(sum(sa.unreviewedLowCount),0),
+    'medium', coalesce(sum(sa.unreviewedMediumCount),0),
+    'high', coalesce(sum(sa.unreviewedHighCount),0)
   )
 ) as metrics`
 const colsMetricsDetail = [
@@ -388,6 +408,9 @@ const colsMetricsDetail = [
   `sa.lowCount as low`,
   `sa.mediumCount as medium`,
   `sa.highCount as high`,
+  `sa.unreviewedLowCount as unreviewedLow`,
+  `sa.unreviewedMediumCount as unreviewedMedium`,
+  `sa.unreviewedHighCount as unreviewedHigh`,
   `sa.saved`,
   `sa.savedResultEngine`,
   `sa.submitted`,
@@ -427,6 +450,9 @@ const colsMetricsDetailAgg = [
   `coalesce(sum(sa.lowCount),0) as low`,
   `coalesce(sum(sa.mediumCount),0) as medium`,
   `coalesce(sum(sa.highCount),0) as high`,
+  `coalesce(sum(sa.unreviewedLowCount),0) as unreviewedLow`,
+  `coalesce(sum(sa.unreviewedMediumCount),0) as unreviewedMedium`,
+  `coalesce(sum(sa.unreviewedHighCount),0) as unreviewedHigh`,
   `coalesce(sum(sa.saved),0) as saved`,
   `coalesce(sum(sa.savedResultEngine),0) as savedResultEngine`,
   `coalesce(sum(sa.submitted),0) as submitted`,
