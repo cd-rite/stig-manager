@@ -291,6 +291,10 @@ module.exports.updateStatsAssetStig = async function(connection, {
        sum(CASE WHEN review.resultId=4 and rgr.severity='medium' THEN 1 ELSE 0 END) as mediumCount,
        sum(CASE WHEN review.resultId=4 and rgr.severity='low' THEN 1 ELSE 0 END) as lowCount,
        
+       sum(CASE WHEN (review.reviewId is null or review.resultId not in (2,3,4)) and rgr.severity='high' THEN 1 ELSE 0 END) as unreviewedHighCount,
+       sum(CASE WHEN (review.reviewId is null or review.resultId not in (2,3,4)) and rgr.severity='medium' THEN 1 ELSE 0 END) as unreviewedMediumCount,
+       sum(CASE WHEN (review.reviewId is null or review.resultId not in (2,3,4)) and rgr.severity='low' THEN 1 ELSE 0 END) as unreviewedLowCount,
+       
        sum(CASE WHEN review.resultId = 1 THEN 1 ELSE 0 END) as notchecked,
        sum(CASE WHEN review.resultEngine is not null and review.resultId = 1 THEN 1 ELSE 0 END) as notcheckedResultEngine,
        sum(CASE WHEN review.resultId = 2 THEN 1 ELSE 0 END) as notapplicable,
@@ -338,6 +342,9 @@ module.exports.updateStatsAssetStig = async function(connection, {
         sam.highCount = source.highCount,
         sam.mediumCount = source.mediumCount,
         sam.lowCount = source.lowCount,
+        sam.unreviewedHighCount = source.unreviewedHighCount,
+        sam.unreviewedMediumCount = source.unreviewedMediumCount,
+        sam.unreviewedLowCount = source.unreviewedLowCount,
         sam.notchecked = source.notchecked,
         sam.notcheckedResultEngine = source.notcheckedResultEngine,
         sam.notapplicable = source.notapplicable,
