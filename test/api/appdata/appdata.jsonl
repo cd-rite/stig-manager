@@ -3467,8 +3467,3 @@
 [1,"TestGroup","TestGroup",87,"2024-10-30 19:39:58",87,"2024-10-30 19:39:58"]
 {"table":"user_group_user_map","columns":"`ugumId`,`userGroupId`,`userId`","rowCount":1}
 [1,1,85]
-{"table":"user_stig_asset_map","columns":"`id`,`userId`,`saId`","rowCount":4}
-[1,85,3]
-[2,86,4]
-[3,85,5]
-[4,85,9]
