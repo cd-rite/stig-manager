@@ -73,6 +73,13 @@ const metricsOutputToJSON = (testCaseName, username, responseData, outputJsonFil
   writeFileSync(metricsFilePath, outputContent, 'utf8')
 }
 
+const conditionalMetricsOutput = (testCaseName, username, responseData, outputJsonFile) => {
+  // Only record metrics if generateMetricsReferenceData is true in config
+  if (config.generateMetricsReferenceData) {
+    metricsOutputToJSON(testCaseName, username, responseData, outputJsonFile)
+  }
+}
+
 const getUUIDSubString = (length = 20) => {
   return uuidv4().substring(0, length)
 }
@@ -682,6 +689,7 @@ export {
   createCollectionLabel,
   putCollection,
   metricsOutputToJSON,
+  conditionalMetricsOutput,  // Export the new function
   putReviewByAssetRule,
   createUser,
   resetTestAsset,
