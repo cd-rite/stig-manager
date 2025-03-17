@@ -18,5 +18,6 @@ export const config = {
             "enabled": "always",
             "required": "always"
         }
-    }
+    },
+    "generateMetricsReferenceData": true
 }

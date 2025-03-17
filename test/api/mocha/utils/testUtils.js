@@ -30,13 +30,47 @@ const executeRequest = async (url, method, token, body = null) => {
 }
 
 const metricsOutputToJSON = (testCaseName, username, responseData, outputJsonFile) => {
-  const metricsFilePath = join(import.meta.url, outputJsonFile)
-  let metricsData = JSON.parse(readFileSync(metricsFilePath, 'utf8'))
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = dirname(__filename)
+  
+  // Create absolute path from the root directory of the project
+  const projectRoot = join(__dirname, '../../../..')
+  const metricsFilePath = join(projectRoot, 'test/api/mocha/data/metrics/metricsGet.js')
+  
+  // Read existing file to preserve all data
+  let fileContent
+  try {
+    fileContent = readFileSync(metricsFilePath, 'utf8')
+  } catch (err) {
+    console.log(`Error reading metrics file: ${err.message}`)
+    // If file doesn't exist, create a basic structure
+    fileContent = 'export const metrics = {}'
+  }
+  
+  // Extract the metrics object from the file
+  // This pattern finds the content between 'metrics = ' and the last '}'
+  const metricsMatch = fileContent.match(/metrics\s*=\s*(\{[\s\S]*\})/)
+  let metricsData = {}
+  
+  if (metricsMatch && metricsMatch[1]) {
+    try {
+      // Parse the existing metrics object
+      metricsData = Function('return ' + metricsMatch[1])()
+    } catch (err) {
+      console.log(`Error parsing metrics data: ${err.message}`)
+      // Continue with empty object if parsing fails
+    }
+  }
+  
+  // Update metrics data with new test case data
   if (!metricsData[testCaseName]) {
     metricsData[testCaseName] = {}
   }
   metricsData[testCaseName][username] = responseData
-  writeFileSync(metricsFilePath, JSON.stringify(metricsData, null, 2), 'utf8')
+  
+  // Write back to file preserving the export syntax
+  const outputContent = `export const metrics = ${JSON.stringify(metricsData, null, 2)}`
+  writeFileSync(metricsFilePath, outputContent, 'utf8')
 }
 
 const getUUIDSubString = (length = 20) => {

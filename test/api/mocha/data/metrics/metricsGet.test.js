@@ -1,4 +1,3 @@
-
 import {config } from '../../testConfig.js'
 import * as utils from '../../utils/testUtils.js'
 import reference from '../../referenceData.js'
@@ -25,6 +24,10 @@ describe('GET - Metrics', function () {
                 return
             }
             expect(res.status).to.eql(200)
+            
+            // Record the response for this test
+            utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+            
             const expectedData = metrics[this.test.title]
           
             if(iteration.name === 'lvl1'){
@@ -44,6 +47,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -62,6 +69,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 expect(res.body).to.be.empty
 
             })
@@ -73,6 +84,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -96,6 +111,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -114,6 +133,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -132,6 +155,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -150,6 +177,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -168,6 +199,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -186,6 +221,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -210,6 +249,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -230,6 +273,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -249,6 +296,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -267,6 +318,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -285,6 +340,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -307,6 +366,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -326,6 +389,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -345,6 +412,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -364,6 +435,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -383,6 +458,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -405,6 +484,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -425,6 +508,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -444,6 +531,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -463,6 +554,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -481,6 +576,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -507,6 +606,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -524,6 +627,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -541,6 +648,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -558,6 +669,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -575,6 +690,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -598,6 +717,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -616,6 +739,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -634,6 +761,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -653,6 +784,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -671,6 +806,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -693,6 +832,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -712,6 +855,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -731,6 +878,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -749,6 +900,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -768,6 +923,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -792,6 +951,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -811,6 +974,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -830,6 +997,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -851,6 +1022,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -871,6 +1046,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -894,6 +1073,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -913,6 +1096,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -932,6 +1119,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -950,6 +1141,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
@@ -969,6 +1164,10 @@ describe('GET - Metrics', function () {
                     return
                 }
                 expect(res.status).to.eql(200)
+                
+                // Record the response for this test
+                utils.metricsOutputToJSON(this.test.title, iteration.name, res.body, '../data/metrics/metricsGet.js')
+                
                 const expectedData = metrics[this.test.title]
 
                 if(iteration.name === 'lvl1'){
