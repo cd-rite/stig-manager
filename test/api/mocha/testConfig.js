@@ -19,5 +19,5 @@ export const config = {
             "required": "always"
         }
     },
-    "generateMetricsReferenceData": true
+    "generateMetricsReferenceData": false
 }
