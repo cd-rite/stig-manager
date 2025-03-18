@@ -85,22 +85,27 @@ const metricsOutputToJSON = (testCaseName, username, responseData, outputJsonFil
   outputMetricsToJSON('metrics', testCaseName, username, responseData, outputJsonFile)
 }
 
+const shouldGenerateMetricsData = () => {
+  // Check for environment variable set by runMocha.sh
+  return process.env.STIGMAN_GENERATE_METRICS_DATA === 'true'
+}
+
 const conditionalMetricsOutput = (testCaseName, username, responseData, outputJsonFile) => {
-  // Only record metrics if generateMetricsReferenceData is true in config
-  if (config.generateMetricsReferenceData) {
+  // Only record metrics if the environment variable is set
+  if (shouldGenerateMetricsData()) {
     outputMetricsToJSON('metrics', testCaseName, username, responseData, outputJsonFile)
+  }
+}
+
+const conditionalMetaMetricsOutput = (testCaseName, username, responseData, outputJsonFile) => {
+  // Only record metrics if the environment variable is set
+  if (shouldGenerateMetricsData()) {
+    outputMetricsToJSON('metaMetrics', testCaseName, username, responseData, outputJsonFile)
   }
 }
 
 const metaMetricsOutputToJSON = (testCaseName, username, responseData, outputJsonFile) => {
   outputMetricsToJSON('metaMetrics', testCaseName, username, responseData, outputJsonFile)
-}
-
-const conditionalMetaMetricsOutput = (testCaseName, username, responseData, outputJsonFile) => {
-  // Only record metrics if generateMetricsReferenceData is true in config
-  if (config.generateMetricsReferenceData) {
-    outputMetricsToJSON('metaMetrics', testCaseName, username, responseData, outputJsonFile)
-  }
 }
 
 const getUUIDSubString = (length = 20) => {
@@ -741,5 +746,6 @@ export {
   deleteStigByRevision,
   getUUIDSubString,
   executeRequest,
-  outputMetricsToJSON
+  outputMetricsToJSON,
+  shouldGenerateMetricsData
 }

@@ -6,6 +6,7 @@ usage() {
   echo "  -c coverage    Run all tests with a response validation log and generate coverage report. (cannot be used with other options)"
   echo "  -d directory   Run tests in specific directory."
   echo "  -f file        Run specific test file."
+  echo "  -g generate    Generate metrics reference data files during tests."
   echo "  -i iteration   Run tests for specific iteration.name (see iterations.js)"
   echo "  -p pattern     Run tests matching the whole word."
   echo -e "  -h help        examples: \n ./runMocha.sh \n ./runMocha.sh -p \"the name of my test\" \n ./runMocha.sh -p \"getCollections|getAsset\" \n ./runMocha.sh -p getCollections \n ./runMocha.sh -i lvl1 -i lvl2 -p getCollections \n ./runMocha.sh -f collectionGet.test.js \n ./runMocha.sh -d mocha/data/collection"
@@ -15,17 +16,19 @@ usage() {
 DEFAULT_COMMAND="npx mocha --reporter mochawesome --no-timeouts --showFailed --exit"
 COMMAND=$DEFAULT_COMMAND
 COVERAGE=false
+GENERATE_METRICS=false
 GREP=()
 FILES=()
 DIRECTORIES=()
 ITERATION=()
 
-while getopts "bcd:f:hi:p:" opt; do
+while getopts "bcd:f:ghi:p:" opt; do
   case ${opt} in
     b) COMMAND+=" --bail" ;;
     c) COVERAGE=true ;;
     d) DIRECTORIES+=("${OPTARG}") ;;
     f) FILES+=("./mocha/**/${OPTARG}") ;;
+    g) GENERATE_METRICS=true ;;
     h) usage ;;
     i) ITERATION+=("${OPTARG}") ;;
     p) GREP+=("${OPTARG}") ;;
@@ -51,6 +54,12 @@ if [ ${#GREP[@]} -gt 0 ] || [ ${#ITERATION[@]} -gt 0 ]; then
   ITERATION_PATTERN=$(IFS='|'; echo "${ITERATION[*]}")
   GREP_PATTERN="${ITERATION_PATTERN:+\\biteration:(${ITERATION_PATTERN})\\b}${GREP:+.*\\b(${GREP})\\b}"
   COMMAND+=" -g \"/$GREP_PATTERN/\""
+fi
+
+# Set environment variable for metrics generation
+if $GENERATE_METRICS; then
+  export STIGMAN_GENERATE_METRICS_DATA=true
+  echo "Generating metrics reference data files..."
 fi
 
 validate_responses() {
