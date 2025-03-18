@@ -29,27 +29,35 @@ const executeRequest = async (url, method, token, body = null) => {
   }
 }
 
-const metricsOutputToJSON = (testCaseName, username, responseData, outputJsonFile) => {
+/**
+ * Generic function to output metrics data to a JSON file
+ * @param {string} metricsType - The type of metrics (e.g. 'metrics', 'metaMetrics')
+ * @param {string} testCaseName - The test case name
+ * @param {string} username - The username
+ * @param {Object} responseData - The response data to save
+ * @param {string} relativePath - The relative path where the file should be saved
+ */
+const outputMetricsToJSON = (metricsType, testCaseName, username, responseData, relativePath) => {
   const __filename = fileURLToPath(import.meta.url)
   const __dirname = dirname(__filename)
   
   // Create absolute path from the root directory of the project
   const projectRoot = join(__dirname, '../../../..')
-  const metricsFilePath = join(projectRoot, 'test/api/mocha/data/metrics/metricsGet.js')
+  const fileName = metricsType === 'metaMetrics' ? 'metaMetricsGet.js' : 'metricsGet.js'
+  const metricsFilePath = join(projectRoot, `test/api/mocha/data/metrics/${fileName}`)
   
   // Read existing file to preserve all data
   let fileContent
   try {
     fileContent = readFileSync(metricsFilePath, 'utf8')
   } catch (err) {
-    console.log(`Error reading metrics file: ${err.message}`)
+    console.log(`Error reading ${metricsType} file: ${err.message}`)
     // If file doesn't exist, create a basic structure
-    fileContent = 'export const metrics = {}'
+    fileContent = `export const ${metricsType} = {}`
   }
   
   // Extract the metrics object from the file
-  // This pattern finds the content between 'metrics = ' and the last '}'
-  const metricsMatch = fileContent.match(/metrics\s*=\s*(\{[\s\S]*\})/)
+  const metricsMatch = fileContent.match(new RegExp(`${metricsType}\\s*=\\s*(\\{[\\s\\S]*\\})`))
   let metricsData = {}
   
   if (metricsMatch && metricsMatch[1]) {
@@ -57,7 +65,7 @@ const metricsOutputToJSON = (testCaseName, username, responseData, outputJsonFil
       // Parse the existing metrics object
       metricsData = Function('return ' + metricsMatch[1])()
     } catch (err) {
-      console.log(`Error parsing metrics data: ${err.message}`)
+      console.log(`Error parsing ${metricsType} data: ${err.message}`)
       // Continue with empty object if parsing fails
     }
   }
@@ -69,14 +77,29 @@ const metricsOutputToJSON = (testCaseName, username, responseData, outputJsonFil
   metricsData[testCaseName][username] = responseData
   
   // Write back to file preserving the export syntax
-  const outputContent = `export const metrics = ${JSON.stringify(metricsData, null, 2)}`
+  const outputContent = `export const ${metricsType} = ${JSON.stringify(metricsData, null, 2)}`
   writeFileSync(metricsFilePath, outputContent, 'utf8')
+}
+
+const metricsOutputToJSON = (testCaseName, username, responseData, outputJsonFile) => {
+  outputMetricsToJSON('metrics', testCaseName, username, responseData, outputJsonFile)
 }
 
 const conditionalMetricsOutput = (testCaseName, username, responseData, outputJsonFile) => {
   // Only record metrics if generateMetricsReferenceData is true in config
   if (config.generateMetricsReferenceData) {
-    metricsOutputToJSON(testCaseName, username, responseData, outputJsonFile)
+    outputMetricsToJSON('metrics', testCaseName, username, responseData, outputJsonFile)
+  }
+}
+
+const metaMetricsOutputToJSON = (testCaseName, username, responseData, outputJsonFile) => {
+  outputMetricsToJSON('metaMetrics', testCaseName, username, responseData, outputJsonFile)
+}
+
+const conditionalMetaMetricsOutput = (testCaseName, username, responseData, outputJsonFile) => {
+  // Only record metrics if generateMetricsReferenceData is true in config
+  if (config.generateMetricsReferenceData) {
+    outputMetricsToJSON('metaMetrics', testCaseName, username, responseData, outputJsonFile)
   }
 }
 
@@ -689,7 +712,9 @@ export {
   createCollectionLabel,
   putCollection,
   metricsOutputToJSON,
-  conditionalMetricsOutput,  // Export the new function
+  conditionalMetricsOutput,
+  metaMetricsOutputToJSON,
+  conditionalMetaMetricsOutput,
   putReviewByAssetRule,
   createUser,
   resetTestAsset,
@@ -715,5 +740,6 @@ export {
   uploadTestStig,
   deleteStigByRevision,
   getUUIDSubString,
-  executeRequest
+  executeRequest,
+  outputMetricsToJSON
 }
