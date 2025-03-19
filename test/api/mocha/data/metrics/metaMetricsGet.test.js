@@ -9,7 +9,7 @@ import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 
 // import metaMetrics reference file, and set update file path
-import metaMetrics from './metaMetricsGet.json' assert { type: 'json' }
+import metaMetrics from './metaMetricsGet.json' with { type: 'json' }
 const metaMetricsUpdateFile = `${dirname(fileURLToPath(import.meta.url))}/metaMetricsGet.json`
 
  
