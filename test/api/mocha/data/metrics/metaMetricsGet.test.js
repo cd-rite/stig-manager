@@ -9,7 +9,7 @@ use(deepEqualInAnyOrder)
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const metaMetricsUpdateFile = `${__dirname}/newMetaMetricsGet.json`
+const metaMetricsUpdateFile = `${__dirname}/metaMetricsGet.json`
 console.log(`metaMetricsUpdateFile: ${metaMetricsUpdateFile}`)
 console.log(`dirname: ${__dirname}`)
 
