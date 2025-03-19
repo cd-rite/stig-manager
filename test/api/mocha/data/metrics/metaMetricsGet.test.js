@@ -2,10 +2,17 @@ import {config } from '../../testConfig.js'
 import * as utils from '../../utils/testUtils.js'
 import reference from '../../referenceData.js'
 import {iterations} from '../../iterations.js'
-import { metaMetrics } from './metaMetricsGet.js'
+import { metricsResponses as metaMetrics } from './metaMetricsGet.js'
 import deepEqualInAnyOrder from 'deep-equal-in-any-order'
 import {use, expect} from 'chai'
 use(deepEqualInAnyOrder)
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const metaMetricsComparisonFile = `${__dirname}/metaMetricsGet.js`
+console.log(`metaMetricsComparisonFile: ${metaMetricsComparisonFile}`)
+console.log(`dirname: ${__dirname}`)
+
  
 describe('GET - MetaMetrics', function () { 
   before(async function () {
@@ -29,7 +36,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 console.log(this.test.title)
@@ -60,7 +67,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail?collectionId=${reference.testCollection.collectionId}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -85,7 +92,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail?benchmarkId=${reference.benchmark}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -113,7 +120,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail/collection`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -137,7 +144,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail/collection?collectionId=${reference.testCollection.collectionId}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -161,7 +168,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail/collection?benchmarkId=${reference.benchmark}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -185,7 +192,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail/collection?revisionId=${'VPN_SRG_TEST-1-1'}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -213,7 +220,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail/stig`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -237,7 +244,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail/stig?collectionId=${reference.testCollection.collectionId}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -261,7 +268,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/detail/stig?benchmarkId=${reference.benchmark}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -289,7 +296,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -313,7 +320,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary?collectionId=${reference.testCollection.collectionId}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -337,7 +344,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary?benchmarkId=${reference.benchmark}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -365,7 +372,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary/collection`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -389,7 +396,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary/collection?collectionId=${reference.testCollection.collectionId}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -413,7 +420,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary/collection?benchmarkId=${reference.benchmark}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -437,7 +444,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary/collection?revisionId=${'VPN_SRG_TEST'}-1-0`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -461,7 +468,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary/collection?revisionId=${'VPN_SRG_TEST'}-1-1`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -489,7 +496,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary/stig`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -513,7 +520,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary/stig?collectionId=${reference.testCollection.collectionId}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -537,7 +544,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary/stig?benchmarkId=${reference.benchmark}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)
@@ -561,7 +568,7 @@ describe('GET - MetaMetrics', function () {
                 const res = await utils.executeRequest(`${config.baseUrl}/collections/meta/metrics/summary/stig?benchmarkId=${reference.benchmark}&collectionId=${reference.testCollection.collectionId}`, 'GET', iteration.token)
                 
                 // Generates meta metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetaMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metaMetricsGet.js')
                 
                 const expectedData = metaMetrics[this.test.title]
                 expect(res.status).to.eql(200)

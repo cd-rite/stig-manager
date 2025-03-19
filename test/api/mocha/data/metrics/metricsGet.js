@@ -1,4 +1,4 @@
-export const metrics = {
+export const metricsResponses = {
   "Return summary metrics - stig agg - param labelName": {
     "lvl4": [
       {

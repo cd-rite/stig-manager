@@ -1,4 +1,4 @@
-export const metaMetrics = {
+export const metricsResponses = {
   "meta metrics detail - no agg - no params": {
     "stigmanadmin": {
       "collections": 2,

@@ -2,7 +2,7 @@ import {config } from '../../testConfig.js'
 import * as utils from '../../utils/testUtils.js'
 import reference from '../../referenceData.js'
 import {iterations} from '../../iterations.js'
-import { metrics } from './metricsGet.js'
+import { metricsResponses as metrics } from './metricsGet.js'
 import deepEqualInAnyOrder from 'deep-equal-in-any-order'
 import {use, expect} from 'chai'
 use(deepEqualInAnyOrder)
