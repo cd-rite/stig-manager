@@ -6,7 +6,8 @@ usage() {
   echo "  -c coverage    Run all tests with a response validation log and generate coverage report. (cannot be used with other options)"
   echo "  -d directory   Run tests in specific directory."
   echo "  -f file        Run specific test file."
-  echo "  -g generate    Generate metrics reference data files during tests."
+  echo "  -s [mode]      Saves metrics reference data files during tests."
+  echo "                 Default creates new files with 'new-' prefix. Use '-s update' to modify existing files."
   echo "  -i iteration   Run tests for specific iteration.name (see iterations.js)"
   echo "  -p pattern     Run tests matching the whole word."
   echo -e "  -h help        examples: \n ./runMocha.sh \n ./runMocha.sh -p \"the name of my test\" \n ./runMocha.sh -p \"getCollections|getAsset\" \n ./runMocha.sh -p getCollections \n ./runMocha.sh -i lvl1 -i lvl2 -p getCollections \n ./runMocha.sh -f collectionGet.test.js \n ./runMocha.sh -d mocha/data/collection"
@@ -16,19 +17,25 @@ usage() {
 DEFAULT_COMMAND="npx mocha --reporter mochawesome --no-timeouts --showFailed --exit"
 COMMAND=$DEFAULT_COMMAND
 COVERAGE=false
-GENERATE_METRICS=false
+SAVE_METRICS=false
+METRICS_MODE="new"  # by default -s generates new metrics reference data files
 GREP=()
 FILES=()
 DIRECTORIES=()
 ITERATION=()
 
-while getopts "bcd:f:ghi:p:" opt; do
+while getopts "bcd:f:g::hi:p:" opt; do
   case ${opt} in
     b) COMMAND+=" --bail" ;;
     c) COVERAGE=true ;;
     d) DIRECTORIES+=("${OPTARG}") ;;
     f) FILES+=("./mocha/**/${OPTARG}") ;;
-    g) GENERATE_METRICS=true ;;
+    s) 
+       SAVE_METRICS=true
+       if [ -n "$OPTARG" ]; then
+         METRICS_MODE="$OPTARG"
+       fi
+       ;;
     h) usage ;;
     i) ITERATION+=("${OPTARG}") ;;
     p) GREP+=("${OPTARG}") ;;
@@ -56,10 +63,21 @@ if [ ${#GREP[@]} -gt 0 ] || [ ${#ITERATION[@]} -gt 0 ]; then
   COMMAND+=" -g \"/$GREP_PATTERN/\""
 fi
 
-# Set environment variable for metrics generation
-if $GENERATE_METRICS; then
-  export STIGMAN_GENERATE_METRICS_DATA=true
-  echo "Generating metrics reference data files..."
+# Set environment variables for metrics generation
+if $SAVE_METRICS; then
+  export STIGMAN_SAVE_METRICS_DATA=true
+  
+  # Set the appropriate mode based on the -g argument
+  if [ "$METRICS_MODE" = "update" ]; then
+    export STIGMAN_NEW_METRICS_FILES=false
+    echo "Updating existing metrics reference data files..."
+  else
+    export STIGMAN_NEW_METRICS_FILES=true
+    echo "Generating new metrics reference data files with 'new-' prefix..."
+  fi
+else
+  export STIGMAN_SAVE_METRICS_DATA=false
+  export STIGMAN_NEW_METRICS_FILES=false
 fi
 
 validate_responses() {

@@ -8,7 +8,9 @@ import reference from '../referenceData.js';
 
 const baseUrl = config.baseUrl
 const adminToken = config.adminToken
-const shouldGenerateMetricsData = process.env.STIGMAN_GENERATE_METRICS_DATA === 'true'
+const saveMetricsData = process.env.STIGMAN_SAVE_METRICS_DATA === 'true'
+// New flag to control whether to create new files or update existing ones
+const createNewMetricsFiles = process.env.STIGMAN_NEW_METRICS_FILES === 'true'
 
 const executeRequest = async (url, method, token, body = null) => {
 
@@ -40,11 +42,30 @@ const executeRequest = async (url, method, token, body = null) => {
  * @param {string} outputMetricsResponsesFile - Path to the output file
  */
 const outputMetricsToJSON = (testCaseName, username, responseData, outputMetricsResponsesFile) => {
+  // Determine the actual file path based on the createNewMetricsFiles flag
+  let actualOutputFile = outputMetricsResponsesFile
+  if (createNewMetricsFiles) {
+    // Extract directory and filename
+    const lastSlashIndex = outputMetricsResponsesFile.lastIndexOf('/')
+    const lastBackslashIndex = outputMetricsResponsesFile.lastIndexOf('\\')
+    const separatorIndex = Math.max(lastSlashIndex, lastBackslashIndex)
+    
+    if (separatorIndex >= 0) {
+      const dir = outputMetricsResponsesFile.substring(0, separatorIndex + 1)
+      const file = outputMetricsResponsesFile.substring(separatorIndex + 1)
+      actualOutputFile = `${dir}new-${file}`
+    } else {
+      // No directory in the path, just prepend 'new-'
+      actualOutputFile = `new-${outputMetricsResponsesFile}`
+    }
+    
+    console.log(`Creating new metrics file: ${actualOutputFile}`)
+  }
  
   // Read existing file to preserve all data
   let metricsData = {}
   try {
-    const fileContent = readFileSync(outputMetricsResponsesFile, 'utf8')
+    const fileContent = readFileSync(actualOutputFile, 'utf8')
     metricsData = JSON.parse(fileContent)
   } catch (err) {
     console.log(`Creating new metrics file or parsing existing file: ${err.message}`)
@@ -58,11 +79,11 @@ const outputMetricsToJSON = (testCaseName, username, responseData, outputMetrics
   metricsData[testCaseName][username] = responseData
   
   // Write back to file as JSON
-  writeFileSync(outputMetricsResponsesFile, JSON.stringify(metricsData, null, 2), 'utf8')
+  writeFileSync(actualOutputFile, JSON.stringify(metricsData, null, 2), 'utf8')
 }
 
 /**
- * Conditionally outputs metrics data based on the STIGMAN_GENERATE_METRICS_DATA environment variable
+ * Conditionally outputs metrics data based on the STIGMAN_SAVE_METRICS_DATA environment variable
  * Works for both regular metrics and meta metrics
  * @param {string} testCaseName - The test case name
  * @param {string} username - The username
@@ -71,7 +92,7 @@ const outputMetricsToJSON = (testCaseName, username, responseData, outputMetrics
  */
 const conditionalMetricsOutput = (testCaseName, username, responseData, outputJsonFile) => {
   // Only record metrics if the environment variable is set
-  if (shouldGenerateMetricsData) {
+  if (saveMetricsData) {
     outputMetricsToJSON(testCaseName, username, responseData, outputJsonFile)
   }
 }
