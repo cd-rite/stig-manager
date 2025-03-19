@@ -37,24 +37,16 @@ const executeRequest = async (url, method, token, body = null) => {
  * @param {string} testCaseName - The test case name
  * @param {string} username - The username
  * @param {Object} responseData - The response data to save
- * @param {string} outputJsonFile - Relative path to the output file
+ * @param {string} outputMetricsResponsesFile - Path to the output file
  */
-const outputMetricsToJSON = (testCaseName, username, responseData, outputJsonFile) => {
-  const __filename = fileURLToPath(import.meta.url)
-  const __dirname = dirname(__filename)
-  
-  // Create absolute path from the root directory of the project
-  const projectRoot = join(__dirname, '../../../..')
-  
-  // Determine metrics type from output path
-  const isMeta = outputJsonFile.includes('meta')
-  const fileName = isMeta ? 'metaMetricsGet.js' : 'metricsGet.js'
-  const metricsFilePath = join(projectRoot, `test/api/mocha/data/metrics/${fileName}`)
+const outputMetricsToJSON = (testCaseName, username, responseData, outputMetricsResponsesFile) => {
+  // // Use the provided file path directly
+  // const filePath = outputMetricsResponsesFile
   
   // Read existing file to preserve all data
   let fileContent
   try {
-    fileContent = readFileSync(metricsFilePath, 'utf8')
+    fileContent = readFileSync(outputMetricsResponsesFile, 'utf8')
   } catch (err) {
     console.log(`Error reading metrics file: ${err.message}`)
     // If file doesn't exist, create a basic structure with metricsResponses
@@ -83,7 +75,7 @@ const outputMetricsToJSON = (testCaseName, username, responseData, outputJsonFil
   
   // Write back to file preserving the export syntax
   const outputContent = `export const metricsResponses = ${JSON.stringify(metricsData, null, 2)}`
-  writeFileSync(metricsFilePath, outputContent, 'utf8')
+  writeFileSync(outputMetricsResponsesFile, outputContent, 'utf8')
 }
 
 /**

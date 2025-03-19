@@ -6,6 +6,12 @@ import { metricsResponses as metrics } from './metricsGet.js'
 import deepEqualInAnyOrder from 'deep-equal-in-any-order'
 import {use, expect} from 'chai'
 use(deepEqualInAnyOrder)
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const metricsComparisonFile = `${__dirname}/metricsGet.js`
+console.log(`metricsComparisonFile: ${metricsComparisonFile}`)
+console.log(`dirname: ${__dirname}`)
 
 describe('GET - Metrics', function () { 
   before(async function () {
@@ -26,7 +32,7 @@ describe('GET - Metrics', function () {
             expect(res.status).to.eql(200)
             
             // Generates metrics reference file if config.generateMetricsReferenceData=true
-            utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+            utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
             
             const expectedData = metrics[this.test.title]
           
@@ -49,7 +55,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -71,7 +77,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 expect(res.body).to.be.empty
 
@@ -86,7 +92,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -113,7 +119,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -135,7 +141,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -157,7 +163,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -179,7 +185,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -201,7 +207,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -223,7 +229,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -251,7 +257,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -275,7 +281,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -298,7 +304,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -320,7 +326,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -342,7 +348,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -368,7 +374,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -391,7 +397,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -414,7 +420,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -437,7 +443,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -460,7 +466,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -486,7 +492,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -510,7 +516,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -533,7 +539,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -556,7 +562,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -578,7 +584,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -608,7 +614,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -629,7 +635,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -650,7 +656,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -671,7 +677,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -692,7 +698,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -719,7 +725,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -741,7 +747,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -763,7 +769,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -786,7 +792,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -808,7 +814,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -834,7 +840,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -857,7 +863,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -880,7 +886,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -902,7 +908,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -925,7 +931,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -953,7 +959,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -976,7 +982,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -999,7 +1005,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -1024,7 +1030,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -1048,7 +1054,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -1075,7 +1081,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -1098,7 +1104,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -1121,7 +1127,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -1143,7 +1149,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
@@ -1166,7 +1172,7 @@ describe('GET - Metrics', function () {
                 expect(res.status).to.eql(200)
                 
                 // Generates metrics reference file if config.generateMetricsReferenceData=true
-                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, '../../data/metrics/metricsGet.js')
+                utils.conditionalMetricsOutput(this.test.title, iteration.name, res.body, metricsComparisonFile)
                 
                 const expectedData = metrics[this.test.title]
 
