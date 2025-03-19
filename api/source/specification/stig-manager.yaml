@@ -7180,6 +7180,20 @@ components:
                 - submitted
                 - accepted
                 - rejected
+            unreviewed:
+              additionalProperties: false
+              type: object
+              properties:
+                high:
+                  type: integer
+                low:
+                  type: integer
+                medium:
+                  type: integer
+              required:
+                - low
+                - medium
+                - high                
           required:
             - assessments
             - assessed
