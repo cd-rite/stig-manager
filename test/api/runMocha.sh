@@ -6,10 +6,11 @@ usage() {
   echo "  -c coverage    Run all tests with a response validation log and generate coverage report. (cannot be used with other options)"
   echo "  -d directory   Run tests in specific directory."
   echo "  -f file        Run specific test file."
-  echo "  -s [mode]      Saves metrics reference data files during tests."
-  echo "                 Default creates new files with 'new-' prefix. Use '-s update' to modify existing files."
   echo "  -i iteration   Run tests for specific iteration.name (see iterations.js)"
   echo "  -p pattern     Run tests matching the whole word."
+  echo "  -s mode        Saves metrics reference data files during tests."
+  echo "                 Use '-s new' to create new files with 'new-' prefix."
+  echo "                 Use '-s update' to modify existing files."
   echo -e "  -h help        examples: \n ./runMocha.sh \n ./runMocha.sh -p \"the name of my test\" \n ./runMocha.sh -p \"getCollections|getAsset\" \n ./runMocha.sh -p getCollections \n ./runMocha.sh -i lvl1 -i lvl2 -p getCollections \n ./runMocha.sh -f collectionGet.test.js \n ./runMocha.sh -d mocha/data/collection"
   exit 
 }
@@ -35,9 +36,13 @@ while getopts "bcd:f:s:hi:p:" opt; do
     p) GREP+=("${OPTARG}") ;;
     s) 
        SAVE_METRICS=true
-       if [ -n "$OPTARG" ]; then
-         METRICS_MODE="$OPTARG"
+       # Check if the argument starts with a dash, which means it's likely another option
+       if [[ "$OPTARG" == -* ]]; then
+         echo "Error: Option -s requires an argument (new or update)."
+         echo "Did you mean '-s new -f metaMetricsGet.test.js'?"
+         usage
        fi
+       METRICS_MODE="$OPTARG"
        ;;    
     *) usage ;;
   esac
