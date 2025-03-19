@@ -58,8 +58,6 @@ const outputMetricsToJSON = (testCaseName, username, responseData, outputMetrics
       // No directory in the path, just prepend 'new-'
       actualOutputFile = `new-${outputMetricsResponsesFile}`
     }
-    
-    console.log(`Creating new metrics file: ${actualOutputFile}`)
   }
  
   // Read existing file to preserve all data
@@ -68,7 +66,7 @@ const outputMetricsToJSON = (testCaseName, username, responseData, outputMetrics
     const fileContent = readFileSync(actualOutputFile, 'utf8')
     metricsData = JSON.parse(fileContent)
   } catch (err) {
-    console.log(`Creating new metrics file or parsing existing file: ${err.message}`)
+    console.log(`Error creating new metrics file or parsing existing file: ${err.message}`)
     // Continue with empty object if file doesn't exist or parsing fails
   }
   

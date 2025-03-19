@@ -24,21 +24,21 @@ FILES=()
 DIRECTORIES=()
 ITERATION=()
 
-while getopts "bcd:f:s::hi:p:" opt; do
+while getopts "bcd:f:s:hi:p:" opt; do
   case ${opt} in
     b) COMMAND+=" --bail" ;;
     c) COVERAGE=true ;;
     d) DIRECTORIES+=("${OPTARG}") ;;
     f) FILES+=("./mocha/**/${OPTARG}") ;;
+    h) usage ;;
+    i) ITERATION+=("${OPTARG}") ;;
+    p) GREP+=("${OPTARG}") ;;
     s) 
        SAVE_METRICS=true
        if [ -n "$OPTARG" ]; then
          METRICS_MODE="$OPTARG"
        fi
-       ;;
-    h) usage ;;
-    i) ITERATION+=("${OPTARG}") ;;
-    p) GREP+=("${OPTARG}") ;;
+       ;;    
     *) usage ;;
   esac
 done
