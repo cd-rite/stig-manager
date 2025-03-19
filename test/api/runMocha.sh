@@ -24,7 +24,7 @@ FILES=()
 DIRECTORIES=()
 ITERATION=()
 
-while getopts "bcd:f:g::hi:p:" opt; do
+while getopts "bcd:f:s::hi:p:" opt; do
   case ${opt} in
     b) COMMAND+=" --bail" ;;
     c) COVERAGE=true ;;
@@ -67,7 +67,7 @@ fi
 if $SAVE_METRICS; then
   export STIGMAN_SAVE_METRICS_DATA=true
   
-  # Set the appropriate mode based on the -g argument
+  # Set the appropriate mode based on the -s argument
   if [ "$METRICS_MODE" = "update" ]; then
     export STIGMAN_NEW_METRICS_FILES=false
     echo "Updating existing metrics reference data files..."
