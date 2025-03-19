@@ -2,14 +2,14 @@ import {config } from '../../testConfig.js'
 import * as utils from '../../utils/testUtils.js'
 import reference from '../../referenceData.js'
 import {iterations} from '../../iterations.js'
-import { metricsResponses as metaMetrics } from './metaMetricsGet.js'
+import metaMetrics from './metaMetricsGet.json' assert { type: 'json' }
 import deepEqualInAnyOrder from 'deep-equal-in-any-order'
 import {use, expect} from 'chai'
 use(deepEqualInAnyOrder)
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const metaMetricsComparisonFile = `${__dirname}/newmetaMetricsGet.js`
+const metaMetricsComparisonFile = `${__dirname}/newmetaMetricsGet.json`
 console.log(`metaMetricsComparisonFile: ${metaMetricsComparisonFile}`)
 console.log(`dirname: ${__dirname}`)
 

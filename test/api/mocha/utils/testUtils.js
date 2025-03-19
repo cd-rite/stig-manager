@@ -42,27 +42,13 @@ const executeRequest = async (url, method, token, body = null) => {
 const outputMetricsToJSON = (testCaseName, username, responseData, outputMetricsResponsesFile) => {
  
   // Read existing file to preserve all data
-  let fileContent
-  try {
-    fileContent = readFileSync(outputMetricsResponsesFile, 'utf8')
-  } catch (err) {
-    console.log(`Error reading metrics file: ${err.message}`)
-    // If file doesn't exist, create a basic structure with metricsResponses
-    fileContent = `export const metricsResponses = {}`
-  }
-  
-  // Extract the metricsResponses object from the file
-  const metricsMatch = fileContent.match(/metricsResponses\s*=\s*(\{[\s\S]*\})/)
   let metricsData = {}
-  
-  if (metricsMatch && metricsMatch[1]) {
-    try {
-      // Parse the existing metrics object
-      metricsData = Function('return ' + metricsMatch[1])()
-    } catch (err) {
-      console.log(`Error parsing metrics data: ${err.message}`)
-      // Continue with empty object if parsing fails
-    }
+  try {
+    const fileContent = readFileSync(outputMetricsResponsesFile, 'utf8')
+    metricsData = JSON.parse(fileContent)
+  } catch (err) {
+    console.log(`Creating new metrics file or parsing existing file: ${err.message}`)
+    // Continue with empty object if file doesn't exist or parsing fails
   }
   
   // Update metrics data with new test case data
@@ -71,9 +57,8 @@ const outputMetricsToJSON = (testCaseName, username, responseData, outputMetrics
   }
   metricsData[testCaseName][username] = responseData
   
-  // Write back to file preserving the export syntax
-  const outputContent = `export const metricsResponses = ${JSON.stringify(metricsData, null, 2)}`
-  writeFileSync(outputMetricsResponsesFile, outputContent, 'utf8')
+  // Write back to file as JSON
+  writeFileSync(outputMetricsResponsesFile, JSON.stringify(metricsData, null, 2), 'utf8')
 }
 
 /**
