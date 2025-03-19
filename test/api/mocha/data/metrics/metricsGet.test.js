@@ -2,16 +2,16 @@ import {config } from '../../testConfig.js'
 import * as utils from '../../utils/testUtils.js'
 import reference from '../../referenceData.js'
 import {iterations} from '../../iterations.js'
-import metrics from './metricsGet.json' assert { type: 'json' }
 import deepEqualInAnyOrder from 'deep-equal-in-any-order'
 import {use, expect} from 'chai'
 use(deepEqualInAnyOrder)
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const metricsUpdateFile = `${__dirname}/metricsGet.json`
-console.log(`metricsUpdateFile: ${metricsUpdateFile}`)
-console.log(`dirname: ${__dirname}`)
+
+// import metrics reference file, and set update file path
+import metrics from './metricsGet.json' assert { type: 'json' }
+const metricsUpdateFile = `${dirname(fileURLToPath(import.meta.url))}/metricsGet.json`
+
 
 describe('GET - Metrics', function () { 
   before(async function () {

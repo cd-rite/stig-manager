@@ -2,16 +2,15 @@ import {config } from '../../testConfig.js'
 import * as utils from '../../utils/testUtils.js'
 import reference from '../../referenceData.js'
 import {iterations} from '../../iterations.js'
-import metaMetrics from './metaMetricsGet.json' assert { type: 'json' }
 import deepEqualInAnyOrder from 'deep-equal-in-any-order'
 import {use, expect} from 'chai'
 use(deepEqualInAnyOrder)
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const metaMetricsUpdateFile = `${__dirname}/metaMetricsGet.json`
-console.log(`metaMetricsUpdateFile: ${metaMetricsUpdateFile}`)
-console.log(`dirname: ${__dirname}`)
+
+// import metaMetrics reference file, and set update file path
+import metaMetrics from './metaMetricsGet.json' assert { type: 'json' }
+const metaMetricsUpdateFile = `${dirname(fileURLToPath(import.meta.url))}/metaMetricsGet.json`
 
  
 describe('GET - MetaMetrics', function () { 
