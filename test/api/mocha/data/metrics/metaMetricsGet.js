@@ -252,7 +252,7 @@ export const metricsResponses = {
         }
       }
     },
-    "lvl3lvl4": {
+    "lvl3": {
       "collections": 1,
       "assets": 2,
       "stigs": 2,
@@ -758,7 +758,7 @@ export const metricsResponses = {
         }
       }
     },
-    "lvl3lvl4": {
+    "lvl3": {
       "collections": 1,
       "assets": 2,
       "stigs": 2,
@@ -1264,7 +1264,7 @@ export const metricsResponses = {
         }
       }
     },
-    "lvl3lvl4": {
+    "lvl3": {
       "collections": 1,
       "assets": 2,
       "stigs": 1,
@@ -1864,7 +1864,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "collectionId": "21",
         "name": "Collection X",
@@ -2302,7 +2302,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "collectionId": "21",
         "name": "Collection X",
@@ -2825,7 +2825,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "collectionId": "21",
         "name": "Collection X",
@@ -3263,7 +3263,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "collectionId": "21",
         "name": "Collection X",
@@ -3962,7 +3962,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "benchmarkId": "VPN_SRG_TEST",
         "title": "Virtual Private Network (VPN) Security Requirements Guide",
@@ -4749,7 +4749,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "benchmarkId": "VPN_SRG_TEST",
         "title": "Virtual Private Network (VPN) Security Requirements Guide",
@@ -5450,7 +5450,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "benchmarkId": "VPN_SRG_TEST",
         "title": "Virtual Private Network (VPN) Security Requirements Guide",
@@ -5734,7 +5734,7 @@ export const metricsResponses = {
         "assessments": 736
       }
     },
-    "lvl3lvl4": {
+    "lvl3": {
       "collections": 1,
       "assets": 2,
       "stigs": 2,
@@ -5946,7 +5946,7 @@ export const metricsResponses = {
         "assessments": 736
       }
     },
-    "lvl3lvl4": {
+    "lvl3": {
       "collections": 1,
       "assets": 2,
       "stigs": 2,
@@ -6158,7 +6158,7 @@ export const metricsResponses = {
         "assessments": 162
       }
     },
-    "lvl3lvl4": {
+    "lvl3": {
       "collections": 1,
       "assets": 2,
       "stigs": 1,
@@ -6415,7 +6415,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "collectionId": "21",
         "name": "Collection X",
@@ -6608,7 +6608,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "collectionId": "21",
         "name": "Collection X",
@@ -6837,7 +6837,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "collectionId": "21",
         "name": "Collection X",
@@ -6956,7 +6956,7 @@ export const metricsResponses = {
     ],
     "lvl1": [],
     "lvl2": [],
-    "lvl3lvl4": [],
+    "lvl3": [],
     "lvl4": [],
     "collectioncreator": []
   },
@@ -7075,7 +7075,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "collectionId": "21",
         "name": "Collection X",
@@ -7382,7 +7382,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "benchmarkId": "VPN_SRG_TEST",
         "title": "Virtual Private Network (VPN) Security Requirements Guide",
@@ -7728,7 +7728,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "benchmarkId": "VPN_SRG_TEST",
         "title": "Virtual Private Network (VPN) Security Requirements Guide",
@@ -8037,7 +8037,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "benchmarkId": "VPN_SRG_TEST",
         "title": "Virtual Private Network (VPN) Security Requirements Guide",
@@ -8235,7 +8235,7 @@ export const metricsResponses = {
         }
       }
     ],
-    "lvl3lvl4": [
+    "lvl3": [
       {
         "benchmarkId": "VPN_SRG_TEST",
         "title": "Virtual Private Network (VPN) Security Requirements Guide",

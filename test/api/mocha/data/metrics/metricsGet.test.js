@@ -9,7 +9,7 @@ use(deepEqualInAnyOrder)
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const metricsComparisonFile = `${__dirname}/metricsGet.js`
+const metricsComparisonFile = `${__dirname}/newmetricsGet.js`
 console.log(`metricsComparisonFile: ${metricsComparisonFile}`)
 console.log(`dirname: ${__dirname}`)
 

@@ -40,9 +40,7 @@ const executeRequest = async (url, method, token, body = null) => {
  * @param {string} outputMetricsResponsesFile - Path to the output file
  */
 const outputMetricsToJSON = (testCaseName, username, responseData, outputMetricsResponsesFile) => {
-  // // Use the provided file path directly
-  // const filePath = outputMetricsResponsesFile
-  
+ 
   // Read existing file to preserve all data
   let fileContent
   try {
@@ -92,15 +90,6 @@ const conditionalMetricsOutput = (testCaseName, username, responseData, outputJs
     outputMetricsToJSON(testCaseName, username, responseData, outputJsonFile)
   }
 }
-
-// // For backward compatibility - these functions now just call the unified conditionalMetricsOutput
-// const metricsOutputToJSON = (testCaseName, username, responseData, outputJsonFile) => {
-//   outputMetricsToJSON(testCaseName, username, responseData, outputJsonFile)
-// }
-
-// const metaMetricsOutputToJSON = (testCaseName, username, responseData, outputJsonFile) => {
-//   outputMetricsToJSON(testCaseName, username, responseData, outputJsonFile)
-// }
 
 
 

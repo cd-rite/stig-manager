@@ -9,7 +9,7 @@ use(deepEqualInAnyOrder)
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const metaMetricsComparisonFile = `${__dirname}/metaMetricsGet.js`
+const metaMetricsComparisonFile = `${__dirname}/newmetaMetricsGet.js`
 console.log(`metaMetricsComparisonFile: ${metaMetricsComparisonFile}`)
 console.log(`dirname: ${__dirname}`)
 
@@ -49,14 +49,14 @@ describe('GET - MetaMetrics', function () {
                 {
                    const data = expectedData["stigmanadmin"]
                    expect(res.body).to.deep.equalInAnyOrder(expectedData["stigmanadmin"])
-                    //expect(res.body).to.deep.equalInAnyOrder(expectedData["lvl3lvl4"])
+                    //expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
                 else if(iteration.name === "collectioncreator"){
                     expect(res.body).to.deep.equalInAnyOrder(expectedData["collectioncreator"])
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData["lvl3lvl4"])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                     // const data = expectedData["stigmanadmin"]
                     // expect(res.body).to.deep.equalInAnyOrder(expectedData["stigmanadmin"])
                 }
@@ -83,7 +83,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
         
             })
@@ -108,7 +108,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
         })
@@ -136,7 +136,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('meta metrics detail - collection agg - coll param', async function () { 
@@ -160,7 +160,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('meta metrics detail - collection agg - bench param', async function () { 
@@ -184,7 +184,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('meta metrics detail - collection agg - rev param', async function () { 
@@ -208,7 +208,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
         })
@@ -236,7 +236,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('meta metrics detail - stig agg - coll param', async function () {
@@ -260,7 +260,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('meta metrics detail - stig agg - bench param', async function () {
@@ -284,7 +284,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
         })
@@ -312,7 +312,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('meta metrics summary - no agg - collectionId param', async function () {
@@ -336,7 +336,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('meta metrics summary - no agg - benchmark param', async function () {
@@ -360,7 +360,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
         })
@@ -388,7 +388,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('Return meta metrics summary - collection agg - collection param', async function () {
@@ -412,7 +412,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('Return meta metrics summary - collection agg - benchmark param', async function () {
@@ -436,7 +436,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('Return meta metrics summary - collection agg - rev param', async function () {
@@ -460,7 +460,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('Return meta metrics summary - collection agg - rev param Copy', async function () {
@@ -484,7 +484,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
         })
@@ -512,7 +512,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body). to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body). to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('Return meta metrics summary - stig agg - collection param', async function () {  
@@ -536,7 +536,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('Return meta metrics summary - stig agg - benchmark param', async function () {  
@@ -560,7 +560,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
             it('Return meta metrics summary - stig agg - benchmark param and collection param', async function () {  
@@ -584,7 +584,7 @@ describe('GET - MetaMetrics', function () {
                 }
                 else 
                 {
-                    expect(res.body).to.deep.equalInAnyOrder(expectedData['lvl3lvl4'])
+                    expect(res.body).to.deep.equalInAnyOrder(expectedData[iteration.name])
                 }
             })
         })
