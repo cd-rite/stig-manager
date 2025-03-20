@@ -7016,7 +7016,7 @@ components:
                 - low
                 - medium
                 - high
-            unreviewed:
+            unassessed:
               additionalProperties: false
               type: object
               properties:
@@ -7089,7 +7089,7 @@ components:
             - results
             - statuses
             - findings
-            - unreviewed
+            - unassessed
       required:
         - metrics
     MetricsDetailAggAsset:
@@ -7180,7 +7180,7 @@ components:
                 - submitted
                 - accepted
                 - rejected
-            unreviewed:
+            unassessed:
               additionalProperties: false
               type: object
               properties:
@@ -7203,7 +7203,7 @@ components:
             - results
             - statuses
             - findings
-            - unreviewed
+            - unassessed
       required:
         - metrics
     MetricsSummaryAggAsset:
