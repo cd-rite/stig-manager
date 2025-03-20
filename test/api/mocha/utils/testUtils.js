@@ -179,9 +179,9 @@ const loadAndExportAllAppData = async (appdataDir = 'appdata') => {
       const exportedData = await exportAppData({ format: 'jsonl' })
       
       // Create output filename
-      const outputPath = join(dirPath, `new-${file}`)
+      const outputPath = join(dirPath, file)
       
-      // Save to new file
+      // Save to new existing file
       writeFileSync(outputPath, exportedData, 'utf8')
       
       console.log(`Saved to ${outputPath}`)
