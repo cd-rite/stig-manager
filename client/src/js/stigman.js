@@ -77,6 +77,8 @@ async function loadApp () {
 		const oidcWorkerChannel = new BroadcastChannel('stigman-oidc-worker')
 		oidcWorkerChannel.onmessage = broadcastHandler
 
+		const stateWorker = await SM.ApiState.setupStateWorker()
+
 		STIGMAN.webPreferencesChannel = new BroadcastChannel('stigman-web-preferences')
 		STIGMAN.webPreferencesChannel.onmessage = function (event) {
 			if (event.data.darkMode !== undefined) {

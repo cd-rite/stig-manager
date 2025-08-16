@@ -82,6 +82,25 @@ class MockOidc {
       jwks_uri: `http://${origin}/jwks`,
       end_session_endpoint: `http://${origin}/logout`,
       code_challenge_methods_supported: ['S256'],
+      response_types_supported: ['code', 'token'],
+      grant_types_supported: [
+        "authorization_code",
+        "refresh_token",
+        "password",
+        "client_credentials"
+      ],
+      scopes_supported: [
+        'openid', 
+        'stig-manager', 
+        'stig-manager:collection',
+        'stig-manager:collection:read',
+        'stig-manager:stig',
+        'stig-manager:stig:read',
+        'stig-manager:op',
+        'stig-manager:op:read',
+        'stig-manager:user',
+        'stig-manager:user:read'
+      ]
     }
   }
 
@@ -683,7 +702,7 @@ class MockOidc {
       `)
       return
     } else if (request.method === 'OPTIONS') {
-      response.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers':  'X-Requested-With'})
+      response.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers':  'authorization, X-Requested-With'})
       response.end()
       return
     } else {

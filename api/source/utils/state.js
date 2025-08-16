@@ -1,15 +1,25 @@
 const EventEmitter = require('events')
 const logger = require('./logger')
+const { start } = require('repl')
 
 /**
  * Represents the state of the API.
- * @typedef {'starting' | 'fail' | 'available' | 'unavailable' | 'stop'} StateType
+ * @typedef {'starting' | 'fail' | 'available' | 'unavailable' | 'stop'} StateString
  */
 
 /**
  * Represents the mode of the API.
- * @typedef {'normal' | 'maintenance'} ModeType
+ * @typedef {'normal' | 'maintenance'} ModeString
  */
+
+/**
+ * @typedef {Object} Mode
+ * @property {ModeString} currentMode - The current mode of the API.
+ * @property {Date} startedAt - The time when the API entered the current mode.
+ * @property {string} startedBy - The user ID of the user who initiated the mode change.
+ * @property {boolean} isLocked - Whether the mode is locked.
+ * @property {string} message - An optional message associated with the mode change.
+*/
 
 /**
  * @typedef {Object} DependencyStatus
@@ -18,35 +28,47 @@ const logger = require('./logger')
  */
 
 /**
- * Class representing the state of the API.
+ * Class representing the state and mode of the API.
  * @extends EventEmitter
  */
 class State extends EventEmitter {
-  /** @type {StateType} */
+  /** @type {StateString} */
   #currentState
   
-  /** @type {StateType} */
+  /** @type {StateString} */
   #previousState
   
+  /** @type {Date} */
+  #stateDate
+
   /** @type {DependencyStatus} */
   #dependencyStatus
 
   /** @type {Object} */
   #dbPool
 
-  /** @type {ModeType} */
+  /** @type {Mode} */
   #mode
 
-  /** @type {Date} */
-  #stateDate
+  /** @type {Object} */
+  #endpoints
 
   /**
    * Creates an instance of State.
    * @param {Object} options - Options for initializing the state.
-   * @param {StateType} [options.initialState='starting'] - The initial state of the API.
-   * @param {ModeType} [options.initialMode='normal'] - The initial mode of the API.
+   * @param {StateString} [options.initialState='starting'] - The initial state of the API.
+   * @param {Mode} [options.initialMode='normal'] - The initial mode of the API.
    */
-  constructor({ initialState = 'starting', initialMode = 'normal' } = {}) {
+  constructor({ 
+    initialState = 'starting', 
+    initialMode = {currentMode: 'normal', startedAt: new Date(), startedBy: '', message: '', isLocked: false}, 
+    endpoints = { 
+      ui: { 
+        normal: '/', 
+        maintenance: '/maintenance' 
+      } 
+    } 
+  } = {}) {
     super()
     this.#currentState = initialState
     this.#stateDate = new Date()
@@ -55,6 +77,7 @@ class State extends EventEmitter {
       db: false,
       oidc: false
     }
+    this.#endpoints = endpoints
   }
 
   /**
@@ -88,7 +111,7 @@ class State extends EventEmitter {
 
   /**
    * Sets the state to the provided state and emits statechanged event.
-   * @param {StateType} state - The new state.
+   * @param {StateString} state - The new state.
    */
   setState(state) {
     if (this.#currentState === state) return
@@ -100,12 +123,13 @@ class State extends EventEmitter {
 
   /**
    * Sets the mode to the provided mode and emits modechanged event.
-   * @param {ModeType} mode - The new mode.
+   * @param {Mode} mode - The new mode.
+   * @param {boolean} force - Whether to force the mode change.
    * @private
    */
-  #setMode(mode) {
-    if (this.#mode === mode) return
-    this.#mode = mode
+  setMode({ currentMode = 'normal', startedBy = '', message = '', isLocked = false } = {}, force = false) {
+    if (this.#mode.currentMode === currentMode || (this.#mode.isLocked && !force)) return
+    this.#mode = {currentMode, startedAt: new Date(), startedBy, message, isLocked}
     this.#emitModeChangedEvent()
   }
 
@@ -129,9 +153,21 @@ class State extends EventEmitter {
     this.#setStateFromDependencyStatus()
   }
 
+  lockMode() {
+    const wasLocked = this.#mode.isLocked
+    this.#mode.isLocked = true
+    if (!wasLocked) this.#emitModeChangedEvent()
+  }
+
+  unlockMode() {
+    const wasLocked = this.#mode.isLocked
+    this.#mode.isLocked = false
+    if (wasLocked) this.#emitModeChangedEvent()
+  }
+
   /**
    * Gets the current state.
-   * @type {StateType}
+   * @type {StateString}
    * @readonly
    */
   get currentState() {
@@ -149,19 +185,23 @@ class State extends EventEmitter {
 
   /**
    * Gets the current mode.
-   * @type {ModeType}
+   * @type {Mode}
    * @readonly
    */
   get currentMode() {
+    return this.#mode.currentMode
+  }
+
+  get mode() {
     return this.#mode
   }
 
   /**
-   * Sets the current mode.
-   * @param {ModeType} mode - The new mode.
+   * Sets the mode.
+   * @param {Mode} mode - The new mode.
    */
-  set currentMode(mode) {
-    this.#setMode(mode)
+  set mode(mode) {
+    this.setMode(mode)
   }
 
   /**
@@ -188,10 +228,13 @@ class State extends EventEmitter {
    */
   get apiState() {
     return {
-      state: this.#currentState,
-      stateDate: this.#stateDate,
+      currentState: this.#currentState,
+      startedAt: this.#stateDate,
       mode: this.#mode,
-      dependencies: this.#dependencyStatus
+      dependencies: this.#dependencyStatus,
+      endpoints: {
+        ui: this.#endpoints.ui[this.#mode.currentMode]
+      },
     }
   }
 }

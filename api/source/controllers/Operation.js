@@ -120,3 +120,64 @@ module.exports.getState = function (req, res, next) {
 }
 
 module.exports.getDetails = module.exports.getAppInfo
+
+module.exports.setMode = async function setMode(req, res, next) {
+  try {
+    const { mode, message } = req.body
+    const force = req.query.force === 'true' || req.query.force === true
+    if (state.mode.currentMode === mode) {
+      throw new SmError.UnprocessableError(`API mode is already ${state.mode.currentMode}`)
+    }
+    if (state.mode.isLocked && !force) {
+      throw new SmError.ModeLockedError('Use force=true to override locked mode.')
+    }
+    state.setMode({currentMode: mode, startedBy: req.userObject?.userId?.toString(), message: message ?? ''}, force)
+    if (mode === 'maintenance') {
+      state.mode.isLocked = true
+    } 
+    res.json(state.apiState)
+  }
+  catch (err) {
+    next(err)
+  }
+}
+
+module.exports.streamStateSse = function (req, res, next) {
+  try {
+    req.noCompression = true
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    // Helper to send SSE events
+    function sendEvent(eventName, data) {
+      if (eventName) res.write(`event: ${eventName}\n`);
+      res.write(`data: ${typeof data === 'string' ? data : JSON.stringify(data)}\n\n`);
+    }
+
+    // Send initial state
+    sendEvent('state-report', state.apiState);
+
+    // Event listeners
+    const stateChangedListener = () => sendEvent('state-changed', state.apiState);
+    const modeChangedListener = () => sendEvent('mode-changed', state.apiState);
+
+    state.on('statechanged', stateChangedListener);
+    state.on('modechanged', modeChangedListener);
+
+    // Keep-alive ping every 30 seconds
+    const keepAlive = setInterval(() => {
+      sendEvent('state-report', state.apiState);
+    }, 30000);
+
+    // Cleanup on client disconnect
+    req.on('close', () => {
+      clearInterval(keepAlive);
+      state.off('statechanged', stateChangedListener);
+      state.off('modechanged', modeChangedListener);
+      res.end();
+    });
+  } catch (err) {
+    next(err);
+  }
+}
