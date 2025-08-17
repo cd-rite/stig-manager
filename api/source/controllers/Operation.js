@@ -123,6 +123,7 @@ module.exports.getDetails = module.exports.getAppInfo
 
 module.exports.setMode = async function setMode(req, res, next) {
   try {
+    if (!req.query.elevate) throw new SmError.PrivilegeError()
     const { mode, message } = req.body
     const force = req.query.force === 'true' || req.query.force === true
     if (state.mode.currentMode === mode) {
@@ -131,10 +132,10 @@ module.exports.setMode = async function setMode(req, res, next) {
     if (state.mode.isLocked && !force) {
       throw new SmError.ModeLockedError('Use force=true to override locked mode.')
     }
-    state.setMode({currentMode: mode, startedBy: req.userObject?.userId?.toString(), message: message ?? ''}, force)
-    if (mode === 'maintenance') {
-      state.mode.isLocked = true
-    } 
+    state.setMode({currentMode: mode, startedBy: req.userObject?.username, message: message ?? ''}, force)
+    // if (mode === 'maintenance') {
+    //   state.mode.isLocked = true
+    // } 
     res.json(state.apiState)
   }
   catch (err) {

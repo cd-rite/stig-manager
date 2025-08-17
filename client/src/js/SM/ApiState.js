@@ -28,28 +28,50 @@ SM.ApiState.setupStateWorker = async function () {
   }
 }
 
+SM.ApiState.alertTpl = new Ext.XTemplate(
+  '<div style="padding: 10px">',
+
+  '<tpl if="currentState !== \'available\'">',
+  '<p><b>The API is currently unavailable</b></p>',
+  '<p>Database: {values.dependencies.db}</p>',
+  '<p>Authentication: {values.dependencies.oidc}</p>',
+  '</tpl>',
+
+  '<tpl if="mode.currentMode === \'maintenance\'">',
+  '<p><b>The API is currently undergoing maintenance</b></p>',
+  '<p>Started by: {values.mode.startedBy}</p>',
+  '<p>Message: {values.mode.message}</p>',
+  '</tpl>',
+
+  '</div>',
+);
+
 SM.ApiState.alertWindow = new Ext.Window({
   title: `<div class="sm-alert-icon" style="padding-left:20px">API Status</div>`,
   width: 400,
   height: 110,
   modal: true,
-  html: '',
+  tpl: SM.ApiState.alertTpl,
   closable: false,
+  safeUpdate: function (data) {
+    if (this.rendered) {
+      this.update(data)
+    }
+    else {
+      this.data = data
+    }
+  }
 })
 
 SM.ApiState.handleBroadcastMessage = function (event) {
   console.log('[State Broadcast] Received message:', event.data)
-  this.state = JSON.parse(event.data.data)
+  this.state = SM.safeJSONParse(event.data.data)
   const type = event.data.type
   if (type === 'mode-changed') {
     if (this.state?.mode?.currentMode === 'maintenance') {
-      const html = `<div style="padding: 10px">The API is currently undergoing maintenance</div>`
-      if (this.alertWindow.rendered) {
-        this.alertWindow.update(html)
-      }
-      else {
-        this.alertWindow.html = html
-      }
+      // const html = `<div style="padding: 10px">The API is currently undergoing maintenance. Initiated by ${this.state?.mode?.initiatedBy}</div>`
+      // this.alertWindow.safeUpdate(html)
+      this.alertWindow.safeUpdate(this.state)
       this.alertWindow.show()
     }
     else {
@@ -57,19 +79,26 @@ SM.ApiState.handleBroadcastMessage = function (event) {
     }
   }
   else if (type === 'state-changed') {
-    if (this.state.currentState !== 'available') {
-      const html = `<div style="padding: 10px">The API state is currently ${this.state.currentState}<br><br>${JSON.stringify(this.state.dependencies)}</div>`
-      if (this.alertWindow.rendered) {
-        this.alertWindow.update(html)
-      }
-      else {
-        this.alertWindow.html = html
-      }
+    if (this.state?.currentState !== 'available') {
+      // const html = `<div style="padding: 10px">The API state is currently ${this.state?.currentState}<br><br>${JSON.stringify(this.state?.dependencies)}</div>`
+      // this.alertWindow.safeUpdate(html)
+      this.alertWindow.safeUpdate(this.state)
       this.alertWindow.show()
     }
     else {
       this.alertWindow?.hide()
     }
   }
+  else if (type === 'state-error') {
+    const html = `<div style="padding: 10px">An error occurred while fetching the API state.</div>`
+    this.alertWindow.safeUpdate(html)
+    this.alertWindow.show()
+  }
+  else if (type === 'state-report' && this.state?.mode.currentMode === 'normal' && this.state?.currentState === 'available' ) {
+    this.alertWindow.hide()
+  }
+}
+
+SM.ApiState.showMaintenanceTab = function ({ treePath }) {
 }
 

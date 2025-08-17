@@ -23,6 +23,7 @@ function initialize(options) {
 
     evtSource.onerror = (event) => {
       console.log(`${logPrefix} SSE error:`, event)
+      stateWorkerChannel.postMessage({ type: 'state-error', data: event.data })
     }
 
     for (const event of ['mode-changed', 'state-changed', 'state-report']) {

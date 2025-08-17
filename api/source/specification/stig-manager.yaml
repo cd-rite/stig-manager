@@ -3392,6 +3392,7 @@ paths:
       summary: Set the API operating mode (normal | maintenance)
       operationId: setMode
       parameters:
+        - $ref: '#/components/parameters/ElevateQuery'
         - name: force
           in: query
           description: Whether to force the mode change
@@ -8507,7 +8508,7 @@ components:
           enum:
             - normal
             - maintenance
-        startedAt:
+        since:
           $ref: '#/components/schemas/StringDateTime'
         startedBy:
           $ref: '#/components/schemas/UserId'
@@ -8532,7 +8533,7 @@ components:
       properties:
         currentState:
           $ref: '#/components/schemas/State'
-        startedAt:
+        since:
           $ref: '#/components/schemas/StringDateTime'
         mode:
           $ref: '#/components/schemas/StateMode'

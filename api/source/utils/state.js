@@ -15,7 +15,7 @@ const { start } = require('repl')
 /**
  * @typedef {Object} Mode
  * @property {ModeString} currentMode - The current mode of the API.
- * @property {Date} startedAt - The time when the API entered the current mode.
+ * @property {Date} since - The time when the API entered the current mode.
  * @property {string} startedBy - The user ID of the user who initiated the mode change.
  * @property {boolean} isLocked - Whether the mode is locked.
  * @property {string} message - An optional message associated with the mode change.
@@ -61,7 +61,7 @@ class State extends EventEmitter {
    */
   constructor({ 
     initialState = 'starting', 
-    initialMode = {currentMode: 'normal', startedAt: new Date(), startedBy: '', message: '', isLocked: false}, 
+    initialMode = {currentMode: 'normal', since: new Date(), startedBy: '', message: '', isLocked: false}, 
     endpoints = { 
       ui: { 
         normal: '/', 
@@ -129,7 +129,7 @@ class State extends EventEmitter {
    */
   setMode({ currentMode = 'normal', startedBy = '', message = '', isLocked = false } = {}, force = false) {
     if (this.#mode.currentMode === currentMode || (this.#mode.isLocked && !force)) return
-    this.#mode = {currentMode, startedAt: new Date(), startedBy, message, isLocked}
+    this.#mode = {currentMode, since: new Date(), startedBy, message, isLocked}
     this.#emitModeChangedEvent()
   }
 
@@ -229,7 +229,7 @@ class State extends EventEmitter {
   get apiState() {
     return {
       currentState: this.#currentState,
-      startedAt: this.#stateDate,
+      since: this.#stateDate,
       mode: this.#mode,
       dependencies: this.#dependencyStatus,
       endpoints: {

@@ -276,6 +276,12 @@ SM.NavTree.TreePanel = Ext.extend(Ext.tree.TreePanel, {
                   text: 'Application Info',
                   leaf: true,
                   iconCls: 'sm-info-circle-icon'
+                },
+                {
+                  id: 'maintenance-admin',
+                  text: 'Manage API Mode',
+                  leaf: true,
+                  iconCls: 'sm-maintenance-icon'
                 }
               ]
               if (STIGMAN.Env.experimental.appData === 'true') {
@@ -467,6 +473,9 @@ SM.NavTree.TreePanel = Ext.extend(Ext.tree.TreePanel, {
             break
           case 'whats-new':
             SM.WhatsNew.addTab({ treePath })
+            break
+          case 'maintenance-admin':
+            SM.ApiState.showMaintenanceTab({ treePath })
             break
         }
 
