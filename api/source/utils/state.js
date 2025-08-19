@@ -1,6 +1,5 @@
 const EventEmitter = require('events')
 const logger = require('./logger')
-const { start } = require('repl')
 
 /**
  * Represents the state of the API.
@@ -16,10 +15,21 @@ const { start } = require('repl')
  * @typedef {Object} Mode
  * @property {ModeString} currentMode - The current mode of the API.
  * @property {Date} since - The time when the API entered the current mode.
- * @property {string} startedBy - The user ID of the user who initiated the mode change.
+ * @property {string} requestedBy - The user ID of the user who initiated the mode change.
  * @property {boolean} isLocked - Whether the mode is locked.
- * @property {string} message - An optional message associated with the mode change.
+ * @property {string} message - An optional message associated with the mode.
+ * @property {ModeChange} changeScheduled 
 */
+
+/**
+ * @typedef {Object} ModeChange
+ * @property {ModeString} newMode - The requested new mode of the API.
+ * @property {string} newMessage - The message to be associated with the new mode.
+ * @property {string} requestedBy - The user ID of the user who made the request.
+ * @property {Number} scheduledIn - The time in seconds to delay the mode change.
+ * @property {string} message - An optional message associated with the new mode.
+*/
+
 
 /**
  * @typedef {Object} DependencyStatus
@@ -53,6 +63,9 @@ class State extends EventEmitter {
   /** @type {Object} */
   #endpoints
 
+  /** @type {Number} */
+  #changeTimeoutId
+
   /**
    * Creates an instance of State.
    * @param {Object} options - Options for initializing the state.
@@ -61,7 +74,7 @@ class State extends EventEmitter {
    */
   constructor({ 
     initialState = 'starting', 
-    initialMode = {currentMode: 'normal', since: new Date(), startedBy: '', message: '', isLocked: false}, 
+    initialMode = {currentMode: 'normal', since: new Date(), requestedBy: '', message: '', isLocked: false, changeScheduled: null}, 
     endpoints = { 
       ui: { 
         normal: '/', 
@@ -96,6 +109,14 @@ class State extends EventEmitter {
     this.emit('modechanged', this.#mode)
   }
 
+  #emitModeScheduledEvent() {
+    this.emit('mode-scheduled', this.#mode)
+  }
+
+  #emitModeUnscheduledEvent() {
+    this.emit('mode-unscheduled', this.#mode)
+  }
+
   /**
    * Sets the state based on the dependency status.
    * @private
@@ -121,16 +142,56 @@ class State extends EventEmitter {
     this.#emitStateChangedEvent()
   }
 
+  changeMode({ newMode, newMessage, requestedBy, scheduledIn = 0, message }) {
+    // clear any timer that would change the mode
+    clearTimeout(this.#changeTimeoutId)
+
+    if (scheduledIn === 0) {
+      // immediate mode change
+      this.setMode({ currentMode: newMode, requestedBy, message: newMessage, changeScheduled: null })
+    }
+
+    if (scheduledIn > 0) {
+      // scheduled a mode change
+      this.#mode.changeScheduled = { newMode, newMessage, requestedBy, scheduledIn, message }
+      this.#changeTimeoutId = setTimeout(() => {
+        this.setMode({ currentMode: newMode, requestedBy, message: newMessage, changeScheduled: null })
+      }, scheduledIn * 1000)
+      this.#mode.changeScheduled = { newMode, newMessage, requestedBy, scheduledIn, message }
+      this.#emitModeScheduledEvent()
+    } else if (scheduledIn < 0) {
+      // unschedule a mode change (timer is already cleared)
+      this.#mode.changeScheduled = null
+      this.#emitModeUnscheduledEvent()
+    }
+  }
+
   /**
    * Sets the mode to the provided mode and emits modechanged event.
    * @param {Mode} mode - The new mode.
    * @param {boolean} force - Whether to force the mode change.
    * @private
    */
-  setMode({ currentMode = 'normal', startedBy = '', message = '', isLocked = false } = {}, force = false) {
-    if (this.#mode.currentMode === currentMode || (this.#mode.isLocked && !force)) return
-    this.#mode = {currentMode, since: new Date(), startedBy, message, isLocked}
-    this.#emitModeChangedEvent()
+  setMode({ currentMode = 'normal', requestedBy = '', message = '', changeScheduledIn = 0, isLocked = false } = {}, force = false) {
+    const currentChangeScheduledIn = this.#mode.changeScheduledIn
+    const events = []
+    if (this.#mode.isLocked && !force)
+      return false
+
+    if (currentChangeScheduledIn > 0) {
+      // there is a mode change already scheduled
+      if (changeScheduledIn > 0) {
+        events.push(this.#emitModeScheduledEvent)
+      } else if (changeScheduledIn < 0) {
+        events.push(this.#emitModeUnscheduledEvent)
+      }
+      this.#mode = { currentMode, requestedBy, message, changeScheduledIn, isLocked }
+
+      if (this.#mode.changeScheduledIn === 0) {
+        this.#emitModeChangedEvent()
+      }
+    }
+    return true
   }
 
   /**
@@ -227,10 +288,12 @@ class State extends EventEmitter {
    * @readonly
    */
   get apiState() {
+    const publicMode = {...this.#mode}
+    delete publicMode.requestedBy
     return {
       currentState: this.#currentState,
       since: this.#stateDate,
-      mode: this.#mode,
+      mode: publicMode,
       dependencies: this.#dependencyStatus,
       endpoints: {
         ui: this.#endpoints.ui[this.#mode.currentMode]

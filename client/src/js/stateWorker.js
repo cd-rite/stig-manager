@@ -5,7 +5,9 @@ let initialized = false
 let apiBase = ''
 
 const messageHandlers = {
-  initialize
+  initialize,
+  setApiMode,
+  getApiState
 }
 
 // Worker entry point
@@ -38,6 +40,34 @@ function initialize(options) {
 
     return { success: true, channelName }
   }
+}
+
+async function setApiMode({mode, message, force, token}) {
+  const url = `${apiBase}/op/state/mode?elevate=true${force ? '&force=true' : ''}`
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ mode, message })
+  })
+  if (!response.ok) {
+    throw new Error(`Failed to set mode: ${response.status} ${response.statusText}`)
+  }
+  const data = await response.json()
+  console.log(`${logPrefix} Mode set:`, data)
+  return { success: true, data }
+}
+
+async function getApiState() {
+  const url = `${apiBase}/op/state`
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Failed to get API state: ${response.status} ${response.statusText}`)
+  }
+  const data = await response.json()
+  return { success: true, data }
 }
 
 function onMessage(e) {

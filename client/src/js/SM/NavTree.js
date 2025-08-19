@@ -475,7 +475,7 @@ SM.NavTree.TreePanel = Ext.extend(Ext.tree.TreePanel, {
             SM.WhatsNew.addTab({ treePath })
             break
           case 'maintenance-admin':
-            SM.ApiState.showMaintenanceTab({ treePath })
+            SM.ApiState.showModeDialog({ treePath })
             break
         }
 

@@ -8510,8 +8510,6 @@ components:
             - maintenance
         since:
           $ref: '#/components/schemas/StringDateTime'
-        startedBy:
-          $ref: '#/components/schemas/UserId'
         message:
           $ref: '#/components/schemas/String255Nullable'
         isLocked:
