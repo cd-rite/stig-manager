@@ -5903,7 +5903,7 @@ components:
         stig_id:
           type: string
         version:
-          type: integer
+          type: string
         release_info:
           type: string
         uuid:
