@@ -3395,7 +3395,7 @@ paths:
         - $ref: '#/components/parameters/ElevateQuery'
         - name: force
           in: query
-          description: Whether to force the mode change
+          description: Force the mode change even if the mode is locked
           schema:
             type: boolean
             default: false
@@ -3405,6 +3405,61 @@ paths:
           application/json:
             schema:
                 $ref: '#/components/schemas/StateModePost'
+      responses:
+        '200':
+          description: StateMode response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StateMode'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - oauth:
+            - stig-manager:op
+      x-stigman-maintenance: true
+  /op/state/mode/schedule:
+    post:
+      tags:
+        - Operation
+      summary: Schedule a mode change (normal | maintenance)
+      operationId: scheduleModeChange
+      parameters:
+        - $ref: '#/components/parameters/ElevateQuery'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/StateModeSchedule'
+      responses:
+        '200':
+          description: StateMode response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StateMode'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - oauth:
+            - stig-manager:op
+      x-stigman-maintenance: true
+    delete:
+      tags:
+        - Operation
+      summary: Cancel a scheduled mode change
+      operationId: cancelScheduledModeChange
+      parameters:
+        - $ref: '#/components/parameters/ElevateQuery'
       responses:
         '200':
           description: StateMode response
@@ -8514,6 +8569,44 @@ components:
           $ref: '#/components/schemas/String255Nullable'
         isLocked:
           type: boolean
+        scheduled:
+          $ref: '#/components/schemas/StateModeSchedule'
+    StateModeSchedule:
+      type: object
+      properties:
+        nextMode:
+          type: string
+          enum:
+            - normal
+            - maintenance
+        nextMessage:
+          $ref: '#/components/schemas/String255Nullable'
+        scheduledIn:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        scheduledMessage:
+          $ref: '#/components/schemas/String255Nullable'
+        force:
+          type: boolean
+          default: false
+    StateModeScheduled:
+      type: object
+      properties:
+        nextMode:
+          type: string
+          enum:
+            - normal
+            - maintenance
+        nextMessage:
+          $ref: '#/components/schemas/String255Nullable'
+        scheduledFor:
+          $ref: '#/components/schemas/StringDateTime'
+        scheduledMessage:
+          $ref: '#/components/schemas/String255Nullable'
+        force:
+          type: boolean
+          default: false
     StateModePost:
       type: object
       properties:

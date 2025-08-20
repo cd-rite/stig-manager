@@ -121,21 +121,43 @@ module.exports.getState = function (req, res, next) {
 
 module.exports.getDetails = module.exports.getAppInfo
 
-module.exports.setMode = async function setMode(req, res, next) {
+module.exports.setMode = function (req, res, next) {
   try {
     if (!req.query.elevate) throw new SmError.PrivilegeError()
-    const { mode, message } = req.body
-    const force = req.query.force === 'true' || req.query.force === true
-    if (state.mode.currentMode === mode) {
+    if (state.mode.currentMode === req.body.mode) {
       throw new SmError.UnprocessableError(`API mode is already ${state.mode.currentMode}`)
     }
-    if (state.mode.isLocked && !force) {
-      throw new SmError.ModeLockedError('Use force=true to override locked mode.')
+    const { mode, message } = req.body
+    const force = req.query.force === 'true' || req.query.force === true
+    state.setMode({ currentMode: mode, requestedBy: req.userObject.userId, message }, force)
+    res.json(state.apiState)
+  }
+  catch (err) {
+    next(err)
+  }
+}
+
+module.exports.scheduleModeChange = function (req, res, next) {
+  try {
+    if (!req.query.elevate) throw new SmError.PrivilegeError()
+    if (state.mode.currentMode === req.body.nextMode) {
+      throw new SmError.UnprocessableError(`API mode is already ${state.mode.currentMode}`)
     }
-    state.setMode({currentMode: mode, startedBy: req.userObject?.username, message: message ?? ''}, force)
-    // if (mode === 'maintenance') {
-    //   state.mode.isLocked = true
-    // } 
+    state.scheduleMode({ ...req.body, requestedBy: req.userObject.userId })
+    res.json(state.apiState)
+  }
+  catch (err) {
+    next(err)
+  }
+}
+
+module.exports.cancelScheduledModeChange = function (req, res, next) {
+  try {
+    if (!req.query.elevate) throw new SmError.PrivilegeError()
+    if (!state.mode.scheduled) {
+      throw new SmError.NotFoundError(`A mode change is not scheduled`)
+    }
+    state.cancelScheduledMode()
     res.json(state.apiState)
   }
   catch (err) {
@@ -162,9 +184,13 @@ module.exports.streamStateSse = function (req, res, next) {
     // Event listeners
     const stateChangedListener = () => sendEvent('state-changed', state.apiState);
     const modeChangedListener = () => sendEvent('mode-changed', state.apiState);
+    const modeScheduledListener = () => sendEvent('mode-change-scheduled', state.apiState);
+    const modeUnscheduledListener = () => sendEvent('mode-change-unscheduled', state.apiState);
 
-    state.on('statechanged', stateChangedListener);
-    state.on('modechanged', modeChangedListener);
+    state.on('state-changed', stateChangedListener);
+    state.on('mode-changed', modeChangedListener);
+    state.on('mode-scheduled', modeScheduledListener);
+    state.on('mode-unscheduled', modeUnscheduledListener);
 
     // Keep-alive ping every 30 seconds
     const keepAlive = setInterval(() => {
@@ -174,8 +200,8 @@ module.exports.streamStateSse = function (req, res, next) {
     // Cleanup on client disconnect
     req.on('close', () => {
       clearInterval(keepAlive);
-      state.off('statechanged', stateChangedListener);
-      state.off('modechanged', modeChangedListener);
+      state.off('state-changed', stateChangedListener);
+      state.off('mode-changed', modeChangedListener);
       res.end();
     });
   } catch (err) {

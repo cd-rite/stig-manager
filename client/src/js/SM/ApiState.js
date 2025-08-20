@@ -1,9 +1,9 @@
 Ext.ns('SM.ApiState')
 
 SM.ApiState = {
-    isMaintenance: false,
-    stateWorkerChannel: null,
-    stateWorker: null
+  isMaintenance: false,
+  stateWorkerChannel: null,
+  stateWorker: null
 }
 
 SM.ApiState.setupStateWorker = async function () {
@@ -12,7 +12,7 @@ SM.ApiState.setupStateWorker = async function () {
   const response = await this.sendWorkerRequest({ request: 'initialize', apiBase: STIGMAN.Env.apiBase })
   this.stateWorkerChannel = new BroadcastChannel(response.channelName)
   this.stateWorkerChannel.onmessage = this.handleBroadcastMessage.bind(this)
-  return {worker: this.stateWorker, channel: this.stateWorkerChannel}
+  return { worker: this.stateWorker, channel: this.stateWorkerChannel }
 }
 
 SM.ApiState.sendWorkerRequest = function (request) {
@@ -35,14 +35,12 @@ SM.ApiState.AlertWindow = Ext.extend(Ext.Window, {
     const title = `<div class="sm-alert-icon" style="padding-left:20px">API Alert</div>`;
     const config = {
       title,
-      width: 400,
-      modal: true,
-      closable: false,
+      width: 400
     }
     Ext.apply(this, Ext.apply(this.initialConfig, config))
     this.superclass().initComponent.call(this)
   }
-})  
+})
 
 SM.ApiState.handleBroadcastMessage = function (event) {
   console.log('[State Broadcast] Received message:', event.data)
@@ -66,11 +64,12 @@ SM.ApiState.handleBroadcastMessage = function (event) {
           }
         }))
       }
-      this.alertWindow = new SM.ApiState.AlertWindow({html, buttons})
-      this.alertWindow.show()
+      this.alertModal = new SM.ApiState.AlertWindow({ html, buttons, closable: false, modal: true })
+      this.alertModal.show()
+      this.alertToast?.close()
     }
     else {
-      this.alertWindow?.close()
+      this.alertModal?.close()
     }
   }
   else if (type === 'state-changed') {
@@ -80,22 +79,58 @@ SM.ApiState.handleBroadcastMessage = function (event) {
       <p>Database: ${this.state?.dependencies?.db}</p>
       <p>Authentication: ${this.state?.dependencies?.oidc}</p>
       </div>`
-      this.alertWindow = new SM.ApiState.AlertWindow({html})
-      this.alertWindow.show()
+      this.alertModal = new SM.ApiState.AlertWindow({ html, closable: false, modal: true })
+      this.alertModal.show()
+      this.alertToast?.close()
+
     }
     else {
-      this.alertWindow?.close()
+      this.alertModal?.close()
     }
   }
   else if (type === 'state-error') {
     const html = `<div style="padding: 10px">
       <p><b>An error occurred while fetching the API state</b></p>
       </div>`
-    this.alertWindow = new SM.ApiState.AlertWindow({html})
-    this.alertWindow.show()
+    this.alertModal = new SM.ApiState.AlertWindow({ html, closable: false, modal: true })
+    this.alertModal.show()
   }
-  else if (type === 'state-report' && this.state?.mode.currentMode === 'normal' && this.state?.currentState === 'available' ) {
-    this.alertWindow?.close()
+  else if (type === 'state-report' && this.state?.mode.currentMode === 'normal' && this.state?.currentState === 'available') {
+    this.alertModal?.close()
+  }
+  else if (type === 'mode-change-scheduled') {
+    const html = `<div style="padding: 10px">
+      <p><b>A mode change has been scheduled</b></p>
+      <p>New mode: ${this.state?.mode?.scheduled?.nextMode}</p>
+      <p>Scheduled for: ${this.state?.mode?.scheduled?.scheduledFor}</p>
+      <p>Message: ${this.state?.mode?.scheduled?.scheduledMessage}</p>
+      </div>`
+    this.alertToast = new SM.ApiState.AlertWindow({
+      html,
+      closable: false,
+      bodyStyle: {
+        backgroundColor: 'hsl(29 100% 26% / 1)',
+      },
+      modal: false,
+      y: 5,
+      listeners: {
+        show: function (win) {
+          win.getEl().slideIn('t', { // Slide in from the top
+            easing: 'easeOut',
+            duration: 0.5,
+          })
+        }
+      }
+    })
+    this.alertToast.show()
+  }
+  else if (type === 'mode-change-unscheduled') {
+    const html = `<div style="padding: 10px">
+      <p><b>The scheduled mode change has been cancelled</b></p>
+      </div>`
+    if (this.alertToast) this.alertToast.close()
+    this.alertToast = new SM.ApiState.AlertWindow({ html, closable: true, modal: false })
+    this.alertToast.show(Ext.getBody())
   }
 }
 
@@ -139,6 +174,6 @@ SM.ApiState.showModeDialog = function ({ treePath }) {
     ]
   })
   dialog.show()
-} 
+}
 
 

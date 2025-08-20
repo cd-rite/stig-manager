@@ -28,7 +28,7 @@ function initialize(options) {
       stateWorkerChannel.postMessage({ type: 'state-error', data: event.data })
     }
 
-    for (const event of ['mode-changed', 'state-changed', 'state-report']) {
+    for (const event of ['mode-changed', 'state-changed', 'state-report', 'mode-change-scheduled', 'mode-change-unscheduled']) {
       evtSource.addEventListener(event, (event) => {
         console.log(`${logPrefix} ${event.type} event:`, event)
         stateWorkerChannel.postMessage({ type: event.type, data: event.data })
