@@ -92,6 +92,7 @@ echo "Preparing Worker resources"
 cp $SrcDir/serviceWorker.js $DistDir/serviceWorker.js
 mkdir -p $DistDir/js
 cp $SrcDir/js/oidcWorker.js $DistDir/js/oidcWorker.js
+cp $SrcDir/js/stateWorker.js $DistDir/js/stateWorker.js
 
 # npm
 echo "Preparing npm resources"
@@ -168,6 +169,7 @@ uglifyjs \
 'jszip.min.js' \
 'FileSaver.js' \
 'jsonview.bundle.js' \
+'SM/ApiState.js' \
 'stigman.js' -o ../../$DistDir/js/stig-manager.min.js -m -c --source-map "root='src',url='stig-manager.min.js.map'"
 
 echo "Copying files for sourcemap debugging"

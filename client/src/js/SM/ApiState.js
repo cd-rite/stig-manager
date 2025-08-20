@@ -50,7 +50,6 @@ SM.ApiState.handleBroadcastMessage = function (event) {
     if (this.state?.mode?.currentMode === 'maintenance') {
       const html = `<div style="padding: 10px">
       <p><b>The API is currently undergoing maintenance</b></p>
-      <p>Started by: ${this.state?.mode?.startedBy}</p>
       <p>Message: ${this.state?.mode?.message}</p>
       ${curUser.privileges.admin ? `<p><a href="${this.state?.endpoints?.ui}" target="_blank">Open Maintenance App</a></p>` : ''}
       </div>`
@@ -105,6 +104,15 @@ SM.ApiState.handleBroadcastMessage = function (event) {
       <p>Scheduled for: ${this.state?.mode?.scheduled?.scheduledFor}</p>
       <p>Message: ${this.state?.mode?.scheduled?.scheduledMessage}</p>
       </div>`
+    const buttons = []
+      if (curUser.privileges.admin) {
+      buttons.push(new Ext.Button({
+        text: 'Cancel scheduled change',
+        handler: async () => {
+          const response = await SM.ApiState.sendWorkerRequest({ request: 'cancelScheduledApiMode', token: window.oidcWorker.token })
+        }
+      }))
+    }
     this.alertToast = new SM.ApiState.AlertWindow({
       html,
       closable: false,
@@ -113,6 +121,7 @@ SM.ApiState.handleBroadcastMessage = function (event) {
       },
       modal: false,
       y: 5,
+      buttons,
       listeners: {
         show: function (win) {
           win.getEl().slideIn('t', { // Slide in from the top
@@ -136,18 +145,32 @@ SM.ApiState.handleBroadcastMessage = function (event) {
 
 SM.ApiState.showModeDialog = function ({ treePath }) {
   const _this = this
-  const modeMessage = new Ext.form.TextArea({
-    fieldLabel: 'Message',
+  const nextMessage = new Ext.form.TextArea({
+    fieldLabel: 'Mode Message',
     anchor: '100%',
+    value: 'The current mode is maintenance.'
   })
+  const scheduledMessage = new Ext.form.TextArea({
+    fieldLabel: 'Scheduled Message',
+    anchor: '100%',
+    value: 'The scheduled message for maintenance mode.'
+  })
+  const scheduledIn = new Ext.form.NumberField({
+    fieldLabel: 'Scheduled In (seconds)',
+    anchor: '100%',
+    value: 20
+  })
+
   const dialog = new Ext.Window({
-    title: 'Maintenance Mode',
+    title: 'Schedule Maintenance Mode',
     width: 400,
     layout: 'form',
     padding: 20,
     modal: true,
     items: [
-      modeMessage
+      scheduledIn,
+      scheduledMessage,
+      nextMessage
     ],
     buttons: [
       {
@@ -157,11 +180,17 @@ SM.ApiState.showModeDialog = function ({ treePath }) {
         }
       },
       {
-        text: 'Start Maintenance Mode',
+        text: 'Schedule Maintenance Mode',
         handler: async function () {
           try {
-            const message = modeMessage.getValue()
-            const response = await _this.sendWorkerRequest({ request: 'setApiMode', mode: 'maintenance', message, token: window.oidcWorker.token })
+            const response = await _this.sendWorkerRequest({
+              request: 'scheduleApiMode',
+              nextMode: 'maintenance',
+              nextMessage: nextMessage.getValue(),
+              scheduledMessage: scheduledMessage.getValue(),
+              scheduledIn: scheduledIn.getValue(),
+              token: window.oidcWorker.token
+            })
           }
           catch (error) {
             Ext.Msg.alert('Error', `Failed to set maintenance mode. Please try again. ${error}`)

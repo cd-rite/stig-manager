@@ -7,6 +7,8 @@ let apiBase = ''
 const messageHandlers = {
   initialize,
   setApiMode,
+  scheduleApiMode,
+  cancelScheduledApiMode,
   getApiState
 }
 
@@ -57,6 +59,41 @@ async function setApiMode({mode, message, force, token}) {
   }
   const data = await response.json()
   console.log(`${logPrefix} Mode set:`, data)
+  return { success: true, data }
+}
+
+async function scheduleApiMode({nextMode, nextMessage, scheduledMessage, scheduledIn, force = false, token}) {
+  const url = `${apiBase}/op/state/mode/schedule?elevate=true`
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ nextMode, nextMessage, scheduledMessage, scheduledIn, force })
+  })
+  if (!response.ok) {
+    throw new Error(`Failed to set mode: ${response.status} ${response.statusText}`)
+  }
+  const data = await response.json()
+  console.log(`${logPrefix} Mode scheduled:`, data)
+  return { success: true, data }
+}
+
+async function cancelScheduledApiMode({ token }) {
+  const url = `${apiBase}/op/state/mode/schedule?elevate=true`
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  if (!response.ok) {
+    throw new Error(`Failed to cancel scheduled mode: ${response.status} ${response.statusText}`)
+  }
+  const data = await response.json()
+  console.log(`${logPrefix} Mode change cancelled:`, data)
   return { success: true, data }
 }
 
