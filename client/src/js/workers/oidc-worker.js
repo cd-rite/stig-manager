@@ -82,7 +82,8 @@ async function initialize(options) {
     ENV = options.env || null
 
     try {
-      oidcConfiguration = await fetchOpenIdConfiguration()
+      // Use provided config from main thread (for cert trust) or fetch if not provided (backward compat)
+      oidcConfiguration = options.wellKnownConfig || await fetchOpenIdConfiguration()
     }
     catch (e) {
       console.error(logPrefix, 'Failed to fetch OIDC configuration', e)

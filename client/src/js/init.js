@@ -18,20 +18,22 @@ import { stylesheets, scripts, isMinimizedSource } from './resources.js'
     else {
       console.log('[init] STIGMAN_CLIENT_STATE_EVENTS is false; skipping state worker setup')
     }
-    await setupOidcWorker() 
-    await bootstrap()
+    // Fetch OIDC config from main thread to establish certificate trust before worker initialization
+    const wellKnownConfig = await setupOidcWorker()
+    await bootstrap(wellKnownConfig)
   } 
   catch (error) {
     console.error(`[init] Error during initialization:`, error)
     appendError(error.message || 'Unknown error during initialization', !error.message?.includes('Timeout waiting for API state event stream'))
   }
 
-  async function bootstrap() {
+  async function bootstrap(wellKnownConfig) {
 
     const url = new URL(window.location.href)
     const redirectUri = `${url.origin}${url.pathname}`
 
-    const response = await OW.sendWorkerRequest({ request: 'initialize', redirectUri, env: STIGMAN.Env.oauth })
+    // Pass pre-fetched config to worker so it doesn't need to make initial HTTPS request
+    const response = await OW.sendWorkerRequest({ request: 'initialize', redirectUri, env: STIGMAN.Env.oauth, wellKnownConfig })
     if (response.error) {
       appendError(response.error)
       return
@@ -207,6 +209,13 @@ import { stylesheets, scripts, isMinimizedSource } from './resources.js'
 
     OW = window.oidcWorker
     OW.worker.port.start()
+
+    // Fetch well-known config from main thread to establish certificate trust before shared worker needs it
+    // Shared workers inherit certificate trust from the main context but cannot prompt users on their own
+    const wellKnownUrl = `${STIGMAN.Env.oauth.authority}/.well-known/openid-configuration`
+    const wellKnownConfig = await fetch(wellKnownUrl).then(r => r.json())
+
+    return wellKnownConfig
   }
 
   async function setupStateWorker() {
