@@ -64,6 +64,11 @@ function toggleNodeExpansion(node) {
       :value="nodes"
       :loading="loading"
       selection-mode="single"
+      :dt="{
+        node: {
+          gap: '0.125rem',
+        },
+      }"
       :pt="{
         root: { class: 'tree-root' },
         nodeContent: (options) => ({
@@ -191,17 +196,17 @@ function toggleNodeExpansion(node) {
 
 :deep(.tree-children) {
   font-size: 13px;
-  padding-left: 20px;
+  padding-left: 10px;
   overflow: hidden;
   transform-origin: top left;
-  animation: treeFadeSlideIn 1000ms cubic-bezier(0.4, 0.8, 0.2, 1) both;
+  animation: treeFadeSlideIn 200ms cubic-bezier(0.4, 0.8, 0.2, 1) both;
 }
 
 .node-inner {
   display: inline-flex;
   align-items: center;
   min-width: 0;
-  gap: 6px;
+  /* gap: 2px; */
 }
 
 .node-text {
