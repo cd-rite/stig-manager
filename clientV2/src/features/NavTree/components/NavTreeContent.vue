@@ -206,7 +206,7 @@ function toggleNodeExpansion(node) {
   display: inline-flex;
   align-items: center;
   min-width: 0;
-  /* gap: 2px; */
+  gap: 2px;
 }
 
 .node-text {
