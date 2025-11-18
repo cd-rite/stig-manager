@@ -39,6 +39,21 @@ watch(selectionKeys, (map) => {
 function onNodeSelect(node) {
   emit('node-select', node)
 }
+
+function toggleNodeExpansion(node) {
+  // Only toggle if the node has children
+  if (!node.children || node.children.length === 0) {
+    return
+  }
+
+  // Toggle the expansion state
+  if (expandedKeys.value[node.key]) {
+    delete expandedKeys.value[node.key]
+  }
+  else {
+    expandedKeys.value[node.key] = true
+  }
+}
 </script>
 
 <template>
@@ -51,7 +66,13 @@ function onNodeSelect(node) {
       selection-mode="single"
       :pt="{
         root: { class: 'tree-root' },
-        nodeContent: { class: 'tree-node' },
+        nodeContent: (options) => ({
+          class: 'tree-node',
+          onDblclick: (event) => {
+            event.preventDefault()
+            toggleNodeExpansion(options.context.node)
+          },
+        }),
         nodeToggleButton: { class: 'tree-toggle-btn' },
         nodeToggleIcon: { class: 'tree-toggle-ico' },
         nodeChildren: { class: 'tree-children' },
@@ -59,7 +80,10 @@ function onNodeSelect(node) {
       @node-select="onNodeSelect"
     >
       <template #default="{ node }">
-        <span class="node-inner">
+        <span
+          class="node-inner"
+          @dblclick.prevent.stop="toggleNodeExpansion(node)"
+        >
           <span class="icon sm-icon" :class="[node.icon]" aria-hidden="true" />
           <span class="node-text" :class="{ 'is-italic': node.data?.italic }">
             {{ node.label }}
