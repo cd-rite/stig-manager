@@ -5,7 +5,7 @@
     resizableColumns
     columnResizeMode="fit"
     scroll-height="flex"
-    :virtualScrollerOptions="{ itemSize: 45, delay: 0 }"
+    :virtualScrollerOptions="{ itemSize: 55, delay: 0 }"
     :pt="{
         table: { style: 'min-width: 50rem; table-layout: fixed' },
       column: {
@@ -14,7 +14,7 @@
       }"
   >
     <template v-for="col in columns" :key="col.field">
-      <component :is="col.component" v-bind="col" :style="{ fontSize: '12px', height: '45px', width: col.width, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }"/>
+      <component :is="col.component" v-bind="col" :style="{ fontSize: '12px', height: '55px', width: col.width, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }"/>
     </template>
   </DataTable>
   <!-- {{ JSON.stringify(data, null, 2) }} -->
@@ -24,10 +24,10 @@
 import { computed } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import AssetColumn from './AssetColumn.vue'
 import DurationColumn from './DurationColumn.vue'
 import PercentageColumn from './PercentageColumn.vue'
 import { calculateCoraRiskRating } from '../lib/libCora.js'
+import AssetWithLabelsColumn from './AssetWithLabelsColumn.vue'
 
 const props = defineProps({
   apiMetricsSummary: {
@@ -73,8 +73,7 @@ const columns = computed(() => {
   switch (aggregationType.value) {
     case 'asset':
       return [
-        { field: 'assetName', header: 'Asset', component: AssetColumn, width: '200px' },
-        { field: 'labels', header: 'Labels', component: Column, width: '200px' },
+        { field: 'assetName', header: 'Asset', component: AssetWithLabelsColumn, width: '300px' },
         { field: 'stigCnt', header: 'Stigs', component: Column, width: '50px' },
         ...commonColumns,
       ]
@@ -117,6 +116,7 @@ const data = computed(() => {
           stigCnt: r.benchmarkIds.length,
           ...commonData,
         }
+        
       case 'stig':
         return {
           benchmarkId: r.benchmarkId,
