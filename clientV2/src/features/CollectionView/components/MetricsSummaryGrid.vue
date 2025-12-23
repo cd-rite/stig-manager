@@ -2,6 +2,8 @@
   <DataTable
     :value="data"
     scrollable
+    resizableColumns
+    columnResizeMode="fit"
     scroll-height="flex"
     :virtualScrollerOptions="{ itemSize: 45, delay: 0 }"
     :pt="{
@@ -9,7 +11,7 @@
     }"
   >
     <template v-for="col in columns" :key="col.field">
-      <component :is="col.component" v-bind="col" style="font-size: 12px; height: 45px; width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"/>
+      <component :is="col.component" v-bind="col" :style="{ fontSize: '12px', height: '45px', width: col.width, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }"/>
     </template>
   </DataTable>
   <!-- {{ JSON.stringify(data, null, 2) }} -->
@@ -53,7 +55,7 @@ const aggregationType = computed(() => {
 const columns = computed(() => {
   // Common columns
   const commonColumns = [
-    { field: 'checks', header: 'Checks', component: Column  },
+    { field: 'checks', header: 'Checks', component: Column, width: '80px'  },
     { field: 'oldest', header: 'Oldest', component: DurationColumn },
     { field: 'updated', header: 'Updated', component: DurationColumn },
     { field: 'assessedPct', header: 'Assessed', component: PercentageColumn },
@@ -68,9 +70,9 @@ const columns = computed(() => {
   switch (aggregationType.value) {
     case 'asset':
       return [
-        { field: 'assetName', header: 'Asset', component: AssetColumn },
-        { field: 'labels', header: 'Labels', component: Column },
-        { field: 'stigCnt', header: 'Stigs', component: Column },
+        { field: 'assetName', header: 'Asset', component: AssetColumn, width: '200px' },
+        { field: 'labels', header: 'Labels', component: Column, width: '300px' },
+        { field: 'stigCnt', header: 'Stigs', component: Column, width: '50px' },
         ...commonColumns,
       ]
     case 'stig':
