@@ -58,32 +58,32 @@ const aggregationType = computed(() => {
 const columns = computed(() => {
   // Common columns
   const commonColumns = [
-    { field: 'checks', header: 'Checks', component: Column, width: '80px'  },
-    { field: 'oldest', header: 'Oldest', component: DurationColumn },
-    { field: 'updated', header: 'Updated', component: DurationColumn },
-    { field: 'assessedPct', header: 'Assessed', component: PercentageColumn },
-    { field: 'submitted', header: 'Submitted', component: PercentageColumn },
-    { field: 'accepted', header: 'Accepted', component: PercentageColumn },
-    { field: 'rejected', header: 'Rejected', component: PercentageColumn },
-    { field: 'cora', header: 'CORA', component: Column },
-    { field: 'low', header: 'Low', component: Column },
-    { field: 'medium', header: 'Medium', component: Column },
-    { field: 'high', header: 'High', component: Column },
+    { field: 'checks', header: 'Checks', component: Column, width: '50px'  },
+    { field: 'oldest', header: 'Oldest', component: DurationColumn, width: '50px' },
+    { field: 'updated', header: 'Updated', component: DurationColumn, width: '50px' },
+    { field: 'assessedPct', header: 'Assessed', component: PercentageColumn, width: '80px' },
+    { field: 'submitted', header: 'Submitted', component: PercentageColumn, width: '80px' },
+    { field: 'accepted', header: 'Accepted', component: PercentageColumn, width: '80px' },
+    { field: 'rejected', header: 'Rejected', component: PercentageColumn, width: '80px' },
+    { field: 'cora', header: 'CORA', component: Column, width: '50px' },
+    { field: 'low', header: 'Low', component: Column, width: '50px' },
+    { field: 'medium', header: 'Medium', component: Column, width: '50px' },
+    { field: 'high', header: 'High', component: Column, width: '50px' },
   ]
   switch (aggregationType.value) {
     case 'asset':
       return [
         { field: 'assetName', header: 'Asset', component: AssetColumn, width: '200px' },
-        { field: 'labels', header: 'Labels', component: Column, width: '300px' },
+        { field: 'labels', header: 'Labels', component: Column, width: '200px' },
         { field: 'stigCnt', header: 'Stigs', component: Column, width: '50px' },
         ...commonColumns,
       ]
     case 'stig':
       return [
-        { field: 'benchmarkId', header: 'Benchmark', component: Column },
-        { field: 'title', header: 'Title', component: Column },
-        { field: 'revision', header: 'Revision', component: Column },
-        { field: 'assetCnt', header: 'Assets', component: Column },
+        { field: 'benchmarkId', header: 'Benchmark', component: Column, width: '200px'  },
+        { field: 'title', header: 'Title', component: Column, width: '200px'  },
+        { field: 'revision', header: 'Revision', component: Column, width: '50px'  },
+        { field: 'assetCnt', header: 'Assets', component: Column, width: '50px'  },
         ...commonColumns,
       ]
     default:
