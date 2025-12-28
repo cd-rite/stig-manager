@@ -11,6 +11,9 @@ import ApiStateBootstrap from './components/global/ApiStateBootstrap.vue'
 import { useGlobalAppStore } from './shared/stores/globalAppStore.js'
 import { bootstrapEnv, useEnv } from './shared/stores/useEnv.js'
 import './style.css'
+import Tooltip from 'primevue/tooltip'
+
+
 
 // this is a dark mode override — in the future we may want to make this dynamic based on user preference
 if (typeof document !== 'undefined') {
@@ -62,6 +65,7 @@ try {
   // helper to mount the real app (requires an auth boot result)
   const mountApp = async (authBootResult) => {
     const app = createApp(App)
+    app.directive('tooltip', Tooltip)
     app.use(pinia)
 
     // set classification in global app state from env

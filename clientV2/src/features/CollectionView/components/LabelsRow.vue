@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import Popover from 'primevue/popover'
 
 const props = defineProps({
   labels: {
@@ -8,11 +9,13 @@ const props = defineProps({
   }
 })
 
+const popoverRef = ref()
+
 // Constants for label size estimation
 const CHAR_WIDTH = 6.5          // Approximate width per character at 0.65rem font
 const LABEL_PADDING = 12        // Horizontal padding (5px * 2 + a bit extra)
 const LABEL_GAP = 3             // Gap between labels
-const OVERFLOW_BADGE_WIDTH = 28 // Width of "+N" badge
+const OVERFLOW_BADGE_WIDTH = 8 // Width of "+N" badge
 const RIGHT_MARGIN = 8          // Safety margin on the right
 
 // Container ref and width
@@ -99,11 +102,22 @@ const visibleLabelsData = computed(() => {
     visible.push(labels[0])
   }
 
+  const overflow = labels.slice(visible.length)
+
   return {
     visible,
-    overflowCount: labels.length - visible.length
+    overflow,
+    overflowCount: overflow.length
   }
 })
+
+function showPopover(event) {
+  popoverRef.value?.show(event)
+}
+
+function hidePopover(event) {
+  popoverRef.value?.hide(event)
+}
 </script>
 
 <template>
@@ -117,7 +131,20 @@ const visibleLabelsData = computed(() => {
     <span
       v-if="visibleLabelsData.overflowCount > 0"
       class="label-tag label-overflow"
+      @mouseenter="showPopover"
+      @mouseleave="hidePopover"
     >+{{ visibleLabelsData.overflowCount }}</span>
+
+    <Popover ref="popoverRef">
+      <div class="overflow-labels-popover">
+        <span
+          v-for="label in visibleLabelsData.overflow"
+          :key="label.labelId"
+          :style="{ backgroundColor: normalizeColor(label.color), color: getContrastColor(label.color) }"
+          class="label-tag"
+        >{{ label.name }}</span>
+      </div>
+    </Popover>
   </div>
 </template>
 
@@ -141,5 +168,13 @@ const visibleLabelsData = computed(() => {
 .label-overflow {
   background-color: #000;
   color: #fff;
+  cursor: pointer;
+}
+
+.overflow-labels-popover {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 250px;
 }
 </style>
