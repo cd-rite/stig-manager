@@ -9,7 +9,8 @@
     :pt="{
         table: { style: 'min-width: 50rem; table-layout: fixed' },
       column: {
-          headerCell: { style: 'border-right: 1px solid var(--p-datatable-border-color); border-top: 1px solid var(--p-datatable-border-color)' }   
+          headerCell: { style: 'border-right: 1px solid var(--p-datatable-border-color); border-top: 1px solid var(--p-datatable-border-color)' },
+          bodyCell: { style: 'padding: 4px 12px' }  /* Add this */
         }
       }"
   >
