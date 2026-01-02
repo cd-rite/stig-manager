@@ -3,10 +3,9 @@ import Column from 'primevue/column'
 import Popover from 'primevue/popover'
 import { ref } from 'vue'
 
-const props = defineProps({
+defineProps({
   field: String,
   header: String,
-  // style: [String, Object],
 })
 
 const popoverRef = ref()
@@ -32,17 +31,17 @@ function hidePopover() {
       >
         {{ Array.isArray(slotProps.data[slotProps.field]) ? slotProps.data[slotProps.field].length : slotProps.data[slotProps.field] }}
       </span>
+      <Popover ref="popoverRef">
+        <div class="popover-content">
+          <ul class="item-list">
+            <li v-for="item in popoverItems" :key="item">
+              {{ item }}
+            </li>
+          </ul>
+        </div>
+      </Popover>
     </template>
   </Column>
-  <Popover ref="popoverRef">
-    <div class="popover-content">
-      <ul class="item-list">
-        <li v-for="item in popoverItems" :key="item">
-          {{ item }}
-        </li>
-      </ul>
-    </div>
-  </Popover>
 </template>
 
 <style scoped>
