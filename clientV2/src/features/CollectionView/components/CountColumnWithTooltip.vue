@@ -52,6 +52,7 @@ function hidePopover() {
 .popover-content {
   max-height: 300px;
   overflow-y: auto;
+  font-size: 12px;
 }
 
 .item-list {
