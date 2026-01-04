@@ -102,7 +102,10 @@ ACL rules:
 ### JSON Object Tree display:
 - **JsonObjectPanel**: Displays a JSON object in a formatted panel with syntax highlighting. (last claims, API responses, app info json)
 
-
+### Panels with header actions:
+- **Progress**: import ckl/scap
+- **Inventory**: export/manage
+- **findings**: details
 
 
 
