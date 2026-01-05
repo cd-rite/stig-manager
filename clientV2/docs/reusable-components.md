@@ -18,10 +18,10 @@ Outlines common component types used in the current client, and how they might m
 
 
 ### Possible additional column types:
-- **ListColumnInline**: Displays a list of items in a cell. (stig management:"earlier revisions")
+- **ListColumnInline**: Displays a list of items in a cell. (stig management:"earl  ier revisions")
 - **ListColumnNewline**: Displays a list of items in a cell. (ie. CCIs; service jobs: "tasks",schedule, last run, findings: stigs)
 - **SingleLabelColumn**: Displays a single label in a cell. Could just be label Column. (label management, metrics labels tab)
-- **privilegeColumn**: Displays checkmark if user has privilege 
+- **iconColumn**: Displays an icon (with optional tooltip). (ie. asset type icon in asset table)
 - **DataWithBadgeColumn**: Displays benchmark name with badge showing classification, type (stig management:"benchmarks", effective grants (icon, not badge...))
 - **BadgeColumn**: Displays N items in badges. (stig diff:"changed properties", stig status,)
 - **ActionColumn**: Displays action buttons. (ie. history, attachments, edit, delete)
@@ -33,7 +33,7 @@ Outlines common component types used in the current client, and how they might m
 - **ReviewStatusColumn**: Displays review status icon
 
 
-### multi-row Columns:
+### multi-line Columns:
 #### specific:
 - **AssetWithLabelsColumn**: Displays asset names along with their associated label on a sub-row. If truncated, adds a "+N" badge with a tooltip showing truncated labels.
 #### generic?:
@@ -51,8 +51,8 @@ Outlines common component types used in the current client, and how they might m
 - filtering
 - checkbox selection
 
-### Cells:
-- Hightlighted cells (collection review stats (ie. O-red, NF-green, stats-neutral))
+### column with reactive Cells:
+-  cell background (collection review stats (ie. O-red, NF-green, stats-neutral))
 
 ### Badges/icons content:
 - Severity Category - stig library, stig diff,

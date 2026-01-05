@@ -23,8 +23,12 @@ appdata import/export
 
 ### app-scoped:
 home
+
+### user functions
 Preferences
-stig library
+
+### stig library
+stig browser
 stig differ
 search?
 
