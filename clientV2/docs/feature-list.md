@@ -1,14 +1,9 @@
 
+# stigman top-level features by category:
 
+Should be reflected in client implementation structure
 
-
-# stigman top-level features:
-
-Should be reflected in client implementation structure?
-
-
-
-## App Management:
+## App Management Features:
 collections
 users
 usergroups
@@ -19,20 +14,24 @@ log stream
 appdata import/export
 
 
-## Universal features:
+## Universal Features:
 
-### app-scoped:
+### App-scoped:
 home
+Classification Banner
+Nav Tree 
 
-### user functions
+### User-scoped:
 Preferences
+Token Display
+Logout
 
-### stig library
+### Stig library scoped:
 stig browser
 stig differ
 search?
 
-### collection-scoped:
+### Collection-scoped:
 meta-dashboard
 dashboard
 metrics
@@ -40,11 +39,9 @@ asset review
 collection review
 findings
 collection management
+checklist import/export
 
 
-
-
-## both user and app management:
+## Both User and App Management:
 create collection
 grants
-checklist import/export
