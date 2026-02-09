@@ -138,11 +138,12 @@ User grants can change mid-session (e.g., removed from a collection while viewin
 1. API calls return 403
 2. On 403, the client:
    1. Re-fetches the user object (`GET /user`) to update `globalAppStore.user` with current grants/privileges
-   2. Checks if the current route is still accessible with the updated grants
-   3. If **no longer accessible** → redirect to `/collections` with a toast: *"Your access to this collection has changed"*
-   4. If **still accessible** (403 was for a different reason) → show the error normally
+   2. Re-fetches the collections list (`GET /collections`) so the NavTree reflects the updated grants — the NavTree sources its collection list independently from the user object, so both must be refreshed
+   3. Checks if the current route is still accessible with the updated grants
+   4. If **no longer accessible** → redirect to `/collections` with a toast: *"Your access to this collection has changed"*
+   5. If **still accessible** (403 was for a different reason) → show the error normally
 
-This can be implemented as a 403 interceptor in `apiClient` or as a handler in the global error composable.
+The `refreshUser()` method on `useCurrentUser()` should handle both fetches (user + collections) as a single operation. This can be triggered by a 403 interceptor in `apiClient` or by a handler in the global error composable.
 
 ---
 
