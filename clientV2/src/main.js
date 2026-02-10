@@ -67,6 +67,15 @@ try {
   console.log('router base', router.options.history.base)
   console.log('router.currentRoute.value', router.currentRoute.value)
   app.mount('#app')
+
+  // Restore route preserved through OIDC redirect
+  router.isReady().then(() => {
+    const returnTo = sessionStorage.getItem('oidcReturnTo')
+    if (returnTo) {
+      sessionStorage.removeItem('oidcReturnTo')
+      router.replace(returnTo)
+    }
+  })
 }
 // catch all for any errors
 catch (err) {

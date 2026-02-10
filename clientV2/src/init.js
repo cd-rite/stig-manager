@@ -38,7 +38,9 @@ if (!window.isSecureContext) {
 
 async function authorize() {
   const url = new URL(window.location.href)
-  const redirectUri = `${url.origin}${url.pathname}`
+  const redirectUri = STIGMAN.Env.historyBase
+    ? `${url.origin}${STIGMAN.Env.historyBase}`
+    : `${url.origin}${url.pathname}`
 
   const response = await initializeOidcWorker(redirectUri)
   if (response.error) {
@@ -122,6 +124,20 @@ async function handleNoParameters() {
   } else if (response.redirect) {
     sessionStorage.setItem('codeVerifier', response.codeVerifier)
     sessionStorage.setItem('oidcState', response.state)
+    // Preserve the intended route through the OIDC redirect
+    // Hash mode: only the hash fragment matters (pathname is the server path, not a route)
+    // History mode: strip the base so router.replace() gets a path relative to base
+    let intendedRoute = '/'
+    if (window.location.hash) {
+      intendedRoute = window.location.hash.substring(1)
+    }
+    else if (STIGMAN.Env.historyBase) {
+      const base = STIGMAN.Env.historyBase.replace(/\/$/, '')
+      intendedRoute = window.location.pathname.slice(base.length) || '/'
+    }
+    if (intendedRoute && intendedRoute !== '/') {
+      sessionStorage.setItem(`oidcReturnTo:${response.state}`, intendedRoute)
+    }
     window.location.href = response.redirect
     return false
   }
@@ -157,6 +173,12 @@ async function handleRedirectAndParameters(redirectUri, paramStr) {
     OW.token = response.accessToken
     OW.tokenParsed = response.accessTokenPayload
     window.history.replaceState(window.history.state, '', redirectUri)
+    // Retrieve the preserved route and store under a short-lived key for main.js
+    const returnTo = sessionStorage.getItem(`oidcReturnTo:${params.state}`)
+    sessionStorage.removeItem(`oidcReturnTo:${params.state}`)
+    if (returnTo) {
+      sessionStorage.setItem('oidcReturnTo', returnTo)
+    }
     sessionStorage.removeItem('codeVerifier')
     sessionStorage.removeItem('oidcState')
     return true
