@@ -4,6 +4,52 @@ How the Vue client gates routes, UI elements, and data access based on user priv
 
 ---
 
+## Authentication Bootstrap
+
+How `init.js` authenticates the user via OIDC and preserves the intended route through the login redirect, and how `main.js` restores that route once the Vue router is ready. Once complete, the authorization layer (route guards, privilege checks) takes over.
+
+### The problem
+
+When a user navigates directly to a deep link (e.g., `/#/collection/123/stigs` via bookmark or shared URL) without a valid token, `init.js` redirects to the OIDC provider. The hash fragment is **lost** during this redirect — `window.location.href = authorizationUrl` is a full navigation that discards the fragment entirely. This is true across all supported providers (Keycloak, Okta, Azure Entra ID). RFC 6749 Section 3.1.2 also prohibits fragments in `redirect_uri`.
+
+### The approach: `sessionStorage` keyed by OIDC state nonce
+
+This is the standard approach (recommended by Auth0, used by oidc-client-ts) and fits naturally into the existing `init.js` pattern, which already stores `codeVerifier` and `oidcState` in `sessionStorage`.
+
+1. **Before OIDC redirect** (`init.js` → `handleNoParameters()`): extract and save the intended route to `sessionStorage`, keyed by the OIDC state nonce for cross-tab isolation
+2. **After OIDC callback** (`init.js` → `handleRedirectAndParameters()`): retrieve the route by state nonce, move it to a short-lived `oidcReturnTo` key for `main.js`
+3. **After router is ready** (`main.js`): read `oidcReturnTo` from `sessionStorage` and call `router.replace()` to navigate to the preserved route
+4. **Then** the authorization layer (route guards, described below) checks whether the user has the necessary grants/privileges for that route
+
+**Extracting the intended route (step 1)** depends on routing mode:
+- **Hash mode**: the route is in `window.location.hash` (e.g., `#/collection/123` → `/collection/123`). The server pathname (e.g., `/client-v2/`) is ignored — it's the server path, not a client route.
+- **History mode**: the route is in `window.location.pathname`, with `historyBase` stripped (e.g., pathname `/client-v2/collection/123` with `historyBase: "/client-v2/"` → `/collection/123`).
+- **No deep link** (no hash, or pathname equals the base): `intendedRoute` defaults to `/` and nothing is saved.
+
+Using `router.replace()` (not `push()`) ensures the home route doesn't end up in browser history. Keying by the state nonce during the OP round-trip prevents cross-tab contamination — each tab's auth flow preserves its own intended route independently.
+
+### `redirectUri` and history mode
+
+The `redirectUri` passed to the OIDC provider must be a single, predictable URL registered in the provider's allowed redirect URIs. In hash mode, `redirectUri` is naturally `origin + pathname` (the hash isn't included). In history mode, `pathname` would be the full deep-link path (e.g., `/client-v2/collection/17/stigs`), which varies per route and can't all be registered. So when `historyBase` is set, `redirectUri` uses `origin + historyBase` instead (e.g., `http://host/client-v2/`), giving a single predictable redirect target.
+
+### History mode and `historyBase`
+
+Hash-based routing is the default, but history mode (`createWebHistory`) is needed for environments where URL fragments are stripped from links (common in Teams and email sanitizers). History mode is enabled by setting `STIGMAN_CLIENT_HISTORY_BASE` to the path the app is served at (e.g., `/` or `/instance/`).
+
+### Relative paths and the `<base>` tag
+
+Several resource paths in `index.html` and worker registrations in `init.js` are relative (`init.css`, `./Env.js`, `shield-green-check.svg`, `workers/*.js`). In history mode at a deep route like `/collection/17/stigs`, the browser would resolve these against `/collection/17/` instead of the app root — breaking the bootstrap.
+
+The fix uses the HTML `<base>` element, which sets the document's base URL for all relative path resolution (including `href`, `src`, `new SharedWorker(url)`, and `navigator.serviceWorker.register(url)`):
+
+- **Production**: The API (`api/source/bootstrap/client.js`) injects `<base href="${historyBase}">` into `index.html` when serving requests without a file extension (i.e., SPA fallback routes). This makes relative paths resolve from the configured base (e.g., `/client-v2/`).
+- **Dev mode**: A Vite plugin in `vite.config.js` injects `<base href="/">` via `transformIndexHtml` (dev only — `command === 'serve'`). Vite serves all files from `/`, so this is the correct base.
+- **Hash mode**: No `<base>` tag is needed because the pathname is always the app root (the route lives in the hash fragment, which doesn't affect path resolution).
+
+Whether injected by the API (production) or the Vite plugin (dev), the `<base>` tag means `index.html` and `init.js` don't need any changes to their relative paths — resolution is handled transparently. The only code in `init.js` that needs routing-mode awareness is `redirectUri` construction and `intendedRoute` extraction, which are about OIDC protocol and route parsing, not resource loading.
+
+---
+
 ## Privilege Source: `globalAppStore.user`
 
 The canonical source for privilege and grant data is `globalAppStore.user`, populated at boot from `GET /user`. This object contains:
