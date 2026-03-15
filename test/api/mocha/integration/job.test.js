@@ -774,6 +774,422 @@ describe('Task tests', function () {
         expect(review.result).to.eql('notchecked')
       }
     })
+
+    it('should create history snapshot after status update', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      const testAssetId = '42'
+      const testRuleId = 'SV-106179r1_rule'
+
+      // Capture review state and history before aging
+      const reviewBefore = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews/${testAssetId}/${testRuleId}?projection=history`,
+        'GET', user.token
+      )
+      expect(reviewBefore.status).to.eql(200)
+      const statusBefore = reviewBefore.body.status.label
+      const historyLengthBefore = reviewBefore.body.history.length
+
+      await runAgingWithConfig([{
+        triggerField: 'ts',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'update',
+        updateField: 'status',
+        updateValue: 'saved',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      // Verify history snapshot was created with the pre-update state
+      const reviewAfter = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews/${testAssetId}/${testRuleId}?projection=history`,
+        'GET', user.token
+      )
+      expect(reviewAfter.status).to.eql(200)
+      expect(reviewAfter.body.status.label).to.eql('saved')
+      expect(reviewAfter.body.history.length).to.eql(historyLengthBefore + 1)
+      // Most recent history entry should have the old status
+      const newestHistory = reviewAfter.body.history[0]
+      expect(newestHistory.status.label).to.eql(statusBefore)
+    })
+
+    it('should create history snapshot after result update', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      const testAssetId = '42'
+      const testRuleId = 'SV-106179r1_rule'
+
+      // Capture review state before aging
+      const reviewBefore = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews/${testAssetId}/${testRuleId}?projection=history`,
+        'GET', user.token
+      )
+      expect(reviewBefore.status).to.eql(200)
+      const resultBefore = reviewBefore.body.result
+      const historyLengthBefore = reviewBefore.body.history.length
+
+      await runAgingWithConfig([{
+        triggerField: 'ts',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'update',
+        updateField: 'result',
+        updateValue: 'notReviewed',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      const reviewAfter = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews/${testAssetId}/${testRuleId}?projection=history`,
+        'GET', user.token
+      )
+      expect(reviewAfter.status).to.eql(200)
+      expect(reviewAfter.body.result).to.eql('notchecked')
+      expect(reviewAfter.body.history.length).to.eql(historyLengthBefore + 1)
+      // Most recent history entry should have the old result
+      const newestHistory = reviewAfter.body.history[0]
+      expect(newestHistory.result).to.eql(resultBefore)
+    })
+
+    it('should attribute status update to the task user', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      await runAgingWithConfig([{
+        triggerField: 'ts',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'update',
+        updateField: 'status',
+        updateValue: 'saved',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      const reviewsRes = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews`,
+        'GET', user.token
+      )
+      expect(reviewsRes.status).to.eql(200)
+      for (const review of reviewsRes.body) {
+        expect(review.status.user.username).to.eql('_task_ReviewAging')
+      }
+    })
+
+    it('should attribute result update to the task user', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      await runAgingWithConfig([{
+        triggerField: 'ts',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'update',
+        updateField: 'result',
+        updateValue: 'notReviewed',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      const reviewsRes = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews`,
+        'GET', user.token
+      )
+      expect(reviewsRes.status).to.eql(200)
+      for (const review of reviewsRes.body) {
+        // Result update also resets status, so both should be attributed to task user
+        expect(review.status.user.username).to.eql('_task_ReviewAging')
+      }
+    })
+
+    it('should refresh asset stats after status update', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      await runAgingWithConfig([{
+        triggerField: 'ts',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'update',
+        updateField: 'status',
+        updateValue: 'saved',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      // Verify stats reflect all reviews now being 'saved'
+      const assetRes = await utils.executeRequest(
+        `${config.baseUrl}/assets/42?projection=statusStats`,
+        'GET', user.token
+      )
+      expect(assetRes.status).to.eql(200)
+      const stats = assetRes.body.statusStats
+      expect(stats.submittedCount).to.eql(0)
+      expect(stats.acceptedCount).to.eql(0)
+      expect(stats.rejectedCount).to.eql(0)
+      expect(stats.savedCount).to.be.greaterThan(0)
+    })
+
+    it('should refresh asset stats after delete', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      // Verify stats are non-zero before
+      const assetBefore = await utils.executeRequest(
+        `${config.baseUrl}/assets/42?projection=statusStats`,
+        'GET', user.token
+      )
+      expect(assetBefore.status).to.eql(200)
+      const totalBefore = assetBefore.body.statusStats.savedCount
+        + assetBefore.body.statusStats.submittedCount
+        + assetBefore.body.statusStats.acceptedCount
+        + assetBefore.body.statusStats.rejectedCount
+      expect(totalBefore).to.be.greaterThan(0)
+
+      await runAgingWithConfig([{
+        triggerField: 'ts',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'delete',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      const assetAfter = await utils.executeRequest(
+        `${config.baseUrl}/assets/42?projection=statusStats`,
+        'GET', user.token
+      )
+      expect(assetAfter.status).to.eql(200)
+      const stats = assetAfter.body.statusStats
+      expect(stats.savedCount).to.eql(0)
+      expect(stats.submittedCount).to.eql(0)
+      expect(stats.acceptedCount).to.eql(0)
+      expect(stats.rejectedCount).to.eql(0)
+    })
+
+    it('should restrict affected reviews using updateFilter.benchmarkIds (verified)', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      // Capture statuses before
+      const reviewsBefore = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews`,
+        'GET', user.token
+      )
+      const statusesBefore = {}
+      for (const r of reviewsBefore.body) {
+        statusesBefore[`${r.assetId}-${r.ruleId}`] = r.status.label
+      }
+
+      await runAgingWithConfig([{
+        triggerField: 'ts',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'update',
+        updateField: 'status',
+        updateValue: 'saved',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: ['VPN_SRG_TEST'] },
+        enabled: true
+      }])
+
+      const reviewsAfter = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews`,
+        'GET', user.token
+      )
+      expect(reviewsAfter.status).to.eql(200)
+
+      // All reviews should still exist (update, not delete)
+      expect(reviewsAfter.body.length).to.eql(reviewsBefore.body.length)
+
+      // Check that reviews on assets with VPN_SRG_TEST are affected
+      let affectedCount = 0
+      for (const review of reviewsAfter.body) {
+        const key = `${review.assetId}-${review.ruleId}`
+        if (review.status.label === 'saved' && statusesBefore[key] !== 'saved') {
+          affectedCount++
+        }
+      }
+      expect(affectedCount).to.be.greaterThan(0)
+    })
+
+    it('should restrict affected reviews using updateFilter.labelIds', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      // test-label-lvl1 is assigned to asset 42 only
+      const labelId = '5130dc84-9a68-11ec-b1bc-0242ac110002'
+      const labeledAssetId = 42
+
+      // Capture statuses before
+      const reviewsBefore = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews`,
+        'GET', user.token
+      )
+
+      await runAgingWithConfig([{
+        triggerField: 'ts',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'update',
+        updateField: 'status',
+        updateValue: 'saved',
+        updateFilter: { assetIds: [], labelIds: [labelId], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      const reviewsAfter = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews`,
+        'GET', user.token
+      )
+      expect(reviewsAfter.status).to.eql(200)
+
+      for (const review of reviewsAfter.body) {
+        if (review.assetId === labeledAssetId) {
+          // Labeled asset's reviews should be updated
+          expect(review.status.label).to.eql('saved')
+        }
+      }
+
+      // Verify at least some non-labeled asset reviews are unchanged
+      const unchangedReviews = reviewsAfter.body.filter(r => {
+        const before = reviewsBefore.body.find(b => b.assetId === r.assetId && b.ruleId === r.ruleId)
+        return r.assetId !== labeledAssetId && before && r.status.label === before.status.label
+      })
+      expect(unchangedReviews.length).to.be.greaterThan(0)
+    })
+
+    it('should evaluate multiple rules in a single config', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      await runAgingWithConfig([
+        {
+          triggerField: 'ts',
+          triggerBasis: 'now',
+          triggerInterval: 0,
+          triggerAction: 'update',
+          updateField: 'status',
+          updateValue: 'saved',
+          updateFilter: { assetIds: ['42'], labelIds: [], benchmarkIds: [] },
+          enabled: true
+        },
+        {
+          triggerField: 'ts',
+          triggerBasis: 'now',
+          triggerInterval: 0,
+          triggerAction: 'update',
+          updateField: 'result',
+          updateValue: 'notReviewed',
+          updateFilter: { assetIds: ['154'], labelIds: [], benchmarkIds: [] },
+          enabled: true
+        }
+      ])
+
+      // Asset 42 reviews should have status=saved (rule 0)
+      const asset42Reviews = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews/42`,
+        'GET', user.token
+      )
+      expect(asset42Reviews.status).to.eql(200)
+      for (const review of asset42Reviews.body) {
+        expect(review.status.label).to.eql('saved')
+      }
+
+      // Asset 154 reviews should have result=notchecked (rule 1)
+      const asset154Reviews = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews/154`,
+        'GET', user.token
+      )
+      expect(asset154Reviews.status).to.eql(200)
+      for (const review of asset154Reviews.body) {
+        expect(review.result).to.eql('notchecked')
+      }
+    })
+
+    it('should delete review history when reviews are deleted', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      // Verify history exists before by fetching actual history entries
+      const historyBefore = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/review-history`,
+        'GET', user.token
+      )
+      expect(historyBefore.status).to.eql(200)
+      expect(historyBefore.body).to.be.an('array').with.length.greaterThan(0)
+
+      await runAgingWithConfig([{
+        triggerField: 'ts',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'delete',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      // Verify all history is also gone
+      const historyAfter = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/review-history`,
+        'GET', user.token
+      )
+      expect(historyAfter.status).to.eql(200)
+      expect(historyAfter.body).to.be.an('array').with.lengthOf(0)
+    })
+
+    it('should use statusTs as trigger field when configured', async function () {
+      this.timeout(60_000)
+      await utils.loadAppData()
+
+      const reviewsBefore = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews`,
+        'GET', user.token
+      )
+      // Cutoff before all data — no reviews should have statusTs < 2000-01-01
+      await runAgingWithConfig([{
+        triggerField: 'statusTs',
+        triggerBasis: '2000-01-01T00:00:00Z',
+        triggerInterval: 0,
+        triggerAction: 'update',
+        updateField: 'status',
+        updateValue: 'saved',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      // Verify no reviews affected
+      const reviewsAfterNoMatch = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews`,
+        'GET', user.token
+      )
+      const statusesBefore = reviewsBefore.body.map(r => ({ assetId: r.assetId, ruleId: r.ruleId, status: r.status.label }))
+      const statusesAfter = reviewsAfterNoMatch.body.map(r => ({ assetId: r.assetId, ruleId: r.ruleId, status: r.status.label }))
+      expect(statusesAfter).to.deep.equal(statusesBefore)
+
+      // Now use 'now' basis — all reviews should be affected
+      await utils.loadAppData()
+      await deleteTestJobs()
+      await runAgingWithConfig([{
+        triggerField: 'statusTs',
+        triggerBasis: 'now',
+        triggerInterval: 0,
+        triggerAction: 'update',
+        updateField: 'status',
+        updateValue: 'saved',
+        updateFilter: { assetIds: [], labelIds: [], benchmarkIds: [] },
+        enabled: true
+      }])
+
+      const reviewsAfterMatch = await utils.executeRequest(
+        `${config.baseUrl}/collections/${collectionId}/reviews`,
+        'GET', user.token
+      )
+      for (const review of reviewsAfterMatch.body) {
+        expect(review.status.label).to.eql('saved')
+      }
+    })
   })
 })
 
