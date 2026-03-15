@@ -1389,7 +1389,7 @@ BEGIN
 
             IF IFNULL(v_numReviews, 0) > 0 THEN
               IF v_triggerAction = 'delete' THEN
-                -- Capture affected saIds before deleting reviews (reviews won't exist after)
+                -- Capture affected saIds before deleting reviews (reviews will not exist after)
                 SET @v_saIds = (
                   SELECT JSON_ARRAYAGG(saId) FROM (
                     SELECT DISTINCT sa.saId
