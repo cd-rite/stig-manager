@@ -86,7 +86,7 @@ const upMigration = [
             );
             SET v_curMinId = v_curMinId + v_incrementValue;
             SET v_curMaxId = v_curMaxId + v_incrementValue;
-          UNTIL ROW_COUNT() = 0 END REPEAT;
+          UNTIL v_curMinId > v_numHistoryIds END REPEAT;
         END IF;
         DROP TEMPORARY TABLE IF EXISTS t_historyIds;
 
@@ -99,7 +99,7 @@ const upMigration = [
           );
           SET v_curMinId = v_curMinId + v_incrementValue;
           SET v_curMaxId = v_curMaxId + v_incrementValue;
-        UNTIL ROW_COUNT() = 0 END REPEAT;
+        UNTIL v_curMinId > v_numReviewIds END REPEAT;
       END IF;
     END`,
 
@@ -140,7 +140,7 @@ const upMigration = [
           );
           SET v_curMinId = v_curMinId + v_incrementValue;
           SET v_curMaxId = v_curMaxId + v_incrementValue;
-        UNTIL ROW_COUNT() = 0 END REPEAT;
+        UNTIL v_curMinId > v_numReviewIds END REPEAT;
       END IF;
     END`,
 
@@ -185,7 +185,7 @@ const upMigration = [
           );
           SET v_curMinId = v_curMinId + v_incrementValue;
           SET v_curMaxId = v_curMaxId + v_incrementValue;
-        UNTIL ROW_COUNT() = 0 END REPEAT;
+        UNTIL v_curMinId > v_numReviewIds END REPEAT;
       END IF;
     END`,
 
@@ -211,7 +211,7 @@ const upMigration = [
           rh.historyId,
           ROW_NUMBER() OVER (PARTITION BY r.reviewId ORDER BY rh.historyId DESC) AS rowNum
         FROM review_history rh
-        LEFT JOIN review r USING (reviewId)
+        INNER JOIN review r USING (reviewId)
         WHERE r.reviewId IN (SELECT reviewId FROM t_reviewIds)
       )
       DELETE review_history
@@ -535,6 +535,19 @@ const upMigration = [
             SET v_updateValue     = JSON_UNQUOTE(JSON_EXTRACT(v_rule, '$.updateValue'));
             SET v_updateFilter    = JSON_EXTRACT(v_rule, '$.updateFilter');
 
+            -- Validate extracted values
+            IF v_triggerField NOT IN ('ts', 'statusTs', 'touchTs') THEN
+              SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid triggerField value';
+            END IF;
+
+            IF v_triggerAction NOT IN ('delete', 'update') THEN
+              SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid triggerAction value';
+            END IF;
+
+            IF v_triggerAction = 'update' AND v_updateField NOT IN ('status', 'result') THEN
+              SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid updateField value';
+            END IF;
+
             -- Compute cutoff datetime
             -- CAST() does not accept ISO8601 T/Z separators; strip them with REPLACE before casting
             IF v_triggerBasis = 'now' THEN
@@ -646,6 +659,9 @@ const downMigration = [
   `ALTER TABLE task_output DROP FOREIGN KEY fk_to_collectionId`,
   `ALTER TABLE task_output DROP COLUMN collectionId`,
   `DROP TABLE IF EXISTS task_collection_config`,
+  `DELETE FROM user_data WHERE username = '_task_ReviewAging'`,
+  `ALTER TABLE user_data DROP FOREIGN KEY fk_ud_taskId`,
+  `ALTER TABLE user_data DROP COLUMN taskId`,
   `DELETE FROM task WHERE taskId = 5`,
 ]
 

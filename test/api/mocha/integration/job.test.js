@@ -802,7 +802,6 @@ async function runImmediateTask(taskname) {
 }
 
 async function deleteTestJobs() {
-  // return // comment out unless keeping test jobs for inspection after tests
   const res = await utils.executeRequest(`${config.baseUrl}/jobs?elevate=true`, 'GET', user.token)
   for (let job of res.body) {
     if (job.name.startsWith('Test Job')) {

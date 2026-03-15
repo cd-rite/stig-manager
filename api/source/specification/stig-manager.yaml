@@ -7866,9 +7866,10 @@ components:
           updateField:
             type: string
             enum: [status, result]
+            description: Required when triggerAction is 'update'
           updateValue:
             type: string
-            description: Status or result value depending on updateField
+            description: Required when triggerAction is 'update'. The target value for the field specified by updateField.
           updateFilter:
             type: object
             additionalProperties: false

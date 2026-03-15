@@ -1048,7 +1048,7 @@ BEGIN
             );
             SET v_curMinId = v_curMinId + v_incrementValue;
             SET v_curMaxId = v_curMaxId + v_incrementValue;
-          UNTIL ROW_COUNT() = 0 END REPEAT;
+          UNTIL v_curMinId > v_numHistoryIds END REPEAT;
         END IF;
         DROP TEMPORARY TABLE IF EXISTS t_historyIds;
 
@@ -1061,7 +1061,7 @@ BEGIN
           );
           SET v_curMinId = v_curMinId + v_incrementValue;
           SET v_curMaxId = v_curMaxId + v_incrementValue;
-        UNTIL ROW_COUNT() = 0 END REPEAT;
+        UNTIL v_curMinId > v_numReviewIds END REPEAT;
       END IF;
     END $
 DELIMITER ;
@@ -1178,7 +1178,7 @@ BEGIN
           rh.historyId,
           ROW_NUMBER() OVER (PARTITION BY r.reviewId ORDER BY rh.historyId DESC) AS rowNum
         FROM review_history rh
-        LEFT JOIN review r USING (reviewId)
+        INNER JOIN review r USING (reviewId)
         WHERE r.reviewId IN (SELECT reviewId FROM t_reviewIds)
       )
       DELETE review_history
@@ -1305,6 +1305,19 @@ BEGIN
             SET v_updateField     = JSON_UNQUOTE(JSON_EXTRACT(v_rule, '$.updateField'));
             SET v_updateValue     = JSON_UNQUOTE(JSON_EXTRACT(v_rule, '$.updateValue'));
             SET v_updateFilter    = JSON_EXTRACT(v_rule, '$.updateFilter');
+
+            -- Validate extracted values
+            IF v_triggerField NOT IN ('ts', 'statusTs', 'touchTs') THEN
+              SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid triggerField value';
+            END IF;
+
+            IF v_triggerAction NOT IN ('delete', 'update') THEN
+              SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid triggerAction value';
+            END IF;
+
+            IF v_triggerAction = 'update' AND v_updateField NOT IN ('status', 'result') THEN
+              SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid updateField value';
+            END IF;
 
             -- Compute cutoff datetime
             -- CAST() does not accept ISO8601 T/Z separators; strip them with REPLACE before casting
@@ -1575,7 +1588,7 @@ BEGIN
           );
           SET v_curMinId = v_curMinId + v_incrementValue;
           SET v_curMaxId = v_curMaxId + v_incrementValue;
-        UNTIL ROW_COUNT() = 0 END REPEAT;
+        UNTIL v_curMinId > v_numReviewIds END REPEAT;
       END IF;
     END $
 DELIMITER ;
@@ -1622,7 +1635,7 @@ BEGIN
           );
           SET v_curMinId = v_curMinId + v_incrementValue;
           SET v_curMaxId = v_curMaxId + v_incrementValue;
-        UNTIL ROW_COUNT() = 0 END REPEAT;
+        UNTIL v_curMinId > v_numReviewIds END REPEAT;
       END IF;
     END $
 DELIMITER ;
