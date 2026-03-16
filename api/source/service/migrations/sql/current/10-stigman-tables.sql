@@ -1389,21 +1389,17 @@ BEGIN
 
             IF IFNULL(v_numReviews, 0) > 0 THEN
               IF v_triggerAction = 'delete' THEN
-                -- Capture affected saIds before deleting reviews (reviews will not exist after)
-                SET @v_saIds = (
-                  SELECT JSON_ARRAYAGG(saId) FROM (
-                    SELECT DISTINCT sa.saId
+                -- Capture affected assetIds before deleting (reviews will not exist after)
+                SET @v_deleteAssetIds = (
+                  SELECT JSON_ARRAYAGG(assetId) FROM (
+                    SELECT DISTINCT r.assetId
                     FROM t_reviewIds tri
                     INNER JOIN review r ON tri.reviewId = r.reviewId
-                    INNER JOIN rule_version_check_digest rvcd ON (rvcd.version = r.version AND rvcd.checkDigest = r.checkDigest)
-                    INNER JOIN rev_group_rule_map rgr ON rgr.ruleId = rvcd.ruleId
-                    INNER JOIN revision rev ON rev.revId = rgr.revId
-                    INNER JOIN stig_asset_map sa ON (sa.assetId = r.assetId AND sa.benchmarkId = rev.benchmarkId)
-                  ) AS distinct_saIds
+                  ) AS x
                 );
                 CALL delete_review_batch();
-                IF @v_saIds IS NOT NULL THEN
-                  CALL update_stats_asset_stig(JSON_OBJECT('saIds', @v_saIds));
+                IF @v_deleteAssetIds IS NOT NULL THEN
+                  CALL update_stats_asset_stig(JSON_OBJECT('assetIds', @v_deleteAssetIds));
                 END IF;
               ELSEIF v_triggerAction = 'update' THEN
                 SELECT CAST(c.settings->>"$.history.maxReviews" AS UNSIGNED)
