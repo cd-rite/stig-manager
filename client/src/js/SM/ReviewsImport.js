@@ -853,6 +853,26 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
             }
         })
 
+        this.updateAssetPropsCb = new SM.Global.HelperCheckbox({
+            boxLabel: 'Update existing Asset properties',
+            name: 'updateAssetProps',
+            checked: this.initialOptions.updateAssetProps ?? false,
+            helpText: SM.TipContent.ImportOptions.UpdateAssetProps,
+            hideLabel: true,
+            disabled: this.context === 'wizard',
+            listeners: {
+                check: function (cb, checked) {
+                    if (_this.localStorage) {
+                        localStorage.setItem('wizardImportOptions', JSON.stringify(_this.getOptions()))
+                    }
+                    _this.onOptionChanged?.(_this, cb, checked)
+                }
+            }
+        })
+        this.updateAssetPropsCb.setReadOnly = function (readOnly) {
+            _this.updateAssetPropsCb.setDisabled(readOnly)
+        }
+
         this.autoStatusFieldGroup = new Ext.form.FieldSet({
             title: 'Review Status Per Result',
             border: true,
@@ -879,7 +899,8 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
             this.unreviewedCombo,
             this.unreviewedCommentedCombo,
             this.emptyDetailCombo,
-            this.emptyCommentCombo
+            this.emptyCommentCombo,
+            this.updateAssetPropsCb
         ]
         this.allowCustomCb = new Ext.form.Checkbox({
             boxLabel: `Options can be customized for each import`,
@@ -952,6 +973,7 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
                 unreviewedCommented: _this.unreviewedCommentedCombo.value ,  
                 emptyDetail: _this.emptyDetailCombo.value,
                 emptyComment: _this.emptyCommentCombo.value,
+                updateAssetProps: _this.updateAssetPropsCb.checked,
                 allowCustom: _this.allowCustomCb.checked
             }
             return options
