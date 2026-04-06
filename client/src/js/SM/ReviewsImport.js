@@ -1346,7 +1346,7 @@ SM.ReviewsImport.MultiSelectPanel = Ext.extend(Ext.Panel, {
     initComponent: function () {
         const _this = this
         this.parseOptionsFieldSet = new SM.ReviewsImport.ParseOptionsFieldSet({
-            height: 300,
+            height: 330,
             context: this.optionsContext,
             canAccept: true,
             initialOptions: this.initialOptions,
@@ -1430,7 +1430,7 @@ SM.ReviewsImport.SelectFilesPanel = Ext.extend(Ext.Panel, {
         }
 
         this.parseOptionsFieldSet = new SM.ReviewsImport.ParseOptionsFieldSet({
-            height: 300,
+            height: 330,
             context: 'wizard',
             initialOptions: this.initialOptions,
             canAccept: this.canAccept
