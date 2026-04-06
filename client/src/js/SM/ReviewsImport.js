@@ -2373,14 +2373,15 @@ async function showImportResultFiles(collectionId, createObjects = true) {
                 fpwindow.add(progressPanel)
                 fpwindow.doLayout()
 
+                const { updateAssetProps } = fp.parseOptionsFieldSet.getOptions()
                 let processedCount = 0
                 for (const taskAsset of taskAssets.values()) {
                     try {
                         let assetId = taskAsset.assetProps.assetId
                         updateProgress(processedCount / taskAssets.size, taskAsset.assetProps.name)
                         let importAssetResult
-                        if (modifyAssets && (!taskAsset.knownAsset || taskAsset.hasNewAssignment)) {
-                            importAssetResult = await importAsset(taskAsset)
+                        if (modifyAssets && (!taskAsset.knownAsset || taskAsset.hasNewAssignment || (taskAsset.hasUpdatedAssetProps && updateAssetProps))) {
+                            importAssetResult = await importAsset(taskAsset, updateAssetProps)
                             updateStatusGrid(importAssetResult)
                             assetId = importAssetResult.assetId
                         }
@@ -2426,14 +2427,18 @@ async function showImportResultFiles(collectionId, createObjects = true) {
                 progressPanel.st.store.loadData(status, true)
             }
 
-            async function importAsset(taskAsset) {
+            async function importAsset(taskAsset, updateAssetProps) {
                 let url, method, jsonData
-                if (taskAsset.knownAsset && taskAsset.hasNewAssignment) {
+                if (taskAsset.knownAsset) {
                     url = `${STIGMAN.Env.apiBase}/assets/${taskAsset.assetProps.assetId}`
                     method = 'PATCH'
-                    jsonData = {
-                        collectionId: taskAsset.assetProps.collectionId,
-                        stigs: taskAsset.assetProps.stigs
+                    jsonData = { collectionId: taskAsset.assetProps.collectionId }
+                    if (taskAsset.hasNewAssignment) {
+                        jsonData.stigs = taskAsset.assetProps.stigs
+                    }
+                    if (taskAsset.hasUpdatedAssetProps && updateAssetProps) {
+                        const { ip, fqdn, mac, noncomputing, metadata } = taskAsset.assetProps
+                        Object.assign(jsonData, { ip, fqdn, mac, noncomputing, metadata })
                     }
                 }
                 else {
