@@ -5,8 +5,8 @@ import { computed, ref } from 'vue'
 import lineHeightDown from '../../../assets/line-height-down.svg'
 import lineHeightUp from '../../../assets/line-height-up.svg'
 import shieldGreenCheck from '../../../assets/shield-green-check.svg'
-import Label from '../../../components/common/Label.vue'
-import { normalizeColor } from '../../../shared/lib/colorUtils.js'
+import LabelsRow from '../../../components/columns/LabelsRow.vue'
+import ColumnToggle from '../../../components/common/ColumnToggle.vue'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
 import { useSearch } from '../composables/useSearch.js'
 
@@ -31,7 +31,9 @@ const props = defineProps({
 
 // No emits currently used directly in this component
 const {
-  displayMode,
+  checklistColumns,
+  selectedChecklistColumns,
+  displayModeItems,
   lineClamp,
   increaseRowHeight,
   decreaseRowHeight,
@@ -48,40 +50,8 @@ const headerTitle = computed(() => {
   return 'Checklist'
 })
 
-const displayModeMenuItems = computed(() => [
-  {
-    label: 'Group ID and Rule title',
-    icon: displayMode.value === 'groupRule' ? 'pi pi-circle-fill' : 'pi pi-circle',
-    command: () => { displayMode.value = 'groupRule' },
-  },
-  {
-    label: 'Group ID and Group title',
-    icon: displayMode.value === 'groupGroup' ? 'pi pi-circle-fill' : 'pi pi-circle',
-    command: () => { displayMode.value = 'groupGroup' },
-  },
-  {
-    label: 'Rule ID and Rule title',
-    icon: displayMode.value === 'ruleRule' ? 'pi pi-circle-fill' : 'pi pi-circle',
-    command: () => { displayMode.value = 'ruleRule' },
-  },
-])
-
-const checklistMenuPT = {
-  root: { style: 'background: var(--color-background-dark); border: 1px solid var(--color-border-default); border-radius: 4px; box-shadow: 0 6px 24px rgba(0,0,0,0.6); padding: 0.4rem 0; min-width: 16.5rem; font-family: inherit;' },
-  itemContent: { style: 'border-radius: 2px; margin: 0 0.25rem;' },
-  itemLink: { style: 'padding: 0.6rem 0.9rem; color: var(--color-text-primary); font-size: 1.05rem; font-weight: 400; gap: 0.65rem; text-decoration: none; transition: background 0.12s;' },
-  itemIcon: { style: 'font-size: 1rem; color: var(--color-text-dim);' },
-  itemLabel: { style: 'font-size: 1.2rem;' },
-  submenuIcon: { style: 'font-size: 0.8rem; color: var(--color-text-dim); margin-left: auto;' },
-  submenu: { style: 'background: var(--color-background-dark); border: 1px solid var(--color-border-default); border-radius: 4px; box-shadow: 0 6px 24px rgba(0,0,0,0.6); padding: 0.4rem 0; min-width: 14rem;' },
-  separator: { style: 'border: none; border-top: 1px solid var(--color-border-light); margin: 0.35rem 0;' },
-}
-
 const checklistMenuItems = computed(() => [
-  {
-    label: 'Group/Rule display',
-    items: displayModeMenuItems.value,
-  },
+  displayModeItems.value[0],
   {
     label: 'Export to file',
     icon: 'pi pi-download',
@@ -104,24 +74,20 @@ const checklistMenuItems = computed(() => [
   },
 ])
 
+const checklistMenuPT = {
+  root: { style: 'background: var(--color-background-dark); border: 1px solid var(--color-border-default); border-radius: 4px; box-shadow: 0 6px 24px rgba(0,0,0,0.6); padding: 0.25rem 0; min-width: 12rem;' },
+  menu: { style: 'background: transparent; outline: none;' },
+  menuitem: { style: 'margin: 0;' },
+  content: { style: 'padding: 0.4rem 0.8rem; color: var(--color-text-primary); border-radius: 0; transition: background-color 0.1s; display: flex; align-items: center;' },
+  icon: { style: 'color: var(--color-text-dim); margin-right: 0.5rem; font-size: 0.95rem;' },
+  label: { style: 'font-size: 0.95rem;' },
+  separator: { style: 'border-top: 1px solid var(--color-border-light); margin: 0.25rem 0;' },
+  submenuIcon: { style: 'color: var(--color-text-dim); font-size: 0.75rem; margin-left: auto;' },
+}
+
 function toggleChecklistMenu(event) {
   checklistMenu.value.toggle(event)
 }
-
-const maxVisibleLabels = 3
-const visibleAssetLabels = computed(() => {
-  if (!props.asset?.labels) {
-    return []
-  }
-  return props.asset.labels.slice(0, maxVisibleLabels)
-})
-
-const overflowAssetLabelsCount = computed(() => {
-  if (!props.asset?.labels) {
-    return 0
-  }
-  return Math.max(0, props.asset.labels.length - maxVisibleLabels)
-})
 </script>
 
 <template>
@@ -134,16 +100,7 @@ const overflowAssetLabelsCount = computed(() => {
           <span class="asset-info__id">ID: {{ asset.assetId || asset.id }}</span>
           <span v-if="asset.ip" class="asset-info__ip">IP: {{ asset.ip }}</span>
           <div v-if="asset.labels?.length" class="asset-info__labels">
-            <Label
-              v-for="label in visibleAssetLabels" :key="label.name" :value="label.name"
-              :color="normalizeColor(label.color)"
-            />
-            <span
-              v-if="overflowAssetLabelsCount > 0" class="asset-info__labels-overflow"
-              :title="asset.labels.slice(maxVisibleLabels).map(l => l.name).join(', ')"
-            >
-              +{{ overflowAssetLabelsCount }}
-            </span>
+            <LabelsRow :labels="asset.labels" />
           </div>
         </div>
       </div>
@@ -170,6 +127,7 @@ const overflowAssetLabelsCount = computed(() => {
         </button>
       </div>
       <div class="checklist-grid__header-controls">
+        <ColumnToggle v-model="selectedChecklistColumns" :columns="checklistColumns" />
         <button
           type="button" class="checklist-grid__menu-btn checklist-grid__menu-btn--checklist"
           aria-haspopup="true" aria-controls="checklist_menu" @click="toggleChecklistMenu"
@@ -365,6 +323,7 @@ const overflowAssetLabelsCount = computed(() => {
   display: flex;
   align-items: center;
   margin-left: 0.25rem;
+  min-width: 0;
 }
 
 .asset-info__labels-overflow {

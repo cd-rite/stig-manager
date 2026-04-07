@@ -250,6 +250,9 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
       root: {
         class: 'review-popover',
       },
+      content: {
+        style: { maxHeight: '85vh', overflowY: 'auto', overflowX: 'hidden' },
+      },
       transition: {
         enterActiveClass: 'review-popover-enter',
         leaveActiveClass: 'review-popover-leave',
@@ -704,34 +707,14 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
   cursor: default;
 }
 
-/* Arrow size and popover gap overrides.
-   The arrow is two overlapping CSS-border triangles: ::before (outer/border)
-   and ::after (inner/fill). margin-block-start is the gap between the anchor
-   row and the popover body — it must match the arrow's border-width so the
-   arrow spans the full gap. The ::after border-width is slightly smaller to
-   reveal the ::before border color as an outline. The flipped variants apply
-   when the popover opens above the anchor instead of below. */
 :global(.review-popover) {
   border: 1px solid var(--p-primary-color);
   box-shadow: 0 0 10px 2px color-mix(in srgb, var(--p-primary-color) 30%, transparent);
   margin-left: -5rem;
-  margin-block-start: 2rem; /* gap below anchor row */
 }
 
 :global(.review-popover.p-popover-flipped) {
-  margin-block-start: -2rem; /* gap above anchor row (flipped) */
-  margin-block-end: 2rem;
-}
-
-:global(.review-popover::before) {
-  border-width: 2rem; /* outer arrow size — matches gap */
-  margin-left: -2rem; /* center the outer arrow */
-  border-bottom-color: var(--p-primary-color);
-}
-
-:global(.review-popover::after) {
-  border-width: 1.875rem; /* inner arrow — slightly smaller for border effect */
-  margin-left: -1.875rem; /* center the inner arrow */
+  margin-block-start: 5px;
 }
 
 :global(.review-popover.p-popover-flipped::before) {
@@ -817,7 +800,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
 .review-edit-popover__resources-container {
   margin: 0 -0.8rem -0.8rem -0.8rem;
   border-top: 1px solid var(--color-border-light);
-  height: 350px; /* Fixed height for the expanded section */
+  height: clamp(200px, 45vh, 350px);
   display: flex;
   flex-direction: column;
   overflow: hidden;

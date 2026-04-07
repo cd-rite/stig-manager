@@ -1,12 +1,26 @@
-import { FilterMatchMode } from '@primevue/core/api'
+import { FilterMatchMode, FilterService } from '@primevue/core/api'
 import { computed, ref, watch } from 'vue'
 import { calculateChecklistStats } from '../lib/checklistUtils.js'
+
+FilterService.register('strictIn', (value, filter) => {
+  if (!filter || filter.length === 0) {
+    return false
+  }
+  if (value === undefined || value === null) {
+    return false
+  }
+  return filter.includes(value)
+})
 
 // Shared state across all instances (since usually only one grid is active)
 const searchFilter = ref('')
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  severity: { value: null, matchMode: 'strictIn' },
+  result: { value: null, matchMode: 'strictIn' },
+  _statusText: { value: null, matchMode: 'strictIn' },
+  _engineDisplay: { value: null, matchMode: 'strictIn' },
 })
 
 const currentFilteredData = ref([])

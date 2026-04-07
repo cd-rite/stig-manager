@@ -1,9 +1,13 @@
 <script setup>
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
+import engineIcon from '../../../assets/bot2.svg'
+import overrideIcon from '../../../assets/override2.svg'
+import manualIcon from '../../../assets/user.svg'
 import CatBadge from '../../../components/common/CatBadge.vue'
+import ColumnFilter from '../../../components/common/ColumnFilter.vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import { durationToNow } from '../../../shared/lib.js'
@@ -13,7 +17,7 @@ import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.
 import { useSearch } from '../composables/useSearch.js'
 import { getEngineDisplay, getResultDisplay, severityMap } from '../lib/checklistUtils.js'
 
-defineProps({
+const props = defineProps({
   gridData: {
     type: Array,
     default: () => [],
@@ -31,14 +35,70 @@ defineProps({
 const emit = defineEmits(['update:selectedRow', 'row-click'])
 
 const {
-  showGroupId,
-  showRuleId,
-  showRuleTitle,
-  showGroupTitle,
+  isColVisible,
   itemSize,
 } = useChecklistDisplayMode()
 
 const { filters, dsFilterFields, searchFilter, updateFilteredData } = useSearch()
+
+const processedGridData = computed(() => {
+  return props.gridData.map(item => ({
+    ...item,
+    _statusText: item.status?.label ?? item.status,
+    _engineDisplay: getEngineDisplay(item),
+  }))
+})
+
+const catOptions = computed(() => {
+  const severities = new Set(props.gridData.map(item => item.severity).filter(Boolean))
+  return Array.from(severities).map(val => ({
+    value: val,
+    label: `Cat ${severityMap[val] || val}`,
+  })).sort((a, b) => a.label.localeCompare(b.label))
+})
+
+const resultOptions = computed(() => {
+  const results = new Set(props.gridData.map(item => item.result).filter(Boolean))
+  return Array.from(results).map(val => ({
+    value: val,
+    label: getResultDisplay(val),
+  })).sort((a, b) => a.label.localeCompare(b.label))
+})
+
+const statusOptions = computed(() => {
+  const statuses = new Set(props.gridData.map(item => item.status?.label ?? item.status).filter(Boolean))
+  return Array.from(statuses).map(val => ({
+    value: val,
+    label: val,
+  })).sort((a, b) => a.label.localeCompare(b.label))
+})
+
+const engineOptions = computed(() => {
+  const engines = new Set(props.gridData.map(item => getEngineDisplay(item)).filter(Boolean))
+  return Array.from(engines).map(val => ({
+    value: val,
+    label: val === 'engine' ? 'Engine' : val === 'override' ? 'Override' : 'Manual',
+    image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
+  }))
+})
+watch(() => props.gridData, () => {
+  if (!props.gridData?.length) {
+    return
+  }
+
+  if (filters.value.severity.value === null && catOptions.value.length > 0) {
+    filters.value.severity.value = catOptions.value.map(o => o.value)
+  }
+  if (filters.value.result.value === null && resultOptions.value.length > 0) {
+    filters.value.result.value = resultOptions.value.map(o => o.value)
+  }
+  if (filters.value._statusText.value === null && statusOptions.value.length > 0) {
+    filters.value._statusText.value = statusOptions.value.map(o => o.value)
+  }
+  if (filters.value._engineDisplay.value === null && engineOptions.value.length > 0) {
+    filters.value._engineDisplay.value = engineOptions.value.map(o => o.value)
+  }
+}, { immediate: true })
 
 function onFilter(event) {
   updateFilteredData(event.filteredValue)
@@ -48,7 +108,7 @@ function onRowClick(event) {
   emit('row-click', event)
 }
 
-const defaultSortField = computed(() => showGroupId.value ? 'groupId' : 'ruleId')
+const defaultSortField = computed(() => isColVisible('groupId') ? 'groupId' : 'ruleId')
 
 function getColumnPt(alignment = 'left') {
   const isCenter = alignment === 'center'
@@ -103,13 +163,23 @@ const dataTablePt = {
 
 <template>
   <DataTable
-    :selection="selectedRow" :filters="filters" :global-filter-fields="dsFilterFields" :value="gridData"
+    v-model:filters="filters" :selection="selectedRow" :global-filter-fields="dsFilterFields" :value="processedGridData"
     :loading="isLoading" data-key="ruleId" selection-mode="single" scrollable scroll-height="flex"
     :virtual-scroller-options="{ itemSize }" resizable-columns striped-rows :sort-field="defaultSortField"
     :sort-order="1" class="checklist-grid__table" :pt="dataTablePt" @update:selection="(val) => $emit('update:selectedRow', val)"
     @row-click="onRowClick" @filter="onFilter" @pointerdown.stop
   >
-    <Column header="Cat" field="severity" sortable :style="{ width: '5rem' }" :pt="columnPt.center">
+    <Column v-if="isColVisible('severity')" field="severity" filter-field="severity" sortable :style="{ width: '6.5rem' }" :pt="columnPt.center">
+      <template #header>
+        <div class="column-header-with-filter">
+          Cat
+          <ColumnFilter v-model="filters.severity.value" :options="catOptions">
+            <template #option="{ option }">
+              <CatBadge :category="severityMap[option.value]" variant="label" />
+            </template>
+          </ColumnFilter>
+        </div>
+      </template>
       <template #body="{ data }">
         <div class="cell-center">
           <CatBadge :category="severityMap[data.severity]" variant="label" />
@@ -117,7 +187,7 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column v-if="showGroupId" header="Group" field="groupId" sortable :style="{ width: '7rem' }" :pt="columnPt.left">
+    <Column v-if="isColVisible('groupId')" header="Group" field="groupId" sortable :style="{ width: '7rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <span class="cell-text" :class="{ 'cell--match': searchFilter && fieldMatches(data.groupId, searchFilter) }">
           <span v-if="searchFilter" v-html="highlightText(data.groupId, searchFilter)" />
@@ -127,7 +197,7 @@ const dataTablePt = {
     </Column>
 
     <Column
-      v-if="showRuleId" header="Rule Id" field="ruleId" sortable :style="{ width: '15rem' }"
+      v-if="isColVisible('ruleId')" header="Rule Id" field="ruleId" sortable :style="{ width: '15rem' }"
       :pt="columnPt.left"
     >
       <template #body="{ data }">
@@ -139,7 +209,7 @@ const dataTablePt = {
     </Column>
 
     <Column
-      v-if="showRuleTitle" header="Rule Title" field="ruleTitle" sortable :style="{ width: '25%' }"
+      v-if="isColVisible('ruleTitle')" header="Rule Title" field="ruleTitle" sortable :style="{ width: '25%' }"
       :pt="columnPt.left"
     >
       <template #body="{ data }">
@@ -157,7 +227,7 @@ const dataTablePt = {
     </Column>
 
     <Column
-      v-if="showGroupTitle" header="Group Title" field="groupTitle" sortable :style="{ width: '25%' }"
+      v-if="isColVisible('groupTitle')" header="Group Title" field="groupTitle" sortable :style="{ width: '25%' }"
       :pt="columnPt.left"
     >
       <template #body="{ data }">
@@ -172,7 +242,17 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column header="Result" field="result" sortable :style="{ width: '5rem' }" :pt="columnPt.center">
+    <Column v-if="isColVisible('result')" field="result" filter-field="result" sortable :style="{ width: '7rem' }" :pt="columnPt.center">
+      <template #header>
+        <div class="column-header-with-filter">
+          Result
+          <ColumnFilter v-model="filters.result.value" :options="resultOptions">
+            <template #option="{ option }">
+              <ResultBadge :status="option.label" />
+            </template>
+          </ColumnFilter>
+        </div>
+      </template>
       <template #body="{ data }">
         <div data-result-cell class="cell-result">
           <ResultBadge v-if="getResultDisplay(data.result)" :status="getResultDisplay(data.result)" />
@@ -181,7 +261,7 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column header="Detail" field="detail" sortable :style="{ width: '25%' }" :pt="columnPt.left">
+    <Column v-if="isColVisible('detail')" header="Detail" field="detail" sortable :style="{ width: '25%' }" :pt="columnPt.left">
       <template #body="{ data }">
         <div class="cell-text-field">
           <span
@@ -196,7 +276,7 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column header="Comment" field="comment" sortable :style="{ width: '25%' }" :pt="columnPt.left">
+    <Column v-if="isColVisible('comment')" header="Comment" field="comment" sortable :style="{ width: '25%' }" :pt="columnPt.left">
       <template #body="{ data }">
         <div class="cell-text-field">
           <span
@@ -212,38 +292,53 @@ const dataTablePt = {
     </Column>
 
     <Column
-      field="resultEngine" sortable sort-field="resultEngine.product" :style="{ width: '3rem' }"
+      v-if="isColVisible('resultEngine')"
+      field="resultEngine" sortable filter-field="_engineDisplay" sort-field="resultEngine.product" :style="{ width: '5.5rem' }"
       :pt="columnPt.center"
     >
       <template #header>
-        <img src="../../../assets/bot2.svg" alt="Engine" class="engine-header-icon" title="Result engine">
+        <div class="column-header-with-filter">
+          <img src="../../../assets/bot2.svg" alt="Engine" class="engine-header-icon" title="Result engine">
+          <ColumnFilter v-model="filters._engineDisplay.value" :options="engineOptions" />
+        </div>
       </template>
       <template #body="{ data }">
         <img
-          v-if="getEngineDisplay(data) === 'engine'" src="../../../assets/bot2.svg" alt="Engine"
+          v-if="data._engineDisplay === 'engine'" src="../../../assets/bot2.svg" alt="Engine"
           class="engine-icon" title="Result engine"
         >
         <img
-          v-else-if="getEngineDisplay(data) === 'override'" src="../../../assets/override2.svg" alt="Override"
+          v-else-if="data._engineDisplay === 'override'" src="../../../assets/override2.svg" alt="Override"
           class="engine-icon" title="Overridden result"
         >
         <img
-          v-else-if="getEngineDisplay(data) === 'manual'" src="../../../assets/user.svg" alt="Manual"
+          v-else-if="data._engineDisplay === 'manual'" src="../../../assets/user.svg" alt="Manual"
           class="engine-icon" title="Manual result"
         >
       </template>
     </Column>
 
     <Column
-      header="Status" field="status" sortable sort-field="status.label" :style="{ width: '5rem' }"
+      v-if="isColVisible('status')"
+      field="status" filter-field="_statusText" sortable sort-field="status.label" :style="{ width: '9rem' }"
       :pt="columnPt.center"
     >
+      <template #header>
+        <div class="column-header-with-filter">
+          Status
+          <ColumnFilter v-model="filters._statusText.value" :options="statusOptions">
+            <template #option="{ option }">
+              <StatusBadge :status="option.value" />
+            </template>
+          </ColumnFilter>
+        </div>
+      </template>
       <template #body="{ data }">
         <StatusBadge v-if="data.status" :status="data.status?.label ?? data.status" />
       </template>
     </Column>
 
-    <Column field="touchTs" sortable :style="{ width: '4rem' }" :pt="columnPt.center">
+    <Column v-if="isColVisible('touchTs')" field="touchTs" sortable :style="{ width: '4rem' }" :pt="columnPt.center">
       <template #header>
         <i class="pi pi-clock" title="Last action" />
       </template>
@@ -265,6 +360,14 @@ const dataTablePt = {
 </template>
 
 <style scoped>
+.column-header-with-filter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  width: 100%;
+}
+
 /* Table Styles */
 .checklist-grid__table {
   flex: 1;

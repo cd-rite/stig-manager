@@ -1,15 +1,23 @@
 <script setup>
+import { FilterMatchMode } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+
+import engineIcon from '../../../assets/bot2.svg'
+import overrideIcon from '../../../assets/override2.svg'
+import manualIcon from '../../../assets/user.svg'
+import ColumnFilter from '../../../components/common/ColumnFilter.vue'
+import ColumnSearchFilter from '../../../components/common/ColumnSearchFilter.vue'
 
 import EngineBadge from '../../../components/common/EngineBadge.vue'
+import LongTextPopover from '../../../components/common/LongTextPopover.vue'
 import ManualBadge from '../../../components/common/ManualBadge.vue'
 import OverrideBadge from '../../../components/common/OverrideBadge.vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
-import { useReviewDensity } from '../composables/useReviewDensity.js'
 import { getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
 
 const props = defineProps({
@@ -37,6 +45,8 @@ const props = defineProps({
 
 const emit = defineEmits(['apply-review'])
 
+const ROW_HEIGHT = 40
+
 const isAlreadyApplied = (data) => {
   return data.result === props.formResult
     && (data.detail ?? '') === props.formDetail
@@ -53,12 +63,152 @@ const getApplyTooltip = (data) => {
   return 'Apply this review'
 }
 
-const {
-  lineClamp,
-  itemSize,
-  increaseRowHeight,
-  decreaseRowHeight,
-} = useReviewDensity()
+const longTextPopover = ref(null)
+const showLongText = (event, label, text) => {
+  longTextPopover.value?.show(event, label, text)
+}
+
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  ruleId: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  detail: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  comment: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  statusText: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  username: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  result: { value: null, matchMode: FilterMatchMode.IN },
+  _engineDisplay: { value: null, matchMode: FilterMatchMode.IN },
+  _statusLabel: { value: null, matchMode: FilterMatchMode.IN },
+})
+
+const processedHistory = computed(() => {
+  return (props.reviewHistory || []).map(item => ({
+    ...item,
+    _engineDisplay: getEngineDisplay(item),
+    _statusLabel: item.status?.label ?? '',
+  }))
+})
+
+const resultOptions = computed(() => {
+  const results = new Set(props.reviewHistory.map(item => item.result).filter(Boolean))
+  return Array.from(results).map(val => ({
+    value: val,
+    label: getResultDisplay(val),
+  })).sort((a, b) => a.label.localeCompare(b.label))
+})
+
+const engineOptions = computed(() => {
+  const engines = new Set(props.reviewHistory.map(item => getEngineDisplay(item)).filter(Boolean))
+  return Array.from(engines).map(val => ({
+    value: val,
+    label: val === 'engine' ? 'Engine' : val === 'override' ? 'Override' : 'Manual',
+    image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
+  }))
+})
+
+const statusOptions = computed(() => {
+  const statuses = new Set(props.reviewHistory.map(item => item.status?.label).filter(Boolean))
+  return Array.from(statuses).map(val => ({
+    value: val,
+    label: val,
+  })).sort((a, b) => a.label.localeCompare(b.label))
+})
+
+watch(() => props.reviewHistory, () => {
+  if (!props.reviewHistory?.length) {
+    return
+  }
+  if (filters.value.result.value === null && resultOptions.value.length > 0) {
+    filters.value.result.value = resultOptions.value.map(o => o.value)
+  }
+  if (filters.value._engineDisplay.value === null && engineOptions.value.length > 0) {
+    filters.value._engineDisplay.value = engineOptions.value.map(o => o.value)
+  }
+  if (filters.value._statusLabel.value === null && statusOptions.value.length > 0) {
+    filters.value._statusLabel.value = statusOptions.value.map(o => o.value)
+  }
+}, { immediate: true })
+
+const tableWrapper = ref(null)
+const wrapperHeight = ref(400)
+let resizeObserver = null
+
+watch(tableWrapper, (el) => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
+  if (!el) {
+    return
+  }
+  resizeObserver = new ResizeObserver((entries) => {
+    const h = entries[0]?.contentRect?.height
+    if (h && h > 0) {
+      wrapperHeight.value = h
+    }
+  })
+  resizeObserver.observe(el)
+})
+
+onBeforeUnmount(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
+})
+
+const historyStats = computed(() => {
+  const reviews = props.reviewHistory || []
+  const stats = {
+    total: reviews.length,
+    results: { fail: 0, pass: 0, notapplicable: 0, other: 0 },
+    engine: { manual: 0, engine: 0, override: 0 },
+    statuses: { saved: 0, submitted: 0, accepted: 0, rejected: 0 },
+  }
+
+  for (const r of reviews) {
+    if (r.result === 'fail') {
+      stats.results.fail++
+    }
+    else if (r.result === 'pass') {
+      stats.results.pass++
+    }
+    else if (r.result === 'notapplicable') {
+      stats.results.notapplicable++
+    }
+    else {
+      stats.results.other++
+    }
+
+    const engineDisplay = getEngineDisplay(r)
+    if (engineDisplay === 'engine') {
+      stats.engine.engine++
+    }
+    else if (engineDisplay === 'override') {
+      stats.engine.override++
+    }
+    else {
+      stats.engine.manual++
+    }
+
+    const statusLabel = r.status?.label
+    if (statusLabel === 'saved') {
+      stats.statuses.saved++
+    }
+    else if (statusLabel === 'submitted') {
+      stats.statuses.submitted++
+    }
+    else if (statusLabel === 'accepted') {
+      stats.statuses.accepted++
+    }
+    else if (statusLabel === 'rejected') {
+      stats.statuses.rejected++
+    }
+  }
+
+  return stats
+})
+
+const scrollHeightPx = computed(() => `${Math.max(100, Math.floor(wrapperHeight.value) - 35)}px`)
 
 const historyTablePt = {
   root: { class: 'sm-scrollbar-thin', style: { backgroundColor: 'var(--color-background-dark)' } },
@@ -95,160 +245,248 @@ const historyTablePt = {
 </script>
 
 <template>
-  <DataTable
-    :value="reviewHistory"
-    data-key="touchTs"
-    scrollable
-    scroll-height="flex"
-    :virtual-scroll="true"
-    :virtual-scroll-item-size="itemSize"
-    striped-rows
-    class="history-table"
-    :pt="historyTablePt"
-    :style="{ '--line-clamp': lineClamp }"
-  >
-    <Column header="Time" field="touchTs" sortable :style="{ width: '120px' }">
-      <template #body="{ data }">
-        <span class="cell-text--dim">{{ formatReviewDate(data.touchTs) }}</span>
-      </template>
-    </Column>
+  <div ref="tableWrapper" class="history-wrapper">
+    <DataTable
+      v-model:filters="filters"
+      :value="processedHistory"
+      data-key="touchTs"
+      scrollable
+      :scroll-height="scrollHeightPx"
+      :virtual-scroller-options="{ itemSize: ROW_HEIGHT, showLoader: true }"
+      striped-rows
+      :resizable-columns="true"
+      column-resize-mode="fit"
+      class="history-table"
+      :pt="historyTablePt"
+    >
+      <Column header="Time" field="touchTs" sortable :style="{ width: '8%' }">
+        <template #body="{ data }">
+          <span class="cell-text--dim">{{ formatReviewDate(data.touchTs) }}</span>
+        </template>
+      </Column>
 
-    <Column header="Rule" field="ruleId" :style="{ width: '110px' }">
-      <template #body="{ data }">
-        <span class="cell-text--mono">{{ data.ruleId }}</span>
-      </template>
-    </Column>
+      <Column field="ruleId" :style="{ width: '10%' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            Rule
+            <ColumnSearchFilter v-model="filters.ruleId.value" placeholder="Search rule..." />
+          </div>
+        </template>
+        <template #body="{ data }">
+          <span class="cell-text--mono">{{ data.ruleId }}</span>
+        </template>
+      </Column>
 
-    <Column header="Result" field="result" :style="{ width: '50px', textAlign: 'center' }">
-      <template #body="{ data }">
-        <ResultBadge v-if="getResultDisplay(data.result)" :status="getResultDisplay(data.result)" />
-      </template>
-    </Column>
+      <Column field="result" :style="{ width: '7%', textAlign: 'center' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            Result
+            <ColumnFilter v-model="filters.result.value" :options="resultOptions">
+              <template #option="{ option }">
+                <ResultBadge :status="option.label" />
+              </template>
+            </ColumnFilter>
+          </div>
+        </template>
+        <template #body="{ data }">
+          <ResultBadge v-if="getResultDisplay(data.result)" :status="getResultDisplay(data.result)" />
+        </template>
+      </Column>
 
-    <Column field="resultEngine" :style="{ width: '24px', textAlign: 'center' }">
-      <template #header>
-        <img
-          src="../../../assets/bot2.svg"
-          alt="Engine"
-          class="engine-header-icon"
-          title="Result engine"
-        >
-      </template>
-      <template #body="{ data }">
-        <img
-          v-if="getEngineDisplay(data) === 'engine'"
-          src="../../../assets/bot2.svg"
-          alt="Engine"
-          class="engine-icon"
-          title="Result engine"
-        >
-        <img
-          v-else-if="getEngineDisplay(data) === 'override'"
-          src="../../../assets/override2.svg"
-          alt="Override"
-          class="engine-icon"
-          title="Overridden result"
-        >
-        <img
-          v-else-if="getEngineDisplay(data) === 'manual'"
-          src="../../../assets/user.svg"
-          alt="Manual"
-          class="engine-icon"
-          title="Manual result"
-        >
-      </template>
-    </Column>
+      <Column field="resultEngine" filter-field="_engineDisplay" :style="{ width: '5%', textAlign: 'center' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            <img
+              src="../../../assets/bot2.svg"
+              alt="Engine"
+              class="engine-header-icon"
+              title="Result engine"
+            >
+            <ColumnFilter v-model="filters._engineDisplay.value" :options="engineOptions" />
+          </div>
+        </template>
+        <template #body="{ data }">
+          <img
+            v-if="getEngineDisplay(data) === 'engine'"
+            src="../../../assets/bot2.svg"
+            alt="Engine"
+            class="engine-icon"
+            title="Result engine"
+          >
+          <img
+            v-else-if="getEngineDisplay(data) === 'override'"
+            src="../../../assets/override2.svg"
+            alt="Override"
+            class="engine-icon"
+            title="Overridden result"
+          >
+          <img
+            v-else-if="getEngineDisplay(data) === 'manual'"
+            src="../../../assets/user.svg"
+            alt="Manual"
+            class="engine-icon"
+            title="Manual result"
+          >
+        </template>
+      </Column>
 
-    <Column header="Detail" field="detail" :style="{ width: '250px' }">
-      <template #body="{ data }">
-        <div class="cell-text-field">
-          <span v-if="data.detail" class="cell-text cell-text--clamped" :title="data.detail">
+      <Column field="detail" :style="{ width: '17%' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            Detail
+            <ColumnSearchFilter v-model="filters.detail.value" placeholder="Search detail..." />
+          </div>
+        </template>
+        <template #body="{ data }">
+          <span
+            v-if="data.detail"
+            class="cell-text--ellipsis"
+            title="Click to view full text"
+            @click="showLongText($event, 'Detail', data.detail)"
+          >
             {{ data.detail }}
           </span>
           <span v-else class="cell-text--empty">---</span>
-        </div>
-      </template>
-    </Column>
+        </template>
+      </Column>
 
-    <Column header="Comment" field="comment" :style="{ width: '250px' }">
-      <template #body="{ data }">
-        <div class="cell-text-field">
-          <span v-if="data.comment" class="cell-text cell-text--clamped" :title="data.comment">
+      <Column field="comment" :style="{ width: '18%' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            Comment
+            <ColumnSearchFilter v-model="filters.comment.value" placeholder="Search comment..." />
+          </div>
+        </template>
+        <template #body="{ data }">
+          <span
+            v-if="data.comment"
+            class="cell-text--ellipsis"
+            title="Click to view full text"
+            @click="showLongText($event, 'Comment', data.comment)"
+          >
             {{ data.comment }}
           </span>
           <span v-else class="cell-text--empty">---</span>
-        </div>
-      </template>
-    </Column>
+        </template>
+      </Column>
 
-    <Column header="Status Text" field="statusText" :style="{ width: '180px' }">
-      <template #body="{ data }">
-        <div class="cell-text-field">
-          <span v-if="data.status?.text" class="cell-text cell-text--clamped" :title="data.status.text">
+      <Column field="statusText" :style="{ width: '10%' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            Status Text
+            <ColumnSearchFilter v-model="filters.statusText.value" placeholder="Search status text..." />
+          </div>
+        </template>
+        <template #body="{ data }">
+          <span
+            v-if="data.status?.text"
+            class="cell-text--ellipsis"
+            title="Click to view full text"
+            @click="showLongText($event, 'Status Text', data.status.text)"
+          >
             {{ data.status.text }}
           </span>
           <span v-else class="cell-text--empty">---</span>
+        </template>
+      </Column>
+
+      <Column filter-field="_statusLabel" :style="{ width: '7%', textAlign: 'center' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            Status
+            <ColumnFilter v-model="filters._statusLabel.value" :options="statusOptions">
+              <template #option="{ option }">
+                <StatusBadge :status="option.value" />
+              </template>
+            </ColumnFilter>
+          </div>
+        </template>
+        <template #body="{ data }">
+          <StatusBadge v-if="data.status?.label" :status="data.status.label" />
+        </template>
+      </Column>
+
+      <Column field="username" :style="{ width: '10%' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            User
+            <ColumnSearchFilter v-model="filters.username.value" placeholder="Search user..." />
+          </div>
+        </template>
+      </Column>
+
+      <Column header="Apply" :style="{ width: '5%', textAlign: 'center' }">
+        <template #body="{ data }">
+          <button
+            class="apply-review-icon-btn"
+            :disabled="!editable || isAlreadyApplied(data)"
+            :title="getApplyTooltip(data)"
+            @click="emit('apply-review', data)"
+          >
+            <i class="pi pi-copy" />
+          </button>
+        </template>
+      </Column>
+
+      <template #empty>
+        <div class="history-table__empty">
+          No review history found for this rule.
         </div>
       </template>
-    </Column>
 
-    <Column header="Status" :style="{ width: '60px', textAlign: 'center' }">
-      <template #body="{ data }">
-        <StatusBadge v-if="data.status?.label" :status="data.status.label" />
-      </template>
-    </Column>
-
-    <Column header="User" field="username" :style="{ width: '90px' }" />
-
-    <Column header="Apply" :style="{ width: '60px', textAlign: 'center' }">
-      <template #body="{ data }">
-        <button
-          class="apply-review-icon-btn"
-          :disabled="!editable || isAlreadyApplied(data)"
-          :title="getApplyTooltip(data)"
-          @click="emit('apply-review', data)"
+      <template #footer>
+        <StatusFooter
+          :show-refresh="false"
+          :total-count="historyStats.total"
         >
-          <i class="pi pi-copy" />
-        </button>
+          <template #right-extra>
+            <ResultBadge status="O" :count="historyStats.results.fail" />
+            <ResultBadge status="NF" :count="historyStats.results.pass" />
+            <ResultBadge status="NA" :count="historyStats.results.notapplicable" />
+            <ResultBadge status="NR+" :count="historyStats.results.other" />
+            <span class="footer-divider">|</span>
+            <ManualBadge :count="historyStats.engine.manual" />
+            <EngineBadge :count="historyStats.engine.engine" />
+            <OverrideBadge :count="historyStats.engine.override" />
+            <span class="footer-divider">|</span>
+            <StatusBadge status="saved" :count="historyStats.statuses.saved" />
+            <StatusBadge status="submitted" :count="historyStats.statuses.submitted" />
+            <StatusBadge status="accepted" :count="historyStats.statuses.accepted" />
+            <StatusBadge status="rejected" :count="historyStats.statuses.rejected" />
+          </template>
+        </StatusFooter>
       </template>
-    </Column>
+    </DataTable>
 
-    <template #empty>
-      <div class="history-table__empty">
-        No review history found for this rule.
-      </div>
-    </template>
-
-    <template v-if="historyStats" #footer>
-      <StatusFooter
-        :show-refresh="false"
-        :total-count="historyStats.total"
-      >
-        <template #left-extra>
-          <ResultBadge status="O" :count="historyStats.results.fail" />
-          <ResultBadge status="NF" :count="historyStats.results.pass" />
-          <ResultBadge status="NA" :count="historyStats.results.notapplicable" />
-          <ResultBadge status="NR+" :count="historyStats.results.other" />
-          <span class="footer-divider">|</span>
-          <ManualBadge :count="historyStats.engine.manual" />
-          <EngineBadge :count="historyStats.engine.engine" />
-          <OverrideBadge :count="historyStats.engine.override" />
-          <span class="footer-divider">|</span>
-          <StatusBadge status="saved" :count="historyStats.statuses.saved" />
-          <StatusBadge status="submitted" :count="historyStats.statuses.submitted" />
-          <StatusBadge status="accepted" :count="historyStats.statuses.accepted" />
-          <StatusBadge status="rejected" :count="historyStats.statuses.rejected" />
-        </template>
-      </StatusFooter>
-    </template>
-  </DataTable>
+    <LongTextPopover ref="longTextPopover" />
+  </div>
 </template>
 
 <style scoped>
+.history-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .history-table {
   flex: 1;
   min-height: 0;
   border-top: none;
+}
+
+/* Allow table to expand and scroll horizontally if needed. */
+:deep(.p-datatable-table) {
+  width: 100%;
+  min-width: 750px;
+  table-layout: fixed;
+}
+
+:deep(.p-datatable-wrapper),
+:deep(.p-virtualscroller) {
+  overflow-x: auto !important;
 }
 
 :deep(.p-datatable-tbody > tr > td) {
@@ -257,6 +495,7 @@ const historyTablePt = {
   font-size: 1.1rem;
   border-bottom: 1px solid var(--color-border-light);
   color: var(--color-text-primary);
+  overflow: hidden;
 }
 
 :deep(.p-datatable-thead > tr > th) {
@@ -267,6 +506,12 @@ const historyTablePt = {
   border-right: none !important;
 }
 
+.column-header-with-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .cell-text--mono {
   color: var(--color-text-primary);
   font-size: 1rem;
@@ -274,17 +519,28 @@ const historyTablePt = {
 
 .cell-text--dim {
   color: var(--color-text-dim);
+  white-space: normal;
+  font-size: 0.96rem;
+  letter-spacing: 0.02em;
+  word-break: break-word;
 }
 
-.cell-text--clamped {
-  display: -webkit-box;
-  -webkit-line-clamp: var(--line-clamp, 2);
-  line-clamp: var(--line-clamp, 2);
-  -webkit-box-orient: vertical;
+.cell-text--ellipsis {
+  display: block;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 0.95rem;
   line-height: 1.3;
   color: var(--color-text-primary);
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0 2px;
+  transition: background-color 0.1s ease;
+}
+
+.cell-text--ellipsis:hover {
+  background-color: color-mix(in srgb, var(--color-primary-highlight) 15%, transparent);
 }
 
 .cell-text--empty {

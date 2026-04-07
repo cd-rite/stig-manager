@@ -110,7 +110,7 @@ function openRowEditor(event, rowData) {
     const gridRect = gridEl.getBoundingClientRect()
     const cellRect = resultCell.getBoundingClientRect()
     const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
-    editingPopoverWidth.value = gridRect.right - cellRect.left + (3 * rem)
+    editingPopoverWidth.value = gridRect.right - cellRect.left + (2 * rem)
   }
   else {
     editingPopoverWidth.value = null
@@ -169,16 +169,21 @@ watch(() => props.selectedRuleId, (ruleId) => {
 
 watch(() => props.gridData, (data) => {
   if (!data?.length) {
+    selectedRow.value = null
     return
   }
-  if (!props.selectedRuleId) {
-    const targetData = isFiltered.value ? currentFilteredData.value : data
+
+  const targetData = isFiltered.value ? currentFilteredData.value : data
+  const isValid = props.selectedRuleId && targetData.some(r => r.ruleId === props.selectedRuleId)
+
+  if (!isValid) {
     const firstVisible = targetData[0]
     if (firstVisible) {
       selectedRow.value = firstVisible
       emit('select-rule', firstVisible.ruleId)
     }
   }
+
   if (editingRow.value) {
     const updated = data.find(r => r.ruleId === editingRow.value.ruleId)
     if (updated) {
