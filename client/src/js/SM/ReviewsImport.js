@@ -786,6 +786,7 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
     initComponent: function () {
         const _this = this
         this.context = this.context ?? 'manage' // 'or 'wizard'
+        this.canUpdateAssetProps = this.canUpdateAssetProps ?? true
         this.autoStatusCombo = new SM.ReviewsImport.AutoStatusComboBox({
             value: this.initialOptions.autoStatus.fail,
             name: 'autoStatus.fail',
@@ -900,7 +901,6 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
             this.unreviewedCommentedCombo,
             this.emptyDetailCombo,
             this.emptyCommentCombo,
-            this.updateAssetPropsCb
         ]
         this.allowCustomCb = new Ext.form.Checkbox({
             boxLabel: `Options can be customized for each import`,
@@ -925,6 +925,7 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
                     for (const combo of _this.optionComboBoxes) {
                         combo.setReadOnly(!checked)
                     }
+                    _this.updateAssetPropsCb.setReadOnly(!checked)
                     _this.localStorage = checked
                     if (_this.localStorage && localStorage.wizardImportOptions?.length) {
                         _this.restoreOptions(JSON.parse(localStorage.wizardImportOptions))
@@ -960,6 +961,9 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
             _this.autoStatusCombo.setValue(options.autoStatus.fail)
             _this.autoStatusNotApplicable.setValue(options.autoStatus.notapplicable)
             _this.autoStatusPass.setValue(options.autoStatus.pass)
+            _this.updateAssetPropsCb.suspendEvents()
+            _this.updateAssetPropsCb.setValue(options.updateAssetProps ?? false)
+            _this.updateAssetPropsCb.resumeEvents()
         }
 
         this.getOptions = function () {
@@ -973,7 +977,7 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
                 unreviewedCommented: _this.unreviewedCommentedCombo.value ,  
                 emptyDetail: _this.emptyDetailCombo.value,
                 emptyComment: _this.emptyCommentCombo.value,
-                updateAssetProps: _this.updateAssetPropsCb.checked,
+                updateAssetProps: _this.canUpdateAssetProps ? _this.updateAssetPropsCb.checked : false,
                 allowCustom: _this.allowCustomCb.checked
             }
             return options
@@ -984,9 +988,11 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
             items.push(this.initialOptions.allowCustom ? this.customizeCb : this.noCustomizeDisplay)
         }
         items.push(this.autoStatusFieldGroup, ...this.optionComboBoxes)
-
+        if (this.canUpdateAssetProps) {
+            items.push(this.updateAssetPropsCb)
+        }
         if (this.context !== 'wizard') {
-            items.push(this.allowCustomCb)
+            items.push(this.updateAssetPropsCb, this.allowCustomCb)
         }
         const config = {
             title: 'Import options',
@@ -1350,6 +1356,7 @@ SM.ReviewsImport.MultiSelectPanel = Ext.extend(Ext.Panel, {
             context: this.optionsContext,
             canAccept: true,
             initialOptions: this.initialOptions,
+            canUpdateAssetProps: this.canUpdateAssetProps,
         })
         this.selectFilesGrid = new SM.ReviewsImport.SelectFilesGrid({
             flex: 3,
@@ -1430,10 +1437,12 @@ SM.ReviewsImport.SelectFilesPanel = Ext.extend(Ext.Panel, {
         }
 
         this.parseOptionsFieldSet = new SM.ReviewsImport.ParseOptionsFieldSet({
-            height: 330,
+            height: 300,
             context: 'wizard',
             initialOptions: this.initialOptions,
-            canAccept: this.canAccept
+            canAccept: this.canAccept,
+            canUpdateAssetProps: this.canUpdateAssetProps ?? false
+
         })
 
 
@@ -2060,7 +2069,7 @@ SM.ReviewsImport.ImportProgressPanel = Ext.extend(Ext.Panel, {
     }
 })
 
-async function showImportResultFiles(collectionId, createObjects = true) {
+async function showImportResultFiles(collectionId, createObjects = true, canUpdateAssetProps = true) {
     try {
         const cachedCollection = SM.Cache.CollectionMap.get(collectionId)
         const userGrant = curUser.collectionGrants.find( i => i.collection.collectionId === cachedCollection.collectionId )?.roleId
@@ -2081,6 +2090,7 @@ async function showImportResultFiles(collectionId, createObjects = true) {
             optionsContext: 'wizard',
             initialOptions,
             canAccept,
+            canUpdateAssetProps,
             listeners: {
                 continue: function(panel) {
                     const records = panel.selectFilesGrid.store.getRange()
@@ -2523,6 +2533,7 @@ async function showImportResultFile(params) {
             optionsContext: 'wizard',
             initialOptions,
             canAccept,
+            canUpdateAssetProps: false,
             onFileSelected,
             onFileDropped
         })

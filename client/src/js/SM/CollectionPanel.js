@@ -1904,7 +1904,7 @@ SM.CollectionPanel.showCollectionTab = function (options) {
           text: 'Import CKL(B) or SCAP...',
           qtip: SM.TipContent.ImportFromCollectionPanel,
           handler: () => {
-            showImportResultFiles(collectionId, false)         
+            showImportResultFiles(collectionId, false, false)         
           }
         }
       ],
