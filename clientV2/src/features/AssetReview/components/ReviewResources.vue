@@ -16,10 +16,6 @@ defineProps({
     type: Object,
     default: null,
   },
-  reviewHistory: {
-    type: Array,
-    default: () => [],
-  },
   ruleId: {
     type: String,
     default: null,
@@ -43,6 +39,10 @@ defineProps({
   formComment: {
     type: String,
     default: '',
+  },
+  assetId: {
+    type: String,
+    default: null,
   },
 })
 
@@ -141,13 +141,15 @@ const tabPt = {
         <Tab value="attachments" :pt="tabPt" disabled>
           Attachments
         </Tab>
-
       </TabList>
 
       <TabPanels :pt="tabPanelsPt">
         <TabPanel value="history" :pt="tabPanelPt">
           <ReviewHistoryTab
-            :review-history="reviewHistory"
+            :active="activeTab === 'history'"
+            :rule-id="ruleId"
+            :asset-id="assetId"
+            :collection-id="collectionId"
             :editable="editable"
             :form-result="formResult"
             :form-detail="formDetail"

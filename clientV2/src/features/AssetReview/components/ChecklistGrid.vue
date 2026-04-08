@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref, toRef, watch } from 'vue'
+import { computed, onMounted, ref, toRef, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 import EngineBadge from '../../../components/common/EngineBadge.vue'
 import ManualBadge from '../../../components/common/ManualBadge.vue'
@@ -63,10 +64,6 @@ const props = defineProps({
     type: Object,
     default: null,
   },
-  reviewHistory: {
-    type: Array,
-    default: () => [],
-  },
 })
 
 const emit = defineEmits(['update:searchFilter', 'select-rule', 'row-save', 'status-action', 'refresh', 'clear-save-error'])
@@ -75,13 +72,35 @@ watch(() => props.asset, (newReview) => {
   console.log('asset', newReview)
 }, { immediate: true })
 
+watch(() => props.gridData, (gridData) => {
+  console.log('gridData', gridData)
+}, { immediate: true })
+
+watch(() => props.currentReview, (currentReview) => {
+  console.log('currentReview', currentReview)
+}, { immediate: true })
 const selectedRow = ref(null)
 const reviewEditPopover = ref()
 const editingRow = ref(null)
 const editingPopoverWidth = ref(null)
 
+const route = useRoute()
+
 const { lineClamp, itemSize } = useChecklistDisplayMode()
-const { stats, isFiltered, currentFilteredData, searchFilter: sharedSearchFilter } = useSearch(toRef(props, 'gridData'))
+const { stats, isFiltered, currentFilteredData, searchFilter: sharedSearchFilter, resetFilters } = useSearch(toRef(props, 'gridData'))
+
+onMounted(() => {
+  resetFilters()
+})
+
+watch([
+  () => route.params.collectionId,
+  () => route.params.assetId,
+  () => route.params.benchmarkId,
+  () => route.params.revisionStr,
+], () => {
+  resetFilters()
+})
 
 // Sync the shared search filter with the prop (for backward compatibility)
 watch(() => props.searchFilter, (val) => {
@@ -238,7 +257,7 @@ function handleFooterAction(actionKey) {
           :refresh-loading="isLoading" :total-count="gridData.length"
           :filtered-count="isFiltered ? currentFilteredData.length : null" @action="handleFooterAction"
         >
-          <template #left-extra>
+          <template #right-extra>
             <ResultBadge status="O" :count="stats.results.fail" />
             <ResultBadge status="NF" :count="stats.results.pass" />
             <ResultBadge status="NA" :count="stats.results.notapplicable" />
@@ -262,8 +281,8 @@ function handleFooterAction(actionKey) {
       :field-settings="fieldSettings" :access-mode="accessMode" :can-accept="canAccept" :is-saving="isSaving"
       :save-error="saveError"
       :current-review="currentReview"
-      :review-history="reviewHistory"
       :collection-id="asset?.collection?.collectionId"
+      :asset-id="asset?.assetId"
       @save="onPopoverSave" @status-action="onPopoverStatusAction" @close="onPopoverClose"
       @clear-save-error="emit('clear-save-error')"
     />

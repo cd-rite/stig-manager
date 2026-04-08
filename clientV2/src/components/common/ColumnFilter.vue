@@ -1,18 +1,24 @@
 <script setup>
 import MultiSelect from 'primevue/multiselect'
+import { computed } from 'vue'
 
-defineProps({
+const props = defineProps({
   options: {
     type: Array,
     required: true,
   },
   modelValue: {
-    type: Array,
-    required: true,
+    required: false,
+    default: null,
   },
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+const isActive = computed(() => {
+  // Active if any items are specifically selected (non-null filter)
+  return Array.isArray(props.modelValue) && props.modelValue.length > 0
+})
 
 function onToggle(val) {
   emit('update:modelValue', val)
@@ -22,7 +28,7 @@ function onToggle(val) {
 const columnFilterPT = {
   root: { class: 'column-filter-select' },
   label: { style: 'display: none;' }, // Hide standard label since it's an icon only mostly
-  trigger: { style: 'width: auto; padding: 0.2rem 0.2rem; color: var(--color-text-dim);' },
+  trigger: { style: 'width: auto; padding: 0.2rem 0.2rem;' },
   panel: { style: 'background: var(--color-background-dark); border: 1px solid var(--color-border-default); border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.6); min-width: 100px;' },
   header: { style: 'background: var(--color-background-dark); border-bottom: 1px solid var(--color-border-light); padding: 0.25rem 0.5rem;' },
   item: ({ context }) => ({
@@ -53,7 +59,7 @@ const columnFilterPT = {
     @update:model-value="onToggle"
   >
     <template #dropdownicon>
-      <i class="pi pi-filter" :class="{ 'filter-active': modelValue && modelValue.length > 0 }" />
+      <i class="pi pi-filter" :class="{ 'filter-active': isActive }" />
     </template>
     <template #option="slotProps">
       <div class="column-filter__option">
@@ -87,11 +93,6 @@ const columnFilterPT = {
   border-radius: 4px;
 }
 
-.filter-active {
-  color: var(--color-primary);
-  opacity: 1;
-}
-
 .pi-filter {
   font-size: 0.95rem;
   color: var(--color-text-dim);
@@ -100,9 +101,14 @@ const columnFilterPT = {
   margin-top: 3px;
 }
 
+.pi-filter.filter-active {
+  color: var(--color-primary) !important;
+  opacity: 1;
+}
+
 .column-filter-select:hover .pi-filter {
   opacity: 1;
-  color: var(--color-text-bright);
+  color: var(--color-primary);
 }
 
 .column-filter__option {

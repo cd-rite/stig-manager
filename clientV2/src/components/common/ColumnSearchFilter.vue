@@ -5,7 +5,7 @@ import { ref, watch } from 'vue'
 
 const props = defineProps({
   modelValue: {
-    type: String,
+    required: false,
     default: '',
   },
   placeholder: {

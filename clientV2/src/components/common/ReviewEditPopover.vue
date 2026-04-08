@@ -39,15 +39,15 @@ const props = defineProps({
     type: Object,
     default: null,
   },
-  reviewHistory: {
-    type: Array,
-    default: () => [],
-  },
   width: {
     type: Number,
     default: null,
   },
   collectionId: {
+    type: String,
+    default: null,
+  },
+  assetId: {
     type: String,
     default: null,
   },
@@ -187,8 +187,9 @@ function hide() {
 }
 
 function alignPopover() {
-  if (popover.value && lastAnchorEvent.value) {
-    popover.value.alignOverlay()
+  const pv = popover.value
+  if (pv && pv.container && lastAnchorEvent.value) {
+    pv.alignOverlay()
   }
 }
 
@@ -215,7 +216,12 @@ function bindOutsideHandler() {
   // Delay to avoid catching the click that opened the popover
   setTimeout(() => {
     outsideHandler = (event) => {
-      if (event.target.closest('.p-popover')) {
+      if (
+        event.target.closest('.p-popover')
+        || event.target.closest('.p-multiselect-list')
+        || event.target.closest('.p-multiselect-option')
+        || event.target.closest('.p-multiselect-header')
+      ) {
         return
       }
       if (isDirty.value) {
@@ -426,9 +432,9 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
         <div v-if="showResources" class="review-edit-popover__resources-container">
           <ReviewResources
             :current-review="currentReview"
-            :review-history="reviewHistory"
             :rule-id="rowData.ruleId"
             :collection-id="collectionId"
+            :asset-id="assetId"
             :editable="editable"
             :form-result="formResult"
             :form-detail="formDetail"

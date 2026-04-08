@@ -11,31 +11,23 @@ const checklistColumns = ref([
   { field: 'result', header: 'Result' },
   { field: 'detail', header: 'Detail' },
   { field: 'comment', header: 'Comment' },
-  { field: 'resultEngine', header: 'Engine', image: botIcon },
+  { field: 'resultEngine', image: botIcon },
   { field: 'status', header: 'Status' },
-  { field: 'touchTs', header: 'Last action', icon: 'pi pi-clock' },
+  { field: 'touchTs', icon: 'pi pi-clock' },
 ])
 
-// Define default selected columns (everything except groupTitle maybe, or just check the old default)
-
-const selectedChecklistColumns = ref([
-  checklistColumns.value[0], // CAT
-  checklistColumns.value[1], // Group
-  checklistColumns.value[2], // ruleId
-  checklistColumns.value[4], // Rule Title
-  checklistColumns.value[5], // Result
-  checklistColumns.value[6], // Detail
-  checklistColumns.value[7], // Comment
-  checklistColumns.value[8], // Engine
-  checklistColumns.value[9], // Status
-  checklistColumns.value[10], // TouchTs
-])
+// Define default selected columns (empty means show all default columns)
+const selectedChecklistColumns = ref([])
 
 // Row height state across all consumers
 const lineClamp = ref(3)
 
 export function useChecklistDisplayMode() {
   const isColVisible = (field) => {
+    // If no columns are specifically selected, we show all columns (PrimeVue style)
+    if (selectedChecklistColumns.value.length === 0) {
+      return true
+    }
     return selectedChecklistColumns.value.some(col => col.field === field)
   }
 

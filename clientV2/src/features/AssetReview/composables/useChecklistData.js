@@ -1,8 +1,8 @@
 import { computed, ref } from 'vue'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
-import { fetchChecklist, fetchReviewsByAsset } from '../api/assetReviewApi.js'
+import { fetchChecklist } from '../api/assetReviewApi.js'
 
-export function useChecklistData({ collectionId, assetId, benchmarkId, revisionStr }) {
+export function useChecklistData({ assetId, benchmarkId, revisionStr }) {
   const accessMode = ref('r')
 
   // --- Checklist data ---
@@ -20,6 +20,7 @@ export function useChecklistData({ collectionId, assetId, benchmarkId, revisionS
         assetId.value,
         benchmarkId.value,
         revisionStr.value,
+        ['comment', 'detail', 'rule'],
       )
       accessMode.value = response.access ?? 'r'
       return response.checklist ?? []
@@ -27,57 +28,17 @@ export function useChecklistData({ collectionId, assetId, benchmarkId, revisionS
     { immediate: false, initialState: [], onError: null },
   )
 
-  // --- All reviews (for grid mode) ---
-  // Errors here are shown via global modal (default behaviour).
-  const {
-    state: allReviews,
-    execute: loadAllReviews,
-  } = useAsyncState(
-    () => fetchReviewsByAsset(collectionId.value, assetId.value, benchmarkId.value),
-    { immediate: false, initialState: [] },
-  )
-
-  // Merged grid data: checklist items + review detail/comment
-  const gridData = computed(() => {
-    if (!checklistData.value?.length) {
-      return []
-    }
-    const reviewMap = new Map()
-    for (const r of allReviews.value) {
-      reviewMap.set(r.ruleId, r)
-      if (r.ruleIds) {
-        for (const id of r.ruleIds) {
-          reviewMap.set(id, r)
-        }
-      }
-    }
-    return checklistData.value.map((item) => {
-      const review = reviewMap.get(item.ruleId)
-      return {
-        ...item,
-        result: review?.result ?? item.result,
-        detail: review?.detail ?? '',
-        comment: review?.comment ?? '',
-        username: review?.username ?? item.username ?? '',
-        status: review?.status ?? item.status,
-        ts: review?.ts ?? item.ts,
-        touchTs: review?.touchTs ?? item.touchTs,
-        resultEngine: review?.resultEngine ?? item.resultEngine ?? null,
-      }
-    })
-  })
+  // Merged grid data: now provided directly by the unified API
+  const gridData = computed(() => checklistData.value || [])
 
   function upsertReview(ruleId, review) {
-    const idx = allReviews.value.findIndex(r => r.ruleId === ruleId)
+    const idx = checklistData.value.findIndex(r => r.ruleId === ruleId)
     if (idx !== -1) {
-      allReviews.value = [
-        ...allReviews.value.slice(0, idx),
-        review,
-        ...allReviews.value.slice(idx + 1),
+      checklistData.value = [
+        ...checklistData.value.slice(0, idx),
+        { ...checklistData.value[idx], ...review },
+        ...checklistData.value.slice(idx + 1),
       ]
-    }
-    else {
-      allReviews.value = [...allReviews.value, review]
     }
   }
 
@@ -86,10 +47,8 @@ export function useChecklistData({ collectionId, assetId, benchmarkId, revisionS
     checklistData,
     isChecklistLoading,
     checklistError,
-    allReviews,
     gridData,
     loadChecklist,
-    loadAllReviews,
     upsertReview,
   }
 }

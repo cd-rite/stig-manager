@@ -1,7 +1,7 @@
 <script setup>
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 
 import engineIcon from '../../../assets/bot2.svg'
 import overrideIcon from '../../../assets/override2.svg'
@@ -81,25 +81,6 @@ const engineOptions = computed(() => {
     image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
   }))
 })
-watch(() => props.gridData, () => {
-  if (!props.gridData?.length) {
-    return
-  }
-
-  if (filters.value.severity.value === null && catOptions.value.length > 0) {
-    filters.value.severity.value = catOptions.value.map(o => o.value)
-  }
-  if (filters.value.result.value === null && resultOptions.value.length > 0) {
-    filters.value.result.value = resultOptions.value.map(o => o.value)
-  }
-  if (filters.value._statusText.value === null && statusOptions.value.length > 0) {
-    filters.value._statusText.value = statusOptions.value.map(o => o.value)
-  }
-  if (filters.value._engineDisplay.value === null && engineOptions.value.length > 0) {
-    filters.value._engineDisplay.value = engineOptions.value.map(o => o.value)
-  }
-}, { immediate: true })
-
 function onFilter(event) {
   updateFilteredData(event.filteredValue)
 }
@@ -242,7 +223,7 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column v-if="isColVisible('result')" field="result" filter-field="result" sortable :style="{ width: '7rem' }" :pt="columnPt.center">
+    <Column v-if="isColVisible('result')" field="result" filter-field="result" sortable :style="{ width: '8%' }" :pt="columnPt.center">
       <template #header>
         <div class="column-header-with-filter">
           Result

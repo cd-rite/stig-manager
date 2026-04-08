@@ -116,9 +116,8 @@ const {
   checklistError,
   gridData,
   loadChecklist,
-  loadAllReviews,
   upsertReview,
-} = useChecklistData({ collectionId, assetId, benchmarkId, revisionStr })
+} = useChecklistData({ assetId, benchmarkId, revisionStr })
 
 const {
   selectedRuleId,
@@ -127,10 +126,9 @@ const {
   isRuleLoading,
   ruleContentError,
   currentReview,
-  reviewHistory,
   selectRule,
   clearSelectedRule,
-} = useRuleDetail({ collectionId, assetId, benchmarkId, revisionStr, checklistData })
+} = useRuleDetail({ checklistData })
 
 const {
   isSaving,
@@ -147,7 +145,6 @@ watch([benchmarkId, revisionStr, asset], () => {
       loadStigRevisions()
     }
     loadChecklist()
-    loadAllReviews()
   }
 }, { immediate: true })
 
@@ -183,7 +180,6 @@ function onStatusAction({ ruleId, actionType }) {
 
 function onGridRefresh() {
   loadChecklist()
-  loadAllReviews()
 }
 
 const searchFilter = useDebouncedRef('', 220)
@@ -228,7 +224,6 @@ const searchFilter = useDebouncedRef('', 220)
             :save-error="saveError"
             :search-filter="searchFilter"
             :current-review="currentReview"
-            :review-history="reviewHistory"
             @update:search-filter="searchFilter = $event"
             @select-rule="selectRule"
             @row-save="onRowSave"

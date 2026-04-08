@@ -2,7 +2,8 @@
 import { FilterMatchMode } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 import engineIcon from '../../../assets/bot2.svg'
 import overrideIcon from '../../../assets/override2.svg'
@@ -18,12 +19,25 @@ import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
+import { fetchReview } from '../api/assetReviewApi.js'
 import { getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
 
 const props = defineProps({
-  reviewHistory: {
-    type: Array,
-    default: () => [],
+  active: {
+    type: Boolean,
+    default: true,
+  },
+  ruleId: {
+    type: String,
+    default: null,
+  },
+  assetId: {
+    type: String,
+    default: null,
+  },
+  collectionId: {
+    type: String,
+    default: null,
   },
   editable: {
     type: Boolean,
@@ -44,6 +58,71 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['apply-review'])
+
+// --- Local state for history ---
+const fullReviewHistory = ref([])
+const isInternalHistoryLoading = ref(false)
+
+async function loadHistory() {
+  if (!props.active || !props.ruleId || !props.assetId || !props.collectionId) {
+    return
+  }
+  isInternalHistoryLoading.value = true
+  try {
+    const result = await fetchReview(props.collectionId, props.assetId, props.ruleId)
+    fullReviewHistory.value = result?.history || []
+  }
+  catch (err) {
+    console.error('Failed to load review history', err)
+  }
+  finally {
+    isInternalHistoryLoading.value = false
+  }
+}
+
+// Reset and reload on rule change or when tab becomes active
+watch([() => props.active, () => props.ruleId], ([active, ruleId], [_oldActive, oldRuleId]) => {
+  if (active) {
+    // If the rule changed, clear the old history first
+    if (ruleId !== oldRuleId) {
+      fullReviewHistory.value = []
+    }
+    loadHistory()
+  }
+}, { immediate: true })
+
+const processedHistory = computed(() => {
+  return (fullReviewHistory.value || []).map(item => ({
+    ...item,
+    _engineDisplay: getEngineDisplay(item),
+    _statusLabel: item.status?.label ?? '',
+  }))
+})
+
+const resultOptions = computed(() => {
+  const results = new Set((fullReviewHistory.value || []).map(item => item.result).filter(Boolean))
+  return Array.from(results).map(val => ({
+    value: val,
+    label: getResultDisplay(val),
+  })).sort((a, b) => a.label.localeCompare(b.label))
+})
+
+const engineOptions = computed(() => {
+  const engines = new Set((fullReviewHistory.value || []).map(item => getEngineDisplay(item)).filter(Boolean))
+  return Array.from(engines).map(val => ({
+    value: val,
+    label: val === 'engine' ? 'Engine' : val === 'override' ? 'Override' : 'Manual',
+    image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
+  }))
+})
+
+const statusOptions = computed(() => {
+  const statuses = new Set((fullReviewHistory.value || []).map(item => item.status?.label).filter(Boolean))
+  return Array.from(statuses).map(val => ({
+    value: val,
+    label: val,
+  })).sort((a, b) => a.label.localeCompare(b.label))
+})
 
 const ROW_HEIGHT = 40
 
@@ -80,53 +159,32 @@ const filters = ref({
   _statusLabel: { value: null, matchMode: FilterMatchMode.IN },
 })
 
-const processedHistory = computed(() => {
-  return (props.reviewHistory || []).map(item => ({
-    ...item,
-    _engineDisplay: getEngineDisplay(item),
-    _statusLabel: item.status?.label ?? '',
-  }))
+const route = useRoute()
+
+const resetFilters = () => {
+  filters.value.global.value = null
+  filters.value.ruleId.value = null
+  filters.value.detail.value = null
+  filters.value.comment.value = null
+  filters.value.statusText.value = null
+  filters.value.username.value = null
+  filters.value.result.value = null
+  filters.value._engineDisplay.value = null
+  filters.value._statusLabel.value = null
+}
+
+onMounted(() => {
+  resetFilters()
 })
 
-const resultOptions = computed(() => {
-  const results = new Set(props.reviewHistory.map(item => item.result).filter(Boolean))
-  return Array.from(results).map(val => ({
-    value: val,
-    label: getResultDisplay(val),
-  })).sort((a, b) => a.label.localeCompare(b.label))
+watch([
+  () => route.params.collectionId,
+  () => route.params.assetId,
+  () => route.params.benchmarkId,
+  () => route.params.revisionStr,
+], () => {
+  resetFilters()
 })
-
-const engineOptions = computed(() => {
-  const engines = new Set(props.reviewHistory.map(item => getEngineDisplay(item)).filter(Boolean))
-  return Array.from(engines).map(val => ({
-    value: val,
-    label: val === 'engine' ? 'Engine' : val === 'override' ? 'Override' : 'Manual',
-    image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
-  }))
-})
-
-const statusOptions = computed(() => {
-  const statuses = new Set(props.reviewHistory.map(item => item.status?.label).filter(Boolean))
-  return Array.from(statuses).map(val => ({
-    value: val,
-    label: val,
-  })).sort((a, b) => a.label.localeCompare(b.label))
-})
-
-watch(() => props.reviewHistory, () => {
-  if (!props.reviewHistory?.length) {
-    return
-  }
-  if (filters.value.result.value === null && resultOptions.value.length > 0) {
-    filters.value.result.value = resultOptions.value.map(o => o.value)
-  }
-  if (filters.value._engineDisplay.value === null && engineOptions.value.length > 0) {
-    filters.value._engineDisplay.value = engineOptions.value.map(o => o.value)
-  }
-  if (filters.value._statusLabel.value === null && statusOptions.value.length > 0) {
-    filters.value._statusLabel.value = statusOptions.value.map(o => o.value)
-  }
-}, { immediate: true })
 
 const tableWrapper = ref(null)
 const wrapperHeight = ref(400)
@@ -157,7 +215,7 @@ onBeforeUnmount(() => {
 })
 
 const historyStats = computed(() => {
-  const reviews = props.reviewHistory || []
+  const reviews = fullReviewHistory.value || []
   const stats = {
     total: reviews.length,
     results: { fail: 0, pass: 0, notapplicable: 0, other: 0 },
@@ -249,6 +307,7 @@ const historyTablePt = {
     <DataTable
       v-model:filters="filters"
       :value="processedHistory"
+      :loading="isInternalHistoryLoading"
       data-key="touchTs"
       scrollable
       :scroll-height="scrollHeightPx"
@@ -273,7 +332,11 @@ const historyTablePt = {
           </div>
         </template>
         <template #body="{ data }">
-          <span class="cell-text--mono">{{ data.ruleId }}</span>
+          <span
+            class="cell-text--mono cell-text--ellipsis"
+            title="Click to view full rule ID"
+            @click="showLongText($event, 'Rule', data.ruleId)"
+          >{{ data.ruleId }}</span>
         </template>
       </Column>
 
@@ -412,6 +475,15 @@ const historyTablePt = {
             User
             <ColumnSearchFilter v-model="filters.username.value" placeholder="Search user..." />
           </div>
+        </template>
+        <template #body="{ data }">
+          <span
+            v-if="data.username"
+            class="cell-text--ellipsis"
+            title="Click to view full username"
+            @click="showLongText($event, 'User', data.username)"
+          >{{ data.username }}</span>
+          <span v-else class="cell-text--empty">---</span>
         </template>
       </Column>
 

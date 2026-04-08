@@ -1,8 +1,9 @@
 <script setup>
-import { FilterMatchMode } from '@primevue/core/api'
+import { FilterMatchMode, FilterService } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 import engineIcon from '../../../assets/bot2.svg'
 import overrideIcon from '../../../assets/override2.svg'
@@ -17,8 +18,10 @@ import ManualBadge from '../../../components/common/ManualBadge.vue'
 import OverrideBadge from '../../../components/common/OverrideBadge.vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
+import StatusFooter from '../../../components/common/StatusFooter.vue'
 
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
+import { normalizeColor } from '../../../shared/lib/colorUtils.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchOtherReviews } from '../api/assetReviewApi.js'
 import { getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
@@ -56,6 +59,16 @@ const props = defineProps({
 
 const emit = defineEmits(['apply-review'])
 
+FilterService.register('labelContainsAny', (value, filter) => {
+  if (!filter || filter.length === 0) {
+    return true
+  }
+  if (!value || value.length === 0) {
+    return false
+  }
+  return value.some(label => filter.includes(label.name))
+})
+
 const ROW_HEIGHT = 36
 
 const longTextPopover = ref(null)
@@ -71,6 +84,7 @@ const filters = ref({
   username: { value: null, matchMode: FilterMatchMode.CONTAINS },
   result: { value: null, matchMode: FilterMatchMode.IN },
   _engineDisplay: { value: null, matchMode: FilterMatchMode.IN },
+  assetLabels: { value: null, matchMode: 'labelContainsAny' },
 })
 
 const isAlreadyApplied = (data) => {
@@ -125,17 +139,19 @@ const engineOptions = computed(() => {
   }))
 })
 
-watch(() => filteredOtherReviews.value, () => {
-  if (!filteredOtherReviews.value?.length) {
-    return
+const labelOptions = computed(() => {
+  const seen = new Map()
+  for (const item of filteredOtherReviews.value) {
+    for (const label of (item.assetLabels || [])) {
+      if (!seen.has(label.name)) {
+        seen.set(label.name, label)
+      }
+    }
   }
-  if (filters.value.result.value === null && resultOptions.value.length > 0) {
-    filters.value.result.value = resultOptions.value.map(o => o.value)
-  }
-  if (filters.value._engineDisplay.value === null && engineOptions.value.length > 0) {
-    filters.value._engineDisplay.value = engineOptions.value.map(o => o.value)
-  }
-}, { immediate: true })
+  return Array.from(seen.values())
+    .map(label => ({ value: label.name, label: label.name, color: label.color }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+})
 
 const otherAssetsStats = computed(() => {
   const reviews = filteredOtherReviews.value || []
@@ -194,6 +210,32 @@ watch([() => props.ruleId, () => props.collectionId], () => {
     loadOtherReviews()
   }
 }, { immediate: true })
+
+const route = useRoute()
+
+const resetFilters = () => {
+  filters.value.global.value = null
+  filters.value.assetName.value = null
+  filters.value.detail.value = null
+  filters.value.comment.value = null
+  filters.value.username.value = null
+  filters.value.result.value = null
+  filters.value._engineDisplay.value = null
+  filters.value.assetLabels.value = null
+}
+
+onMounted(() => {
+  resetFilters()
+})
+
+watch([
+  () => route.params.collectionId,
+  () => route.params.assetId,
+  () => route.params.benchmarkId,
+  () => route.params.revisionStr,
+], () => {
+  resetFilters()
+})
 
 const tableWrapper = ref(null)
 const wrapperHeight = ref(400)
@@ -283,11 +325,28 @@ const otherTablePt = {
           </div>
         </template>
         <template #body="{ data }">
-          <span class="cell-text--primary" :title="data.assetId">{{ data.assetName }}</span>
+          <span
+            class="cell-text--ellipsis"
+            :title="data.assetId"
+            @click="showLongText($event, 'Asset', data.assetName)"
+          >{{ data.assetName }}</span>
         </template>
       </Column>
 
-      <Column header="Labels" field="assetLabels" :style="{ width: '8%' }">
+      <Column field="assetLabels" filter-field="assetLabels" :style="{ width: '12%' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            Labels
+            <ColumnFilter v-model="filters.assetLabels.value" :options="labelOptions">
+              <template #option="{ option }">
+                <span
+                  class="label-filter-chip"
+                  :style="{ backgroundColor: normalizeColor(option.color, '#cccccc') }"
+                >{{ option.label }}</span>
+              </template>
+            </ColumnFilter>
+          </div>
+        </template>
         <template #body="{ data }">
           <LabelsRow :labels="data.assetLabels" compact />
         </template>
@@ -309,7 +368,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="resultEngine" filter-field="_engineDisplay" :style="{ width: '5%', textAlign: 'center' }">
+      <Column field="resultEngine" filter-field="_engineDisplay" :style="{ width: '7%', textAlign: 'center' }">
         <template #header>
           <div class="column-header-with-filter">
             <img
@@ -346,7 +405,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="detail" :style="{ width: '17%' }">
+      <Column field="detail" :style="{ width: '15%' }">
         <template #header>
           <div class="column-header-with-filter">
             Detail
@@ -366,7 +425,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="comment" :style="{ width: '17%' }">
+      <Column field="comment" :style="{ width: '15%' }">
         <template #header>
           <div class="column-header-with-filter">
             Comment
@@ -405,6 +464,15 @@ const otherTablePt = {
             User
             <ColumnSearchFilter v-model="filters.username.value" placeholder="Search user..." />
           </div>
+        </template>
+        <template #body="{ data }">
+          <span
+            v-if="data.username"
+            class="cell-text--ellipsis"
+            title="Click to view full username"
+            @click="showLongText($event, 'User', data.username)"
+          >{{ data.username }}</span>
+          <span v-else class="cell-text--empty">---</span>
         </template>
       </Column>
 
@@ -563,6 +631,15 @@ const otherTablePt = {
 .other-table__empty {
   font-style: italic;
   color: var(--color-text-dim);
+}
+
+.label-filter-chip {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
 .apply-review-icon-btn {
