@@ -271,11 +271,14 @@ paths:
           in: query
           description: Additional fields to include in JSON checklist responses.
           schema:
-            type: string
-            enum:
-              - rule
-              - detail
-              - comment
+            type: array
+            items:
+              type: string
+              enum:
+                - rule
+                - detail
+                - comment
+          style: form
           explode: true
       responses:
         '200':
