@@ -656,7 +656,7 @@ paths:
               unreviewedCommented: 'informational',
               emptyDetail: 'replace',
               emptyComment: 'ignore',
-              updateAssetProps: true,
+              updateAssetProps: false,
               allowCustom: true,
             }
         ```
@@ -6979,7 +6979,7 @@ components:
             - replace
         updateAssetProps:
           description: |
-            Flag indicating whether to update Asset information (IP, MAC, FQDN, noncomputing, role) when Asset already exists in the Collection.
+            Flag indicating whether to update Asset information (IP, MAC, FQDN, noncomputing, metadata:(role and tech area)) when Asset already exists in the Collection.
           type: boolean
         allowCustom:
           description: |
