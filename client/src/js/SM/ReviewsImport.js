@@ -925,7 +925,9 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
                     for (const combo of _this.optionComboBoxes) {
                         combo.setReadOnly(!checked)
                     }
-                    _this.updateAssetPropsCb.setReadOnly(!checked)
+                    if (_this.canUpdateAssetProps) {
+                        _this.updateAssetPropsCb.setReadOnly(!checked)
+                    }
                     _this.localStorage = checked
                     if (_this.localStorage && localStorage.wizardImportOptions?.length) {
                         _this.restoreOptions(JSON.parse(localStorage.wizardImportOptions))
@@ -933,6 +935,12 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
                     _this.onOptionChanged?.(_this, cb, checked)
                 }
             }
+        })
+
+        this.noUpdateAssetPropsDisplay = new Ext.form.DisplayField({
+            value: '<i>Asset property updates are configured in the Manage Collection interface.</i>',
+            height: 22,
+            hideLabel: true
         })
 
         this.noCustomizeDisplay = new Ext.form.DisplayField({
@@ -988,11 +996,9 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
             items.push(this.initialOptions.allowCustom ? this.customizeCb : this.noCustomizeDisplay)
         }
         items.push(this.autoStatusFieldGroup, ...this.optionComboBoxes)
-        if (this.canUpdateAssetProps) {
-            items.push(this.updateAssetPropsCb)
-        }
+        items.push(this.canUpdateAssetProps ? this.updateAssetPropsCb : this.noUpdateAssetPropsDisplay)
         if (this.context !== 'wizard') {
-            items.push(this.updateAssetPropsCb, this.allowCustomCb)
+            items.push(this.allowCustomCb)
         }
         const config = {
             title: 'Import options',
