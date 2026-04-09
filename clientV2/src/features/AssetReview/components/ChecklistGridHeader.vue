@@ -1,6 +1,6 @@
 <script setup>
 import TieredMenu from 'primevue/tieredmenu'
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 
 import lineHeightDown from '../../../assets/line-height-down.svg'
 import lineHeightUp from '../../../assets/line-height-up.svg'
@@ -10,24 +10,12 @@ import ColumnToggle from '../../../components/common/ColumnToggle.vue'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
 import { useSearch } from '../composables/useSearch.js'
 
-const props = defineProps({
-  asset: {
-    type: Object,
-    default: null,
-  },
-  revisionInfo: {
-    type: Object,
-    default: null,
-  },
-  isLoading: {
-    type: Boolean,
-    default: false,
-  },
-  accessMode: {
-    type: String,
-    default: 'r',
-  },
-})
+// Inject feature-level context
+const {
+  asset,
+  revisionInfo,
+  accessMode,
+} = inject('assetReviewContext')
 
 // No emits currently used directly in this component
 const {
@@ -44,8 +32,8 @@ const { searchFilter, clearSearch } = useSearch()
 const checklistMenu = ref()
 
 const headerTitle = computed(() => {
-  if (props.revisionInfo?.display) {
-    return props.revisionInfo.display
+  if (revisionInfo.value?.display) {
+    return revisionInfo.value.display
   }
   return 'Checklist'
 })

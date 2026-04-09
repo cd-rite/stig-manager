@@ -2,63 +2,33 @@
 import Popover from 'primevue/popover'
 import Textarea from 'primevue/textarea'
 import Tooltip from 'primevue/tooltip'
-import { nextTick, onBeforeUnmount, ref, toRef, watch } from 'vue'
+import { inject, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
 import ReviewResources from '../../features/AssetReview/components/ReviewResources.vue'
 import { useReviewEditForm } from '../../shared/composables/useReviewEditForm.js'
-import { defaultFieldSettings, formatReviewDate, resultOptions } from '../../shared/lib/reviewFormUtils.js'
+import { formatReviewDate, resultOptions } from '../../shared/lib/reviewFormUtils.js'
 import ResultBadge from './ResultBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 import StatusButton from './StatusButton.vue'
 
-const props = defineProps({
-  rowData: {
-    type: Object,
-    default: null,
-  },
-  fieldSettings: {
-    type: Object,
-    default: () => defaultFieldSettings,
-  },
-  accessMode: {
-    type: String,
-    default: 'r',
-  },
-  canAccept: {
-    type: Boolean,
-    default: false,
-  },
-  isSaving: {
-    type: Boolean,
-    default: false,
-  },
-  saveError: {
-    type: String,
-    default: null,
-  },
-  currentReview: {
-    type: Object,
-    default: null,
-  },
+defineProps({
   width: {
     type: Number,
-    default: null,
-  },
-  collectionId: {
-    type: String,
-    default: null,
-  },
-  assetId: {
-    type: String,
     default: null,
   },
 })
 
 const emit = defineEmits(['save', 'status-action', 'close', 'clear-save-error'])
 
-// print collecitonid on moiunt
-watch(() => props.collectionId, (val) => {
-  console.log('collectionId', val)
-}, { immediate: true })
+// Inject feature-level context
+const {
+  fieldSettings,
+  accessMode,
+  canAccept,
+  isSaving,
+  saveError,
+  clearSaveError,
+  currentReview,
+} = inject('assetReviewContext')
 
 // Register PrimeVue Tooltip directive for v-tooltip usage
 const vTooltip = Tooltip
@@ -70,6 +40,13 @@ const showUnsavedWarning = ref(false)
 const showResources = ref(false)
 
 // Form state and business logic from composable
+const reviewEditForm = useReviewEditForm({
+  rowData: currentReview,
+  fieldSettings,
+  accessMode,
+  canAccept,
+})
+
 const {
   formResult,
   formDetail,
@@ -89,28 +66,26 @@ const {
   selectResult,
   applyReviewData,
   discardChanges,
-} = useReviewEditForm({
-  rowData: toRef(props, 'rowData'),
-  fieldSettings: toRef(props, 'fieldSettings'),
-  accessMode: toRef(props, 'accessMode'),
-  canAccept: toRef(props, 'canAccept'),
-})
+} = reviewEditForm
+
+// Provide form state to nested components (ReviewResources tabs)
+provide('reviewEditForm', reviewEditForm)
 
 // Button action handler
 function onButtonClick(actionType) {
-  if (!actionType || !props.rowData) {
+  if (!actionType || !currentReview.value) {
     return
   }
 
   // Unsubmit: emit but keep popover open for further editing
   if (actionType === 'unsubmit') {
-    emit('status-action', { ruleId: props.rowData.ruleId, actionType })
+    emit('status-action', { ruleId: currentReview.value.ruleId, actionType })
     return
   }
 
   // Other status-only actions (PATCH) — dismiss after
   if (actionType === 'submit' || actionType === 'accept') {
-    emit('status-action', { ruleId: props.rowData.ruleId, actionType })
+    emit('status-action', { ruleId: currentReview.value.ruleId, actionType })
     closing.value = true
     popover.value.hide()
     return
@@ -123,7 +98,7 @@ function onButtonClick(actionType) {
   }
 
   emit('save', {
-    ruleId: props.rowData.ruleId,
+    ruleId: currentReview.value.ruleId,
     result: formResult.value,
     detail: formDetail.value,
     comment: formComment.value,
@@ -267,7 +242,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
     @show="bindOutsideHandler"
     @hide="onPopoverHide"
   >
-    <div v-if="rowData" class="review-edit-popover" :style="width ? { width: `${width}px` } : {}">
+    <div v-if="currentReview" class="review-edit-popover" :style="width ? { width: `${width}px` } : {}">
       <button class="review-edit-popover__close" :title="isDirty ? 'Close (discards unsaved changes)' : 'Close'" @click="dismiss">
         <i class="pi pi-times" />
       </button>
@@ -368,7 +343,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
       <div v-if="saveError" class="review-edit-popover__save-error">
         <i class="pi pi-exclamation-circle" />
         <span>{{ saveError }}</span>
-        <button class="review-edit-popover__save-error-dismiss" @click="emit('clear-save-error')">
+        <button class="review-edit-popover__save-error-dismiss" @click="clearSaveError">
           <i class="pi pi-times" />
         </button>
       </div>
@@ -376,17 +351,17 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
       <div class="review-edit-popover__attributions">
         <div class="review-edit-popover__engine-badges">
           <span
-            v-if="rowData.resultEngine"
+            v-if="currentReview.resultEngine"
             v-tooltip="{ value: engineTooltipHtml, escape: false, autoHide: false, hideDelay: 300, pt: { root: { style: { maxWidth: '40rem' } } } }"
             class="review-edit-popover__engine-badge"
           >
-            {{ rowData.resultEngine.product || 'Engine' }}
+            {{ currentReview.resultEngine.product || 'Engine' }}
           </span>
           <span v-else class="review-edit-popover__engine-badge review-edit-popover__engine-badge--manual">
             Manual
           </span>
           <span
-            v-if="rowData.resultEngine?.overrides?.length"
+            v-if="currentReview.resultEngine?.overrides?.length"
             v-tooltip="{ value: overrideTooltipHtml, escape: false, autoHide: false, hideDelay: 300, pt: { root: { style: { maxWidth: '40rem' } } } }"
             class="review-edit-popover__override-badge"
           >
@@ -395,26 +370,26 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
         </div>
         <div class="review-edit-popover__attr-section">
           <span class="review-edit-popover__attr-label">Evaluated: </span>
-          <span v-if="rowData.ts" class="review-edit-popover__attr-pill">
+          <span v-if="currentReview.ts" class="review-edit-popover__attr-pill">
             <i class="pi pi-clock" />
-            {{ formatReviewDate(rowData.ts) }}
+            {{ formatReviewDate(currentReview.ts) }}
           </span>
-          <span v-if="rowData.username" class="review-edit-popover__attr-pill">
+          <span v-if="currentReview.username" class="review-edit-popover__attr-pill">
             <i class="pi pi-user" />
-            {{ rowData.username }}
+            {{ currentReview.username }}
           </span>
-          <span v-if="!rowData.ts && !rowData.username" class="review-edit-popover__attr-pill review-edit-popover__attr-pill--empty">--</span>
+          <span v-if="!currentReview.ts && !currentReview.username" class="review-edit-popover__attr-pill review-edit-popover__attr-pill--empty">--</span>
         </div>
         <div class="review-edit-popover__attr-section">
           <span class="review-edit-popover__attr-label">Statused: </span>
-          <template v-if="rowData.status && statusLabel">
-            <span v-if="rowData.status?.ts" class="review-edit-popover__attr-pill">
+          <template v-if="currentReview.status && statusLabel">
+            <span v-if="currentReview.status?.ts" class="review-edit-popover__attr-pill">
               <i class="pi pi-clock" />
-              {{ formatReviewDate(rowData.status.ts) }}
+              {{ formatReviewDate(currentReview.status.ts) }}
             </span>
-            <span v-if="rowData.status?.user?.username" class="review-edit-popover__attr-pill">
+            <span v-if="currentReview.status?.user?.username" class="review-edit-popover__attr-pill">
               <i class="pi pi-user" />
-              {{ rowData.status.user.username }}
+              {{ currentReview.status.user.username }}
             </span>
             <StatusBadge :status="statusLabel" />
           </template>
@@ -431,14 +406,6 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
       <Transition name="expand" @after-enter="alignPopover" @after-leave="alignPopover">
         <div v-if="showResources" class="review-edit-popover__resources-container">
           <ReviewResources
-            :current-review="currentReview"
-            :rule-id="rowData.ruleId"
-            :collection-id="collectionId"
-            :asset-id="assetId"
-            :editable="editable"
-            :form-result="formResult"
-            :form-detail="formDetail"
-            :form-comment="formComment"
             @apply-review="applyReviewData"
           />
         </div>
@@ -716,15 +683,27 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
 :global(.review-popover) {
   border: 1px solid var(--p-primary-color);
   box-shadow: 0 0 10px 2px color-mix(in srgb, var(--p-primary-color) 30%, transparent);
-  margin-left: -5rem;
+  margin-left: -10rem;
+}
+
+:global(.review-popover::before) {
+  border-bottom-color: var(--p-primary-color) !important;
+}
+
+:global(.review-popover::after) {
+  border-bottom-color: var(--color-background-dark) !important;
+}
+
+:global(.review-popover.p-popover-flipped::before) {
+  border-top-color: var(--p-primary-color) !important;
+}
+
+:global(.review-popover.p-popover-flipped::after) {
+  border-top-color: var(--color-background-dark) !important;
 }
 
 :global(.review-popover.p-popover-flipped) {
   margin-block-start: 5px;
-}
-
-:global(.review-popover.p-popover-flipped::before) {
-  border-top-color: var(--p-primary-color);
 }
 
 :global(.review-popover-leave) {

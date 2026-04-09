@@ -4,7 +4,7 @@ import TabList from 'primevue/tablist'
 import TabPanel from 'primevue/tabpanel'
 import TabPanels from 'primevue/tabpanels'
 import Tabs from 'primevue/tabs'
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
 
 import ReviewAttachmentsTab from './ReviewAttachmentsTab.vue'
 import ReviewHistoryTab from './ReviewHistoryTab.vue'
@@ -12,15 +12,7 @@ import ReviewOtherAssetsTab from './ReviewOtherAssetsTab.vue'
 import ReviewStatusTextTab from './ReviewStatusTextTab.vue'
 
 defineProps({
-  currentReview: {
-    type: Object,
-    default: null,
-  },
   ruleId: {
-    type: String,
-    default: null,
-  },
-  collectionId: {
     type: String,
     default: null,
   },
@@ -40,13 +32,16 @@ defineProps({
     type: String,
     default: '',
   },
-  assetId: {
-    type: String,
-    default: null,
-  },
 })
 
 const emit = defineEmits(['apply-review'])
+
+// Inject feature-level context
+const {
+  currentReview,
+  collectionId,
+  assetId,
+} = inject('assetReviewContext')
 
 const activeTab = ref('history')
 

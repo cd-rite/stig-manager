@@ -1,7 +1,7 @@
 <script setup>
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
-import { computed, watch } from 'vue'
+import { computed, provide, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getHttpStatus } from '../../../shared/api/apiClient.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
@@ -115,6 +115,7 @@ const {
   isChecklistLoading,
   checklistError,
   gridData,
+  ruleLookupMap,
   loadChecklist,
   upsertReview,
 } = useChecklistData({ assetId, benchmarkId, revisionStr })
@@ -128,7 +129,7 @@ const {
   currentReview,
   selectRule,
   clearSelectedRule,
-} = useRuleDetail({ checklistData })
+} = useRuleDetail({ ruleLookupMap })
 
 const {
   isSaving,
@@ -137,6 +138,29 @@ const {
   saveFullReview,
   saveStatusAction,
 } = useReviewActions({ collectionId, assetId }, { gridData, upsertReview, selectedRuleId, currentReview })
+
+provide('assetReviewContext', {
+  collectionId,
+  assetId,
+  asset,
+  accessMode,
+  checklistData,
+  gridData,
+  ruleLookupMap,
+  isChecklistLoading,
+  checklistError,
+  fieldSettings,
+  statusSettings,
+  canAccept,
+  isSaving,
+  saveError,
+  currentReview,
+  selectedRuleId,
+  revisionInfo,
+  selectRule,
+  loadChecklist,
+  clearSaveError,
+})
 
 watch([benchmarkId, revisionStr, asset], () => {
   clearSelectedRule()
@@ -212,24 +236,11 @@ const searchFilter = useDebouncedRef('', 220)
       >
         <SplitterPanel :size="75" :min-size="40">
           <ChecklistGrid
-            :grid-data="gridData"
-            :is-loading="isChecklistLoading"
-            :selected-rule-id="selectedRuleId"
-            :access-mode="accessMode"
-            :revision-info="revisionInfo"
-            :asset="asset"
-            :field-settings="fieldSettings"
-            :can-accept="canAccept"
-            :is-saving="isSaving"
-            :save-error="saveError"
             :search-filter="searchFilter"
-            :current-review="currentReview"
             @update:search-filter="searchFilter = $event"
-            @select-rule="selectRule"
             @row-save="onRowSave"
             @status-action="onStatusAction"
             @refresh="onGridRefresh"
-            @clear-save-error="clearSaveError"
           />
         </SplitterPanel>
         <SplitterPanel :size="25" :min-size="20">

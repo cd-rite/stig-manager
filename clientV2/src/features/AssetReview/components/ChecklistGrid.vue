@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, toRef, watch } from 'vue'
+import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import EngineBadge from '../../../components/common/EngineBadge.vue'
@@ -9,77 +9,39 @@ import ResultBadge from '../../../components/common/ResultBadge.vue'
 import ReviewEditPopover from '../../../components/common/ReviewEditPopover.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
-import { defaultFieldSettings } from '../../../shared/lib/reviewFormUtils.js'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
 import { useSearch } from '../composables/useSearch.js'
 import ChecklistGridHeader from './ChecklistGridHeader.vue'
 import ChecklistGridTable from './ChecklistGridTable.vue'
 
 const props = defineProps({
-  gridData: {
-    type: Array,
-    default: () => [],
-  },
-  isLoading: {
-    type: Boolean,
-    default: false,
-  },
-  selectedRuleId: {
-    type: String,
-    default: null,
-  },
-  accessMode: {
-    type: String,
-    default: 'r',
-  },
-  revisionInfo: {
-    type: Object,
-    default: null,
-  },
-  asset: {
-    type: Object,
-    default: null,
-  },
-  fieldSettings: {
-    type: Object,
-    default: () => defaultFieldSettings,
-  },
-  canAccept: {
-    type: Boolean,
-    default: false,
-  },
-  isSaving: {
-    type: Boolean,
-    default: false,
-  },
-  saveError: {
-    type: String,
-    default: null,
-  },
   searchFilter: {
     type: String,
     default: '',
-  },
-  currentReview: {
-    type: Object,
-    default: null,
   },
 })
 
 const emit = defineEmits(['update:searchFilter', 'select-rule', 'row-save', 'status-action', 'refresh', 'clear-save-error'])
 
-watch(() => props.asset, (newReview) => {
-  console.log('asset', newReview)
-}, { immediate: true })
+// Inject feature-level context
+const {
+  gridData,
+  isChecklistLoading: isLoading,
+  selectedRuleId,
+  asset,
+  revisionInfo,
+  accessMode,
+  selectRule,
+  ruleLookupMap,
+} = inject('assetReviewContext')
 
-watch(() => props.gridData, (gridData) => {
-  console.log('gridData', gridData)
-}, { immediate: true })
-
-watch(() => props.currentReview, (currentReview) => {
-  console.log('currentReview', currentReview)
-}, { immediate: true })
-const selectedRow = ref(null)
+const selectedRow = computed(() => {
+  if (!selectedRuleId.value || !gridData.value) {
+    return null
+  }
+  const idx = ruleLookupMap.value.get(selectedRuleId.value)
+  return idx !== undefined ? gridData.value[idx] : null
+})
 const reviewEditPopover = ref()
 const editingRow = ref(null)
 const editingPopoverWidth = ref(null)
@@ -87,7 +49,7 @@ const editingPopoverWidth = ref(null)
 const route = useRoute()
 
 const { lineClamp, itemSize } = useChecklistDisplayMode()
-const { stats, isFiltered, currentFilteredData, searchFilter: sharedSearchFilter, resetFilters } = useSearch(toRef(props, 'gridData'))
+const { stats, isFiltered, currentFilteredData, searchFilter: sharedSearchFilter, resetFilters } = useSearch(gridData)
 
 onMounted(() => {
   resetFilters()
@@ -129,7 +91,7 @@ function openRowEditor(event, rowData) {
     const gridRect = gridEl.getBoundingClientRect()
     const cellRect = resultCell.getBoundingClientRect()
     const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
-    editingPopoverWidth.value = gridRect.right - cellRect.left + (2 * rem)
+    editingPopoverWidth.value = (gridRect.right + 1 * rem) - cellRect.left + (7 * rem)
   }
   else {
     editingPopoverWidth.value = null
@@ -175,31 +137,19 @@ function onGridScroll() {
   reviewEditPopover.value?.hide()
 }
 
-watch(() => props.selectedRuleId, (ruleId) => {
-  if (!ruleId) {
-    selectedRow.value = null
-    return
-  }
-  const item = props.gridData?.find(r => r.ruleId === ruleId)
-  if (item && selectedRow.value?.ruleId !== ruleId) {
-    selectedRow.value = item
-  }
-})
-
-watch(() => props.gridData, (data) => {
+watch(() => gridData.value, (data) => {
   if (!data?.length) {
-    selectedRow.value = null
+    selectRule(null)
     return
   }
 
   const targetData = isFiltered.value ? currentFilteredData.value : data
-  const isValid = props.selectedRuleId && targetData.some(r => r.ruleId === props.selectedRuleId)
+  const isValid = selectedRuleId.value && targetData.some(r => r.ruleId === selectedRuleId.value)
 
   if (!isValid) {
     const firstVisible = targetData[0]
     if (firstVisible) {
-      selectedRow.value = firstVisible
-      emit('select-rule', firstVisible.ruleId)
+      selectRule(firstVisible.ruleId)
     }
   }
 
@@ -227,7 +177,7 @@ function onRowClick(event) {
     reviewEditPopover.value.triggerUnsavedWarning()
     return
   }
-  emit('select-rule', event.data.ruleId)
+  selectRule(event.data.ruleId)
   openRowEditor(event.originalEvent || event, event.data)
 }
 
@@ -277,14 +227,9 @@ function handleFooterAction(actionKey) {
     </ChecklistGridTable>
 
     <ReviewEditPopover
-      ref="reviewEditPopover" :row-data="editingRow" :width="editingPopoverWidth"
-      :field-settings="fieldSettings" :access-mode="accessMode" :can-accept="canAccept" :is-saving="isSaving"
-      :save-error="saveError"
-      :current-review="currentReview"
-      :collection-id="asset?.collection?.collectionId"
-      :asset-id="asset?.assetId"
+      ref="reviewEditPopover" :width="editingPopoverWidth"
       @save="onPopoverSave" @status-action="onPopoverStatusAction" @close="onPopoverClose"
-      @clear-save-error="emit('clear-save-error')"
+      @clear-save-error="clearSaveError"
     />
   </div>
 </template>

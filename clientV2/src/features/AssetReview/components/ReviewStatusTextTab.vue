@@ -1,12 +1,8 @@
 <script setup>
+import { inject } from 'vue'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 
-defineProps({
-  currentReview: {
-    type: Object,
-    default: null,
-  },
-})
+const { currentReview } = inject('assetReviewContext')
 </script>
 
 <template>

@@ -2,7 +2,7 @@
 import { FilterMatchMode } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import engineIcon from '../../../assets/bot2.svg'
@@ -27,49 +27,41 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  ruleId: {
-    type: String,
-    default: null,
-  },
-  assetId: {
-    type: String,
-    default: null,
-  },
-  collectionId: {
-    type: String,
-    default: null,
-  },
-  editable: {
-    type: Boolean,
-    default: false,
-  },
-  formResult: {
-    type: String,
-    default: '',
-  },
-  formDetail: {
-    type: String,
-    default: '',
-  },
-  formComment: {
-    type: String,
-    default: '',
-  },
 })
 
 const emit = defineEmits(['apply-review'])
+
+// Inject feature-level context
+const {
+  selectedRuleId: ruleId,
+  collectionId,
+  assetId,
+  accessMode,
+  currentReview,
+} = inject('assetReviewContext')
+
+const reviewEditForm = inject('reviewEditForm')
+
+// Extract form state for "Already Applied" check
+const {
+  formResult,
+  formDetail,
+  formComment,
+} = reviewEditForm
+
+const editable = computed(() => accessMode.value === 'rw' && (!currentReview.value?.status?.label || currentReview.value.status.label === 'saved' || currentReview.value.status.label === 'rejected'))
 
 // --- Local state for history ---
 const fullReviewHistory = ref([])
 const isInternalHistoryLoading = ref(false)
 
 async function loadHistory() {
-  if (!props.active || !props.ruleId || !props.assetId || !props.collectionId) {
+  if (!props.active || !ruleId.value || !assetId.value || !collectionId.value) {
     return
   }
   isInternalHistoryLoading.value = true
   try {
-    const result = await fetchReview(props.collectionId, props.assetId, props.ruleId)
+    const result = await fetchReview(collectionId.value, assetId.value, ruleId.value)
     fullReviewHistory.value = result?.history || []
   }
   catch (err) {
@@ -81,10 +73,10 @@ async function loadHistory() {
 }
 
 // Reset and reload on rule change or when tab becomes active
-watch([() => props.active, () => props.ruleId], ([active, ruleId], [_oldActive, oldRuleId]) => {
+watch([() => props.active, () => ruleId.value], ([active, rid], [_oldActive, oldRid]) => {
   if (active) {
     // If the rule changed, clear the old history first
-    if (ruleId !== oldRuleId) {
+    if (rid !== oldRid) {
       fullReviewHistory.value = []
     }
     loadHistory()
@@ -127,13 +119,13 @@ const statusOptions = computed(() => {
 const ROW_HEIGHT = 40
 
 const isAlreadyApplied = (data) => {
-  return data.result === props.formResult
-    && (data.detail ?? '') === props.formDetail
-    && (data.comment ?? '') === props.formComment
+  return data.result === formResult.value
+    && (data.detail ?? '') === formDetail.value
+    && (data.comment ?? '') === formComment.value
 }
 
 const getApplyTooltip = (data) => {
-  if (!props.editable) {
+  if (!editable.value) {
     return 'Cannot apply review while submitted or accepted'
   }
   if (isAlreadyApplied(data)) {
@@ -318,13 +310,13 @@ const historyTablePt = {
       class="history-table"
       :pt="historyTablePt"
     >
-      <Column header="Time" field="touchTs" sortable :style="{ width: '8%' }">
+      <Column header="Time" field="touchTs" sortable :style="{ width: '80px' }">
         <template #body="{ data }">
           <span class="cell-text--dim">{{ formatReviewDate(data.touchTs) }}</span>
         </template>
       </Column>
 
-      <Column field="ruleId" :style="{ width: '10%' }">
+      <Column field="ruleId" :style="{ width: '150px' }">
         <template #header>
           <div class="column-header-with-filter">
             Rule
@@ -340,7 +332,7 @@ const historyTablePt = {
         </template>
       </Column>
 
-      <Column field="result" :style="{ width: '7%', textAlign: 'center' }">
+      <Column field="result" :style="{ width: '70px', textAlign: 'center' }">
         <template #header>
           <div class="column-header-with-filter">
             Result
@@ -356,7 +348,7 @@ const historyTablePt = {
         </template>
       </Column>
 
-      <Column field="resultEngine" filter-field="_engineDisplay" :style="{ width: '5%', textAlign: 'center' }">
+      <Column field="resultEngine" filter-field="_engineDisplay" :style="{ width: '50px', textAlign: 'center' }">
         <template #header>
           <div class="column-header-with-filter">
             <img
@@ -393,7 +385,7 @@ const historyTablePt = {
         </template>
       </Column>
 
-      <Column field="detail" :style="{ width: '17%' }">
+      <Column field="detail" :style="{ width: '130px' }">
         <template #header>
           <div class="column-header-with-filter">
             Detail
@@ -413,7 +405,7 @@ const historyTablePt = {
         </template>
       </Column>
 
-      <Column field="comment" :style="{ width: '18%' }">
+      <Column field="comment" :style="{ width: '130px' }">
         <template #header>
           <div class="column-header-with-filter">
             Comment
@@ -433,7 +425,7 @@ const historyTablePt = {
         </template>
       </Column>
 
-      <Column field="statusText" :style="{ width: '10%' }">
+      <Column field="statusText" :style="{ width: '100px' }">
         <template #header>
           <div class="column-header-with-filter">
             Status Text
@@ -453,7 +445,7 @@ const historyTablePt = {
         </template>
       </Column>
 
-      <Column filter-field="_statusLabel" :style="{ width: '7%', textAlign: 'center' }">
+      <Column filter-field="_statusLabel" :style="{ width: '70px', textAlign: 'center' }">
         <template #header>
           <div class="column-header-with-filter">
             Status
@@ -469,7 +461,7 @@ const historyTablePt = {
         </template>
       </Column>
 
-      <Column field="username" :style="{ width: '10%' }">
+      <Column field="username" :style="{ width: '100px' }">
         <template #header>
           <div class="column-header-with-filter">
             User
@@ -487,7 +479,7 @@ const historyTablePt = {
         </template>
       </Column>
 
-      <Column header="Apply" :style="{ width: '5%', textAlign: 'center' }">
+      <Column header="Apply" :style="{ width: '40px', textAlign: 'center' }">
         <template #body="{ data }">
           <button
             class="apply-review-icon-btn"
@@ -551,8 +543,6 @@ const historyTablePt = {
 
 /* Allow table to expand and scroll horizontally if needed. */
 :deep(.p-datatable-table) {
-  width: 100%;
-  min-width: 750px;
   table-layout: fixed;
 }
 

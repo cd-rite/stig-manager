@@ -1,14 +1,14 @@
 import { computed, ref } from 'vue'
 
-export function useRuleDetail({ checklistData }) {
+export function useRuleDetail({ ruleLookupMap }) {
   // --- Selected rule ---
   const selectedRuleId = ref(null)
 
   const selectedChecklistItem = computed(() => {
-    if (!selectedRuleId.value || !checklistData.value?.length) {
+    if (!selectedRuleId.value || !ruleLookupMap.value) {
       return null
     }
-    return checklistData.value.find(item => item.ruleId === selectedRuleId.value) ?? null
+    return ruleLookupMap.value.get(selectedRuleId.value) ?? null
   })
 
   // --- Rule content ---

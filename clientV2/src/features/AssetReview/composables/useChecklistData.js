@@ -6,9 +6,6 @@ export function useChecklistData({ assetId, benchmarkId, revisionStr }) {
   const accessMode = ref('r')
 
   // --- Checklist data ---
-  // onError: null — we expose checklistError so AssetReview.vue can show an inline
-  // page-level banner. We must NOT redirect on a checklist 404/403 because that
-  // can mean the STIG was simply unassigned, not that the whole route is gone.
   const {
     state: checklistData,
     isLoading: isChecklistLoading,
@@ -31,14 +28,21 @@ export function useChecklistData({ assetId, benchmarkId, revisionStr }) {
   // Merged grid data: now provided directly by the unified API
   const gridData = computed(() => checklistData.value || [])
 
+  // Optimization: Keep a lookup map for O(1) access
+  const ruleLookupMap = computed(() => {
+    const map = new Map()
+    for (const item of gridData.value) {
+      map.set(item.ruleId, item)
+    }
+    return map
+  })
+
   function upsertReview(ruleId, review) {
     const idx = checklistData.value.findIndex(r => r.ruleId === ruleId)
     if (idx !== -1) {
-      checklistData.value = [
-        ...checklistData.value.slice(0, idx),
-        { ...checklistData.value[idx], ...review },
-        ...checklistData.value.slice(idx + 1),
-      ]
+      // Direct array mutation if possible, but keeping it reactive/immutable-ish for safety
+      const updatedItem = { ...checklistData.value[idx], ...review }
+      checklistData.value[idx] = updatedItem
     }
   }
 
@@ -48,6 +52,7 @@ export function useChecklistData({ assetId, benchmarkId, revisionStr }) {
     isChecklistLoading,
     checklistError,
     gridData,
+    ruleLookupMap,
     loadChecklist,
     upsertReview,
   }

@@ -2,7 +2,7 @@
 import { FilterMatchMode, FilterService } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import engineIcon from '../../../assets/bot2.svg'
@@ -26,38 +26,34 @@ import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchOtherReviews } from '../api/assetReviewApi.js'
 import { getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
 
-const props = defineProps({
-  ruleId: {
-    type: String,
-    default: null,
-  },
-  collectionId: {
-    type: String,
-    default: null,
-  },
-  assetId: {
-    type: String,
-    default: null,
-  },
-  editable: {
+defineProps({
+  active: {
     type: Boolean,
-    default: false,
-  },
-  formResult: {
-    type: String,
-    default: '',
-  },
-  formDetail: {
-    type: String,
-    default: '',
-  },
-  formComment: {
-    type: String,
-    default: '',
+    default: true,
   },
 })
 
 const emit = defineEmits(['apply-review'])
+
+// Inject feature-level context
+const {
+  selectedRuleId: ruleId,
+  collectionId,
+  assetId,
+  accessMode,
+  currentReview,
+} = inject('assetReviewContext')
+
+const reviewEditForm = inject('reviewEditForm')
+
+// Extract form state for "Already Applied" check
+const {
+  formResult,
+  formDetail,
+  formComment,
+} = reviewEditForm
+
+const editable = computed(() => accessMode.value === 'rw' && (!currentReview.value?.status?.label || currentReview.value.status.label === 'saved' || currentReview.value.status.label === 'rejected'))
 
 FilterService.register('labelContainsAny', (value, filter) => {
   if (!filter || filter.length === 0) {
@@ -88,13 +84,13 @@ const filters = ref({
 })
 
 const isAlreadyApplied = (data) => {
-  return data.result === props.formResult
-    && (data.detail ?? '') === props.formDetail
-    && (data.comment ?? '') === props.formComment
+  return data.result === formResult.value
+    && (data.detail ?? '') === formDetail.value
+    && (data.comment ?? '') === formComment.value
 }
 
 const getApplyTooltip = (data) => {
-  if (!props.editable) {
+  if (!editable.value) {
     return 'Cannot apply review while submitted or accepted'
   }
   if (isAlreadyApplied(data)) {
@@ -104,15 +100,15 @@ const getApplyTooltip = (data) => {
 }
 
 const { state: otherReviews, isLoading, execute: loadOtherReviews } = useAsyncState(
-  () => fetchOtherReviews(props.collectionId, props.ruleId),
+  () => fetchOtherReviews(collectionId.value, ruleId.value),
   { immediate: false, initialState: [] },
 )
 
 const filteredOtherReviews = computed(() => {
-  if (!props.assetId) {
+  if (!assetId.value) {
     return otherReviews.value
   }
-  return otherReviews.value.filter(review => review.assetId !== props.assetId)
+  return otherReviews.value.filter(review => review.assetId !== assetId.value)
 })
 
 const processedOtherReviews = computed(() => {
@@ -205,8 +201,8 @@ const otherAssetsStats = computed(() => {
   return stats
 })
 
-watch([() => props.ruleId, () => props.collectionId], () => {
-  if (props.ruleId && props.collectionId) {
+watch([() => ruleId.value, () => collectionId.value], () => {
+  if (ruleId.value && collectionId.value) {
     loadOtherReviews()
   }
 }, { immediate: true })
@@ -312,12 +308,10 @@ const otherTablePt = {
       :scroll-height="scrollHeightPx"
       :virtual-scroller-options="{ itemSize: ROW_HEIGHT, showLoader: true }"
       striped-rows
-      :resizable-columns="true"
-      column-resize-mode="fit"
       class="other-assets-table"
       :pt="otherTablePt"
     >
-      <Column field="assetName" sortable :style="{ width: '10%' }">
+      <Column field="assetName" sortable :style="{ width: '100px' }">
         <template #header>
           <div class="column-header-with-filter">
             Asset
@@ -333,7 +327,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="assetLabels" filter-field="assetLabels" :style="{ width: '12%' }">
+      <Column field="assetLabels" filter-field="assetLabels" :style="{ width: '100px' }">
         <template #header>
           <div class="column-header-with-filter">
             Labels
@@ -352,7 +346,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="result" :style="{ width: '7%', textAlign: 'center' }">
+      <Column field="result" :style="{ width: '65px', textAlign: 'center' }">
         <template #header>
           <div class="column-header-with-filter">
             Result
@@ -368,7 +362,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="resultEngine" filter-field="_engineDisplay" :style="{ width: '7%', textAlign: 'center' }">
+      <Column field="resultEngine" filter-field="_engineDisplay" :style="{ width: '50px', textAlign: 'center' }">
         <template #header>
           <div class="column-header-with-filter">
             <img
@@ -405,7 +399,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="detail" :style="{ width: '15%' }">
+      <Column field="detail" :style="{ width: '150px' }">
         <template #header>
           <div class="column-header-with-filter">
             Detail
@@ -425,7 +419,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="comment" :style="{ width: '15%' }">
+      <Column field="comment" :style="{ width: '150px' }">
         <template #header>
           <div class="column-header-with-filter">
             Comment
@@ -445,20 +439,20 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column header="Evaluated" field="ts" sortable :style="{ width: '10%' }">
+      <Column header="Evaluated" field="ts" sortable :style="{ width: '80px' }">
         <template #body="{ data }">
           <span class="cell-text--dim">{{ formatReviewDate(data.ts) }}</span>
         </template>
       </Column>
 
-      <Column header="Statused" field="touchTs" sortable :style="{ width: '10%' }">
+      <Column header="Statused" field="touchTs" sortable :style="{ width: '80px' }">
         <template #body="{ data }">
           <span v-if="data.touchTs" class="cell-text--dim">{{ formatReviewDate(data.touchTs) }}</span>
           <span v-else class="cell-text--empty">---</span>
         </template>
       </Column>
 
-      <Column field="username" :style="{ width: '8%' }">
+      <Column field="username" :style="{ width: '80px' }">
         <template #header>
           <div class="column-header-with-filter">
             User
@@ -476,7 +470,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column header="Apply" :style="{ width: '4%', textAlign: 'center' }">
+      <Column header="Apply" :style="{ width: '40px', textAlign: 'center' }">
         <template #body="{ data }">
           <button
             class="apply-review-icon-btn"
@@ -546,8 +540,6 @@ const otherTablePt = {
 
 /* Allow table to expand and scroll horizontally if needed. */
 :deep(.p-datatable-table) {
-  width: 100%;
-  min-width: 750px;
   table-layout: fixed;
 }
 
