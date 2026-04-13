@@ -129,7 +129,7 @@ const {
   currentReview,
   selectRule,
   clearSelectedRule,
-} = useRuleDetail({ ruleLookupMap })
+} = useRuleDetail({ ruleLookupMap, collectionId, assetId, benchmarkId, revisionStr })
 
 const {
   isSaving,
@@ -162,9 +162,9 @@ provide('assetReviewContext', {
   clearSaveError,
 })
 
-watch([benchmarkId, revisionStr, asset], () => {
+watch([benchmarkId, revisionStr], () => {
   clearSelectedRule()
-  if (benchmarkId.value && revisionStr.value && asset.value) {
+  if (benchmarkId.value && revisionStr.value) {
     if (!stigRevisions.value?.length) {
       loadStigRevisions()
     }

@@ -3,27 +3,35 @@ import botIcon from '../../../assets/bot2.svg'
 
 // Defines the available columns for the checklist grid
 const checklistColumns = ref([
-  { field: 'severity', header: 'Cat' },
-  { field: 'groupId', header: 'Group' },
-  { field: 'ruleId', header: 'Rule Id' },
+  { field: 'severity', header: 'Cat', permanent: true },
+  { field: 'groupId', header: 'Group', permanent: true },
+  { field: 'ruleId', header: 'Rule Id', permanent: true },
   { field: 'groupTitle', header: 'Group Title' },
   { field: 'ruleTitle', header: 'Rule Title' },
-  { field: 'result', header: 'Result' },
+  { field: 'result', header: 'Result', permanent: true },
   { field: 'detail', header: 'Detail' },
   { field: 'comment', header: 'Comment' },
-  { field: 'resultEngine', image: botIcon },
-  { field: 'status', header: 'Status' },
+  { field: 'resultEngine', image: botIcon, permanent: true },
+  { field: 'status', header: 'Status', permanent: true },
   { field: 'touchTs', icon: 'pi pi-clock' },
 ])
 
-// Define default selected columns (empty means show all default columns)
-const selectedChecklistColumns = ref([])
+// Define default selected columns
+const selectedChecklistColumns = ref(
+  checklistColumns.value.filter(col =>
+    ['severity', 'groupId', 'ruleId', 'ruleTitle', 'result', 'detail', 'comment', 'resultEngine', 'status', 'touchTs'].includes(col.field),
+  ),
+)
 
 // Row height state across all consumers
 const lineClamp = ref(3)
 
 export function useChecklistDisplayMode() {
   const isColVisible = (field) => {
+    const col = checklistColumns.value.find(c => c.field === field)
+    if (col?.permanent) {
+      return true
+    }
     // If no columns are specifically selected, we show all columns (PrimeVue style)
     if (selectedChecklistColumns.value.length === 0) {
       return true
@@ -32,9 +40,22 @@ export function useChecklistDisplayMode() {
   }
 
   const setColVisible = (field, visible) => {
+    const col = checklistColumns.value.find(c => c.field === field)
+    if (col?.permanent) {
+      return // Cannot hide permanent columns
+    }
+
+    // If empty, it means all columns are currently visible.
+    // To hide something, we must first populate the selection with all columns.
+    if (selectedChecklistColumns.value.length === 0) {
+      if (!visible) {
+        selectedChecklistColumns.value = checklistColumns.value.filter(c => c.field !== field)
+      }
+      return
+    }
+
     const isVis = isColVisible(field)
     if (visible && !isVis) {
-      const col = checklistColumns.value.find(c => c.field === field)
       if (col) {
         selectedChecklistColumns.value.push(col)
       }

@@ -3,7 +3,7 @@ import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { patchReview, putReview } from '../api/assetReviewApi.js'
 
 export function useReviewActions({ collectionId, assetId }, deps) {
-  const { gridData, upsertReview, selectedRuleId, currentReview } = deps
+  const { gridData, upsertReview, currentReview } = deps
 
   // Action error is shown inline in the popover, not as a global modal.
   const saveError = ref(null)
@@ -34,10 +34,7 @@ export function useReviewActions({ collectionId, assetId }, deps) {
       const result = await putReview(collectionId.value, assetId.value, ruleId, body)
 
       upsertReview(ruleId, result)
-
-      if (ruleId === selectedRuleId.value) {
-        currentReview.value = result
-      }
+      currentReview.value = result
 
       return result
     },
@@ -48,7 +45,6 @@ export function useReviewActions({ collectionId, assetId }, deps) {
     executeSaveReview(ruleId, data)
   }
 
-  // --- Status action (for grid mode) ---
   const { isLoading: isSavingStatus, execute: executeSaveStatus } = useAsyncState(
     async (ruleId, actionType) => {
       saveError.value = null
@@ -70,10 +66,7 @@ export function useReviewActions({ collectionId, assetId }, deps) {
       const result = await patchReview(collectionId.value, assetId.value, ruleId, { status })
 
       upsertReview(ruleId, result)
-
-      if (ruleId === selectedRuleId.value) {
-        currentReview.value = result
-      }
+      currentReview.value = result
 
       return result
     },

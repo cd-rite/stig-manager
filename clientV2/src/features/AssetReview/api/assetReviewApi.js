@@ -14,12 +14,21 @@ export function fetchChecklist(assetId, benchmarkId, revisionStr, projection) {
   })
 }
 
-export function fetchReview(collectionId, assetId, ruleId) {
+export function fetchRule(benchmarkId, revisionStr, ruleId) {
+  return apiCall('getRuleByRevision', {
+    benchmarkId,
+    revisionStr,
+    ruleId,
+    projection: ['detail', 'ccis', 'check', 'fix'],
+  })
+}
+
+export function fetchReview(collectionId, assetId, ruleId, { projection } = {}) {
   return apiCall('getReviewByAssetRule', {
     collectionId,
     assetId,
     ruleId,
-    projection: 'history',
+    ...(projection ? { projection } : {}),
   })
 }
 

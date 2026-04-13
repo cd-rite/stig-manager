@@ -18,6 +18,7 @@ import OverrideBadge from '../../../components/common/OverrideBadge.vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
+import { durationToNow } from '../../../shared/lib.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchReview } from '../api/assetReviewApi.js'
 import { getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
@@ -61,7 +62,7 @@ async function loadHistory() {
   }
   isInternalHistoryLoading.value = true
   try {
-    const result = await fetchReview(collectionId.value, assetId.value, ruleId.value)
+    const result = await fetchReview(collectionId.value, assetId.value, ruleId.value, { projection: 'history' })
     fullReviewHistory.value = result?.history || []
   }
   catch (err) {
@@ -310,9 +311,9 @@ const historyTablePt = {
       class="history-table"
       :pt="historyTablePt"
     >
-      <Column header="Time" field="touchTs" sortable :style="{ width: '80px' }">
+      <Column header="Time" field="touchTs" sortable :style="{ width: '65px' }">
         <template #body="{ data }">
-          <span class="cell-text--dim">{{ formatReviewDate(data.touchTs) }}</span>
+          <span class="cell-text-mono" :title="formatReviewDate(data.touchTs)">{{ durationToNow(data.touchTs) }}</span>
         </template>
       </Column>
 

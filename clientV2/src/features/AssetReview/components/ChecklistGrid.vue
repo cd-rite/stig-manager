@@ -32,6 +32,7 @@ const {
   revisionInfo,
   accessMode,
   selectRule,
+  clearSaveError,
   ruleLookupMap,
 } = inject('assetReviewContext')
 
@@ -39,10 +40,10 @@ const selectedRow = computed(() => {
   if (!selectedRuleId.value || !gridData.value) {
     return null
   }
-  const idx = ruleLookupMap.value.get(selectedRuleId.value)
-  return idx !== undefined ? gridData.value[idx] : null
+  return ruleLookupMap.value.get(selectedRuleId.value) ?? null
 })
 const reviewEditPopover = ref()
+const popoverAnchor = ref(null)
 const editingRow = ref(null)
 const editingPopoverWidth = ref(null)
 
@@ -82,22 +83,27 @@ function openRowEditor(event, rowData) {
   const wasOpen = !!editingRow.value
 
   editingRow.value = rowData
-  const row = event.target ? event.target.closest('tr') : null
-  const resultCell = row?.querySelector('[data-result-cell]')
-  const anchorEl = resultCell || event.currentTarget || event.target
 
-  const gridEl = anchorEl?.closest ? anchorEl.closest('.checklist-grid') : null
-  if (gridEl && resultCell) {
-    const gridRect = gridEl.getBoundingClientRect()
-    const cellRect = resultCell.getBoundingClientRect()
-    const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
-    editingPopoverWidth.value = (gridRect.right + 1 * rem) - cellRect.left + (7 * rem)
-  }
-  else {
-    editingPopoverWidth.value = null
+  // Find the row element to get its vertical dimensions
+  const row = event.target?.closest ? event.target.closest('tr') : null
+  const rowRect = row ? row.getBoundingClientRect() : { top: 0, bottom: 0, height: 0 }
+  const clickX = event.clientX
+
+  // Update the hidden anchor element's position
+  if (popoverAnchor.value) {
+    popoverAnchor.value.style.left = `${clickX}px`
+    popoverAnchor.value.style.top = `${rowRect.top}px`
+    popoverAnchor.value.style.height = `${rowRect.height}px`
   }
 
-  const anchorEvent = { currentTarget: anchorEl, target: anchorEl }
+  // Ensure width is handled by the popover's internal sizing/min-width
+  editingPopoverWidth.value = null
+
+  const anchorEvent = {
+    currentTarget: popoverAnchor.value,
+    target: popoverAnchor.value,
+    clientX: clickX,
+  }
 
   if (isSameRow) {
     reviewEditPopover.value.toggle(anchorEvent)
@@ -162,12 +168,15 @@ watch(() => gridData.value, (data) => {
 })
 
 function onSelectionChange(newRow) {
+  if (!newRow) {
+    return
+  }
   const isSameRow = editingRow.value?.ruleId === newRow?.ruleId
   if (!isSameRow && reviewEditPopover.value?.isDirty) {
     reviewEditPopover.value.triggerUnsavedWarning()
     return
   }
-  selectedRow.value = newRow
+  selectRule(newRow.ruleId)
 }
 
 function onRowClick(event) {
@@ -230,6 +239,12 @@ function handleFooterAction(actionKey) {
       ref="reviewEditPopover" :width="editingPopoverWidth"
       @save="onPopoverSave" @status-action="onPopoverStatusAction" @close="onPopoverClose"
       @clear-save-error="clearSaveError"
+    />
+
+    <div
+      ref="popoverAnchor"
+      class="popover-anchor"
+      style="position: fixed; width: 0px; pointer-events: none; visibility: hidden; z-index: -1;"
     />
   </div>
 </template>

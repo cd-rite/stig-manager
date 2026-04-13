@@ -17,7 +17,7 @@ export function useChecklistData({ assetId, benchmarkId, revisionStr }) {
         assetId.value,
         benchmarkId.value,
         revisionStr.value,
-        ['comment', 'detail', 'rule'],
+        ['comment', 'detail'],
       )
       accessMode.value = response.access ?? 'r'
       return response.checklist ?? []

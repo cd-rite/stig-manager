@@ -76,6 +76,15 @@ const checklistMenuPT = {
 function toggleChecklistMenu(event) {
   checklistMenu.value.toggle(event)
 }
+
+const toggleableColumns = computed(() => checklistColumns.value.filter(col => !col.permanent))
+const selectedToggleableColumns = computed({
+  get: () => selectedChecklistColumns.value.filter(col => !col.permanent),
+  set: (val) => {
+    const permanent = selectedChecklistColumns.value.filter(col => col.permanent)
+    selectedChecklistColumns.value = [...permanent, ...val]
+  },
+})
 </script>
 
 <template>
@@ -115,7 +124,7 @@ function toggleChecklistMenu(event) {
         </button>
       </div>
       <div class="checklist-grid__header-controls">
-        <ColumnToggle v-model="selectedChecklistColumns" :columns="checklistColumns" />
+        <ColumnToggle v-model="selectedToggleableColumns" :columns="toggleableColumns" />
         <button
           type="button" class="checklist-grid__menu-btn checklist-grid__menu-btn--checklist"
           aria-haspopup="true" aria-controls="checklist_menu" @click="toggleChecklistMenu"

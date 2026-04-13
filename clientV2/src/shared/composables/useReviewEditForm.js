@@ -44,12 +44,10 @@ export function useReviewEditForm({ rowData, fieldSettings, accessMode, canAccep
 
   // --- Dirty tracking ---
   const isDirty = computed(() => {
-    if (!rowData.value) {
-      return false
-    }
-    return formResult.value !== (rowData.value.result ?? '')
-      || formDetail.value !== (rowData.value.detail ?? '')
-      || formComment.value !== (rowData.value.comment ?? '')
+    const row = rowData.value
+    return formResult.value !== (row?.result ?? '')
+      || formDetail.value !== (row?.detail ?? '')
+      || formComment.value !== (row?.comment ?? '')
   })
 
   const showResultEmphasis = computed(() => editable.value && !formResult.value)

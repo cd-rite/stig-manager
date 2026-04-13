@@ -1,6 +1,8 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
+import { fetchReview, fetchRule } from '../api/assetReviewApi.js'
 
-export function useRuleDetail({ ruleLookupMap }) {
+export function useRuleDetail({ ruleLookupMap, collectionId, assetId, benchmarkId, revisionStr }) {
   // --- Selected rule ---
   const selectedRuleId = ref(null)
 
@@ -11,27 +13,46 @@ export function useRuleDetail({ ruleLookupMap }) {
     return ruleLookupMap.value.get(selectedRuleId.value) ?? null
   })
 
-  // --- Rule content ---
-  const ruleContent = computed(() => selectedChecklistItem.value?.rule ?? null)
-  const isRuleLoading = ref(false)
-  const ruleContentError = ref(null)
+  // --- Rule content (fetched on demand via getRuleByRevision) ---
+  const {
+    state: ruleContent,
+    isLoading: isRuleLoading,
+    error: ruleContentError,
+    execute: loadRuleContent,
+  } = useAsyncState(
+    ruleId => fetchRule(benchmarkId.value, revisionStr.value, ruleId),
+    { immediate: false, initialState: null, onError: null },
+  )
 
-  // --- Current review ---
-  const currentReview = computed(() => {
-    const item = selectedChecklistItem.value
-    if (!item) {
-      return null
+  // --- Current review (fetched via getReviewByAssetRule for popover attribution) ---
+  const {
+    state: currentReview,
+    isLoading: isReviewLoading,
+    error: reviewError,
+    execute: loadCurrentReview,
+  } = useAsyncState(
+    ruleId => fetchReview(collectionId.value, assetId.value, ruleId),
+    { immediate: false, initialState: null, onError: null },
+  )
+
+  // Fire both fetches in parallel when the selected rule changes
+  watch(selectedRuleId, (ruleId) => {
+    if (!ruleId) {
+      ruleContent.value = null
+      currentReview.value = null
+      return
     }
-    return {
-      ruleId: item.ruleId,
-      result: item.result,
-      detail: item.detail,
-      comment: item.comment,
-      status: item.status,
-      ts: item.ts,
-      touchTs: item.touchTs,
-      resultEngine: item.resultEngine,
-      autoResult: item.autoResult,
+
+    // Clear stale data immediately so the UI doesn't flash previous content on slow networks
+    ruleContent.value = null
+    currentReview.value = null
+
+    if (benchmarkId?.value && revisionStr?.value) {
+      loadRuleContent(ruleId)
+    }
+
+    if (collectionId?.value && assetId?.value) {
+      loadCurrentReview(ruleId)
     }
   })
 
@@ -54,6 +75,8 @@ export function useRuleDetail({ ruleLookupMap }) {
     isRuleLoading,
     ruleContentError,
     currentReview,
+    isReviewLoading,
+    reviewError,
     selectRule,
     clearSelectedRule,
   }

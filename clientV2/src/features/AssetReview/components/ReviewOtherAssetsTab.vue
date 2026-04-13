@@ -21,6 +21,7 @@ import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
 
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
+import { durationToNow } from '../../../shared/lib.js'
 import { normalizeColor } from '../../../shared/lib/colorUtils.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchOtherReviews } from '../api/assetReviewApi.js'
@@ -441,13 +442,13 @@ const otherTablePt = {
 
       <Column header="Evaluated" field="ts" sortable :style="{ width: '80px' }">
         <template #body="{ data }">
-          <span class="cell-text--dim">{{ formatReviewDate(data.ts) }}</span>
+          <span class="cell-text-mono" :title="formatReviewDate(data.ts)">{{ durationToNow(data.ts) }}</span>
         </template>
       </Column>
 
       <Column header="Statused" field="touchTs" sortable :style="{ width: '80px' }">
         <template #body="{ data }">
-          <span v-if="data.touchTs" class="cell-text--dim">{{ formatReviewDate(data.touchTs) }}</span>
+          <span v-if="data.touchTs" class="cell-text-mono" :title="formatReviewDate(data.touchTs)">{{ durationToNow(data.touchTs) }}</span>
           <span v-else class="cell-text--empty">---</span>
         </template>
       </Column>

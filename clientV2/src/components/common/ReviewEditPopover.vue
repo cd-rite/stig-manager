@@ -28,6 +28,7 @@ const {
   saveError,
   clearSaveError,
   currentReview,
+  selectedRuleId,
 } = inject('assetReviewContext')
 
 // Register PrimeVue Tooltip directive for v-tooltip usage
@@ -73,19 +74,20 @@ provide('reviewEditForm', reviewEditForm)
 
 // Button action handler
 function onButtonClick(actionType) {
-  if (!actionType || !currentReview.value) {
+  const ruleId = selectedRuleId.value
+  if (!actionType || !ruleId) {
     return
   }
 
   // Unsubmit: emit but keep popover open for further editing
   if (actionType === 'unsubmit') {
-    emit('status-action', { ruleId: currentReview.value.ruleId, actionType })
+    emit('status-action', { ruleId, actionType })
     return
   }
 
   // Other status-only actions (PATCH) — dismiss after
   if (actionType === 'submit' || actionType === 'accept') {
-    emit('status-action', { ruleId: currentReview.value.ruleId, actionType })
+    emit('status-action', { ruleId, actionType })
     closing.value = true
     popover.value.hide()
     return
@@ -98,7 +100,7 @@ function onButtonClick(actionType) {
   }
 
   emit('save', {
-    ruleId: currentReview.value.ruleId,
+    ruleId,
     result: formResult.value,
     detail: formDetail.value,
     comment: formComment.value,
@@ -111,6 +113,7 @@ function onButtonClick(actionType) {
 // Dirty close handling
 function onPopoverHide() {
   unbindOutsideHandler()
+  unbindResizeHandler()
   showResources.value = false
   if (closing.value) {
     closing.value = false
@@ -161,10 +164,62 @@ function hide() {
   showResources.value = false
 }
 
+function clampPopoverPosition() {
+  const pv = popover.value
+  if (!pv || !pv.container || !lastAnchorEvent.value) {
+    return
+  }
+  const container = pv.container
+  const anchor = lastAnchorEvent.value.currentTarget
+  if (!anchor) {
+    return
+  }
+
+  // Reset prior manual offset
+  container.style.marginLeft = '0px'
+
+  // Use clientX from the original click event if available for maximum precision.
+  // Fall back to the anchor element's center if needed.
+  const rect = container.getBoundingClientRect()
+  const anchorRect = anchor.getBoundingClientRect()
+  const targetX = lastAnchorEvent.value.clientX ?? (anchorRect.left + anchorRect.width / 2)
+
+  const gutter = 12
+  const viewportW = document.documentElement.clientWidth
+
+  // Calculate desired offset to center the popover rect on the target X coordinate
+  let offset = targetX - (rect.left + rect.width / 2)
+
+  // Clamp so the popover stays within viewport gutters
+  const projectedLeft = rect.left + offset
+  const projectedRight = projectedLeft + rect.width
+
+  if (projectedLeft < gutter) {
+    offset += (gutter - projectedLeft)
+  }
+  else if (projectedRight > viewportW - gutter) {
+    offset -= (projectedRight - (viewportW - gutter))
+  }
+
+  // If the popover is wider than viewport minus gutters, just pin to left gutter.
+  if (rect.width > viewportW - gutter * 2) {
+    offset = gutter - rect.left
+  }
+
+  container.style.marginLeft = `${offset}px`
+
+  // Calculate the arrow's left edge relative to the popover body.
+  // We use a direct pixel value for the edge (minus 10px half-width) to avoid
+  // subpixel misalignment that occurs with translateX(-50%).
+  const arrowLeftEdge = targetX - (rect.left + offset) - 10
+  container.style.setProperty('--p-popover-arrow-left', `${arrowLeftEdge}px`)
+}
+
 function alignPopover() {
   const pv = popover.value
   if (pv && pv.container && lastAnchorEvent.value) {
     pv.alignOverlay()
+    nextTick(clampPopoverPosition)
   }
 }
 
@@ -174,7 +229,10 @@ function reposition(event) {
   pv.target = event.currentTarget
   pv.eventTarget = event.currentTarget
   pv.container?.classList.remove('p-popover-flipped')
-  nextTick(() => pv.alignOverlay())
+  nextTick(() => {
+    pv.alignOverlay()
+    clampPopoverPosition()
+  })
 }
 
 watch(showResources, () => {
@@ -183,10 +241,35 @@ watch(showResources, () => {
   })
 })
 
-// Outside-click detection (replaces PrimeVue's dismissable which can't handle dirty checks)
 let outsideHandler = null
+let resizeHandler = null
+let resizeTimer = null
+
+function bindResizeHandler() {
+  unbindResizeHandler()
+  resizeHandler = () => {
+    clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(() => {
+      const pv = popover.value
+      if (pv && pv.container) {
+        pv.alignOverlay()
+        clampPopoverPosition()
+      }
+    }, 60)
+  }
+  window.addEventListener('resize', resizeHandler)
+}
+
+function unbindResizeHandler() {
+  if (resizeHandler) {
+    window.removeEventListener('resize', resizeHandler)
+    resizeHandler = null
+  }
+  clearTimeout(resizeTimer)
+}
 
 function bindOutsideHandler() {
+  bindResizeHandler()
   unbindOutsideHandler()
   // Delay to avoid catching the click that opened the popover
   setTimeout(() => {
@@ -217,6 +300,7 @@ function unbindOutsideHandler() {
   }
 }
 
+onBeforeUnmount(unbindResizeHandler)
 onBeforeUnmount(unbindOutsideHandler)
 
 defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUnsavedWarning })
@@ -239,10 +323,10 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
         leaveActiveClass: 'review-popover-leave',
       },
     }"
-    @show="bindOutsideHandler"
+    @show="bindOutsideHandler(); nextTick(clampPopoverPosition)"
     @hide="onPopoverHide"
   >
-    <div v-if="currentReview" class="review-edit-popover" :style="width ? { width: `${width}px` } : {}">
+    <div class="review-edit-popover" :style="width ? { width: `${width}px` } : {}">
       <button class="review-edit-popover__close" :title="isDirty ? 'Close (discards unsaved changes)' : 'Close'" @click="dismiss">
         <i class="pi pi-times" />
       </button>
@@ -351,7 +435,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
       <div class="review-edit-popover__attributions">
         <div class="review-edit-popover__engine-badges">
           <span
-            v-if="currentReview.resultEngine"
+            v-if="currentReview?.resultEngine"
             v-tooltip="{ value: engineTooltipHtml, escape: false, autoHide: false, hideDelay: 300, pt: { root: { style: { maxWidth: '40rem' } } } }"
             class="review-edit-popover__engine-badge"
           >
@@ -361,7 +445,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
             Manual
           </span>
           <span
-            v-if="currentReview.resultEngine?.overrides?.length"
+            v-if="currentReview?.resultEngine?.overrides?.length"
             v-tooltip="{ value: overrideTooltipHtml, escape: false, autoHide: false, hideDelay: 300, pt: { root: { style: { maxWidth: '40rem' } } } }"
             class="review-edit-popover__override-badge"
           >
@@ -370,28 +454,28 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
         </div>
         <div class="review-edit-popover__attr-section">
           <span class="review-edit-popover__attr-label">Evaluated: </span>
-          <span v-if="currentReview.ts" class="review-edit-popover__attr-pill">
+          <span v-if="currentReview?.ts" class="review-edit-popover__attr-pill">
             <i class="pi pi-clock" />
             {{ formatReviewDate(currentReview.ts) }}
           </span>
-          <span v-if="currentReview.username" class="review-edit-popover__attr-pill">
+          <span v-if="currentReview?.username" class="review-edit-popover__attr-pill">
             <i class="pi pi-user" />
             {{ currentReview.username }}
           </span>
-          <span v-if="!currentReview.ts && !currentReview.username" class="review-edit-popover__attr-pill review-edit-popover__attr-pill--empty">--</span>
+          <span v-if="!currentReview?.ts && !currentReview?.username" class="review-edit-popover__attr-pill review-edit-popover__attr-pill--empty">--</span>
         </div>
         <div class="review-edit-popover__attr-section">
           <span class="review-edit-popover__attr-label">Statused: </span>
-          <template v-if="currentReview.status && statusLabel">
+          <template v-if="currentReview?.status && statusLabel">
             <span v-if="currentReview.status?.ts" class="review-edit-popover__attr-pill">
               <i class="pi pi-clock" />
               {{ formatReviewDate(currentReview.status.ts) }}
             </span>
+            <StatusBadge :status="statusLabel" />
             <span v-if="currentReview.status?.user?.username" class="review-edit-popover__attr-pill">
               <i class="pi pi-user" />
               {{ currentReview.status.user.username }}
             </span>
-            <StatusBadge :status="statusLabel" />
           </template>
           <span v-else class="review-edit-popover__attr-pill review-edit-popover__attr-pill--empty">--</span>
         </div>
@@ -419,7 +503,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  min-width: 500px;
+  min-width: 650px;
   position: relative;
 }
 
@@ -683,23 +767,30 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
 :global(.review-popover) {
   border: 1px solid var(--p-primary-color);
   box-shadow: 0 0 10px 2px color-mix(in srgb, var(--p-primary-color) 30%, transparent);
-  margin-left: -10rem;
 }
 
-:global(.review-popover::before) {
+:global(.review-popover:not(.p-popover-flipped)::before) {
   border-bottom-color: var(--p-primary-color) !important;
+  left: var(--p-popover-arrow-left, calc(50% - 10px)) !important;
+  transform: none !important;
 }
 
-:global(.review-popover::after) {
+:global(.review-popover:not(.p-popover-flipped)::after) {
   border-bottom-color: var(--color-background-dark) !important;
+  left: var(--p-popover-arrow-left, calc(50% - 10px)) !important;
+  transform: none !important;
 }
 
 :global(.review-popover.p-popover-flipped::before) {
   border-top-color: var(--p-primary-color) !important;
+  left: var(--p-popover-arrow-left, calc(50% - 10px)) !important;
+  transform: none !important;
 }
 
 :global(.review-popover.p-popover-flipped::after) {
   border-top-color: var(--color-background-dark) !important;
+  left: var(--p-popover-arrow-left, calc(50% - 10px)) !important;
+  transform: none !important;
 }
 
 :global(.review-popover.p-popover-flipped) {
