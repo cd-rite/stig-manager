@@ -1,12 +1,12 @@
 <script setup>
 import Popover from 'primevue/popover'
 import Textarea from 'primevue/textarea'
-import Tooltip from 'primevue/tooltip'
 import { inject, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
 import ReviewResources from '../../features/AssetReview/components/ReviewResources.vue'
 import { useReviewEditForm } from '../../shared/composables/useReviewEditForm.js'
 import { formatReviewDate, resultOptions } from '../../shared/lib/reviewFormUtils.js'
 import ResultBadge from './ResultBadge.vue'
+import ResultEngineBadges from './ResultEngineBadges.vue'
 import StatusBadge from './StatusBadge.vue'
 import StatusButton from './StatusButton.vue'
 
@@ -30,9 +30,6 @@ const {
   currentReview,
   selectedRuleId,
 } = inject('assetReviewContext')
-
-// Register PrimeVue Tooltip directive for v-tooltip usage
-const vTooltip = Tooltip
 
 const popover = ref()
 const lastAnchorEvent = ref(null)
@@ -62,8 +59,6 @@ const {
   commentRequired,
   buttonStates,
   isActionActive,
-  engineTooltipHtml,
-  overrideTooltipHtml,
   selectResult,
   applyReviewData,
   discardChanges,
@@ -433,25 +428,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
       </div>
 
       <div class="review-edit-popover__attributions">
-        <div class="review-edit-popover__engine-badges">
-          <span
-            v-if="currentReview?.resultEngine"
-            v-tooltip="{ value: engineTooltipHtml, escape: false, autoHide: false, hideDelay: 300, pt: { root: { style: { maxWidth: '40rem' } } } }"
-            class="review-edit-popover__engine-badge"
-          >
-            {{ currentReview.resultEngine.product || 'Engine' }}
-          </span>
-          <span v-else class="review-edit-popover__engine-badge review-edit-popover__engine-badge--manual">
-            Manual
-          </span>
-          <span
-            v-if="currentReview?.resultEngine?.overrides?.length"
-            v-tooltip="{ value: overrideTooltipHtml, escape: false, autoHide: false, hideDelay: 300, pt: { root: { style: { maxWidth: '40rem' } } } }"
-            class="review-edit-popover__override-badge"
-          >
-            Override
-          </span>
-        </div>
+        <ResultEngineBadges :result-engine="currentReview?.resultEngine" />
         <div class="review-edit-popover__attr-section">
           <span class="review-edit-popover__attr-label">Evaluated: </span>
           <span v-if="currentReview?.ts" class="review-edit-popover__attr-pill">
@@ -723,45 +700,6 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
   flex-wrap: wrap;
   border-top: 1px solid var(--color-border-light);
   padding-top: 0.4rem;
-}
-
-.review-edit-popover__engine-badges {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.review-edit-popover__engine-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-engine-text);
-  background-color: var(--color-engine-bg);
-  border: 1px solid var(--color-engine-border);
-  border-radius: 4px;
-  cursor: default;
-}
-
-.review-edit-popover__engine-badge--manual {
-  color: var(--color-text-primary);
-  background-color: var(--color-background-dark);
-  border-color: var(--color-border-light);
-  opacity: 0.7;
-}
-
-.review-edit-popover__override-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-override-text);
-  background-color: var(--color-override-bg);
-  border: 1px solid var(--color-override-border);
-  border-radius: 4px;
-  cursor: default;
 }
 
 :global(.review-popover) {
