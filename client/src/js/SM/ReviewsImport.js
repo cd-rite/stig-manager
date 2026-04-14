@@ -995,7 +995,7 @@ SM.ReviewsImport.ParseOptionsFieldSet = Ext.extend(Ext.form.FieldSet, {
         if (this.context === 'wizard') {
             items.push(this.initialOptions.allowCustom ? this.customizeCb : this.noCustomizeDisplay)
         }
-        items.push(this.autoStatusFieldGroup, ...this.optionComboBoxes)
+        items.push(...this.optionComboBoxes)
         items.push(this.canUpdateAssetProps ? this.updateAssetPropsCb : this.noUpdateAssetPropsDisplay)
         if (this.context !== 'wizard') {
             items.push(this.allowCustomCb)

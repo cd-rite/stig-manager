@@ -28,7 +28,7 @@ SM.TipContent.ImportOptions.EmptyComment = `How to handle Reviews with empty com
 `
 
 SM.TipContent.ImportOptions.UpdateAssetProps = `Should Asset properties be updated from the import source when the Asset already exists in the Collection?
-<br><br>When <b>checked</b>, the import will update Asset information (IP, MAC, FQDN, noncomputing, metadata:(role and tech area)) from the import source, if present.
+<br><br>When <b>checked</b>, the import will update Asset information (IP, MAC, FQDN, noncomputing, and metadata including role and tech area) from the import source, if present.
 <br><br>When <b>unchecked</b>, existing Asset properties will be preserved.
 `
 
