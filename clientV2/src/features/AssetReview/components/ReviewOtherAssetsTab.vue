@@ -2,7 +2,7 @@
 import { FilterMatchMode, FilterService } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import engineIcon from '../../../assets/bot2.svg'
@@ -36,7 +36,6 @@ defineProps({
 
 const emit = defineEmits(['apply-review'])
 
-// Inject feature-level context
 const {
   selectedRuleId: ruleId,
   collectionId,
@@ -47,7 +46,6 @@ const {
 
 const reviewEditForm = inject('reviewEditForm')
 
-// Extract form state for "Already Applied" check
 const {
   formResult,
   formDetail,
@@ -221,10 +219,6 @@ const resetFilters = () => {
   filters.value.assetLabels.value = null
 }
 
-onMounted(() => {
-  resetFilters()
-})
-
 watch([
   () => route.params.collectionId,
   () => route.params.assetId,
@@ -233,36 +227,6 @@ watch([
 ], () => {
   resetFilters()
 })
-
-const tableWrapper = ref(null)
-const wrapperHeight = ref(400)
-let resizeObserver = null
-
-watch(tableWrapper, (el) => {
-  if (resizeObserver) {
-    resizeObserver.disconnect()
-    resizeObserver = null
-  }
-  if (!el) {
-    return
-  }
-  resizeObserver = new ResizeObserver((entries) => {
-    const h = entries[0]?.contentRect?.height
-    if (h && h > 0) {
-      wrapperHeight.value = h
-    }
-  })
-  resizeObserver.observe(el)
-})
-
-onBeforeUnmount(() => {
-  if (resizeObserver) {
-    resizeObserver.disconnect()
-    resizeObserver = null
-  }
-})
-
-const scrollHeightPx = computed(() => `${Math.max(100, Math.floor(wrapperHeight.value) - 35)}px`)
 
 const otherTablePt = {
   root: { class: 'sm-scrollbar-thin', style: { backgroundColor: 'var(--color-background-dark)' } },
@@ -299,14 +263,14 @@ const otherTablePt = {
 </script>
 
 <template>
-  <div ref="tableWrapper" class="other-assets-wrapper">
+  <div class="other-assets-wrapper">
     <DataTable
       v-model:filters="filters"
       :value="processedOtherReviews"
       :loading="isLoading"
       data-key="assetId"
       scrollable
-      :scroll-height="scrollHeightPx"
+      scroll-height="flex"
       :virtual-scroller-options="{ itemSize: ROW_HEIGHT, showLoader: true }"
       striped-rows
       class="other-assets-table"
@@ -442,13 +406,13 @@ const otherTablePt = {
 
       <Column header="Evaluated" field="ts" sortable :style="{ width: '80px' }">
         <template #body="{ data }">
-          <span class="cell-text-mono" :title="formatReviewDate(data.ts)">{{ durationToNow(data.ts) }}</span>
+          <span class="cell-text--mono" :title="formatReviewDate(data.ts)">{{ durationToNow(data.ts) }}</span>
         </template>
       </Column>
 
       <Column header="Statused" field="touchTs" sortable :style="{ width: '80px' }">
         <template #body="{ data }">
-          <span v-if="data.touchTs" class="cell-text-mono" :title="formatReviewDate(data.touchTs)">{{ durationToNow(data.touchTs) }}</span>
+          <span v-if="data.touchTs" class="cell-text--mono" :title="formatReviewDate(data.touchTs)">{{ durationToNow(data.touchTs) }}</span>
           <span v-else class="cell-text--empty">---</span>
         </template>
       </Column>
@@ -566,22 +530,10 @@ const otherTablePt = {
   border-right: none !important;
 }
 
-.cell-text--primary {
-  color: var(--color-text-primary);
-}
-
 .cell-text--mono {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   color: var(--color-text-dim);
   font-size: 1rem;
-}
-
-.cell-text--dim {
-  color: var(--color-text-dim);
-  white-space: normal;
-  font-size: 0.96rem;
-  letter-spacing: 0.02em;
-  word-break: break-word;
 }
 
 .cell-text--ellipsis {

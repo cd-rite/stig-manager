@@ -5,7 +5,6 @@ import { patchReview, putReview } from '../api/assetReviewApi.js'
 export function useReviewActions({ collectionId, assetId }, deps) {
   const { gridData, upsertReview, currentReview } = deps
 
-  // Action error is shown inline in the popover, not as a global modal.
   const saveError = ref(null)
 
   function onSaveError(err) {
@@ -16,7 +15,6 @@ export function useReviewActions({ collectionId, assetId }, deps) {
     saveError.value = null
   }
 
-  // --- Full review save (for grid popover) ---
   const { isLoading: isSavingReview, execute: executeSaveReview } = useAsyncState(
     async (ruleId, { result: newResult, detail, comment, status }) => {
       saveError.value = null

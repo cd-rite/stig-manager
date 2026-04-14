@@ -2,7 +2,6 @@ import { FilterMatchMode } from '@primevue/core/api'
 import { computed, ref, watch } from 'vue'
 import { calculateChecklistStats } from '../lib/checklistUtils.js'
 
-// Shared state across all instances (since usually only one grid is active)
 const searchFilter = ref('')
 
 const filters = ref({
@@ -15,7 +14,6 @@ const filters = ref({
 
 const currentFilteredData = ref([])
 
-// Registry for global search fields used by PrimeVue DataTable
 export const dsFilterFields = [
   'ruleId',
   'groupId',

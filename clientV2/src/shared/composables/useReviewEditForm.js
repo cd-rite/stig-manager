@@ -33,7 +33,7 @@ export function useReviewEditForm({ rowData, fieldSettings, accessMode, canAccep
     if (!s) {
       return ''
     }
-    return s?.label ?? s
+    return s?.label
   })
 
   const editable = computed(() => {

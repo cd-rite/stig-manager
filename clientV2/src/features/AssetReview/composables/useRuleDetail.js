@@ -3,7 +3,6 @@ import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { fetchReview, fetchRule } from '../api/assetReviewApi.js'
 
 export function useRuleDetail({ ruleLookupMap, collectionId, assetId, benchmarkId, revisionStr }) {
-  // --- Selected rule ---
   const selectedRuleId = ref(null)
 
   const selectedChecklistItem = computed(() => {
@@ -13,7 +12,6 @@ export function useRuleDetail({ ruleLookupMap, collectionId, assetId, benchmarkI
     return ruleLookupMap.value.get(selectedRuleId.value) ?? null
   })
 
-  // --- Rule content (fetched on demand via getRuleByRevision) ---
   const {
     state: ruleContent,
     isLoading: isRuleLoading,
@@ -24,7 +22,6 @@ export function useRuleDetail({ ruleLookupMap, collectionId, assetId, benchmarkI
     { immediate: false, initialState: null, onError: null },
   )
 
-  // --- Current review (fetched via getReviewByAssetRule for popover attribution) ---
   const {
     state: currentReview,
     isLoading: isReviewLoading,
@@ -35,7 +32,6 @@ export function useRuleDetail({ ruleLookupMap, collectionId, assetId, benchmarkI
     { immediate: false, initialState: null, onError: null },
   )
 
-  // Fire both fetches in parallel when the selected rule changes
   watch(selectedRuleId, (ruleId) => {
     if (!ruleId) {
       ruleContent.value = null
@@ -43,7 +39,6 @@ export function useRuleDetail({ ruleLookupMap, collectionId, assetId, benchmarkI
       return
     }
 
-    // Clear stale data immediately so the UI doesn't flash previous content on slow networks
     ruleContent.value = null
     currentReview.value = null
 
@@ -56,7 +51,6 @@ export function useRuleDetail({ ruleLookupMap, collectionId, assetId, benchmarkI
     }
   })
 
-  // --- Handle rule selection ---
   function selectRule(ruleId) {
     if (ruleId === selectedRuleId.value) {
       return

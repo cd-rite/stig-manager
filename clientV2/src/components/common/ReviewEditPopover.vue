@@ -10,12 +10,6 @@ import ResultEngineBadges from './ResultEngineBadges.vue'
 import StatusBadge from './StatusBadge.vue'
 import StatusButton from './StatusButton.vue'
 
-defineProps({
-  width: {
-    type: Number,
-    default: null,
-  },
-})
 
 const emit = defineEmits(['save', 'status-action', 'close', 'clear-save-error'])
 
@@ -64,23 +58,19 @@ const {
   discardChanges,
 } = reviewEditForm
 
-// Provide form state to nested components (ReviewResources tabs)
 provide('reviewEditForm', reviewEditForm)
 
-// Button action handler
 function onButtonClick(actionType) {
   const ruleId = selectedRuleId.value
   if (!actionType || !ruleId) {
     return
   }
 
-  // Unsubmit: emit but keep popover open for further editing
   if (actionType === 'unsubmit') {
     emit('status-action', { ruleId, actionType })
     return
   }
 
-  // Other status-only actions (PATCH) — dismiss after
   if (actionType === 'submit' || actionType === 'accept') {
     emit('status-action', { ruleId, actionType })
     closing.value = true
@@ -88,7 +78,6 @@ function onButtonClick(actionType) {
     return
   }
 
-  // Save actions (PUT) — include form data
   let status = 'saved'
   if (actionType === 'save and submit') {
     status = 'submitted'
@@ -105,7 +94,6 @@ function onButtonClick(actionType) {
   popover.value.hide()
 }
 
-// Dirty close handling
 function onPopoverHide() {
   unbindOutsideHandler()
   unbindResizeHandler()
@@ -115,7 +103,6 @@ function onPopoverHide() {
     emit('close')
     return
   }
-  // Toggle or programmatic hide without closing flag — check dirty
   if (isDirty.value) {
     nextTick(() => {
       popover.value?.show(lastAnchorEvent.value)
@@ -137,26 +124,26 @@ function dismiss() {
   popover.value.hide()
 }
 
-// Expose toggle for parent to open/close
-function toggle(event) {
+function openAt(event, method) {
   lastAnchorEvent.value = event
   showResources.value = false
-  popover.value.toggle(event)
   showUnsavedWarning.value = false
+  popover.value[method](event)
+}
+
+function toggle(event) {
+  openAt(event, 'toggle')
 }
 
 function show(event) {
-  lastAnchorEvent.value = event
-  showResources.value = false
-  popover.value.show(event)
-  showUnsavedWarning.value = false
+  openAt(event, 'show')
 }
 
 function hide() {
   closing.value = true
   showUnsavedWarning.value = false
-  popover.value.hide()
   showResources.value = false
+  popover.value.hide()
 }
 
 function clampPopoverPosition() {
@@ -170,11 +157,8 @@ function clampPopoverPosition() {
     return
   }
 
-  // Reset prior manual offset
   container.style.marginLeft = '0px'
 
-  // Use clientX from the original click event if available for maximum precision.
-  // Fall back to the anchor element's center if needed.
   const rect = container.getBoundingClientRect()
   const anchorRect = anchor.getBoundingClientRect()
   const targetX = lastAnchorEvent.value.clientX ?? (anchorRect.left + anchorRect.width / 2)
@@ -182,10 +166,8 @@ function clampPopoverPosition() {
   const gutter = 12
   const viewportW = document.documentElement.clientWidth
 
-  // Calculate desired offset to center the popover rect on the target X coordinate
   let offset = targetX - (rect.left + rect.width / 2)
 
-  // Clamp so the popover stays within viewport gutters
   const projectedLeft = rect.left + offset
   const projectedRight = projectedLeft + rect.width
 
@@ -196,16 +178,12 @@ function clampPopoverPosition() {
     offset -= (projectedRight - (viewportW - gutter))
   }
 
-  // If the popover is wider than viewport minus gutters, just pin to left gutter.
   if (rect.width > viewportW - gutter * 2) {
     offset = gutter - rect.left
   }
 
   container.style.marginLeft = `${offset}px`
 
-  // Calculate the arrow's left edge relative to the popover body.
-  // We use a direct pixel value for the edge (minus 10px half-width) to avoid
-  // subpixel misalignment that occurs with translateX(-50%).
   const arrowLeftEdge = targetX - (rect.left + offset) - 10
   container.style.setProperty('--p-popover-arrow-left', `${arrowLeftEdge}px`)
 }
@@ -237,6 +215,7 @@ watch(showResources, () => {
 })
 
 let outsideHandler = null
+let outsideBindTimer = null
 let resizeHandler = null
 let resizeTimer = null
 
@@ -266,8 +245,8 @@ function unbindResizeHandler() {
 function bindOutsideHandler() {
   bindResizeHandler()
   unbindOutsideHandler()
-  // Delay to avoid catching the click that opened the popover
-  setTimeout(() => {
+  outsideBindTimer = setTimeout(() => {
+    outsideBindTimer = null
     outsideHandler = (event) => {
       if (
         event.target.closest('.p-popover')
@@ -289,14 +268,25 @@ function bindOutsideHandler() {
 }
 
 function unbindOutsideHandler() {
+  if (outsideBindTimer) {
+    clearTimeout(outsideBindTimer)
+    outsideBindTimer = null
+  }
   if (outsideHandler) {
     document.removeEventListener('pointerdown', outsideHandler)
     outsideHandler = null
   }
 }
 
-onBeforeUnmount(unbindResizeHandler)
-onBeforeUnmount(unbindOutsideHandler)
+function onPopoverShow() {
+  bindOutsideHandler()
+  nextTick(clampPopoverPosition)
+}
+
+onBeforeUnmount(() => {
+  unbindResizeHandler()
+  unbindOutsideHandler()
+})
 
 defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUnsavedWarning })
 </script>
@@ -318,10 +308,10 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
         leaveActiveClass: 'review-popover-leave',
       },
     }"
-    @show="bindOutsideHandler(); nextTick(clampPopoverPosition)"
+    @show="onPopoverShow"
     @hide="onPopoverHide"
   >
-    <div class="review-edit-popover" :style="width ? { width: `${width}px` } : {}">
+    <div class="review-edit-popover">
       <button class="review-edit-popover__close" :title="isDirty ? 'Close (discards unsaved changes)' : 'Close'" @click="dismiss">
         <i class="pi pi-times" />
       </button>
@@ -412,13 +402,11 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
         </div>
       </div>
 
-      <!-- Unsaved Changes Warning -->
       <div v-if="showUnsavedWarning" class="review-edit-popover__unsaved-warning">
         <i class="pi pi-exclamation-triangle" />
         <span>Please <strong>Save</strong> or <strong>Undo</strong> your changes to close.</span>
       </div>
 
-      <!-- Inline save error (Tier: Action Error) -->
       <div v-if="saveError" class="review-edit-popover__save-error">
         <i class="pi pi-exclamation-circle" />
         <span>{{ saveError }}</span>

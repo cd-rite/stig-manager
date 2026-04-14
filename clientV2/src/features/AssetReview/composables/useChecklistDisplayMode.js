@@ -23,7 +23,6 @@ const selectedChecklistColumns = ref(
   ),
 )
 
-// Row height state across all consumers
 const lineClamp = ref(3)
 
 export function useChecklistDisplayMode() {
@@ -32,7 +31,6 @@ export function useChecklistDisplayMode() {
     if (col?.permanent) {
       return true
     }
-    // If no columns are specifically selected, we show all columns (PrimeVue style)
     if (selectedChecklistColumns.value.length === 0) {
       return true
     }
@@ -42,11 +40,9 @@ export function useChecklistDisplayMode() {
   const setColVisible = (field, visible) => {
     const col = checklistColumns.value.find(c => c.field === field)
     if (col?.permanent) {
-      return // Cannot hide permanent columns
+      return
     }
 
-    // If empty, it means all columns are currently visible.
-    // To hide something, we must first populate the selection with all columns.
     if (selectedChecklistColumns.value.length === 0) {
       if (!visible) {
         selectedChecklistColumns.value = checklistColumns.value.filter(c => c.field !== field)
@@ -127,7 +123,6 @@ export function useChecklistDisplayMode() {
     },
   ])
 
-  // Row height control (line-clamp 1-10, default 3)
   const itemSize = computed(() => (15 * lineClamp.value) + 6)
 
   function increaseRowHeight() {

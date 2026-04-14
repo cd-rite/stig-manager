@@ -10,14 +10,12 @@ import ColumnToggle from '../../../components/common/ColumnToggle.vue'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
 import { useSearch } from '../composables/useSearch.js'
 
-// Inject feature-level context
 const {
   asset,
   revisionInfo,
   accessMode,
 } = inject('assetReviewContext')
 
-// No emits currently used directly in this component
 const {
   checklistColumns,
   selectedChecklistColumns,

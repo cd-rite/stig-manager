@@ -51,11 +51,5 @@ const emit = defineEmits(['retry-rule-content'])
         @retry="emit('retry-rule-content')"
       />
     </SplitterPanel>
-    <!-- <SplitterPanel :size="40" :min-size="20">
-      <ReviewResources
-        :current-review="currentReview"
-        :review-history="reviewHistory"
-      />
-    </SplitterPanel> -->
   </Splitter>
 </template>

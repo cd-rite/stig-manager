@@ -53,7 +53,6 @@ const emit = defineEmits(['retry'])
     </div>
 
     <div v-else-if="ruleContent" class="rule-info__content">
-      <!-- Header -->
       <div class="rule-info__header">
         <div class="rule-info__header-row">
           <span class="rule-info__rule-id">{{ ruleContent.ruleId }}</span>
@@ -69,7 +68,6 @@ const emit = defineEmits(['retry'])
         </div>
       </div>
 
-      <!-- Check Content + Fix (one card) -->
       <div v-if="ruleContent.check?.content || ruleContent.fix?.text" class="rule-info__card">
         <div v-if="ruleContent.check?.content" class="rule-info__card-section">
           <h4 class="rule-info__section-title">
@@ -86,7 +84,6 @@ const emit = defineEmits(['retry'])
         </div>
       </div>
 
-      <!-- Other Data (separate card) -->
       <div class="rule-info__card">
         <h4 class="rule-info__section-title">
           Other Data
@@ -107,7 +104,6 @@ const emit = defineEmits(['retry'])
           <span>{{ ruleContent.detail.responsibility }}</span>
         </div>
 
-        <!-- Controls Table (CCIs) -->
         <div v-if="ruleContent.ccis?.length" class="rule-info__card-section">
           <span class="rule-info__sub-label">Controls:</span>
           <table class="controls-table">

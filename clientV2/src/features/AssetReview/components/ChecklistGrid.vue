@@ -21,9 +21,8 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:searchFilter', 'select-rule', 'row-save', 'status-action', 'refresh', 'clear-save-error'])
+const emit = defineEmits(['update:searchFilter', 'row-save', 'status-action', 'refresh'])
 
-// Inject feature-level context
 const {
   gridData,
   isChecklistLoading: isLoading,
@@ -45,7 +44,6 @@ const selectedRow = computed(() => {
 const reviewEditPopover = ref()
 const popoverAnchor = ref(null)
 const editingRow = ref(null)
-const editingPopoverWidth = ref(null)
 
 const route = useRoute()
 
@@ -65,7 +63,6 @@ watch([
   resetFilters()
 })
 
-// Sync the shared search filter with the prop (for backward compatibility)
 watch(() => props.searchFilter, (val) => {
   if (val !== sharedSearchFilter.value) {
     sharedSearchFilter.value = val
@@ -84,20 +81,15 @@ function openRowEditor(event, rowData) {
 
   editingRow.value = rowData
 
-  // Find the row element to get its vertical dimensions
   const row = event.target?.closest ? event.target.closest('tr') : null
   const rowRect = row ? row.getBoundingClientRect() : { top: 0, bottom: 0, height: 0 }
   const clickX = event.clientX
 
-  // Update the hidden anchor element's position
   if (popoverAnchor.value) {
     popoverAnchor.value.style.left = `${clickX}px`
     popoverAnchor.value.style.top = `${rowRect.top}px`
     popoverAnchor.value.style.height = `${rowRect.height}px`
   }
-
-  // Ensure width is handled by the popover's internal sizing/min-width
-  editingPopoverWidth.value = null
 
   const anchorEvent = {
     currentTarget: popoverAnchor.value,
@@ -116,17 +108,6 @@ function openRowEditor(event, rowData) {
   }
 }
 
-function onPopoverClose() {
-  editingRow.value = null
-}
-
-function onPopoverSave(payload) {
-  emit('row-save', payload)
-}
-
-function onPopoverStatusAction(payload) {
-  emit('status-action', payload)
-}
 
 const scrollLocked = computed(() => !!editingRow.value && !!reviewEditPopover.value?.isDirty)
 
@@ -160,20 +141,27 @@ watch(() => gridData.value, (data) => {
   }
 
   if (editingRow.value) {
-    const updated = data.find(r => r.ruleId === editingRow.value.ruleId)
+    const updated = ruleLookupMap.value.get(editingRow.value.ruleId)
     if (updated) {
       editingRow.value = updated
     }
   }
 })
 
+function guardUnsaved(targetRuleId) {
+  const isSameRow = editingRow.value?.ruleId === targetRuleId
+  if (!isSameRow && reviewEditPopover.value?.isDirty) {
+    reviewEditPopover.value.triggerUnsavedWarning()
+    return false
+  }
+  return true
+}
+
 function onSelectionChange(newRow) {
   if (!newRow) {
     return
   }
-  const isSameRow = editingRow.value?.ruleId === newRow?.ruleId
-  if (!isSameRow && reviewEditPopover.value?.isDirty) {
-    reviewEditPopover.value.triggerUnsavedWarning()
+  if (!guardUnsaved(newRow.ruleId)) {
     return
   }
   selectRule(newRow.ruleId)
@@ -181,9 +169,7 @@ function onSelectionChange(newRow) {
 
 function onRowClick(event) {
   event.originalEvent?.stopPropagation()
-  const isSameRow = editingRow.value?.ruleId === event.data.ruleId
-  if (!isSameRow && reviewEditPopover.value?.isDirty) {
-    reviewEditPopover.value.triggerUnsavedWarning()
+  if (!guardUnsaved(event.data.ruleId)) {
     return
   }
   selectRule(event.data.ruleId)
@@ -236,8 +222,10 @@ function handleFooterAction(actionKey) {
     </ChecklistGridTable>
 
     <ReviewEditPopover
-      ref="reviewEditPopover" :width="editingPopoverWidth"
-      @save="onPopoverSave" @status-action="onPopoverStatusAction" @close="onPopoverClose"
+      ref="reviewEditPopover"
+      @save="(payload) => $emit('row-save', payload)"
+      @status-action="(payload) => $emit('status-action', payload)"
+      @close="editingRow = null"
       @clear-save-error="clearSaveError"
     />
 

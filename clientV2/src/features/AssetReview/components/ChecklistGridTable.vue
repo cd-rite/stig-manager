@@ -85,9 +85,6 @@ function onFilter(event) {
   updateFilteredData(event.filteredValue)
 }
 
-function onRowClick(event) {
-  emit('row-click', event)
-}
 
 const defaultSortField = computed(() => isColVisible('groupId') ? 'groupId' : 'ruleId')
 
@@ -148,7 +145,7 @@ const dataTablePt = {
     :loading="isLoading" data-key="ruleId" selection-mode="single" scrollable scroll-height="flex"
     :virtual-scroller-options="{ itemSize }" resizable-columns striped-rows :sort-field="defaultSortField"
     :sort-order="1" class="checklist-grid__table" :pt="dataTablePt" @update:selection="(val) => $emit('update:selectedRow', val)"
-    @row-click="onRowClick" @filter="onFilter" @pointerdown.stop
+    @row-click="$emit('row-click', $event)" @filter="onFilter" @pointerdown.stop
   >
     <Column v-if="isColVisible('severity')" field="severity" filter-field="severity" sortable :style="{ width: '6.5rem', minWidth: '6.5rem' }" :pt="columnPt.center">
       <template #header>
@@ -470,15 +467,11 @@ const dataTablePt = {
 :deep(.p-datatable-tbody > tr.p-highlight) {
   background: color-mix(in srgb, var(--color-primary, #3b82f6) 12%, var(--color-background-light)) !important;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary, #3b82f6) 25%, transparent);
+  outline: 1px inset color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
 
 :deep(.p-datatable-tbody > tr:hover) {
   background: var(--color-background-light) !important;
-}
-
-:deep(.p-datatable-tbody > tr.p-highlight) {
-  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-background-light)) !important;
-  outline: 1px inset color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
 
 :deep(.p-datatable-tbody > tr.p-highlight .cell-text) {

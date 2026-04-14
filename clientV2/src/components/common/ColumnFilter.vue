@@ -16,7 +16,6 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const isActive = computed(() => {
-  // Active if any items are specifically selected (non-null filter)
   return Array.isArray(props.modelValue) && props.modelValue.length > 0
 })
 
@@ -24,10 +23,9 @@ function onToggle(val) {
   emit('update:modelValue', val)
 }
 
-// Narrower and smaller styling for column filter
 const columnFilterPT = {
   root: { class: 'column-filter-select' },
-  label: { style: 'display: none;' }, // Hide standard label since it's an icon only mostly
+  label: { style: 'display: none;' },
   trigger: { style: 'width: auto; padding: 0.2rem 0.2rem;' },
   panel: { style: 'background: var(--color-background-dark); border: 1px solid var(--color-border-default); border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.6); min-width: 100px;' },
   header: { style: 'background: var(--color-background-dark); border-bottom: 1px solid var(--color-border-light); padding: 0.25rem 0.5rem;' },

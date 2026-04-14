@@ -2,7 +2,7 @@
 import { FilterMatchMode } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import engineIcon from '../../../assets/bot2.svg'
@@ -18,6 +18,7 @@ import OverrideBadge from '../../../components/common/OverrideBadge.vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
+import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { durationToNow } from '../../../shared/lib.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchReview } from '../api/assetReviewApi.js'
@@ -32,7 +33,6 @@ const props = defineProps({
 
 const emit = defineEmits(['apply-review'])
 
-// Inject feature-level context
 const {
   selectedRuleId: ruleId,
   collectionId,
@@ -43,7 +43,6 @@ const {
 
 const reviewEditForm = inject('reviewEditForm')
 
-// Extract form state for "Already Applied" check
 const {
   formResult,
   formDetail,
@@ -52,36 +51,22 @@ const {
 
 const editable = computed(() => accessMode.value === 'rw' && (!currentReview.value?.status?.label || currentReview.value.status.label === 'saved' || currentReview.value.status.label === 'rejected'))
 
-// --- Local state for history ---
-const fullReviewHistory = ref([])
-const isInternalHistoryLoading = ref(false)
+const { state: fullReviewHistory, isLoading: isInternalHistoryLoading, execute: loadHistory } = useAsyncState(
+  async () => {
+    const result = await fetchReview(collectionId.value, assetId.value, ruleId.value, { projection: 'history' })
+    return result?.history || []
+  },
+  { immediate: false, initialState: [] },
+)
 
-async function loadHistory() {
-  if (!props.active || !ruleId.value || !assetId.value || !collectionId.value) {
+watch([() => props.active, () => ruleId.value], ([active, rid], [_oldActive, oldRid]) => {
+  if (!active || !ruleId.value || !assetId.value || !collectionId.value) {
     return
   }
-  isInternalHistoryLoading.value = true
-  try {
-    const result = await fetchReview(collectionId.value, assetId.value, ruleId.value, { projection: 'history' })
-    fullReviewHistory.value = result?.history || []
+  if (rid !== oldRid) {
+    fullReviewHistory.value = []
   }
-  catch (err) {
-    console.error('Failed to load review history', err)
-  }
-  finally {
-    isInternalHistoryLoading.value = false
-  }
-}
-
-// Reset and reload on rule change or when tab becomes active
-watch([() => props.active, () => ruleId.value], ([active, rid], [_oldActive, oldRid]) => {
-  if (active) {
-    // If the rule changed, clear the old history first
-    if (rid !== oldRid) {
-      fullReviewHistory.value = []
-    }
-    loadHistory()
-  }
+  loadHistory()
 }, { immediate: true })
 
 const processedHistory = computed(() => {
@@ -166,10 +151,6 @@ const resetFilters = () => {
   filters.value._statusLabel.value = null
 }
 
-onMounted(() => {
-  resetFilters()
-})
-
 watch([
   () => route.params.collectionId,
   () => route.params.assetId,
@@ -177,34 +158,6 @@ watch([
   () => route.params.revisionStr,
 ], () => {
   resetFilters()
-})
-
-const tableWrapper = ref(null)
-const wrapperHeight = ref(400)
-let resizeObserver = null
-
-watch(tableWrapper, (el) => {
-  if (resizeObserver) {
-    resizeObserver.disconnect()
-    resizeObserver = null
-  }
-  if (!el) {
-    return
-  }
-  resizeObserver = new ResizeObserver((entries) => {
-    const h = entries[0]?.contentRect?.height
-    if (h && h > 0) {
-      wrapperHeight.value = h
-    }
-  })
-  resizeObserver.observe(el)
-})
-
-onBeforeUnmount(() => {
-  if (resizeObserver) {
-    resizeObserver.disconnect()
-    resizeObserver = null
-  }
 })
 
 const historyStats = computed(() => {
@@ -259,8 +212,6 @@ const historyStats = computed(() => {
   return stats
 })
 
-const scrollHeightPx = computed(() => `${Math.max(100, Math.floor(wrapperHeight.value) - 35)}px`)
-
 const historyTablePt = {
   root: { class: 'sm-scrollbar-thin', style: { backgroundColor: 'var(--color-background-dark)' } },
   header: { style: { background: 'transparent', border: 'none', padding: '0' } },
@@ -296,14 +247,14 @@ const historyTablePt = {
 </script>
 
 <template>
-  <div ref="tableWrapper" class="history-wrapper">
+  <div class="history-wrapper">
     <DataTable
       v-model:filters="filters"
       :value="processedHistory"
       :loading="isInternalHistoryLoading"
       data-key="touchTs"
       scrollable
-      :scroll-height="scrollHeightPx"
+      scroll-height="flex"
       :virtual-scroller-options="{ itemSize: ROW_HEIGHT, showLoader: true }"
       striped-rows
       :resizable-columns="true"
@@ -313,7 +264,7 @@ const historyTablePt = {
     >
       <Column header="Time" field="touchTs" sortable :style="{ width: '65px' }">
         <template #body="{ data }">
-          <span class="cell-text-mono" :title="formatReviewDate(data.touchTs)">{{ durationToNow(data.touchTs) }}</span>
+          <span class="cell-text--mono" :title="formatReviewDate(data.touchTs)">{{ durationToNow(data.touchTs) }}</span>
         </template>
       </Column>
 
@@ -578,14 +529,6 @@ const historyTablePt = {
 .cell-text--mono {
   color: var(--color-text-primary);
   font-size: 1rem;
-}
-
-.cell-text--dim {
-  color: var(--color-text-dim);
-  white-space: normal;
-  font-size: 0.96rem;
-  letter-spacing: 0.02em;
-  word-break: break-word;
 }
 
 .cell-text--ellipsis {

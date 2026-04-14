@@ -36,7 +36,6 @@ defineProps({
 
 const emit = defineEmits(['apply-review'])
 
-// Inject feature-level context
 const {
   currentReview,
   collectionId,
@@ -45,7 +44,6 @@ const {
 
 const activeTab = ref('history')
 
-// PrimeVue passthrough objects
 const tabsPt = {
   root: {
     style: {
