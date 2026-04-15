@@ -1,3 +1,41 @@
+1.6.8
+-------
+
+Changes:
+
+  - (Security) Fix reflected XSS in OIDC error handling (init.js, reauth.html)
+
+1.6.7
+-------
+
+Changes:
+
+  - (API) feature: Add projections to getChecklistByAssetStig
+  - (API/UI) feature: Add updateAssetProps flag and UI for asset information updates on checklist import
+  - (API) chore: Remove lodash dependency
+  - (Dependencies) Various security and maintenance updates
+
+1.6.6
+-------
+
+Changes:
+
+  - (Dependencies) Update npm and pip dependencies
+
+1.6.5
+-------
+
+Changes:
+
+  - (Dependencies) Update fast-xml-parser to 5.5.8 with processEntities configuration for STIG checklist compatibility
+
+1.6.4
+-------
+
+Changes:
+
+  - (Dependencies) Security update of package undici
+
 1.6.3
 -------
 
