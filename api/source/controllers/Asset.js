@@ -209,11 +209,12 @@ module.exports.getChecklistByAssetStig = async function getChecklistByAssetStig 
     const benchmarkId = req.params.benchmarkId
     const revisionStr = req.params.revisionStr
     const format = req.query.format || 'json'
+    const projections = req.query.projection
 
     const access = await dbUtils.getUserAssetStigAccess({assetId, benchmarkId, grants: req.userObject.grants})
     if (access === 'none') throw new SmError.PrivilegeError()
 
-    const checklist = await AssetService.getChecklistByAssetStig(assetId, benchmarkId, revisionStr, format, req.userObject )
+    const checklist = await AssetService.getChecklistByAssetStig(assetId, benchmarkId, revisionStr, format, projections, req.userObject )
     if (format.startsWith('json')) {
       res.json(format === 'json-access' ? {access, checklist} : checklist)
       return

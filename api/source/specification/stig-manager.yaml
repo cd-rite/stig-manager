@@ -267,6 +267,19 @@ paths:
               - ckl
               - cklb
               - xccdf
+        - name: projection
+          in: query
+          description: Additional fields to include in JSON checklist responses.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - rule
+                - detail
+                - comment
+          style: form
+          explode: true
       responses:
         '200':
           description: A JSON array of Checklist summary items or a CKL
@@ -656,6 +669,7 @@ paths:
               unreviewedCommented: 'informational',
               emptyDetail: 'replace',
               emptyComment: 'ignore',
+              updateAssetProps: false,
               allowCustom: true
             }
         ```
@@ -6152,6 +6166,10 @@ components:
             $ref: '#/components/schemas/AssetId'
           autoResult:
             type: boolean
+          comment:
+            $ref: '#/components/schemas/CommentaryStringNullable'
+          detail:
+            $ref: '#/components/schemas/CommentaryStringNullable'
           groupId:
             $ref: '#/components/schemas/GroupId'
           groupTitle:
@@ -6160,6 +6178,8 @@ components:
             $ref: '#/components/schemas/ChecklistResult'
           resultEngine:
             $ref: '#/components/schemas/ResultEngine'
+          rule:
+            $ref: '#/components/schemas/RuleProjected'
           ruleId:
             $ref: '#/components/schemas/RuleId'
           ruleTitle:
@@ -6975,6 +6995,10 @@ components:
             - ignore
             - import
             - replace
+        updateAssetProps:
+          description: |
+            Flag indicating whether to update Asset information (IP, MAC, FQDN, noncomputing, and metadata including role and tech area) when Asset already exists in the Collection.
+          type: boolean
         allowCustom:
           description: |
             Flag indicating whether Clients may POST reviews that do not conform to importOptions specified.
@@ -6985,7 +7009,7 @@ components:
         - unreviewedCommented
         - emptyDetail
         - emptyComment
-        - allowCustom      
+        - allowCustom
     CollectionImportAutoStatus:
       type: object
       additionalProperties: false
