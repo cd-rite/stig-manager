@@ -1,7 +1,6 @@
 <script setup>
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
-import ReviewResources from './ReviewResources.vue'
 import RuleInfo from './RuleInfo.vue'
 
 defineProps({
@@ -12,6 +11,10 @@ defineProps({
   isRuleLoading: {
     type: Boolean,
     default: false,
+  },
+  ruleContentError: {
+    type: Object,
+    default: null,
   },
   selectedChecklistItem: {
     type: Object,
@@ -26,6 +29,8 @@ defineProps({
     default: () => [],
   },
 })
+
+const emit = defineEmits(['retry-rule-content'])
 </script>
 
 <template>
@@ -41,13 +46,9 @@ defineProps({
       <RuleInfo
         :rule-content="ruleContent"
         :is-loading="isRuleLoading"
+        :rule-content-error="ruleContentError"
         :selected-checklist-item="selectedChecklistItem"
-      />
-    </SplitterPanel>
-    <SplitterPanel :size="40" :min-size="20">
-      <ReviewResources
-        :current-review="currentReview"
-        :review-history="reviewHistory"
+        @retry="emit('retry-rule-content')"
       />
     </SplitterPanel>
   </Splitter>

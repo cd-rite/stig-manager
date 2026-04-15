@@ -11,11 +11,17 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  ruleContentError: {
+    type: Object,
+    default: null,
+  },
   selectedChecklistItem: {
     type: Object,
     default: null,
   },
 })
+
+const emit = defineEmits(['retry'])
 </script>
 
 <template>
@@ -34,12 +40,19 @@ defineProps({
       Loading rule content...
     </div>
 
+    <div v-else-if="ruleContentError" class="rule-info__fetch-error">
+      <i class="pi pi-exclamation-triangle" />
+      <span>Could not load rule content.</span>
+      <button class="rule-info__retry-btn" @click="emit('retry')">
+        Retry
+      </button>
+    </div>
+
     <div v-else-if="!selectedChecklistItem" class="rule-info__empty">
       Select a rule from the checklist to view its content.
     </div>
 
     <div v-else-if="ruleContent" class="rule-info__content">
-      <!-- Header -->
       <div class="rule-info__header">
         <div class="rule-info__header-row">
           <span class="rule-info__rule-id">{{ ruleContent.ruleId }}</span>
@@ -55,7 +68,6 @@ defineProps({
         </div>
       </div>
 
-      <!-- Check Content + Fix (one card) -->
       <div v-if="ruleContent.check?.content || ruleContent.fix?.text" class="rule-info__card">
         <div v-if="ruleContent.check?.content" class="rule-info__card-section">
           <h4 class="rule-info__section-title">
@@ -72,7 +84,6 @@ defineProps({
         </div>
       </div>
 
-      <!-- Other Data (separate card) -->
       <div class="rule-info__card">
         <h4 class="rule-info__section-title">
           Other Data
@@ -93,7 +104,6 @@ defineProps({
           <span>{{ ruleContent.detail.responsibility }}</span>
         </div>
 
-        <!-- Controls Table (CCIs) -->
         <div v-if="ruleContent.ccis?.length" class="rule-info__card-section">
           <span class="rule-info__sub-label">Controls:</span>
           <table class="controls-table">
@@ -132,26 +142,56 @@ defineProps({
 .rule-info__panel-header {
   display: flex;
   align-items: center;
-  padding: 0.35rem 0.5rem;
-  background-color: var(--color-background-dark);
-  border-bottom: 1px solid var(--color-border-light);
+  padding: 0.7rem 0.9rem;
+  background: linear-gradient(180deg, var(--color-background-light), var(--color-background-dark));
+  border-bottom: 1px solid var(--color-border-default);
+  transition: background 0.15s ease;
   flex-shrink: 0;
+  height: 7.28rem;
 }
 
 .rule-info__panel-title {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: var(--color-text-primary);
 }
 
 .rule-info__content {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-default) transparent;
+}
+
+.rule-info__content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rule-info__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rule-info__content::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.rule-info__content::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-default);
+  border-radius: 999px;
+  border: none;
+  min-height: 28px;
+}
+
+.rule-info__content::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-hover);
 }
 
 .rule-info__loading,
-.rule-info__empty {
+.rule-info__empty,
+.rule-info__fetch-error {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -160,9 +200,36 @@ defineProps({
   color: var(--color-text-dim);
 }
 
+.rule-info__fetch-error {
+  color: var(--color-text-error, #e74c3c);
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rule-info__fetch-error .pi {
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+.rule-info__retry-btn {
+  background: none;
+  border: 1px solid var(--color-text-error, #e74c3c);
+  color: var(--color-text-error, #e74c3c);
+  border-radius: 4px;
+  padding: 0.2rem 0.8rem;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.rule-info__retry-btn:hover {
+  opacity: 1;
+}
+
 .rule-info__header {
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
   border-bottom: 1px solid var(--color-border-light);
 }
 
@@ -170,7 +237,7 @@ defineProps({
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
 }
 
 .rule-info__rule-id {
@@ -189,18 +256,19 @@ defineProps({
 }
 
 .rule-info__title {
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   font-weight: 600;
   color: var(--color-text-primary);
-  line-height: 1.35;
-  padding-left: 1rem;
+  line-height: 1.4;
+  padding-left: 0.5rem;
 }
 
 .rule-info__card {
   background-color: var(--color-background-dark);
+  border: 1px solid var(--color-border-light);
   border-radius: 6px;
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .rule-info__card-section {
@@ -232,7 +300,7 @@ defineProps({
   word-break: break-word;
   line-height: 1.4;
   font-family: inherit;
-  font-size: inherit;
+  font-size: 1.08rem;
   margin: 0;
   padding: 0 1.25rem;
 }

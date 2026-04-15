@@ -133,6 +133,11 @@ function onActionClick(action) {
     </div>
 
     <div class="status-footer__right">
+      <template v-if="slots['right-extra']">
+        <slot name="right-extra" />
+        <div class="status-footer__divider" />
+      </template>
+
       <div
         v-for="metric in metrics"
         :key="metric.key"

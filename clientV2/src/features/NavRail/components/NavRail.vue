@@ -36,7 +36,7 @@ function toggleExpanded() {
     }"
   >
     <SplitterPanel
-      :size="7"
+      :size="10"
       :min-size="4"
       :pt="{ root: { class: { 'nav-panel--collapsed': !expanded, 'nav-panel--animating': isAnimating }, style: 'min-width: 12rem; max-width: 35rem;' } }"
     >
