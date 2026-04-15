@@ -18,7 +18,7 @@ import { useChecklistData } from '../composables/useChecklistData.js'
 import { useReviewActions } from '../composables/useReviewActions.js'
 import { useRuleDetail } from '../composables/useRuleDetail.js'
 import ChecklistGrid from './ChecklistGrid.vue'
-import RuleInfo from './RuleInfo.vue'
+import RuleInfo from '../../../components/common/RuleInfo.vue'
 
 const route = useRoute()
 const router = useRouter()

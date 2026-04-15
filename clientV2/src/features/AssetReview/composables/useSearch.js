@@ -1,6 +1,6 @@
 import { FilterMatchMode } from '@primevue/core/api'
 import { computed, ref, watch } from 'vue'
-import { calculateChecklistStats } from '../lib/checklistUtils.js'
+import { calculateChecklistStats } from '../../../shared/lib/checklistUtils.js'
 
 const searchFilter = ref('')
 

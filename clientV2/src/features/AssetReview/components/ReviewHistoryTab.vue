@@ -22,7 +22,7 @@ import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { durationToNow } from '../../../shared/lib.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchReview } from '../api/assetReviewApi.js'
-import { getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
+import { getEngineDisplay, getResultDisplay } from '../../../shared/lib/checklistUtils.js'
 
 const props = defineProps({
   active: {

@@ -25,7 +25,7 @@ import { durationToNow } from '../../../shared/lib.js'
 import { normalizeColor } from '../../../shared/lib/colorUtils.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchOtherReviews } from '../api/assetReviewApi.js'
-import { getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
+import { getEngineDisplay, getResultDisplay } from '../../../shared/lib/checklistUtils.js'
 
 defineProps({
   active: {
