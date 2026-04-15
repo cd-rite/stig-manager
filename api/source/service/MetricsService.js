@@ -1,4 +1,3 @@
-const { rest } = require('lodash')
 const dbUtils = require('./utils')
 
 function genLabelPredicates ({labelNames, labelIds, labelMatch, collectionLabelTableAlias = 'cl'}) {
