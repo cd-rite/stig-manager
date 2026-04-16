@@ -2,15 +2,8 @@
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-import EngineBadge from '../../../components/common/EngineBadge.vue'
-import ManualBadge from '../../../components/common/ManualBadge.vue'
-import OverrideBadge from '../../../components/common/OverrideBadge.vue'
-import ResultBadge from '../../../components/common/ResultBadge.vue'
 import ReviewEditPopover from '../../../components/common/ReviewEditPopover.vue'
-import StatusBadge from '../../../components/common/StatusBadge.vue'
-import StatusFooter from '../../../components/common/StatusFooter.vue'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
-import { useSearch } from '../composables/useSearch.js'
 import ChecklistGridHeader from './ChecklistGridHeader.vue'
 import ChecklistGridTable from './ChecklistGridTable.vue'
 
@@ -48,10 +41,10 @@ const editingRow = ref(null)
 const route = useRoute()
 
 const { lineClamp, itemSize } = useChecklistDisplayMode()
-const { stats, isFiltered, currentFilteredData, searchFilter: sharedSearchFilter, resetFilters } = useSearch(gridData)
 
-onMounted(() => {
-  resetFilters()
+const localSearchFilter = computed({
+  get: () => props.searchFilter,
+  set: (val) => emit('update:searchFilter', val)
 })
 
 watch([
@@ -60,19 +53,7 @@ watch([
   () => route.params.benchmarkId,
   () => route.params.revisionStr,
 ], () => {
-  resetFilters()
-})
-
-watch(() => props.searchFilter, (val) => {
-  if (val !== sharedSearchFilter.value) {
-    sharedSearchFilter.value = val
-  }
-}, { immediate: true })
-
-watch(sharedSearchFilter, (val) => {
-  if (val !== props.searchFilter) {
-    emit('update:searchFilter', val)
-  }
+  localSearchFilter.value = ''
 })
 
 function openRowEditor(event, rowData) {
@@ -130,11 +111,10 @@ watch(() => gridData.value, (data) => {
     return
   }
 
-  const targetData = isFiltered.value ? currentFilteredData.value : data
-  const isValid = selectedRuleId.value && targetData.some(r => r.ruleId === selectedRuleId.value)
+  const isValid = selectedRuleId.value && data.some(r => r.ruleId === selectedRuleId.value)
 
   if (!isValid) {
-    const firstVisible = targetData[0]
+    const firstVisible = data[0]
     if (firstVisible) {
       selectRule(firstVisible.ruleId)
     }
@@ -176,11 +156,7 @@ function onRowClick(event) {
   openRowEditor(event.originalEvent || event, event.data)
 }
 
-function handleFooterAction(actionKey) {
-  if (actionKey === 'refresh') {
-    emit('refresh')
-  }
-}
+
 </script>
 
 <template>
@@ -189,37 +165,17 @@ function handleFooterAction(actionKey) {
     @scroll.capture="onGridScroll" @wheel.capture="onGridWheel"
   >
     <ChecklistGridHeader
+      v-model:search-filter="localSearchFilter"
       :asset="asset" :revision-info="revisionInfo" :is-loading="isLoading"
       :access-mode="accessMode" @refresh="emit('refresh')"
     />
 
     <ChecklistGridTable
       :selected-row="selectedRow" :grid-data="gridData" :is-loading="isLoading"
+      :search-filter="localSearchFilter"
       @update:selected-row="onSelectionChange" @row-click="onRowClick"
-    >
-      <template #footer>
-        <StatusFooter
-          :refresh-loading="isLoading" :total-count="gridData.length"
-          :filtered-count="isFiltered ? currentFilteredData.length : null" @action="handleFooterAction"
-        >
-          <template #right-extra>
-            <ResultBadge status="O" :count="stats.results.fail" />
-            <ResultBadge status="NF" :count="stats.results.pass" />
-            <ResultBadge status="NA" :count="stats.results.notapplicable" />
-            <ResultBadge status="NR+" :count="stats.results.other" />
-            <span class="footer-divider">|</span>
-            <ManualBadge :count="stats.engine.manual" />
-            <EngineBadge :count="stats.engine.engine" />
-            <OverrideBadge :count="stats.engine.override" />
-            <span class="footer-divider">|</span>
-            <StatusBadge status="saved" :count="stats.statuses.saved" />
-            <StatusBadge status="submitted" :count="stats.statuses.submitted" />
-            <StatusBadge status="accepted" :count="stats.statuses.accepted" />
-            <StatusBadge status="rejected" :count="stats.statuses.rejected" />
-          </template>
-        </StatusFooter>
-      </template>
-    </ChecklistGridTable>
+      @refresh="emit('refresh')"
+    />
 
     <ReviewEditPopover
       ref="reviewEditPopover"

@@ -1,5 +1,6 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 import ChecklistGridHeader from './ChecklistGridHeader.vue'
 import ChecklistGridTable from './ChecklistGridTable.vue'
 
@@ -16,9 +17,15 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  assetCount: {
+    type: Number,
+    default: 0,
+  },
 })
 
 const emit = defineEmits(['select-rule'])
+
+const searchFilter = ref('')
 
 const selectedRow = computed(() => {
   if (!props.selectedRuleId) {
@@ -32,18 +39,22 @@ function onSelectionChange(row) {
     emit('select-rule', row.ruleId)
   }
 }
+
+const { lineClamp, itemSize } = useGridDensity('collection-checklist', 1, 12, 24)
 </script>
 
 <template>
   <div
     class="checklist-grid relative flex h-full flex-col bg-[var(--color-background-dark)]"
-    :style="{ '--item-size': '36px', '--line-clamp': 1 }"
+    :style="{ '--line-clamp': lineClamp, '--item-size': `${itemSize}px` }"
   >
-    <ChecklistGridHeader />
+    <ChecklistGridHeader v-model:search-filter="searchFilter" />
     <ChecklistGridTable
       :grid-data="gridData"
       :is-loading="isLoading"
       :selected-row="selectedRow"
+      :search-filter="searchFilter"
+      :asset-count="assetCount"
       @update:selected-row="onSelectionChange"
     />
   </div>

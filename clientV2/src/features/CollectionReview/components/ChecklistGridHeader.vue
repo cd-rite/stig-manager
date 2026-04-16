@@ -1,15 +1,56 @@
 <script setup>
-import { ref } from 'vue'
 import TieredMenu from 'primevue/tieredmenu'
-
+import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import lineHeightDown from '../../../assets/line-height-down.svg'
 import lineHeightUp from '../../../assets/line-height-up.svg'
+
 import shieldGreenCheck from '../../../assets/shield-green-check.svg'
 import ColumnToggle from '../../../components/common/ColumnToggle.vue'
+import { fetchStigRevisions } from '../../../shared/api/stigsApi.js'
+import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
+import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
+import { getRevisionInfo } from '../../../shared/lib/checklistUtils.js'
 
-// Simplistic mock data until real logic is wired
-const searchFilter = ref('')
-const headerTitle = 'Collection Checklist'
+const props = defineProps({
+  searchFilter: {
+    type: String,
+    default: '',
+  },
+})
+
+const emit = defineEmits(['update:searchFilter'])
+
+const route = useRoute()
+const benchmarkId = computed(() => route.params.benchmarkId)
+const revisionStr = computed(() => route.params.revisionStr)
+
+const { state: stigRevisions, execute: loadStigRevisions } = useAsyncState(
+  () => fetchStigRevisions(benchmarkId.value),
+  { immediate: false, initialState: [] },
+)
+
+onMounted(() => {
+  if (benchmarkId.value) {
+    loadStigRevisions()
+  }
+})
+
+const revisionInfo = computed(() => getRevisionInfo(revisionStr.value, stigRevisions.value))
+
+const localSearch = computed({
+  get: () => props.searchFilter,
+  set: val => emit('update:searchFilter', val),
+})
+
+const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('collection-checklist', 1, 12, 24)
+
+const headerTitle = computed(() => {
+  if (benchmarkId.value && revisionInfo.value?.display) {
+    return `${benchmarkId.value} - ${revisionInfo.value.display}`
+  }
+  return benchmarkId.value || 'Collection Checklist'
+})
 const accessMode = 'rw'
 const dummyColumns = ref([
   { field: 'ruleId', header: 'Rule', permanent: true },
@@ -41,7 +82,7 @@ function toggleChecklistMenu(event) {
 }
 
 function clearSearch() {
-  searchFilter.value = ''
+  localSearch.value = ''
 }
 </script>
 
@@ -58,17 +99,17 @@ function clearSearch() {
         </span>
       </div>
     </div>
-    
+
     <div class="checklist-grid__header-bottom">
       <TieredMenu ref="checklistMenu" :model="checklistMenuItems" :popup="true" :pt="checklistMenuPT" />
       <div class="checklist-grid__header-search">
         <i class="pi pi-search checklist-grid__search-icon" />
         <input
-          v-model="searchFilter" type="text" class="checklist-grid__search-input"
+          v-model="localSearch" type="text" class="checklist-grid__search-input"
           placeholder="Search reviews..."
         >
         <button
-          v-if="searchFilter" type="button" class="checklist-grid__search-clear"
+          v-if="localSearch" type="button" class="checklist-grid__search-clear"
           aria-label="Clear review search" @click="clearSearch"
         >
           <i class="pi pi-times" />
@@ -85,13 +126,19 @@ function clearSearch() {
           <span>Checklist</span>
           <i class="pi pi-chevron-down checklist-grid__menu-caret" />
         </button>
-        
+
         <div class="checklist-grid__density-controls">
           <span class="checklist-grid__density-label">Density</span>
-          <button class="checklist-grid__icon-btn" title="Decrease row height">
+          <button
+            class="checklist-grid__icon-btn" title="Decrease row height" :disabled="lineClamp <= 1"
+            @click="decreaseRowHeight"
+          >
             <img :src="lineHeightDown" alt="Decrease row height">
           </button>
-          <button class="checklist-grid__icon-btn" title="Increase row height">
+          <button
+            class="checklist-grid__icon-btn" title="Increase row height" :disabled="lineClamp >= 10"
+            @click="increaseRowHeight"
+          >
             <img :src="lineHeightUp" alt="Increase row height">
           </button>
         </div>

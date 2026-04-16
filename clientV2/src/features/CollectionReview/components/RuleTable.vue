@@ -1,6 +1,7 @@
 <script setup>
 import RuleTableGrid from './RuleTableGrid.vue'
 import RuleTableHeader from './RuleTableHeader.vue'
+import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 
 defineProps({
   gridData: {
@@ -11,12 +12,21 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  selectedRuleId: {
+    type: String,
+    default: null,
+  },
 })
+
+const { lineClamp, itemSize } = useGridDensity('collection-rule-table', 1, 12, 24)
 </script>
 
 <template>
-  <div class="rule-table">
-    <RuleTableHeader />
+  <div
+    class="rule-table"
+    :style="{ '--line-clamp': lineClamp, '--item-size': `${itemSize}px` }"
+  >
+    <RuleTableHeader :selected-rule-id="selectedRuleId" />
     <RuleTableGrid :grid-data="gridData" :is-loading="isLoading" />
   </div>
 </template>

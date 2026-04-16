@@ -23,7 +23,7 @@ const selectedChecklistColumns = ref(
   ),
 )
 
-const lineClamp = ref(3)
+import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 
 export function useChecklistDisplayMode() {
   const isColVisible = (field) => {
@@ -123,19 +123,12 @@ export function useChecklistDisplayMode() {
     },
   ])
 
-  const itemSize = computed(() => (15 * lineClamp.value) + 6)
-
-  function increaseRowHeight() {
-    if (lineClamp.value < 10) {
-      lineClamp.value++
-    }
-  }
-
-  function decreaseRowHeight() {
-    if (lineClamp.value > 1) {
-      lineClamp.value--
-    }
-  }
+  const {
+    lineClamp,
+    itemSize,
+    increaseRowHeight,
+    decreaseRowHeight,
+  } = useGridDensity('asset-review-checklist', 3, 6, 15)
 
   return {
     checklistColumns,

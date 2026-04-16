@@ -8,6 +8,13 @@ export function fetchCollectionChecklist(collectionId, benchmarkId, revisionStr)
   })
 }
 
+export function fetchAssetsByCollectionStig(collectionId, benchmarkId) {
+  return apiCall('getAssetsByStig', {
+    collectionId,
+    benchmarkId,
+  })
+}
+
 export function fetchRule(benchmarkId, revisionStr, ruleId) {
   return apiCall('getRuleByRevision', {
     benchmarkId,

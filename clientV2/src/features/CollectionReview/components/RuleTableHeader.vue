@@ -1,12 +1,18 @@
 <script setup>
-import { ref } from 'vue'
 import Button from 'primevue/button'
 
 import lineHeightDown from '../../../assets/line-height-down.svg'
 import lineHeightUp from '../../../assets/line-height-up.svg'
+import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 
-// Mocked for now, will be passed as a prop later
-const selectedRuleId = ref('SV-238202r653781_rule')
+defineProps({
+  selectedRuleId: {
+    type: String,
+    default: null,
+  },
+})
+
+const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('collection-rule-table', 1, 12, 24)
 </script>
 
 <template>
@@ -14,7 +20,9 @@ const selectedRuleId = ref('SV-238202r653781_rule')
     <div class="rule-table-header__content">
       <!-- Header Title -->
       <div class="rule-table__title-row">
-        <h2 class="rule-table__title">Reviews of {{ selectedRuleId }}</h2>
+        <h2 class="rule-table__title">
+          Reviews of {{ selectedRuleId ?? '—' }}
+        </h2>
       </div>
 
       <div class="rule-table__right-controls">
@@ -25,7 +33,7 @@ const selectedRuleId = ref('SV-238202r653781_rule')
               <i class="pi pi-arrow-right" style="color: #2ecc71; font-weight: bold; margin-right: 0.3rem;" />
             </template>
           </Button>
-          
+
           <Button text class="toolbar-btn" label="Unsubmit">
             <template #icon>
               <i class="pi pi-bookmark" style="color: #95a5a6; margin-right: 0.3rem;" />
@@ -33,17 +41,23 @@ const selectedRuleId = ref('SV-238202r653781_rule')
           </Button>
 
           <div class="toolbar-divider" />
-          
+
           <Button text class="toolbar-btn" icon="pi pi-pencil" label="Batch edit" />
         </div>
 
         <!-- Density -->
         <div class="rule-table__density-controls">
           <span class="rule-table__density-label">Density</span>
-          <button class="rule-table__icon-btn" title="Decrease row height">
+          <button
+            class="rule-table__icon-btn" title="Decrease row height" :disabled="lineClamp <= 1"
+            @click="decreaseRowHeight"
+          >
             <img :src="lineHeightDown" alt="Decrease row height">
           </button>
-          <button class="rule-table__icon-btn" title="Increase row height">
+          <button
+            class="rule-table__icon-btn" title="Increase row height" :disabled="lineClamp >= 10"
+            @click="increaseRowHeight"
+          >
             <img :src="lineHeightUp" alt="Increase row height">
           </button>
         </div>
@@ -60,7 +74,7 @@ const selectedRuleId = ref('SV-238202r653781_rule')
   background: linear-gradient(180deg, var(--color-background-light), var(--color-background-dark));
   border-bottom: 1px solid var(--color-border-default);
   flex-shrink: 0;
-  height: var(--checklist-control-height, 2.87rem);
+  height: var(5rem);
 }
 
 .rule-table-header__content {

@@ -5,7 +5,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import RuleInfo from '../../../components/common/RuleInfo.vue'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
-import { fetchCollectionChecklist, fetchReviewsByRule, fetchRule } from '../api/collectionReviewApi.js'
+import { fetchAssetsByCollectionStig, fetchCollectionChecklist, fetchReviewsByRule, fetchRule } from '../api/collectionReviewApi.js'
 import ChecklistGrid from './ChecklistGrid.vue'
 import RuleTable from './RuleTable.vue'
 
@@ -19,6 +19,13 @@ const { state: gridData, isLoading: isChecklistLoading, execute: loadChecklist }
   () => fetchCollectionChecklist(collectionId.value, benchmarkId.value, revisionStr.value),
   { immediate: false, initialState: [] },
 )
+
+const { state: assets, execute: loadAssets } = useAsyncState(
+  () => fetchAssetsByCollectionStig(collectionId.value, benchmarkId.value),
+  { immediate: false, initialState: [] },
+)
+
+const assetCount = computed(() => assets.value?.length ?? 0)
 
 const selectedRuleId = ref(null)
 
@@ -51,6 +58,7 @@ const {
 watch([collectionId, benchmarkId, revisionStr], () => {
   if (collectionId.value && benchmarkId.value && revisionStr.value) {
     loadChecklist()
+    loadAssets()
   }
 }, { immediate: true })
 
@@ -67,12 +75,8 @@ watch(gridData, (data) => {
 
 watch(selectedRuleId, (ruleId) => {
   if (!ruleId) {
-    ruleContent.value = null
-    reviewsData.value = []
     return
   }
-  ruleContent.value = null
-  reviewsData.value = []
   if (benchmarkId.value && revisionStr.value) {
     loadRuleContent(ruleId)
   }
@@ -90,6 +94,9 @@ function onRetryRule() {
     loadRuleContent(selectedRuleId.value)
   }
 }
+
+const showRuleLoading = computed(() => isRuleLoading.value && !ruleContent.value)
+const showReviewsLoading = computed(() => isReviewsLoading.value && !reviewsData.value?.length)
 </script>
 
 <template>
@@ -116,13 +123,15 @@ function onRetryRule() {
                 :grid-data="gridData ?? []"
                 :is-loading="isChecklistLoading"
                 :selected-rule-id="selectedRuleId"
+                :asset-count="assetCount"
                 @select-rule="onSelectRule"
               />
             </SplitterPanel>
             <SplitterPanel :size="50" :min-size="20">
               <RuleTable
                 :grid-data="reviewsData ?? []"
-                :is-loading="isReviewsLoading"
+                :is-loading="showReviewsLoading"
+                :selected-rule-id="selectedRuleId"
               />
             </SplitterPanel>
           </Splitter>
@@ -131,7 +140,7 @@ function onRetryRule() {
         <SplitterPanel :size="25" :min-size="20">
           <RuleInfo
             :rule-content="ruleContent"
-            :is-loading="isRuleLoading"
+            :is-loading="showRuleLoading"
             :rule-content-error="ruleContentError"
             :selected-checklist-item="selectedChecklistItem"
             @retry="onRetryRule"

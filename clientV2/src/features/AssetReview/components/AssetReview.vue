@@ -19,6 +19,7 @@ import { useReviewActions } from '../composables/useReviewActions.js'
 import { useRuleDetail } from '../composables/useRuleDetail.js'
 import ChecklistGrid from './ChecklistGrid.vue'
 import RuleInfo from '../../../components/common/RuleInfo.vue'
+import { getRevisionInfo } from '../../../shared/lib/checklistUtils.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -86,28 +87,7 @@ const { state: stigRevisions, execute: loadStigRevisions } = useAsyncState(
   { immediate: false, initialState: [] },
 )
 
-const revisionInfo = computed(() => {
-  const rs = revisionStr.value
-  if (!rs) {
-    return null
-  }
-  const match = rs.match(/^V(\d+)R(\d+)$/)
-  if (!match) {
-    return { display: rs }
-  }
-  const version = match[1]
-  const release = match[2]
-  const rev = stigRevisions.value?.find(r => r.revisionStr === rs)
-  const benchmarkDate = rev?.benchmarkDate
-    ? new Date(rev.benchmarkDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
-    : null
-  return {
-    display: benchmarkDate ? `Version ${version} Release ${release} (${benchmarkDate})` : `Version ${version} Release ${release}`,
-    version,
-    release,
-    benchmarkDate,
-  }
-})
+const revisionInfo = computed(() => getRevisionInfo(revisionStr.value, stigRevisions.value))
 
 const {
   accessMode,

@@ -8,8 +8,6 @@ import shieldGreenCheck from '../../../assets/shield-green-check.svg'
 import LabelsRow from '../../../components/columns/LabelsRow.vue'
 import ColumnToggle from '../../../components/common/ColumnToggle.vue'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
-import { useSearch } from '../composables/useSearch.js'
-
 const {
   asset,
   revisionInfo,
@@ -25,7 +23,11 @@ const {
   decreaseRowHeight,
 } = useChecklistDisplayMode()
 
-const { searchFilter, clearSearch } = useSearch()
+const searchFilter = defineModel('searchFilter', { type: String, default: '' })
+
+function clearSearch() {
+  searchFilter.value = ''
+}
 
 const checklistMenu = ref()
 

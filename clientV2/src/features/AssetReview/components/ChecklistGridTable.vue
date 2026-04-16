@@ -1,21 +1,24 @@
 <script setup>
+import { FilterMatchMode } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed } from 'vue'
-
+import { computed, ref, watch } from 'vue'
 import engineIcon from '../../../assets/bot2.svg'
 import overrideIcon from '../../../assets/override2.svg'
 import manualIcon from '../../../assets/user.svg'
 import CatBadge from '../../../components/common/CatBadge.vue'
 import ColumnFilter from '../../../components/common/ColumnFilter.vue'
+import EngineBadge from '../../../components/common/EngineBadge.vue'
+import ManualBadge from '../../../components/common/ManualBadge.vue'
+import OverrideBadge from '../../../components/common/OverrideBadge.vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
+import StatusFooter from '../../../components/common/StatusFooter.vue'
 import { durationToNow } from '../../../shared/lib.js'
+import { calculateChecklistStats, getEngineDisplay, getResultDisplay, severityMap } from '../../../shared/lib/checklistUtils.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fieldMatches, highlightText } from '../../../shared/lib/searchUtils.js'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
-import { useSearch } from '../composables/useSearch.js'
-import { getEngineDisplay, getResultDisplay, severityMap } from '../../../shared/lib/checklistUtils.js'
 
 const props = defineProps({
   gridData: {
@@ -30,16 +33,61 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  searchFilter: {
+    type: String,
+    default: '',
+  },
 })
 
-const emit = defineEmits(['update:selectedRow', 'row-click'])
+const emit = defineEmits(['update:selectedRow', 'row-click', 'refresh'])
 
 const {
   isColVisible,
   itemSize,
 } = useChecklistDisplayMode()
 
-const { filters, dsFilterFields, searchFilter, updateFilteredData } = useSearch()
+const dsFilterFields = [
+  'ruleId',
+  'groupId',
+  'ruleTitle',
+  'groupTitle',
+  'detail',
+  'comment',
+  'username',
+  'status.user.username',
+  'resultEngine.product',
+  'resultEngine.type',
+  'resultEngine.version',
+]
+
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  severity: { value: null, matchMode: FilterMatchMode.IN },
+  result: { value: null, matchMode: FilterMatchMode.IN },
+  _statusText: { value: null, matchMode: FilterMatchMode.IN },
+  _engineDisplay: { value: null, matchMode: FilterMatchMode.IN },
+})
+
+const filteredData = ref(null)
+
+watch(() => props.searchFilter, (val) => {
+  filters.value.global.value = val || null
+})
+
+const visibleData = computed(() => filteredData.value ?? props.gridData)
+const isFiltered = computed(() => filteredData.value !== null && filteredData.value.length !== props.gridData.length)
+
+const stats = computed(() => {
+  const result = calculateChecklistStats(visibleData.value)
+  if (!result) {
+    return {
+      results: { pass: 0, fail: 0, notapplicable: 0, other: 0 },
+      engine: { manual: 0, engine: 0, override: 0 },
+      statuses: { saved: 0, submitted: 0, accepted: 0, rejected: 0 },
+    }
+  }
+  return result
+})
 
 const processedGridData = computed(() => {
   return props.gridData.map(item => ({
@@ -82,9 +130,8 @@ const engineOptions = computed(() => {
   }))
 })
 function onFilter(event) {
-  updateFilteredData(event.filteredValue)
+  filteredData.value = event.filteredValue
 }
-
 
 const defaultSortField = computed(() => isColVisible('groupId') ? 'groupId' : 'ruleId')
 
@@ -332,7 +379,26 @@ const dataTablePt = {
     </template>
 
     <template #footer>
-      <slot name="footer" />
+      <StatusFooter
+        :refresh-loading="isLoading" :total-count="gridData.length"
+        :filtered-count="isFiltered ? visibleData.length : null" @action="(key) => emit('refresh', key)"
+      >
+        <template #right-extra>
+          <ResultBadge status="O" :count="stats.results.fail" />
+          <ResultBadge status="NF" :count="stats.results.pass" />
+          <ResultBadge status="NA" :count="stats.results.notapplicable" />
+          <ResultBadge status="NR+" :count="stats.results.other" />
+          <span class="footer-divider">|</span>
+          <ManualBadge :count="stats.engine.manual" />
+          <EngineBadge :count="stats.engine.engine" />
+          <OverrideBadge :count="stats.engine.override" />
+          <span class="footer-divider">|</span>
+          <StatusBadge status="saved" :count="stats.statuses.saved" />
+          <StatusBadge status="submitted" :count="stats.statuses.submitted" />
+          <StatusBadge status="accepted" :count="stats.statuses.accepted" />
+          <StatusBadge status="rejected" :count="stats.statuses.rejected" />
+        </template>
+      </StatusFooter>
     </template>
   </DataTable>
 </template>
