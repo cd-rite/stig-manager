@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import ColumnFilter from '../../../components/common/ColumnFilter.vue'
 import ColumnSearchFilter from '../../../components/common/ColumnSearchFilter.vue'
 import EngineBadge from '../../../components/common/EngineBadge.vue'
+import EngineIconCell from '../../../components/common/EngineIconCell.vue'
 import LongTextPopover from '../../../components/common/LongTextPopover.vue'
 import ManualBadge from '../../../components/common/ManualBadge.vue'
 import OverrideBadge from '../../../components/common/OverrideBadge.vue'
@@ -122,27 +123,7 @@ const sharedPt = {
           </div>
         </template>
         <template #body="{ data }">
-          <img
-            v-if="data._engineDisplay === 'engine'"
-            src="../../../assets/bot2.svg"
-            alt="Engine"
-            class="engine-icon"
-            title="Result engine"
-          >
-          <img
-            v-else-if="data._engineDisplay === 'override'"
-            src="../../../assets/override2.svg"
-            alt="Override"
-            class="engine-icon"
-            title="Overridden result"
-          >
-          <img
-            v-else-if="data._engineDisplay === 'manual'"
-            src="../../../assets/user.svg"
-            alt="Manual"
-            class="engine-icon"
-            title="Manual result"
-          >
+          <EngineIconCell :display="data._engineDisplay" />
         </template>
       </Column>
 

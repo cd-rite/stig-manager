@@ -1,9 +1,7 @@
 import { computed, inject, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import engineIcon from '../../../assets/bot2.svg'
-import overrideIcon from '../../../assets/override2.svg'
-import manualIcon from '../../../assets/user.svg'
 import { calculateChecklistStats, getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
+import { buildEngineOptions } from '../lib/reviewFilterOptions.js'
 
 const EMPTY_STATS = {
   total: 0,
@@ -79,14 +77,7 @@ export function useReviewTabTable(dataRef, filterSchema) {
     })).sort((a, b) => a.label.localeCompare(b.label))
   })
 
-  const engineOptions = computed(() => {
-    const engines = new Set((dataRef.value ?? []).map(item => getEngineDisplay(item)).filter(Boolean))
-    return Array.from(engines).map(val => ({
-      value: val,
-      label: val === 'engine' ? 'Engine' : val === 'override' ? 'Override' : 'Manual',
-      image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
-    }))
-  })
+  const engineOptions = computed(() => buildEngineOptions(dataRef.value ?? []))
 
   return {
     editable,

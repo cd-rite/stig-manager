@@ -3,11 +3,9 @@ import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import { computed } from 'vue'
 
-import engineIcon from '../../../assets/bot2.svg'
-import overrideIcon from '../../../assets/override2.svg'
-import manualIcon from '../../../assets/user.svg'
 import CatBadge from '../../../components/common/CatBadge.vue'
 import ColumnFilter from '../../../components/common/ColumnFilter.vue'
+import EngineIconCell from '../../../components/common/EngineIconCell.vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import { durationToNow } from '../../../shared/lib.js'
@@ -15,7 +13,8 @@ import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fieldMatches, highlightText } from '../../../shared/lib/searchUtils.js'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
 import { useSearch } from '../composables/useSearch.js'
-import { getEngineDisplay, getResultDisplay, severityMap } from '../lib/checklistUtils.js'
+import { getResultDisplay, severityMap } from '../lib/checklistUtils.js'
+import { buildEngineOptions } from '../lib/reviewFilterOptions.js'
 
 const props = defineProps({
   gridData: {
@@ -65,14 +64,7 @@ const statusOptions = computed(() => {
   })).sort((a, b) => a.label.localeCompare(b.label))
 })
 
-const engineOptions = computed(() => {
-  const engines = new Set(props.gridData.map(item => getEngineDisplay(item)).filter(Boolean))
-  return Array.from(engines).map(val => ({
-    value: val,
-    label: val === 'engine' ? 'Engine' : val === 'override' ? 'Override' : 'Manual',
-    image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
-  }))
-})
+const engineOptions = computed(() => buildEngineOptions(props.gridData))
 function onFilter(event) {
   updateFilteredData(event.filteredValue)
 }
@@ -273,18 +265,7 @@ const dataTablePt = {
         </div>
       </template>
       <template #body="{ data }">
-        <img
-          v-if="data._engineDisplay === 'engine'" src="../../../assets/bot2.svg" alt="Engine"
-          class="engine-icon" title="Result engine"
-        >
-        <img
-          v-else-if="data._engineDisplay === 'override'" src="../../../assets/override2.svg" alt="Override"
-          class="engine-icon" title="Overridden result"
-        >
-        <img
-          v-else-if="data._engineDisplay === 'manual'" src="../../../assets/user.svg" alt="Manual"
-          class="engine-icon" title="Manual result"
-        >
+        <EngineIconCell :display="data._engineDisplay" />
       </template>
     </Column>
 
