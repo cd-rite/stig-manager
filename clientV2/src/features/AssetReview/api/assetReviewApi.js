@@ -4,16 +4,17 @@ export { fetchAsset, fetchAssetStigs } from '../../../shared/api/assetsApi.js'
 export { fetchCollection, fetchCollectionLabels } from '../../../shared/api/collectionsApi.js'
 export { fetchStigRevisions } from '../../../shared/api/stigsApi.js'
 
-export function fetchChecklist(assetId, benchmarkId, revisionStr) {
+export function fetchChecklist(assetId, benchmarkId, revisionStr, projection) {
   return apiCall('getChecklistByAssetStig', {
     assetId,
     benchmarkId,
     revisionStr,
     format: 'json-access',
+    projection,
   })
 }
 
-export function fetchRuleContent(benchmarkId, revisionStr, ruleId) {
+export function fetchRule(benchmarkId, revisionStr, ruleId) {
   return apiCall('getRuleByRevision', {
     benchmarkId,
     revisionStr,
@@ -22,12 +23,12 @@ export function fetchRuleContent(benchmarkId, revisionStr, ruleId) {
   })
 }
 
-export function fetchReview(collectionId, assetId, ruleId) {
+export function fetchReview(collectionId, assetId, ruleId, { projection } = {}) {
   return apiCall('getReviewByAssetRule', {
     collectionId,
     assetId,
     ruleId,
-    projection: 'history',
+    ...(projection ? { projection } : {}),
   })
 }
 
@@ -45,10 +46,6 @@ export function patchReview(collectionId, assetId, ruleId, body) {
     { collectionId, assetId, ruleId, projection: 'history' },
     body,
   )
-}
-
-export function fetchReviewsByAsset(collectionId, assetId, benchmarkId) {
-  return apiCall('getReviewsByAsset', { collectionId, assetId, benchmarkId })
 }
 
 export function fetchOtherReviews(collectionId, ruleId) {

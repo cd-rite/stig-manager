@@ -1,52 +1,44 @@
 <script setup>
 import Popover from 'primevue/popover'
 import Textarea from 'primevue/textarea'
-import Tooltip from 'primevue/tooltip'
-import { nextTick, onBeforeUnmount, ref, toRef } from 'vue'
+import { inject, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
+import ReviewResources from '../../features/AssetReview/components/ReviewResources.vue'
 import { useReviewEditForm } from '../../shared/composables/useReviewEditForm.js'
-import { defaultFieldSettings, formatReviewDate, resultOptions } from '../../shared/lib/reviewFormUtils.js'
+import { formatReviewDate, resultOptions } from '../../shared/lib/reviewFormUtils.js'
 import ResultBadge from './ResultBadge.vue'
+import ResultEngineBadges from './ResultEngineBadges.vue'
 import StatusBadge from './StatusBadge.vue'
 import StatusButton from './StatusButton.vue'
 
-const props = defineProps({
-  rowData: {
-    type: Object,
-    default: null,
-  },
-  fieldSettings: {
-    type: Object,
-    default: () => defaultFieldSettings,
-  },
-  accessMode: {
-    type: String,
-    default: 'r',
-  },
-  canAccept: {
-    type: Boolean,
-    default: false,
-  },
-  isSaving: {
-    type: Boolean,
-    default: false,
-  },
-  width: {
-    type: Number,
-    default: null,
-  },
-})
 
-const emit = defineEmits(['save', 'status-action', 'close'])
+const emit = defineEmits(['save', 'status-action', 'close', 'clear-save-error'])
 
-// Register PrimeVue Tooltip directive for v-tooltip usage
-const vTooltip = Tooltip
+// Inject feature-level context
+const {
+  fieldSettings,
+  accessMode,
+  canAccept,
+  isSaving,
+  saveError,
+  clearSaveError,
+  currentReview,
+  selectedRuleId,
+} = inject('assetReviewContext')
 
 const popover = ref()
 const lastAnchorEvent = ref(null)
 const closing = ref(false)
-const isButtonsHighlighted = ref(false)
+const showUnsavedWarning = ref(false)
+const showResources = ref(false)
 
 // Form state and business logic from composable
+const reviewEditForm = useReviewEditForm({
+  rowData: currentReview,
+  fieldSettings,
+  accessMode,
+  canAccept,
+})
+
 const {
   formResult,
   formDetail,
@@ -61,45 +53,38 @@ const {
   commentRequired,
   buttonStates,
   isActionActive,
-  engineTooltipHtml,
-  overrideTooltipHtml,
   selectResult,
+  applyReviewData,
   discardChanges,
-} = useReviewEditForm({
-  rowData: toRef(props, 'rowData'),
-  fieldSettings: toRef(props, 'fieldSettings'),
-  accessMode: toRef(props, 'accessMode'),
-  canAccept: toRef(props, 'canAccept'),
-})
+} = reviewEditForm
 
-// Button action handler
+provide('reviewEditForm', reviewEditForm)
+
 function onButtonClick(actionType) {
-  if (!actionType || !props.rowData) {
+  const ruleId = selectedRuleId.value
+  if (!actionType || !ruleId) {
     return
   }
 
-  // Unsubmit: emit but keep popover open for further editing
   if (actionType === 'unsubmit') {
-    emit('status-action', { ruleId: props.rowData.ruleId, actionType })
+    emit('status-action', { ruleId, actionType })
     return
   }
 
-  // Other status-only actions (PATCH) — dismiss after
   if (actionType === 'submit' || actionType === 'accept') {
-    emit('status-action', { ruleId: props.rowData.ruleId, actionType })
+    emit('status-action', { ruleId, actionType })
     closing.value = true
     popover.value.hide()
     return
   }
 
-  // Save actions (PUT) — include form data
   let status = 'saved'
   if (actionType === 'save and submit') {
     status = 'submitted'
   }
 
   emit('save', {
-    ruleId: props.rowData.ruleId,
+    ruleId,
     result: formResult.value,
     detail: formDetail.value,
     comment: formComment.value,
@@ -109,52 +94,106 @@ function onButtonClick(actionType) {
   popover.value.hide()
 }
 
-// Dirty close handling
 function onPopoverHide() {
   unbindOutsideHandler()
+  unbindResizeHandler()
+  showResources.value = false
   if (closing.value) {
     closing.value = false
     emit('close')
     return
   }
-  // Toggle or programmatic hide without closing flag — check dirty
   if (isDirty.value) {
     nextTick(() => {
       popover.value?.show(lastAnchorEvent.value)
     })
-    triggerButtonPulse()
+    showUnsavedWarning.value = true
     return
   }
   emit('close')
 }
 
-function triggerButtonPulse() {
-  isButtonsHighlighted.value = true
-  setTimeout(() => {
-    isButtonsHighlighted.value = false
-  }, 1200)
+function triggerUnsavedWarning() {
+  showUnsavedWarning.value = true
 }
 
 function dismiss() {
   discardChanges()
+  showUnsavedWarning.value = false
   closing.value = true
   popover.value.hide()
 }
 
-// Expose toggle for parent to open/close
-function toggle(event) {
+function openAt(event, method) {
   lastAnchorEvent.value = event
-  popover.value.toggle(event)
+  showResources.value = false
+  showUnsavedWarning.value = false
+  popover.value[method](event)
+}
+
+function toggle(event) {
+  openAt(event, 'toggle')
 }
 
 function show(event) {
-  lastAnchorEvent.value = event
-  popover.value.show(event)
+  openAt(event, 'show')
 }
 
 function hide() {
   closing.value = true
+  showUnsavedWarning.value = false
+  showResources.value = false
   popover.value.hide()
+}
+
+function clampPopoverPosition() {
+  const pv = popover.value
+  if (!pv || !pv.container || !lastAnchorEvent.value) {
+    return
+  }
+  const container = pv.container
+  const anchor = lastAnchorEvent.value.currentTarget
+  if (!anchor) {
+    return
+  }
+
+  container.style.marginLeft = '0px'
+
+  const rect = container.getBoundingClientRect()
+  const anchorRect = anchor.getBoundingClientRect()
+  const targetX = lastAnchorEvent.value.clientX ?? (anchorRect.left + anchorRect.width / 2)
+
+  const gutter = 12
+  const viewportW = document.documentElement.clientWidth
+
+  let offset = targetX - (rect.left + rect.width / 2)
+
+  const projectedLeft = rect.left + offset
+  const projectedRight = projectedLeft + rect.width
+
+  if (projectedLeft < gutter) {
+    offset += (gutter - projectedLeft)
+  }
+  else if (projectedRight > viewportW - gutter) {
+    offset -= (projectedRight - (viewportW - gutter))
+  }
+
+  if (rect.width > viewportW - gutter * 2) {
+    offset = gutter - rect.left
+  }
+
+  container.style.marginLeft = `${offset}px`
+
+  const arrowLeftEdge = targetX - (rect.left + offset) - 10
+  container.style.setProperty('--p-popover-arrow-left', `${arrowLeftEdge}px`)
+}
+
+function alignPopover() {
+  const pv = popover.value
+  if (pv && pv.container && lastAnchorEvent.value) {
+    pv.alignOverlay()
+    nextTick(clampPopoverPosition)
+  }
 }
 
 function reposition(event) {
@@ -162,23 +201,63 @@ function reposition(event) {
   const pv = popover.value
   pv.target = event.currentTarget
   pv.eventTarget = event.currentTarget
-  pv.container.classList.remove('p-popover-flipped')
-  nextTick(() => pv.alignOverlay())
+  pv.container?.classList.remove('p-popover-flipped')
+  nextTick(() => {
+    pv.alignOverlay()
+    clampPopoverPosition()
+  })
 }
 
-// Outside-click detection (replaces PrimeVue's dismissable which can't handle dirty checks)
+watch(showResources, () => {
+  nextTick(() => {
+    alignPopover()
+  })
+})
+
 let outsideHandler = null
+let outsideBindTimer = null
+let resizeHandler = null
+let resizeTimer = null
+
+function bindResizeHandler() {
+  unbindResizeHandler()
+  resizeHandler = () => {
+    clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(() => {
+      const pv = popover.value
+      if (pv && pv.container) {
+        pv.alignOverlay()
+        clampPopoverPosition()
+      }
+    }, 60)
+  }
+  window.addEventListener('resize', resizeHandler)
+}
+
+function unbindResizeHandler() {
+  if (resizeHandler) {
+    window.removeEventListener('resize', resizeHandler)
+    resizeHandler = null
+  }
+  clearTimeout(resizeTimer)
+}
 
 function bindOutsideHandler() {
+  bindResizeHandler()
   unbindOutsideHandler()
-  // Delay to avoid catching the click that opened the popover
-  setTimeout(() => {
+  outsideBindTimer = setTimeout(() => {
+    outsideBindTimer = null
     outsideHandler = (event) => {
-      if (event.target.closest('.p-popover')) {
+      if (
+        event.target.closest('.p-popover')
+        || event.target.closest('.p-multiselect-list')
+        || event.target.closest('.p-multiselect-option')
+        || event.target.closest('.p-multiselect-header')
+      ) {
         return
       }
       if (isDirty.value) {
-        triggerButtonPulse()
+        showUnsavedWarning.value = true
         return
       }
       closing.value = true
@@ -189,15 +268,27 @@ function bindOutsideHandler() {
 }
 
 function unbindOutsideHandler() {
+  if (outsideBindTimer) {
+    clearTimeout(outsideBindTimer)
+    outsideBindTimer = null
+  }
   if (outsideHandler) {
     document.removeEventListener('pointerdown', outsideHandler)
     outsideHandler = null
   }
 }
 
-onBeforeUnmount(unbindOutsideHandler)
+function onPopoverShow() {
+  bindOutsideHandler()
+  nextTick(clampPopoverPosition)
+}
 
-defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
+onBeforeUnmount(() => {
+  unbindResizeHandler()
+  unbindOutsideHandler()
+})
+
+defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUnsavedWarning })
 </script>
 
 <template>
@@ -209,15 +300,18 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
       root: {
         class: 'review-popover',
       },
+      content: {
+        style: { maxHeight: '85vh', overflowY: 'auto', overflowX: 'hidden' },
+      },
       transition: {
         enterActiveClass: 'review-popover-enter',
         leaveActiveClass: 'review-popover-leave',
       },
     }"
-    @show="bindOutsideHandler"
+    @show="onPopoverShow"
     @hide="onPopoverHide"
   >
-    <div v-if="rowData" class="review-edit-popover" :style="width ? { width: `${width}px` } : {}">
+    <div class="review-edit-popover">
       <button class="review-edit-popover__close" :title="isDirty ? 'Close (discards unsaved changes)' : 'Close'" @click="dismiss">
         <i class="pi pi-times" />
       </button>
@@ -272,7 +366,7 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
           />
         </div>
 
-        <div class="review-edit-popover__actions" :class="{ 'review-edit-popover__actions--highlighted': isButtonsHighlighted }">
+        <div class="review-edit-popover__actions">
           <label class="review-edit-popover__label">Status</label>
           <StatusButton
             :label="buttonStates.save.text"
@@ -298,63 +392,73 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
             @click="onButtonClick(buttonStates.accept.actionType)"
           />
           <button
-            class="review-edit-popover__discard-link"
-            :class="{ 'review-edit-popover__discard-link--hidden': !isDirty }"
-            @click="discardChanges"
+            class="review-edit-popover__undo-btn"
+            :disabled="!isDirty"
+            title="Undo changes"
+            @click="discardChanges(); showUnsavedWarning = false"
           >
-            discard changes
+            Undo
           </button>
         </div>
       </div>
 
+      <div v-if="showUnsavedWarning" class="review-edit-popover__unsaved-warning">
+        <i class="pi pi-exclamation-triangle" />
+        <span>Please <strong>Save</strong> or <strong>Undo</strong> your changes to close.</span>
+      </div>
+
+      <div v-if="saveError" class="review-edit-popover__save-error">
+        <i class="pi pi-exclamation-circle" />
+        <span>{{ saveError }}</span>
+        <button class="review-edit-popover__save-error-dismiss" @click="clearSaveError">
+          <i class="pi pi-times" />
+        </button>
+      </div>
+
       <div class="review-edit-popover__attributions">
-        <div class="review-edit-popover__engine-badges">
-          <span
-            v-if="rowData.resultEngine"
-            v-tooltip="{ value: engineTooltipHtml, escape: false, autoHide: false, hideDelay: 300, pt: { root: { style: { maxWidth: '40rem' } } } }"
-            class="review-edit-popover__engine-badge"
-          >
-            {{ rowData.resultEngine.product || 'Engine' }}
-          </span>
-          <span v-else class="review-edit-popover__engine-badge review-edit-popover__engine-badge--manual">
-            Manual
-          </span>
-          <span
-            v-if="rowData.resultEngine?.overrides?.length"
-            v-tooltip="{ value: overrideTooltipHtml, escape: false, autoHide: false, hideDelay: 300, pt: { root: { style: { maxWidth: '40rem' } } } }"
-            class="review-edit-popover__override-badge"
-          >
-            Override
-          </span>
-        </div>
+        <ResultEngineBadges :result-engine="currentReview?.resultEngine" />
         <div class="review-edit-popover__attr-section">
           <span class="review-edit-popover__attr-label">Evaluated: </span>
-          <span v-if="rowData.ts" class="review-edit-popover__attr-pill">
+          <span v-if="currentReview?.ts" class="review-edit-popover__attr-pill">
             <i class="pi pi-clock" />
-            {{ formatReviewDate(rowData.ts) }}
+            {{ formatReviewDate(currentReview.ts) }}
           </span>
-          <span v-if="rowData.username" class="review-edit-popover__attr-pill">
+          <span v-if="currentReview?.username" class="review-edit-popover__attr-pill">
             <i class="pi pi-user" />
-            {{ rowData.username }}
+            {{ currentReview.username }}
           </span>
-          <span v-if="!rowData.ts && !rowData.username" class="review-edit-popover__attr-pill review-edit-popover__attr-pill--empty">--</span>
+          <span v-if="!currentReview?.ts && !currentReview?.username" class="review-edit-popover__attr-pill review-edit-popover__attr-pill--empty">--</span>
         </div>
         <div class="review-edit-popover__attr-section">
           <span class="review-edit-popover__attr-label">Statused: </span>
-          <template v-if="rowData.status && statusLabel">
-            <span v-if="rowData.status?.ts" class="review-edit-popover__attr-pill">
+          <template v-if="currentReview?.status && statusLabel">
+            <span v-if="currentReview.status?.ts" class="review-edit-popover__attr-pill">
               <i class="pi pi-clock" />
-              {{ formatReviewDate(rowData.status.ts) }}
-            </span>
-            <span v-if="rowData.status?.user?.username" class="review-edit-popover__attr-pill">
-              <i class="pi pi-user" />
-              {{ rowData.status.user.username }}
+              {{ formatReviewDate(currentReview.status.ts) }}
             </span>
             <StatusBadge :status="statusLabel" />
+            <span v-if="currentReview.status?.user?.username" class="review-edit-popover__attr-pill">
+              <i class="pi pi-user" />
+              {{ currentReview.status.user.username }}
+            </span>
           </template>
           <span v-else class="review-edit-popover__attr-pill review-edit-popover__attr-pill--empty">--</span>
         </div>
       </div>
+
+      <div class="review-edit-popover__resources-toggle" @click="showResources = !showResources">
+        <i class="pi" :class="showResources ? 'pi-angle-up' : 'pi-angle-down'" />
+        <span>Review Resources</span>
+        <div class="review-edit-popover__resources-toggle-line" />
+      </div>
+
+      <Transition name="expand" @after-enter="alignPopover" @after-leave="alignPopover">
+        <div v-if="showResources" class="review-edit-popover__resources-container">
+          <ReviewResources
+            @apply-review="applyReviewData"
+          />
+        </div>
+      </Transition>
     </div>
   </Popover>
 </template>
@@ -364,29 +468,32 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  min-width: 500px;
+  min-width: 650px;
   position: relative;
 }
 
 .review-edit-popover__close {
   position: absolute;
-  top: -.8rem;
-  right: -.8rem;
+  top: -0.6rem;
+  right: -0.6rem;
   background: none;
   border: none;
   cursor: pointer;
   color: var(--color-text-primary);
-  opacity: 0.5;
-  padding: 0.2rem;
+  opacity: 0.6;
+  padding: 0.4rem;
   line-height: 1;
-}
-
-.review-edit-popover__close .pi {
-  font-size: 0.7rem;
+  z-index: 10;
+  transition: opacity 0.15s ease, transform 0.1s ease;
 }
 
 .review-edit-popover__close:hover {
-  opacity: 0.9;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.review-edit-popover__close .pi {
+  font-size: 1.15rem;
 }
 
 .review-edit-popover__main {
@@ -459,7 +566,7 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
 }
 
 .review-edit-popover__result-item :deep(.status-badge) {
-  min-width: 1.8rem;
+  width: 2.25rem;
   justify-content: center;
 }
 
@@ -477,6 +584,13 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
   resize: none !important;
 }
 
+.review-edit-popover__textarea:disabled,
+.review-edit-popover__textarea.p-disabled {
+  background-color: color-mix(in srgb, var(--color-background-light) 30%, transparent) !important;
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+}
+
 .review-edit-popover__actions {
   display: flex;
   flex-direction: column;
@@ -490,126 +604,123 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
   min-width: 7rem;
 }
 
-.review-edit-popover__actions--highlighted {
-  animation: actions-pulse 0.6s ease-in-out 2;
+.review-edit-popover__undo-btn {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 30%, transparent);
+  border-radius: 4px;
+  padding: 0.45rem 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: auto;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+.review-edit-popover__undo-btn:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-background-light) 50%, transparent);
+  border-color: var(--color-text-primary);
+}
+.review-edit-popover__undo-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
-.review-edit-popover__actions--highlighted .review-edit-popover__discard-link {
-  animation: discard-pulse 0.6s ease-in-out 2;
+/* Unsaved Changes Banner */
+.review-edit-popover__unsaved-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  background-color: color-mix(in srgb, var(--color-warning, #f39c12) 15%, var(--color-background-dark));
+  border: 1px solid color-mix(in srgb, var(--color-warning, #f39c12) 50%, transparent);
+  border-radius: 4px;
+  color: var(--color-warning, #f1c40f);
+  font-size: 0.95rem;
+  animation: warning-slide-down 0.2s cubic-bezier(0, 0, 0.2, 1);
 }
 
-@keyframes discard-pulse {
-  0%, 100% { color: var(--color-text-primary); opacity: 0.7; }
-  50% { color: var(--result-fail, #e74c3c); opacity: 1; }
+@keyframes warning-slide-down {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes actions-pulse {
-  0%, 100% { filter: drop-shadow(0 0 0px transparent); }
-  50% { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--p-primary-color) 70%, transparent)); }
+/* Inline save error banner (Tier: Action Error) */
+.review-edit-popover__save-error {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  background-color: color-mix(in srgb, var(--color-text-error, #e74c3c) 12%, var(--color-background-dark));
+  border: 1px solid color-mix(in srgb, var(--color-text-error, #e74c3c) 40%, transparent);
+  border-radius: 4px;
+  color: var(--color-text-error, #e74c3c);
+  font-size: 0.95rem;
 }
 
-.review-edit-popover__discard-link {
+.review-edit-popover__save-error .pi-exclamation-circle {
+  flex-shrink: 0;
+}
+
+.review-edit-popover__save-error span {
+  flex: 1;
+}
+
+.review-edit-popover__save-error-dismiss {
   background: none;
   border: none;
-  padding: 0;
   cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--color-text-primary);
+  color: var(--color-text-error, #e74c3c);
   opacity: 0.7;
-  text-align: center;
-  white-space: nowrap;
-  transition: opacity 0.15s ease;
-  margin-top: auto;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
-.review-edit-popover__discard-link:hover {
-  opacity: 0.85;
-  text-decoration: underline;
-}
-
-.review-edit-popover__discard-link--hidden {
-  visibility: hidden;
+.review-edit-popover__save-error-dismiss:hover {
+  opacity: 1;
 }
 
 .review-edit-popover__attributions {
   display: flex;
-  gap: 3rem;
+  column-gap: 3rem;
+  row-gap: 0.5rem;
   flex-wrap: wrap;
   border-top: 1px solid var(--color-border-light);
   padding-top: 0.4rem;
 }
 
-.review-edit-popover__engine-badges {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.review-edit-popover__engine-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-engine-text);
-  background-color: var(--color-engine-bg);
-  border: 1px solid var(--color-engine-border);
-  border-radius: 4px;
-  cursor: default;
-}
-
-.review-edit-popover__engine-badge--manual {
-  color: var(--color-text-primary);
-  background-color: var(--color-background-dark);
-  border-color: var(--color-border-light);
-  opacity: 0.7;
-}
-
-.review-edit-popover__override-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-override-text);
-  background-color: var(--color-override-bg);
-  border: 1px solid var(--color-override-border);
-  border-radius: 4px;
-  cursor: default;
-}
-
-/* Arrow size and popover gap overrides.
-   The arrow is two overlapping CSS-border triangles: ::before (outer/border)
-   and ::after (inner/fill). margin-block-start is the gap between the anchor
-   row and the popover body — it must match the arrow's border-width so the
-   arrow spans the full gap. The ::after border-width is slightly smaller to
-   reveal the ::before border color as an outline. The flipped variants apply
-   when the popover opens above the anchor instead of below. */
 :global(.review-popover) {
-  border: 1px solid var(--color-shield-green-dark);
-  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--color-shield-green-dark) 30%, transparent);
-  margin-left: -5rem;
-  margin-block-start: 2rem; /* gap below anchor row */
+  border: 1px solid var(--p-primary-color);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--p-primary-color) 30%, transparent);
 }
 
-:global(.review-popover.p-popover-flipped) {
-  margin-block-start: -2rem; /* gap above anchor row (flipped) */
-  margin-block-end: 2rem;
+:global(.review-popover:not(.p-popover-flipped)::before) {
+  border-bottom-color: var(--p-primary-color) !important;
+  left: var(--p-popover-arrow-left, calc(50% - 10px)) !important;
+  transform: none !important;
 }
 
-:global(.review-popover::before) {
-  border-width: 2rem; /* outer arrow size — matches gap */
-  margin-left: -2rem; /* center the outer arrow */
-  border-bottom-color: var(--color-shield-green-dark);
-}
-
-:global(.review-popover::after) {
-  border-width: 1.875rem; /* inner arrow — slightly smaller for border effect */
-  margin-left: -1.875rem; /* center the inner arrow */
+:global(.review-popover:not(.p-popover-flipped)::after) {
+  border-bottom-color: var(--color-background-dark) !important;
+  left: var(--p-popover-arrow-left, calc(50% - 10px)) !important;
+  transform: none !important;
 }
 
 :global(.review-popover.p-popover-flipped::before) {
-  border-top-color: var(--color-shield-green-dark);
+  border-top-color: var(--p-primary-color) !important;
+  left: var(--p-popover-arrow-left, calc(50% - 10px)) !important;
+  transform: none !important;
+}
+
+:global(.review-popover.p-popover-flipped::after) {
+  border-top-color: var(--color-background-dark) !important;
+  left: var(--p-popover-arrow-left, calc(50% - 10px)) !important;
+  transform: none !important;
+}
+
+:global(.review-popover.p-popover-flipped) {
+  margin-block-start: 5px;
 }
 
 :global(.review-popover-leave) {
@@ -644,7 +755,6 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
   color: var(--color-text-primary);
   border: 1px solid var(--color-border-light);
   border-radius: 4px;
-  background-color: var(--color-background-dark);
   white-space: nowrap;
 }
 
@@ -655,5 +765,58 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerButtonPulse })
 
 .review-edit-popover__attr-pill--empty {
   opacity: 0.4;
+}
+
+.review-edit-popover__resources-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  margin: 0.5rem -0.8rem -0.8rem -0.8rem;
+  background-color: color-mix(in srgb, var(--color-background-light) 20%, transparent);
+  border-top: 1px solid var(--color-border-light);
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  transition: background-color 0.15s ease;
+  user-select: none;
+}
+
+.review-edit-popover__resources-toggle:hover {
+  background-color: color-mix(in srgb, var(--color-background-light) 40%, transparent);
+}
+
+.review-edit-popover__resources-toggle .pi {
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  transition: transform 0.2s ease;
+}
+
+.review-edit-popover__resources-toggle-line {
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border-light);
+}
+
+.review-edit-popover__resources-container {
+  margin: 0 -0.8rem -0.8rem -0.8rem;
+  border-top: 1px solid var(--color-border-light);
+  height: clamp(200px, 45vh, 350px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.expand-enter-active,
+.expand-leave-active {
+  transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
+  max-height: 400px;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
 }
 </style>
