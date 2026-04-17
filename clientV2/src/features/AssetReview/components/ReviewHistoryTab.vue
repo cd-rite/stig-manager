@@ -1,28 +1,17 @@
 <script setup>
 import { FilterMatchMode } from '@primevue/core/api'
 import Column from 'primevue/column'
-import DataTable from 'primevue/datatable'
-import { computed, inject, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, inject, watch } from 'vue'
 
-import engineIcon from '../../../assets/bot2.svg'
-import overrideIcon from '../../../assets/override2.svg'
-import manualIcon from '../../../assets/user.svg'
 import ColumnFilter from '../../../components/common/ColumnFilter.vue'
 import ColumnSearchFilter from '../../../components/common/ColumnSearchFilter.vue'
-
-import EngineBadge from '../../../components/common/EngineBadge.vue'
-import LongTextPopover from '../../../components/common/LongTextPopover.vue'
-import ManualBadge from '../../../components/common/ManualBadge.vue'
-import OverrideBadge from '../../../components/common/OverrideBadge.vue'
-import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
-import StatusFooter from '../../../components/common/StatusFooter.vue'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { durationToNow } from '../../../shared/lib.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchReview } from '../api/assetReviewApi.js'
-import { calculateChecklistStats, getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
+import { useReviewTabTable } from '../composables/useReviewTabTable.js'
+import ReviewTabTable from './ReviewTabTable.vue'
 
 const props = defineProps({
   active: {
@@ -37,19 +26,7 @@ const {
   selectedRuleId: ruleId,
   collectionId,
   assetId,
-  accessMode,
-  currentReview,
 } = inject('assetReviewContext')
-
-const reviewEditForm = inject('reviewEditForm')
-
-const {
-  formResult,
-  formDetail,
-  formComment,
-} = reviewEditForm
-
-const editable = computed(() => accessMode.value === 'rw' && (!currentReview.value?.status?.label || currentReview.value.status.label === 'saved' || currentReview.value.status.label === 'rejected'))
 
 const { state: fullReviewHistory, isLoading: isInternalHistoryLoading, execute: loadHistory } = useAsyncState(
   async () => {
@@ -69,29 +46,25 @@ watch([() => props.active, () => ruleId.value], ([active, rid], [_oldActive, old
   loadHistory()
 }, { immediate: true })
 
-const processedHistory = computed(() => {
-  return (fullReviewHistory.value || []).map(item => ({
-    ...item,
-    _engineDisplay: getEngineDisplay(item),
-    _statusLabel: item.status?.label ?? '',
-  }))
-})
-
-const resultOptions = computed(() => {
-  const results = new Set((fullReviewHistory.value || []).map(item => item.result).filter(Boolean))
-  return Array.from(results).map(val => ({
-    value: val,
-    label: getResultDisplay(val),
-  })).sort((a, b) => a.label.localeCompare(b.label))
-})
-
-const engineOptions = computed(() => {
-  const engines = new Set((fullReviewHistory.value || []).map(item => getEngineDisplay(item)).filter(Boolean))
-  return Array.from(engines).map(val => ({
-    value: val,
-    label: val === 'engine' ? 'Engine' : val === 'override' ? 'Override' : 'Manual',
-    image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
-  }))
+const {
+  editable,
+  isAlreadyApplied,
+  getApplyTooltip,
+  filters,
+  processedData: processedHistory,
+  stats: historyStats,
+  resultOptions,
+  engineOptions,
+} = useReviewTabTable(fullReviewHistory, {
+  global: FilterMatchMode.CONTAINS,
+  ruleId: FilterMatchMode.CONTAINS,
+  detail: FilterMatchMode.CONTAINS,
+  comment: FilterMatchMode.CONTAINS,
+  statusText: FilterMatchMode.CONTAINS,
+  username: FilterMatchMode.CONTAINS,
+  result: FilterMatchMode.IN,
+  _engineDisplay: FilterMatchMode.IN,
+  _statusLabel: FilterMatchMode.IN,
 })
 
 const statusOptions = computed(() => {
@@ -103,122 +76,25 @@ const statusOptions = computed(() => {
 })
 
 const ROW_HEIGHT = 40
-
-const isAlreadyApplied = (data) => {
-  return data.result === formResult.value
-    && (data.detail ?? '') === formDetail.value
-    && (data.comment ?? '') === formComment.value
-}
-
-const getApplyTooltip = (data) => {
-  if (!editable.value) {
-    return 'Cannot apply review while submitted or accepted'
-  }
-  if (isAlreadyApplied(data)) {
-    return 'Review is already applied'
-  }
-  return 'Apply this review'
-}
-
-const longTextPopover = ref(null)
-const showLongText = (event, label, text) => {
-  longTextPopover.value?.show(event, label, text)
-}
-
-const filters = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  ruleId: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  detail: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  comment: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  statusText: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  username: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  result: { value: null, matchMode: FilterMatchMode.IN },
-  _engineDisplay: { value: null, matchMode: FilterMatchMode.IN },
-  _statusLabel: { value: null, matchMode: FilterMatchMode.IN },
-})
-
-const route = useRoute()
-
-const resetFilters = () => {
-  filters.value.global.value = null
-  filters.value.ruleId.value = null
-  filters.value.detail.value = null
-  filters.value.comment.value = null
-  filters.value.statusText.value = null
-  filters.value.username.value = null
-  filters.value.result.value = null
-  filters.value._engineDisplay.value = null
-  filters.value._statusLabel.value = null
-}
-
-watch([
-  () => route.params.collectionId,
-  () => route.params.assetId,
-  () => route.params.benchmarkId,
-  () => route.params.revisionStr,
-], () => {
-  resetFilters()
-})
-
-const historyStats = computed(() => {
-  return calculateChecklistStats(fullReviewHistory.value) ?? {
-    total: 0,
-    results: { pass: 0, fail: 0, notapplicable: 0, other: 0 },
-    engine: { manual: 0, engine: 0, override: 0 },
-    statuses: { saved: 0, submitted: 0, accepted: 0, rejected: 0 },
-  }
-})
-
-const historyTablePt = {
-  root: { class: 'sm-scrollbar-thin', style: { backgroundColor: 'var(--color-background-dark)' } },
-  header: { style: { background: 'transparent', border: 'none', padding: '0' } },
-  table: { style: { borderCollapse: 'separate', borderSpacing: '0', background: 'var(--color-background-darkest)' } },
-  thead: {
-    style: {
-      background: 'var(--color-background-dark)',
-      position: 'sticky',
-      top: '0',
-      zIndex: '1',
-    },
-  },
-  headerCell: {
-    style: {
-      background: 'var(--color-background-dark)',
-      borderBottom: '1px solid var(--color-border-default)',
-      color: 'var(--color-text-dim)',
-      fontWeight: '700',
-      fontSize: '0.9rem',
-      textTransform: 'uppercase',
-      letterSpacing: '0.04em',
-      padding: '0.3rem 0.4rem',
-    },
-  },
-  bodyRow: {
-    style: {
-      background: 'var(--color-background-dark)',
-      transition: 'background-color 0.1s ease',
-    },
-  },
-  footer: { style: { padding: '0', border: 'none', background: 'transparent' } },
-}
 </script>
 
 <template>
-  <div class="history-wrapper">
-    <DataTable
-      v-model:filters="filters"
-      :value="processedHistory"
-      :loading="isInternalHistoryLoading"
-      data-key="touchTs"
-      scrollable
-      scroll-height="flex"
-      :virtual-scroller-options="{ itemSize: ROW_HEIGHT, showLoader: true }"
-      striped-rows
-      :resizable-columns="true"
-      column-resize-mode="fit"
-      class="history-table"
-      :pt="historyTablePt"
-    >
+  <ReviewTabTable
+    v-model:filters="filters"
+    :value="processedHistory"
+    :loading="isInternalHistoryLoading"
+    data-key="touchTs"
+    :row-height="ROW_HEIGHT"
+    :stats="historyStats"
+    :result-options="resultOptions"
+    :engine-options="engineOptions"
+    :editable="editable"
+    :is-already-applied="isAlreadyApplied"
+    :get-apply-tooltip="getApplyTooltip"
+    resizable-columns
+    @apply-review="emit('apply-review', $event)"
+  >
+    <template #lead-columns="{ showLongText }">
       <Column header="Time" field="touchTs" sortable :style="{ width: '65px' }">
         <template #body="{ data }">
           <span class="cell-text--mono" :title="formatReviewDate(data.touchTs)">{{ durationToNow(data.touchTs) }}</span>
@@ -240,100 +116,9 @@ const historyTablePt = {
           >{{ data.ruleId }}</span>
         </template>
       </Column>
+    </template>
 
-      <Column field="result" :style="{ width: '70px', textAlign: 'center' }">
-        <template #header>
-          <div class="column-header-with-filter">
-            Result
-            <ColumnFilter v-model="filters.result.value" :options="resultOptions">
-              <template #option="{ option }">
-                <ResultBadge :status="option.label" />
-              </template>
-            </ColumnFilter>
-          </div>
-        </template>
-        <template #body="{ data }">
-          <ResultBadge v-if="getResultDisplay(data.result)" :status="getResultDisplay(data.result)" />
-        </template>
-      </Column>
-
-      <Column field="resultEngine" filter-field="_engineDisplay" :style="{ width: '50px', textAlign: 'center' }">
-        <template #header>
-          <div class="column-header-with-filter">
-            <img
-              src="../../../assets/bot2.svg"
-              alt="Engine"
-              class="engine-header-icon"
-              title="Result engine"
-            >
-            <ColumnFilter v-model="filters._engineDisplay.value" :options="engineOptions" />
-          </div>
-        </template>
-        <template #body="{ data }">
-          <img
-            v-if="getEngineDisplay(data) === 'engine'"
-            src="../../../assets/bot2.svg"
-            alt="Engine"
-            class="engine-icon"
-            title="Result engine"
-          >
-          <img
-            v-else-if="getEngineDisplay(data) === 'override'"
-            src="../../../assets/override2.svg"
-            alt="Override"
-            class="engine-icon"
-            title="Overridden result"
-          >
-          <img
-            v-else-if="getEngineDisplay(data) === 'manual'"
-            src="../../../assets/user.svg"
-            alt="Manual"
-            class="engine-icon"
-            title="Manual result"
-          >
-        </template>
-      </Column>
-
-      <Column field="detail" :style="{ width: '130px' }">
-        <template #header>
-          <div class="column-header-with-filter">
-            Detail
-            <ColumnSearchFilter v-model="filters.detail.value" placeholder="Search detail..." />
-          </div>
-        </template>
-        <template #body="{ data }">
-          <span
-            v-if="data.detail"
-            class="cell-text--ellipsis"
-            title="Click to view full text"
-            @click="showLongText($event, 'Detail', data.detail)"
-          >
-            {{ data.detail }}
-          </span>
-          <span v-else class="cell-text--empty">---</span>
-        </template>
-      </Column>
-
-      <Column field="comment" :style="{ width: '130px' }">
-        <template #header>
-          <div class="column-header-with-filter">
-            Comment
-            <ColumnSearchFilter v-model="filters.comment.value" placeholder="Search comment..." />
-          </div>
-        </template>
-        <template #body="{ data }">
-          <span
-            v-if="data.comment"
-            class="cell-text--ellipsis"
-            title="Click to view full text"
-            @click="showLongText($event, 'Comment', data.comment)"
-          >
-            {{ data.comment }}
-          </span>
-          <span v-else class="cell-text--empty">---</span>
-        </template>
-      </Column>
-
+    <template #mid-columns="{ showLongText }">
       <Column field="statusText" :style="{ width: '100px' }">
         <template #header>
           <div class="column-header-with-filter">
@@ -369,114 +154,17 @@ const historyTablePt = {
           <StatusBadge v-if="data.status?.label" :status="data.status.label" />
         </template>
       </Column>
+    </template>
 
-      <Column field="username" :style="{ width: '100px' }">
-        <template #header>
-          <div class="column-header-with-filter">
-            User
-            <ColumnSearchFilter v-model="filters.username.value" placeholder="Search user..." />
-          </div>
-        </template>
-        <template #body="{ data }">
-          <span
-            v-if="data.username"
-            class="cell-text--ellipsis"
-            title="Click to view full username"
-            @click="showLongText($event, 'User', data.username)"
-          >{{ data.username }}</span>
-          <span v-else class="cell-text--empty">---</span>
-        </template>
-      </Column>
-
-      <Column header="Apply" :style="{ width: '40px', textAlign: 'center' }">
-        <template #body="{ data }">
-          <button
-            class="apply-review-icon-btn"
-            :disabled="!editable || isAlreadyApplied(data)"
-            :title="getApplyTooltip(data)"
-            @click="emit('apply-review', data)"
-          >
-            <i class="pi pi-copy" />
-          </button>
-        </template>
-      </Column>
-
-      <template #empty>
-        <div class="history-table__empty">
-          No review history found for this rule.
-        </div>
-      </template>
-
-      <template #footer>
-        <StatusFooter
-          :show-refresh="false"
-          :total-count="historyStats.total"
-        >
-          <template #right-extra>
-            <ResultBadge status="O" :count="historyStats.results.fail" />
-            <ResultBadge status="NF" :count="historyStats.results.pass" />
-            <ResultBadge status="NA" :count="historyStats.results.notapplicable" />
-            <ResultBadge status="NR+" :count="historyStats.results.other" />
-            <span class="footer-divider">|</span>
-            <ManualBadge :count="historyStats.engine.manual" />
-            <EngineBadge :count="historyStats.engine.engine" />
-            <OverrideBadge :count="historyStats.engine.override" />
-            <span class="footer-divider">|</span>
-            <StatusBadge status="saved" :count="historyStats.statuses.saved" />
-            <StatusBadge status="submitted" :count="historyStats.statuses.submitted" />
-            <StatusBadge status="accepted" :count="historyStats.statuses.accepted" />
-            <StatusBadge status="rejected" :count="historyStats.statuses.rejected" />
-          </template>
-        </StatusFooter>
-      </template>
-    </DataTable>
-
-    <LongTextPopover ref="longTextPopover" />
-  </div>
+    <template #empty>
+      <div class="history-table__empty">
+        No review history found for this rule.
+      </div>
+    </template>
+  </ReviewTabTable>
 </template>
 
 <style scoped>
-.history-wrapper {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.history-table {
-  flex: 1;
-  min-height: 0;
-  border-top: none;
-}
-
-/* Allow table to expand and scroll horizontally if needed. */
-:deep(.p-datatable-table) {
-  table-layout: fixed;
-}
-
-:deep(.p-datatable-wrapper),
-:deep(.p-virtualscroller) {
-  overflow-x: auto !important;
-}
-
-:deep(.p-datatable-tbody > tr > td) {
-  padding: 0.4rem 0.4rem;
-  vertical-align: middle;
-  font-size: 1.1rem;
-  border-bottom: 1px solid var(--color-border-light);
-  color: var(--color-text-primary);
-  overflow: hidden;
-}
-
-:deep(.p-datatable-thead > tr > th) {
-  border-right: 1px solid var(--color-border-light) !important;
-}
-
-:deep(.p-datatable-thead > tr > th:last-child) {
-  border-right: none !important;
-}
-
 .column-header-with-filter {
   display: flex;
   align-items: center;
@@ -511,56 +199,6 @@ const historyTablePt = {
   opacity: 0.5;
   font-style: italic;
   font-size: 0.9rem;
-}
-
-.engine-header-icon {
-  width: 14px;
-  height: 14px;
-  opacity: 0.7;
-}
-
-.engine-icon {
-  width: 16px;
-  height: 16px;
-  opacity: 0.9;
-}
-
-.apply-review-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background-color: var(--color-primary-highlight);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease;
-}
-
-.apply-review-icon-btn:hover:not(:disabled) {
-  background-color: color-mix(in srgb, var(--color-primary-highlight) 80%, black);
-}
-
-.apply-review-icon-btn:active:not(:disabled) {
-  transform: scale(0.95);
-}
-
-.apply-review-icon-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  filter: grayscale(1);
-}
-
-.apply-review-icon-btn i {
-  font-size: 0.9rem;
-}
-
-.footer-divider {
-  color: var(--color-border-default);
-  margin: 0 0.5rem;
-  opacity: 0.5;
 }
 
 .history-table__empty {
