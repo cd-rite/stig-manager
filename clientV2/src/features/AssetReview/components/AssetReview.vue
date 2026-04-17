@@ -6,7 +6,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { getHttpStatus } from '../../../shared/api/apiClient.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { useCurrentUser } from '../../../shared/composables/useCurrentUser.js'
-import { useDebouncedRef } from '../../../shared/composables/useDebouncedRef.js'
 import { defaultFieldSettings } from '../../../shared/lib/reviewFormUtils.js'
 import { useRecentViews } from '../../NavRail/composables/useRecentViews.js'
 import {
@@ -205,8 +204,6 @@ function onStatusAction({ ruleId, actionType }) {
 function onGridRefresh() {
   loadChecklist()
 }
-
-const searchFilter = useDebouncedRef('', 220)
 </script>
 
 <template>
@@ -236,8 +233,6 @@ const searchFilter = useDebouncedRef('', 220)
       >
         <SplitterPanel :size="75" :min-size="40">
           <ChecklistGrid
-            :search-filter="searchFilter"
-            @update:search-filter="searchFilter = $event"
             @row-save="onRowSave"
             @status-action="onStatusAction"
             @refresh="onGridRefresh"

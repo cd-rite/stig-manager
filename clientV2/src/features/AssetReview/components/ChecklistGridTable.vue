@@ -41,14 +41,6 @@ const {
 
 const { filters, dsFilterFields, searchFilter, updateFilteredData } = useSearch()
 
-const processedGridData = computed(() => {
-  return props.gridData.map(item => ({
-    ...item,
-    _statusText: item.status?.label ?? item.status,
-    _engineDisplay: getEngineDisplay(item),
-  }))
-})
-
 const catOptions = computed(() => {
   const severities = new Set(props.gridData.map(item => item.severity).filter(Boolean))
   return Array.from(severities).map(val => ({
@@ -141,7 +133,7 @@ const dataTablePt = {
 
 <template>
   <DataTable
-    v-model:filters="filters" :selection="selectedRow" :global-filter-fields="dsFilterFields" :value="processedGridData"
+    v-model:filters="filters" :selection="selectedRow" :global-filter-fields="dsFilterFields" :value="gridData"
     :loading="isLoading" data-key="ruleId" selection-mode="single" scrollable scroll-height="flex"
     :virtual-scroller-options="{ itemSize }" resizable-columns striped-rows :sort-field="defaultSortField"
     :sort-order="1" class="checklist-grid__table" :pt="dataTablePt" @update:selection="(val) => $emit('update:selectedRow', val)"

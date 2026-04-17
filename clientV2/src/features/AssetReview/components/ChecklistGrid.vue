@@ -14,14 +14,7 @@ import { useSearch } from '../composables/useSearch.js'
 import ChecklistGridHeader from './ChecklistGridHeader.vue'
 import ChecklistGridTable from './ChecklistGridTable.vue'
 
-const props = defineProps({
-  searchFilter: {
-    type: String,
-    default: '',
-  },
-})
-
-const emit = defineEmits(['update:searchFilter', 'row-save', 'status-action', 'refresh'])
+const emit = defineEmits(['row-save', 'status-action', 'refresh'])
 
 const {
   gridData,
@@ -48,7 +41,7 @@ const editingRow = ref(null)
 const route = useRoute()
 
 const { lineClamp, itemSize } = useChecklistDisplayMode()
-const { stats, isFiltered, currentFilteredData, searchFilter: sharedSearchFilter, resetFilters } = useSearch(gridData)
+const { stats, isFiltered, currentFilteredData, resetFilters } = useSearch(gridData)
 
 onMounted(() => {
   resetFilters()
@@ -61,18 +54,6 @@ watch([
   () => route.params.revisionStr,
 ], () => {
   resetFilters()
-})
-
-watch(() => props.searchFilter, (val) => {
-  if (val !== sharedSearchFilter.value) {
-    sharedSearchFilter.value = val
-  }
-}, { immediate: true })
-
-watch(sharedSearchFilter, (val) => {
-  if (val !== props.searchFilter) {
-    emit('update:searchFilter', val)
-  }
 })
 
 function openRowEditor(event, rowData) {

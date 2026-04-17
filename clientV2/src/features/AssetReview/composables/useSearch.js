@@ -1,8 +1,9 @@
 import { FilterMatchMode } from '@primevue/core/api'
 import { computed, ref, watch } from 'vue'
+import { useDebouncedRef } from '../../../shared/composables/useDebouncedRef.js'
 import { calculateChecklistStats } from '../lib/checklistUtils.js'
 
-const searchFilter = ref('')
+const searchFilter = useDebouncedRef('', 220)
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -59,11 +60,11 @@ export function useSearch(initialData = ref([])) {
   }
 
   function clearSearch() {
-    searchFilter.value = ''
+    searchFilter.immediate('')
   }
 
   function resetFilters() {
-    searchFilter.value = ''
+    searchFilter.immediate('')
     filters.value.global.value = null
     filters.value.severity.value = null
     filters.value.result.value = null
