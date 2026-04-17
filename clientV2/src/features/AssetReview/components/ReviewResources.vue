@@ -4,43 +4,15 @@ import TabList from 'primevue/tablist'
 import TabPanel from 'primevue/tabpanel'
 import TabPanels from 'primevue/tabpanels'
 import Tabs from 'primevue/tabs'
-import { inject, ref } from 'vue'
+import { ref } from 'vue'
 
 import ReviewAttachmentsTab from './ReviewAttachmentsTab.vue'
 import ReviewHistoryTab from './ReviewHistoryTab.vue'
 import ReviewOtherAssetsTab from './ReviewOtherAssetsTab.vue'
 import ReviewStatusTextTab from './ReviewStatusTextTab.vue'
 
-defineProps({
-  ruleId: {
-    type: String,
-    default: null,
-  },
-  editable: {
-    type: Boolean,
-    default: false,
-  },
-  formResult: {
-    type: String,
-    default: '',
-  },
-  formDetail: {
-    type: String,
-    default: '',
-  },
-  formComment: {
-    type: String,
-    default: '',
-  },
-})
-
 const emit = defineEmits(['apply-review'])
 
-const {
-  currentReview,
-  collectionId,
-  assetId,
-} = inject('assetReviewContext')
 
 const activeTab = ref('history')
 
@@ -140,31 +112,17 @@ const tabPt = {
         <TabPanel value="history" :pt="tabPanelPt">
           <ReviewHistoryTab
             :active="activeTab === 'history'"
-            :rule-id="ruleId"
-            :asset-id="assetId"
-            :collection-id="collectionId"
-            :editable="editable"
-            :form-result="formResult"
-            :form-detail="formDetail"
-            :form-comment="formComment"
             @apply-review="emit('apply-review', $event)"
           />
         </TabPanel>
 
         <TabPanel value="statusText" :pt="tabPanelPt">
-          <ReviewStatusTextTab :current-review="currentReview" />
+          <ReviewStatusTextTab />
         </TabPanel>
 
         <TabPanel value="otherAssets" :pt="tabPanelPt">
           <ReviewOtherAssetsTab
             v-if="activeTab === 'otherAssets'"
-            :rule-id="ruleId"
-            :collection-id="collectionId"
-            :asset-id="currentReview?.assetId"
-            :editable="editable"
-            :form-result="formResult"
-            :form-detail="formDetail"
-            :form-comment="formComment"
             @apply-review="emit('apply-review', $event)"
           />
         </TabPanel>

@@ -12,7 +12,8 @@ const EMPTY_STATS = {
 
 export function useReviewTabTable(dataRef, filterSchema) {
   const { accessMode, currentReview } = inject('assetReviewContext')
-  const { formResult, formDetail, formComment } = inject('reviewEditForm')
+
+  const reviewEditForm = inject('reviewEditForm', null)
 
   const editable = computed(() =>
     accessMode.value === 'rw' && (
@@ -22,10 +23,12 @@ export function useReviewTabTable(dataRef, filterSchema) {
     ),
   )
 
-  const isAlreadyApplied = data =>
-    data.result === formResult.value
-    && (data.detail ?? '') === formDetail.value
-    && (data.comment ?? '') === formComment.value
+  const isAlreadyApplied = reviewEditForm
+    ? data =>
+      data.result === reviewEditForm.formResult.value
+      && (data.detail ?? '') === reviewEditForm.formDetail.value
+      && (data.comment ?? '') === reviewEditForm.formComment.value
+    : () => false
 
   const getApplyTooltip = (data) => {
     if (!editable.value) {
