@@ -22,7 +22,7 @@ import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { durationToNow } from '../../../shared/lib.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchReview } from '../api/assetReviewApi.js'
-import { getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
+import { calculateChecklistStats, getEngineDisplay, getResultDisplay } from '../lib/checklistUtils.js'
 
 const props = defineProps({
   active: {
@@ -161,55 +161,12 @@ watch([
 })
 
 const historyStats = computed(() => {
-  const reviews = fullReviewHistory.value || []
-  const stats = {
-    total: reviews.length,
-    results: { fail: 0, pass: 0, notapplicable: 0, other: 0 },
+  return calculateChecklistStats(fullReviewHistory.value) ?? {
+    total: 0,
+    results: { pass: 0, fail: 0, notapplicable: 0, other: 0 },
     engine: { manual: 0, engine: 0, override: 0 },
     statuses: { saved: 0, submitted: 0, accepted: 0, rejected: 0 },
   }
-
-  for (const r of reviews) {
-    if (r.result === 'fail') {
-      stats.results.fail++
-    }
-    else if (r.result === 'pass') {
-      stats.results.pass++
-    }
-    else if (r.result === 'notapplicable') {
-      stats.results.notapplicable++
-    }
-    else {
-      stats.results.other++
-    }
-
-    const engineDisplay = getEngineDisplay(r)
-    if (engineDisplay === 'engine') {
-      stats.engine.engine++
-    }
-    else if (engineDisplay === 'override') {
-      stats.engine.override++
-    }
-    else {
-      stats.engine.manual++
-    }
-
-    const statusLabel = r.status?.label
-    if (statusLabel === 'saved') {
-      stats.statuses.saved++
-    }
-    else if (statusLabel === 'submitted') {
-      stats.statuses.submitted++
-    }
-    else if (statusLabel === 'accepted') {
-      stats.statuses.accepted++
-    }
-    else if (statusLabel === 'rejected') {
-      stats.statuses.rejected++
-    }
-  }
-
-  return stats
 })
 
 const historyTablePt = {
