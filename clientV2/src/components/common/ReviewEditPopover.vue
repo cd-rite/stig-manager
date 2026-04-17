@@ -11,7 +11,7 @@ import StatusBadge from './StatusBadge.vue'
 import StatusButton from './StatusButton.vue'
 
 
-const emit = defineEmits(['save', 'status-action', 'close', 'clear-save-error'])
+const emit = defineEmits(['save', 'status-action', 'close'])
 
 // Inject feature-level context
 const {

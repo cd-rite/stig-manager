@@ -207,7 +207,6 @@ function handleFooterAction(actionKey) {
       @save="(payload) => $emit('row-save', payload)"
       @status-action="(payload) => $emit('status-action', payload)"
       @close="editingRow = null"
-      @clear-save-error="clearSaveError"
     />
 
     <div
