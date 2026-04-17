@@ -13,6 +13,7 @@ import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.
 import { useSearch } from '../composables/useSearch.js'
 import ChecklistGridHeader from './ChecklistGridHeader.vue'
 import ChecklistGridTable from './ChecklistGridTable.vue'
+import ReviewResources from './ReviewResources.vue'
 
 const emit = defineEmits(['row-save', 'status-action', 'refresh'])
 
@@ -23,6 +24,11 @@ const {
   asset,
   revisionInfo,
   accessMode,
+  fieldSettings,
+  canAccept,
+  isSaving,
+  saveError,
+  currentReview,
   selectRule,
   clearSaveError,
   ruleLookupMap,
@@ -204,10 +210,22 @@ function handleFooterAction(actionKey) {
 
     <ReviewEditPopover
       ref="reviewEditPopover"
+      :field-settings="fieldSettings"
+      :access-mode="accessMode"
+      :can-accept="canAccept"
+      :is-saving="isSaving"
+      :save-error="saveError"
+      :current-review="currentReview"
+      :selected-rule-id="selectedRuleId"
       @save="(payload) => $emit('row-save', payload)"
       @status-action="(payload) => $emit('status-action', payload)"
       @close="editingRow = null"
-    />
+      @clear-save-error="clearSaveError"
+    >
+      <template #resources="{ applyReviewData }">
+        <ReviewResources @apply-review="applyReviewData" />
+      </template>
+    </ReviewEditPopover>
 
     <div
       ref="popoverAnchor"

@@ -1,8 +1,7 @@
 <script setup>
 import Popover from 'primevue/popover'
 import Textarea from 'primevue/textarea'
-import { inject, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
-import ReviewResources from '../../features/AssetReview/components/ReviewResources.vue'
+import { nextTick, onBeforeUnmount, provide, ref, toRef, watch } from 'vue'
 import { useReviewEditForm } from '../../shared/composables/useReviewEditForm.js'
 import { formatReviewDate, resultOptions } from '../../shared/lib/reviewFormUtils.js'
 import ResultBadge from './ResultBadge.vue'
@@ -11,19 +10,23 @@ import StatusBadge from './StatusBadge.vue'
 import StatusButton from './StatusButton.vue'
 
 
-const emit = defineEmits(['save', 'status-action', 'close'])
+const emit = defineEmits(['save', 'status-action', 'close', 'clear-save-error'])
 
-// Inject feature-level context
-const {
-  fieldSettings,
-  accessMode,
-  canAccept,
-  isSaving,
-  saveError,
-  clearSaveError,
-  currentReview,
-  selectedRuleId,
-} = inject('assetReviewContext')
+const props = defineProps({
+  fieldSettings: { type: Object, required: true },
+  accessMode: { type: String, required: true },
+  canAccept: { type: Boolean, default: false },
+  isSaving: { type: Boolean, default: false },
+  saveError: { type: String, default: null },
+  currentReview: { type: Object, default: null },
+  selectedRuleId: { type: String, default: null },
+})
+
+defineSlots()
+
+function clearSaveError() {
+  emit('clear-save-error')
+}
 
 const popover = ref()
 const lastAnchorEvent = ref(null)
@@ -33,10 +36,10 @@ const showResources = ref(false)
 
 // Form state and business logic from composable
 const reviewEditForm = useReviewEditForm({
-  rowData: currentReview,
-  fieldSettings,
-  accessMode,
-  canAccept,
+  rowData: toRef(props, 'currentReview'),
+  fieldSettings: toRef(props, 'fieldSettings'),
+  accessMode: toRef(props, 'accessMode'),
+  canAccept: toRef(props, 'canAccept'),
 })
 
 const {
@@ -61,7 +64,7 @@ const {
 provide('reviewEditForm', reviewEditForm)
 
 function onButtonClick(actionType) {
-  const ruleId = selectedRuleId.value
+  const ruleId = props.selectedRuleId
   if (!actionType || !ruleId) {
     return
   }
@@ -454,9 +457,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
 
       <Transition name="expand" @after-enter="alignPopover" @after-leave="alignPopover">
         <div v-if="showResources" class="review-edit-popover__resources-container">
-          <ReviewResources
-            @apply-review="applyReviewData"
-          />
+          <slot name="resources" :apply-review-data="applyReviewData" />
         </div>
       </Transition>
     </div>
