@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue'
-import { escapeHtml } from '../lib/htmlUtils.js'
+import { REVIEW_STATUS } from '../lib/reviewConstants.js'
 import { getReviewButtonStates } from '../lib/reviewButtonStates.js'
-import { formatReviewDate, isFieldEnabled, isFieldRequired } from '../lib/reviewFormUtils.js'
+import { isFieldEnabled, isFieldRequired } from '../lib/reviewFormUtils.js'
 
 /**
  * Manages form state, dirty tracking, submittability, and button states
@@ -34,22 +34,20 @@ export function useReviewEditForm({ rowData, fieldSettings, accessMode, canAccep
     if (!s) {
       return ''
     }
-    return s?.label ?? s
+    return s?.label
   })
 
   const editable = computed(() => {
     const s = statusLabel.value
-    return accessMode.value === 'rw' && (s === '' || s === 'saved' || s === 'rejected')
+    return accessMode.value === 'rw' && (s === '' || s === REVIEW_STATUS.SAVED || s === REVIEW_STATUS.REJECTED)
   })
 
   // --- Dirty tracking ---
   const isDirty = computed(() => {
-    if (!rowData.value) {
-      return false
-    }
-    return formResult.value !== (rowData.value.result ?? '')
-      || formDetail.value !== (rowData.value.detail ?? '')
-      || formComment.value !== (rowData.value.comment ?? '')
+    const row = rowData.value
+    return formResult.value !== (row?.result ?? '')
+      || formDetail.value !== (row?.detail ?? '')
+      || formComment.value !== (row?.comment ?? '')
   })
 
   const showResultEmphasis = computed(() => editable.value && !formResult.value)
@@ -88,57 +86,20 @@ export function useReviewEditForm({ rowData, fieldSettings, accessMode, canAccep
 
   function isActionActive(actionType) {
     const s = statusLabel.value
-    if (!s || s === '' || s === 'rejected') {
+    if (!s || s === '' || s === REVIEW_STATUS.REJECTED) {
       return false
     }
-    if (s === 'saved' && (actionType === 'save' || actionType === 'save and unsubmit')) {
+    if (s === REVIEW_STATUS.SAVED && (actionType === 'save' || actionType === 'save and unsubmit')) {
       return true
     }
-    if (s === 'submitted' && (actionType === 'submit' || actionType === 'save and submit')) {
+    if (s === REVIEW_STATUS.SUBMITTED && (actionType === 'submit' || actionType === 'save and submit')) {
       return true
     }
-    if (s === 'accepted' && actionType === 'accept') {
+    if (s === REVIEW_STATUS.ACCEPTED && actionType === 'accept') {
       return true
     }
     return false
   }
-
-  // --- Engine/Override tooltip HTML ---
-  const engineTooltipHtml = computed(() => {
-    const re = rowData.value?.resultEngine
-    if (!re) {
-      return ''
-    }
-    const lines = []
-    if (re.version) {
-      lines.push(`<b>Version</b><br>${escapeHtml(re.version)}`)
-    }
-    if (re.time) {
-      lines.push(`<b>Time</b><br>${escapeHtml(formatReviewDate(re.time))}`)
-    }
-    if (re.checkContent?.location) {
-      lines.push(`<b>Check content</b><br>${escapeHtml(re.checkContent.location)}`)
-    }
-    return lines.join('<br>')
-  })
-
-  const overrideTooltipHtml = computed(() => {
-    const overrides = rowData.value?.resultEngine?.overrides
-    if (!overrides?.length) {
-      return ''
-    }
-    return overrides.map((o) => {
-      const lines = []
-      if (o.authority) {
-        lines.push(`<b>Authority</b><br>${escapeHtml(o.authority)}`)
-      }
-      if (o.remark) {
-        lines.push(`<b>Remark</b><br>${escapeHtml(o.remark)}`)
-      }
-      lines.push(`<b>Old result</b>: ${escapeHtml(o.oldResult || '\u2014')} \u2192 <b>New result</b>: ${escapeHtml(o.newResult || '\u2014')}`)
-      return lines.join('<br>')
-    }).join('<hr style="margin: 0.3rem 0; opacity: 0.3">')
-  })
 
   // --- Actions ---
   function selectResult(value) {
@@ -146,6 +107,15 @@ export function useReviewEditForm({ rowData, fieldSettings, accessMode, canAccep
       return
     }
     formResult.value = value
+  }
+
+  function applyReviewData(data) {
+    if (!editable.value) {
+      return
+    }
+    formResult.value = data.result ?? ''
+    formDetail.value = data.detail ?? ''
+    formComment.value = data.comment ?? ''
   }
 
   function discardChanges() {
@@ -171,12 +141,9 @@ export function useReviewEditForm({ rowData, fieldSettings, accessMode, canAccep
     buttonStates,
     isActionActive,
 
-    // Tooltips
-    engineTooltipHtml,
-    overrideTooltipHtml,
-
     // Actions
     selectResult,
+    applyReviewData,
     discardChanges,
   }
 }
