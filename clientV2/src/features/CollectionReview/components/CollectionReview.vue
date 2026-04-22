@@ -126,7 +126,7 @@ function onRetryRule() {
 }
 
 const showRuleLoading = computed(() => isRuleLoading.value && !ruleContent.value)
-const showReviewsLoading = computed(() => isReviewsLoading.value && !reviewsData.value?.length)
+const showReviewsLoading = computed(() => isReviewsLoading.value)
 
 const editingAssetId = ref(null)
 const accessMode = ref('rw')

@@ -3,9 +3,12 @@ import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import Dropdown from 'primevue/dropdown'
 import Textarea from 'primevue/textarea'
+import Tooltip from 'primevue/tooltip'
 import { computed, ref, watch } from 'vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import { resultOptions } from '../../../shared/lib/reviewFormUtils.js'
+
+const vTooltip = Tooltip
 
 const props = defineProps({
   visible: {
@@ -67,6 +70,39 @@ const isMeaningfulChange = computed(() => {
   const commentChanged = (comment.value || '').trim().length > 0
   return resultChanged || detailChanged || commentChanged
 })
+
+const tooltipOpts = { escape: false, autoHide: false, hideDelay: 300, pt: { root: { style: { maxWidth: '40rem' } } } }
+
+const resultTooltipHtml = '<b>Result</b><br>The result of an evaluation of a STIG ruleId.<br><br><b>Export Mappings</b><br><b>CKL:</b> &lt;CHECKLIST&gt;&lt;STIGS&gt;&lt;iSTIG&gt;&lt;VULN&gt;&lt;STATUS&gt;<br><b>XCCDF:</b> &lt;TestResult&gt;&lt;rule-result&gt;&lt;result&gt;'
+
+function getFieldTooltipHtml(title, desc, fs, ckl, xccdf) {
+  const enabledText = fs?.enabled === 'findings' ? 'for findings only.' : 'for any result.'
+  let requiredText = 'optional.'
+  if (fs?.required === 'always') {
+    requiredText = 'required to submit a review.'
+  }
+  else if (fs?.required === 'findings') {
+    requiredText = 'required to submit a finding.'
+  }
+
+  return `<b>${title}</b><br>${desc}<br><br><b>Collection Settings</b><br>This field is enabled ${enabledText}<br>Content in this field is ${requiredText}<br><br><b>Export Mappings</b><br><b>CKL:</b> ${ckl}<br><b>XCCDF:</b> ${xccdf}`
+}
+
+const detailTooltipHtml = computed(() => getFieldTooltipHtml(
+  'Detail',
+  'A description of how the evaluator or evaluation tool determined the result.',
+  props.fieldSettings?.detail,
+  '&lt;CHECKLIST&gt;&lt;STIGS&gt;&lt;iSTIG&gt;&lt;VULN&gt;&lt;FINDING_DETAILS&gt;',
+  '&lt;TestResult&gt;&lt;rule-result&gt;&lt;check&gt;&lt;check-content&gt;&lt;sm:detail&gt;',
+))
+
+const commentTooltipHtml = computed(() => getFieldTooltipHtml(
+  'Comment',
+  'Additional comment by the evaluator or evaluation tool.',
+  props.fieldSettings?.comment,
+  '&lt;CHECKLIST&gt;&lt;STIGS&gt;&lt;iSTIG&gt;&lt;VULN&gt;&lt;COMMENTS&gt;',
+  '&lt;TestResult&gt;&lt;rule-result&gt;&lt;check&gt;&lt;check-content&gt;&lt;sm:comment&gt;',
+))
 
 const dialogPt = {
   root: {
@@ -172,7 +208,11 @@ function onCancel() {
   >
     <div class="batch-modal__body">
       <div class="batch-modal__field">
-        <label class="batch-modal__label">Result <span class="batch-modal__muted">(required to apply changes)</span></label>
+        <label class="batch-modal__label">
+          Result
+          <i v-tooltip="{ value: resultTooltipHtml, ...tooltipOpts }" class="pi pi-question-circle batch-modal__help-icon" />
+          <span class="batch-modal__muted">(required to apply changes)</span>
+        </label>
         <Dropdown
           v-model="result"
           :options="resultOptionsWithUnchanged"
@@ -202,6 +242,7 @@ function onCancel() {
       <div class="batch-modal__field">
         <label class="batch-modal__label">
           Detail
+          <i v-tooltip="{ value: detailTooltipHtml, ...tooltipOpts }" class="pi pi-question-circle batch-modal__help-icon" />
           <span v-if="!detailEnabled" class="batch-modal__muted">(disabled for selected result)</span>
         </label>
         <Textarea
@@ -218,6 +259,7 @@ function onCancel() {
       <div class="batch-modal__field">
         <label class="batch-modal__label">
           Comment
+          <i v-tooltip="{ value: commentTooltipHtml, ...tooltipOpts }" class="pi pi-question-circle batch-modal__help-icon" />
           <span v-if="!commentEnabled" class="batch-modal__muted">(disabled for selected result)</span>
         </label>
         <Textarea
@@ -264,9 +306,18 @@ function onCancel() {
 }
 
 .batch-modal__label {
+  display: flex;
+  align-items: center;
   font-weight: 600;
   font-size: 1rem;
   color: var(--color-text-primary);
+}
+
+.batch-modal__help-icon {
+  font-size: 0.9rem;
+  color: var(--color-text-dim);
+  margin-left: 0.4rem;
+  cursor: pointer;
 }
 
 .batch-modal__muted {

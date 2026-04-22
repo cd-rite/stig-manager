@@ -1,6 +1,6 @@
 <script setup>
 import TieredMenu from 'primevue/tieredmenu'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import lineHeightDown from '../../../assets/line-height-down.svg'
 import lineHeightUp from '../../../assets/line-height-up.svg'
@@ -45,9 +45,24 @@ onMounted(() => {
 
 const revisionInfo = computed(() => getRevisionInfo(revisionStr.value, stigRevisions.value))
 
-const localSearch = computed({
-  get: () => props.searchFilter,
-  set: val => emit('update:searchFilter', val),
+const localSearch = ref(props.searchFilter)
+let debounceTimer = null
+
+watch(() => props.searchFilter, (newVal) => {
+  if (newVal !== localSearch.value) {
+    localSearch.value = newVal
+  }
+})
+
+watch(localSearch, (newVal) => {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    emit('update:searchFilter', newVal)
+  }, 250)
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(debounceTimer)
 })
 
 const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('collection-checklist', 1, 12, 24)

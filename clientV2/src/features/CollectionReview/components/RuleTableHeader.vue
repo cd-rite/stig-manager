@@ -149,6 +149,7 @@ const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('coll
 .rule-table__action-controls {
   display: flex;
   align-items: center;
+  gap: 0.4rem;
 }
 
 .rule-table__title-row {
