@@ -1,12 +1,14 @@
 <script setup>
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
-import { computed, provide, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import RuleInfo from '../../../components/common/RuleInfo.vue'
 import { getHttpStatus } from '../../../shared/api/apiClient.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { useCurrentUser } from '../../../shared/composables/useCurrentUser.js'
 import { useDebouncedRef } from '../../../shared/composables/useDebouncedRef.js'
+import { getRevisionInfo } from '../../../shared/lib/checklistUtils.js'
 import { defaultFieldSettings } from '../../../shared/lib/reviewFormUtils.js'
 import { useRecentViews } from '../../NavRail/composables/useRecentViews.js'
 import {
@@ -18,8 +20,6 @@ import { useChecklistData } from '../composables/useChecklistData.js'
 import { useReviewActions } from '../composables/useReviewActions.js'
 import { useRuleDetail } from '../composables/useRuleDetail.js'
 import ChecklistGrid from './ChecklistGrid.vue'
-import RuleInfo from '../../../components/common/RuleInfo.vue'
-import { getRevisionInfo } from '../../../shared/lib/checklistUtils.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -74,7 +74,6 @@ const fieldSettings = computed(() => collection.value?.settings?.fields ?? defau
 const statusSettings = computed(() => collection.value?.settings?.status ?? {
   canAccept: false,
   minAcceptGrant: 4,
-  resetCriteria: 'result',
 })
 
 const roleId = computed(() => getCollectionRoleId(collectionId.value))
@@ -119,28 +118,7 @@ const {
   saveStatusAction,
 } = useReviewActions({ collectionId, assetId }, { gridData, upsertReview, selectedRuleId, currentReview })
 
-provide('assetReviewContext', {
-  collectionId,
-  assetId,
-  asset,
-  accessMode,
-  checklistData,
-  gridData,
-  ruleLookupMap,
-  isChecklistLoading,
-  checklistError,
-  fieldSettings,
-  statusSettings,
-  canAccept,
-  isSaving,
-  saveError,
-  currentReview,
-  selectedRuleId,
-  revisionInfo,
-  selectRule,
-  loadChecklist,
-  clearSaveError,
-})
+// No more provide. Everything passed via props.
 
 watch([benchmarkId, revisionStr], () => {
   clearSelectedRule()
@@ -217,6 +195,22 @@ const searchFilter = useDebouncedRef('', 220)
         <SplitterPanel :size="75" :min-size="40">
           <ChecklistGrid
             :search-filter="searchFilter"
+            :grid-data="gridData"
+            :is-checklist-loading="isChecklistLoading"
+            :selected-rule-id="selectedRuleId"
+            :asset="asset"
+            :revision-info="revisionInfo"
+            :access-mode="accessMode"
+            :select-rule="selectRule"
+            :clear-save-error="clearSaveError"
+            :rule-lookup-map="ruleLookupMap"
+            :field-settings="fieldSettings"
+            :can-accept="canAccept"
+            :is-saving="isSaving"
+            :save-error="saveError"
+            :current-review="currentReview"
+            :collection-id="collectionId"
+            :asset-id="assetId"
             @update:search-filter="searchFilter = $event"
             @row-save="onRowSave"
             @status-action="onStatusAction"

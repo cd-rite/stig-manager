@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, onMounted, ref, watch } from 'vue'
+import { computed, inject, onMounted, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import ReviewEditPopover from '../../../components/common/ReviewEditPopover.vue'
@@ -12,9 +12,75 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  gridData: {
+    type: Array,
+    default: () => [],
+  },
+  isChecklistLoading: {
+    type: Boolean,
+    default: false,
+  },
+  selectedRuleId: {
+    type: String,
+    default: null,
+  },
+  asset: {
+    type: Object,
+    default: null,
+  },
+  revisionInfo: {
+    type: Object,
+    default: null,
+  },
+  accessMode: {
+    type: String,
+    default: 'r',
+  },
+  selectRule: {
+    type: Function,
+    required: true,
+  },
+  clearSaveError: {
+    type: Function,
+    required: true,
+  },
+  ruleLookupMap: {
+    type: Object,
+    default: () => new Map(),
+  },
+  fieldSettings: {
+    type: Object,
+    default: null,
+  },
+  canAccept: {
+    type: Boolean,
+    default: false,
+  },
+  isSaving: {
+    type: Boolean,
+    default: false,
+  },
+  saveError: {
+    type: String,
+    default: null,
+  },
+  currentReview: {
+    type: Object,
+    default: null,
+  },
+  collectionId: {
+    type: String,
+    default: null,
+  },
+  assetId: {
+    type: [String, Number],
+    default: null,
+  },
 })
 
 const emit = defineEmits(['update:searchFilter', 'row-save', 'status-action', 'refresh'])
+
+const { selectRule, clearSaveError } = props
 
 const {
   gridData,
@@ -23,10 +89,15 @@ const {
   asset,
   revisionInfo,
   accessMode,
-  selectRule,
-  clearSaveError,
   ruleLookupMap,
-} = inject('assetReviewContext')
+  fieldSettings,
+  canAccept,
+  isSaving,
+  saveError,
+  currentReview,
+  collectionId,
+  assetId,
+} = toRefs(props)
 
 const selectedRow = computed(() => {
   if (!selectedRuleId.value || !gridData.value) {
@@ -179,10 +250,19 @@ function onRowClick(event) {
 
     <ReviewEditPopover
       ref="reviewEditPopover"
+      :current-review="currentReview"
+      :selected-rule-id="selectedRuleId"
+      :collection-id="collectionId"
+      :asset-id="assetId"
+      :field-settings="fieldSettings"
+      :access-mode="accessMode"
+      :can-accept="canAccept"
+      :is-saving="isSaving"
+      :save-error="saveError"
+      :clear-save-error="clearSaveError"
       @save="(payload) => $emit('row-save', payload)"
       @status-action="(payload) => $emit('status-action', payload)"
       @close="editingRow = null"
-      @clear-save-error="clearSaveError"
     />
 
     <div

@@ -1,6 +1,6 @@
 <script setup>
-import CatBadge from './CatBadge.vue'
 import { severityMap } from '../../shared/lib/checklistUtils.js'
+import CatBadge from './CatBadge.vue'
 
 defineProps({
   ruleContent: {

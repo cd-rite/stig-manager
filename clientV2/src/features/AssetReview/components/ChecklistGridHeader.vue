@@ -1,6 +1,6 @@
 <script setup>
 import TieredMenu from 'primevue/tieredmenu'
-import { computed, inject, ref } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 
 import lineHeightDown from '../../../assets/line-height-down.svg'
 import lineHeightUp from '../../../assets/line-height-up.svg'
@@ -8,11 +8,26 @@ import shieldGreenCheck from '../../../assets/shield-green-check.svg'
 import LabelsRow from '../../../components/columns/LabelsRow.vue'
 import ColumnToggle from '../../../components/common/ColumnToggle.vue'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
+const props = defineProps({
+  asset: {
+    type: Object,
+    default: null,
+  },
+  revisionInfo: {
+    type: Object,
+    default: null,
+  },
+  accessMode: {
+    type: String,
+    default: 'r',
+  },
+})
+
 const {
   asset,
   revisionInfo,
   accessMode,
-} = inject('assetReviewContext')
+} = toRefs(props)
 
 const {
   checklistColumns,

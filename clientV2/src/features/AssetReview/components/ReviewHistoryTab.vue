@@ -2,7 +2,7 @@
 import { FilterMatchMode } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed, inject, ref, watch } from 'vue'
+import { computed, inject, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import engineIcon from '../../../assets/bot2.svg'
@@ -20,26 +20,40 @@ import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { durationToNow } from '../../../shared/lib.js'
+import { getEngineDisplay, getResultDisplay } from '../../../shared/lib/checklistUtils.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchReview } from '../api/assetReviewApi.js'
-import { getEngineDisplay, getResultDisplay } from '../../../shared/lib/checklistUtils.js'
 
 const props = defineProps({
   active: {
     type: Boolean,
     default: true,
   },
+  ruleId: {
+    type: String,
+    default: null,
+  },
+  collectionId: {
+    type: String,
+    default: null,
+  },
+  assetId: {
+    type: [String, Number],
+    default: null,
+  },
+  accessMode: {
+    type: String,
+    default: 'r',
+  },
+  currentReview: {
+    type: Object,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['apply-review'])
 
-const {
-  selectedRuleId: ruleId,
-  collectionId,
-  assetId,
-  accessMode,
-  currentReview,
-} = inject('assetReviewContext')
+const { ruleId, collectionId, assetId, accessMode, currentReview } = toRefs(props)
 
 const reviewEditForm = inject('reviewEditForm')
 
@@ -59,11 +73,11 @@ const { state: fullReviewHistory, isLoading: isInternalHistoryLoading, execute: 
   { immediate: false, initialState: [] },
 )
 
-watch([() => props.active, () => ruleId.value], ([active, rid], [_oldActive, oldRid]) => {
+watch([() => props.active, () => ruleId.value, () => assetId.value], ([active, rid, aid], [_oldActive, oldRid, oldAid]) => {
   if (!active || !ruleId.value || !assetId.value || !collectionId.value) {
     return
   }
-  if (rid !== oldRid) {
+  if (rid !== oldRid || aid !== oldAid) {
     fullReviewHistory.value = []
   }
   loadHistory()

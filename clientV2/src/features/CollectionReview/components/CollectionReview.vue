@@ -4,16 +4,40 @@ import SplitterPanel from 'primevue/splitterpanel'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import RuleInfo from '../../../components/common/RuleInfo.vue'
+import { fetchCollection } from '../../../shared/api/collectionsApi.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
+import { useCurrentUser } from '../../../shared/composables/useCurrentUser.js'
+import { defaultFieldSettings } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchAssetsByCollectionStig, fetchCollectionChecklist, fetchReviewsByRule, fetchRule } from '../api/collectionReviewApi.js'
+import { useBulkActionStates } from '../composables/useBulkActionStates.js'
+import { useRuleReviewActions } from '../composables/useRuleReviewActions.js'
+import BatchEditModal from './BatchEditModal.vue'
 import ChecklistGrid from './ChecklistGrid.vue'
+import RejectReasonModal from './RejectReasonModal.vue'
 import RuleTable from './RuleTable.vue'
 
 const route = useRoute()
+const { getCollectionRoleId } = useCurrentUser()
 
 const collectionId = computed(() => route.params.collectionId)
 const benchmarkId = computed(() => route.params.benchmarkId)
 const revisionStr = computed(() => route.params.revisionStr)
+
+const { state: collection, execute: loadCollection } = useAsyncState(
+  () => fetchCollection(collectionId.value),
+  { immediate: false, initialState: null, onError: null },
+)
+
+const fieldSettings = computed(() => collection.value?.settings?.fields ?? defaultFieldSettings)
+const statusSettings = computed(() => collection.value?.settings?.status ?? {
+  canAccept: false,
+  minAcceptGrant: 4,
+})
+
+const roleId = computed(() => getCollectionRoleId(collectionId.value))
+const canAccept = computed(() =>
+  statusSettings.value.canAccept && roleId.value >= statusSettings.value.minAcceptGrant,
+)
 
 const { state: gridData, isLoading: isChecklistLoading, execute: loadChecklist } = useAsyncState(
   () => fetchCollectionChecklist(collectionId.value, benchmarkId.value, revisionStr.value),
@@ -54,6 +78,12 @@ const {
   ruleId => fetchReviewsByRule(collectionId.value, ruleId),
   { immediate: false, initialState: [], onError: null },
 )
+
+watch(collectionId, () => {
+  if (collectionId.value) {
+    loadCollection()
+  }
+}, { immediate: true })
 
 watch([collectionId, benchmarkId, revisionStr], () => {
   if (collectionId.value && benchmarkId.value && revisionStr.value) {
@@ -97,6 +127,150 @@ function onRetryRule() {
 
 const showRuleLoading = computed(() => isRuleLoading.value && !ruleContent.value)
 const showReviewsLoading = computed(() => isReviewsLoading.value && !reviewsData.value?.length)
+
+const editingAssetId = ref(null)
+const accessMode = ref('rw')
+const selectedAssetIds = ref(new Set())
+
+const selectedRows = computed({
+  get: () => {
+    const ids = selectedAssetIds.value
+    if (!ids.size) {
+      return []
+    }
+    return (reviewsData.value || []).filter(r => ids.has(r.assetId))
+  },
+  set: (rows) => {
+    selectedAssetIds.value = new Set((rows || []).map(r => r.assetId))
+  },
+})
+
+const { actionStates } = useBulkActionStates(selectedRows, fieldSettings)
+
+watch(selectedRuleId, () => {
+  selectedAssetIds.value = new Set()
+})
+
+const currentReview = computed(() => {
+  if (!editingAssetId.value || !reviewsData.value?.length) {
+    return null
+  }
+  return reviewsData.value.find(r => r.assetId === editingAssetId.value) ?? null
+})
+
+function upsertReview(assetId, updated) {
+  if (!reviewsData.value) {
+    return
+  }
+  const idx = reviewsData.value.findIndex(r => r.assetId === assetId)
+  if (idx === -1) {
+    reviewsData.value = [...reviewsData.value, { ...updated, assetId }]
+  }
+  else {
+    const merged = { ...reviewsData.value[idx], ...updated, assetId }
+    reviewsData.value = [
+      ...reviewsData.value.slice(0, idx),
+      merged,
+      ...reviewsData.value.slice(idx + 1),
+    ]
+  }
+}
+
+const {
+  isSaving,
+  saveError,
+  clearSaveError,
+  saveFullReview,
+  saveStatusAction,
+  performBulkAction,
+  performBatchEdit,
+} = useRuleReviewActions(
+  { collectionId, assetId: editingAssetId, ruleId: selectedRuleId },
+  {
+    reviewsData,
+    upsertReview,
+    currentReview,
+    refreshReviews: () => selectedRuleId.value ? loadReviews(selectedRuleId.value) : null,
+  },
+)
+
+function onRowSave(payload) {
+  if (payload?.assetId) {
+    editingAssetId.value = payload.assetId
+  }
+  saveFullReview({
+    result: payload.result,
+    detail: payload.detail,
+    comment: payload.comment,
+    status: payload.status,
+  })
+}
+
+function onStatusAction(payload) {
+  if (payload?.assetId) {
+    editingAssetId.value = payload.assetId
+  }
+  saveStatusAction(payload.actionType)
+}
+
+function onEditAsset(assetId) {
+  editingAssetId.value = assetId
+}
+
+function onEditClose() {
+  editingAssetId.value = null
+}
+
+const rejectModalVisible = ref(false)
+const batchEditModalVisible = ref(false)
+const pendingRejectRows = ref([])
+
+function runAction(actionType, rows, rejectText) {
+  if (rows.length === 1) {
+    editingAssetId.value = rows[0].assetId
+  }
+  performBulkAction({ actionType, rows, rejectText })
+}
+
+function onBulkAction(actionType) {
+  const rows = selectedRows.value
+  if (!rows?.length) {
+    return
+  }
+  if (actionType === 'batchEdit') {
+    batchEditModalVisible.value = true
+    return
+  }
+  if (actionType === 'reject') {
+    pendingRejectRows.value = [...rows]
+    rejectModalVisible.value = true
+    return
+  }
+  runAction(actionType, rows)
+}
+
+function onRejectConfirm(text) {
+  const rows = pendingRejectRows.value
+  pendingRejectRows.value = []
+  if (!rows.length) {
+    return
+  }
+  runAction('reject', rows, text)
+}
+
+function onRejectCancel() {
+  pendingRejectRows.value = []
+}
+
+function onBatchEditConfirm(payload) {
+  const rows = selectedRows.value
+  if (!rows?.length) {
+    return
+  }
+  performBatchEdit({ rows, payload })
+}
+
+// No more provide. Everything passed via props.
 </script>
 
 <template>
@@ -129,9 +303,23 @@ const showReviewsLoading = computed(() => isReviewsLoading.value && !reviewsData
             </SplitterPanel>
             <SplitterPanel :size="50" :min-size="20">
               <RuleTable
+                v-model:selection="selectedRows"
                 :grid-data="reviewsData ?? []"
                 :is-loading="showReviewsLoading"
                 :selected-rule-id="selectedRuleId"
+                :collection-id="collectionId"
+                :field-settings="fieldSettings"
+                :can-accept="canAccept"
+                :is-saving="isSaving"
+                :save-error="saveError"
+                :clear-save-error="clearSaveError"
+                :current-review="currentReview"
+                :action-states="actionStates"
+                @row-save="onRowSave"
+                @status-action="onStatusAction"
+                @edit-asset="onEditAsset"
+                @edit-close="onEditClose"
+                @bulk-action="onBulkAction"
               />
             </SplitterPanel>
           </Splitter>
@@ -148,6 +336,20 @@ const showReviewsLoading = computed(() => isReviewsLoading.value && !reviewsData
         </SplitterPanel>
       </Splitter>
     </div>
+
+    <RejectReasonModal
+      v-model:visible="rejectModalVisible"
+      :count="pendingRejectRows.length"
+      @confirm="onRejectConfirm"
+      @cancel="onRejectCancel"
+    />
+
+    <BatchEditModal
+      v-model:visible="batchEditModalVisible"
+      :rows="selectedRows"
+      :field-settings="fieldSettings"
+      @confirm="onBatchEditConfirm"
+    />
   </div>
 </template>
 

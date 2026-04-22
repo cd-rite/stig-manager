@@ -1,8 +1,12 @@
 <script setup>
-import Button from 'primevue/button'
-
 import lineHeightDown from '../../../assets/line-height-down.svg'
 import lineHeightUp from '../../../assets/line-height-up.svg'
+import rejectIcon from '../../../assets/reject.png'
+import unsubmitIcon from '../../../assets/save-icon-60.svg'
+
+import acceptedIcon from '../../../assets/star.svg'
+import submitIcon from '../../../assets/submit.svg'
+import ColumnToggle from '../../../components/common/ColumnToggle.vue'
 import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 
 defineProps({
@@ -10,7 +14,27 @@ defineProps({
     type: String,
     default: null,
   },
+  toggleableColumns: {
+    type: Array,
+    required: true,
+  },
+  actionStates: {
+    type: Object,
+    required: true,
+  },
+  canAccept: {
+    type: Boolean,
+    default: false,
+  },
 })
+
+const emit = defineEmits(['bulk-action'])
+
+const selectedColumns = defineModel('selectedColumns', { type: Array, required: true })
+
+function onAction(actionType) {
+  emit('bulk-action', actionType)
+}
 
 const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('collection-rule-table', 1, 12, 24)
 </script>
@@ -28,22 +52,53 @@ const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('coll
       <div class="rule-table__right-controls">
         <!-- Toolbar actions -->
         <div class="rule-table__action-controls">
-          <Button text class="toolbar-btn" label="Submit">
-            <template #icon>
-              <i class="pi pi-arrow-right" style="color: #2ecc71; font-weight: bold; margin-right: 0.3rem;" />
-            </template>
-          </Button>
+          <button
+            v-if="canAccept" type="button" class="toolbar-btn" :disabled="!actionStates.accept"
+            @click="onAction('accept')"
+          >
+            <img :src="acceptedIcon" alt="" class="toolbar-btn-icon">
+            <span class="toolbar-btn__label">Accept</span>
+          </button>
 
-          <Button text class="toolbar-btn" label="Unsubmit">
-            <template #icon>
-              <i class="pi pi-bookmark" style="color: #95a5a6; margin-right: 0.3rem;" />
-            </template>
-          </Button>
+          <button
+            v-if="canAccept" type="button" class="toolbar-btn" :disabled="!actionStates.reject"
+            @click="onAction('reject')"
+          >
+            <img :src="rejectIcon" alt="" class="toolbar-btn-icon">
+            <span class="toolbar-btn__label">Reject</span>
+          </button>
 
           <div class="toolbar-divider" />
 
-          <Button text class="toolbar-btn" icon="pi pi-pencil" label="Batch edit" />
+          <button
+            type="button" class="toolbar-btn" :disabled="!actionStates.submit"
+            @click="onAction('submit')"
+          >
+            <img :src="submitIcon" alt="" class="toolbar-btn-icon">
+            <span class="toolbar-btn__label">Submit</span>
+          </button>
+
+          <button
+            type="button" class="toolbar-btn" :disabled="!actionStates.unsubmit"
+            @click="onAction('unsubmit')"
+          >
+            <img :src="unsubmitIcon" alt="" class="toolbar-btn-icon">
+            <span class="toolbar-btn__label">Unsubmit</span>
+          </button>
+
+          <div class="toolbar-divider" />
+
+          <button
+            type="button" class="toolbar-btn" :disabled="!actionStates.batchEdit"
+            @click="onAction('batchEdit')"
+          >
+            <i class="pi pi-pencil toolbar-btn__icon-font" />
+            <span class="toolbar-btn__label">Batch edit</span>
+          </button>
         </div>
+
+        <!-- Columns -->
+        <ColumnToggle v-model="selectedColumns" :columns="toggleableColumns" />
 
         <!-- Density -->
         <div class="rule-table__density-controls">
@@ -68,13 +123,13 @@ const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('coll
 
 <style scoped>
 .rule-table-header {
+  --checklist-control-height: 2.42rem;
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
   background: linear-gradient(180deg, var(--color-background-light), var(--color-background-dark));
   border-bottom: 1px solid var(--color-border-default);
   flex-shrink: 0;
-  height: var(5rem);
 }
 
 .rule-table-header__content {
@@ -115,29 +170,47 @@ const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('coll
 }
 
 .toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  height: var(--checklist-control-height);
+  padding: 0.35rem 0.75rem;
   color: var(--color-text-bright);
-  padding: 0.25rem 0.75rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--color-background-light) 45%, transparent);
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: transparent;
-  height: 2rem;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
 }
 
-.toolbar-btn :deep(.p-button-icon) {
-  font-size: 0.85rem;
+.toolbar-btn__label {
+  font-size: 1.02rem;
+  font-weight: 600;
 }
 
-.toolbar-btn:hover {
-  background: color-mix(in srgb, var(--color-background-light) 65%, transparent);
-  color: var(--color-text-primary);
-  border-color: color-mix(in srgb, var(--color-border-default) 50%, transparent);
+.toolbar-btn-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 0.3rem;
+  object-fit: contain;
+}
+
+.toolbar-btn__icon-font {
+  font-size: 0.9rem;
+  margin-right: 0.3rem;
+}
+
+.toolbar-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-text-dim) 25%, transparent);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .toolbar-divider {
   width: 1px;
-  height: 1.5rem;
+  height: 1.8rem;
   background: var(--color-border-default);
   margin: 0 0.25rem;
 }
@@ -147,15 +220,15 @@ const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('coll
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.15rem 0.25rem 0.15rem 0.5rem;
+  padding: 0.2rem 0.3rem 0.2rem 0.65rem;
   border: 1px solid color-mix(in srgb, var(--color-border-default) 85%, transparent);
   border-radius: 5px;
   background: color-mix(in srgb, var(--color-background-light) 45%, transparent);
-  height: 2rem;
+  height: var(--checklist-control-height);
 }
 
 .rule-table__density-label {
-  font-size: 0.85rem;
+  font-size: 0.98rem;
   font-weight: 600;
   color: var(--color-text-bright);
   margin-right: 0.2rem;
@@ -169,8 +242,8 @@ const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('coll
   border: 1px solid color-mix(in srgb, var(--color-border-light) 40%, transparent);
   border-radius: 5px;
   margin: 0 0.1rem;
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 2.1rem;
+  height: 2.1rem;
   padding: 0;
   cursor: pointer;
   opacity: 0.9;
@@ -188,7 +261,7 @@ const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('coll
 }
 
 .rule-table__icon-btn img {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
 }
 </style>

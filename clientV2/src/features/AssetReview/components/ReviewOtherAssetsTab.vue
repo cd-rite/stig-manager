@@ -2,7 +2,7 @@
 import { FilterMatchMode, FilterService } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed, inject, ref, watch } from 'vue'
+import { computed, inject, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import engineIcon from '../../../assets/bot2.svg'
@@ -27,22 +27,36 @@ import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fetchOtherReviews } from '../api/assetReviewApi.js'
 import { getEngineDisplay, getResultDisplay } from '../../../shared/lib/checklistUtils.js'
 
-defineProps({
+const props = defineProps({
   active: {
     type: Boolean,
     default: true,
+  },
+  ruleId: {
+    type: String,
+    default: null,
+  },
+  collectionId: {
+    type: String,
+    default: null,
+  },
+  assetId: {
+    type: [String, Number],
+    default: null,
+  },
+  accessMode: {
+    type: String,
+    default: 'r',
+  },
+  currentReview: {
+    type: Object,
+    default: null,
   },
 })
 
 const emit = defineEmits(['apply-review'])
 
-const {
-  selectedRuleId: ruleId,
-  collectionId,
-  assetId,
-  accessMode,
-  currentReview,
-} = inject('assetReviewContext')
+const { ruleId, collectionId, assetId, accessMode, currentReview } = toRefs(props)
 
 const reviewEditForm = inject('reviewEditForm')
 
@@ -51,7 +65,6 @@ const {
   formDetail,
   formComment,
 } = reviewEditForm
-
 const editable = computed(() => accessMode.value === 'rw' && (!currentReview.value?.status?.label || currentReview.value.status.label === 'saved' || currentReview.value.status.label === 'rejected'))
 
 FilterService.register('labelContainsAny', (value, filter) => {

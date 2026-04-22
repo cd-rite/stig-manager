@@ -1,8 +1,12 @@
 <script setup>
-import { inject } from 'vue'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 
-const { currentReview } = inject('assetReviewContext')
+defineProps({
+  currentReview: {
+    type: Object,
+    default: null,
+  },
+})
 </script>
 
 <template>
@@ -81,7 +85,9 @@ const { currentReview } = inject('assetReviewContext')
   font-size: 1.15rem;
   line-height: 1.6;
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
+  word-break: break-word; /* fallback */
+  min-width: 0;
 }
 
 .status-text__empty {

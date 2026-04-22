@@ -31,3 +31,7 @@ export function fetchReviewsByRule(collectionId, ruleId) {
     ruleId,
   })
 }
+
+export function postReviewBatch(collectionId, body) {
+  return apiCall('postReviewBatch', { collectionId }, body)
+}

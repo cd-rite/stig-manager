@@ -58,3 +58,25 @@ export function formatReviewDate(dateStr) {
     timeZoneName: 'short',
   })
 }
+
+export function isReviewComplete(review, fieldSettings = defaultFieldSettings) {
+  const result = review?.result
+  if (!result) {
+    return false
+  }
+
+  const validResults = ['pass', 'fail', 'notapplicable']
+  if (!validResults.includes(result)) {
+    return false
+  }
+
+  if (isFieldRequired(fieldSettings?.detail, result) && !review?.detail) {
+    return false
+  }
+
+  if (isFieldRequired(fieldSettings?.comment, result) && !review?.comment) {
+    return false
+  }
+
+  return true
+}

@@ -1,7 +1,7 @@
 <script setup>
 import Popover from 'primevue/popover'
 import Textarea from 'primevue/textarea'
-import { inject, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, provide, ref, toRefs, watch } from 'vue'
 import ReviewResources from '../../features/AssetReview/components/ReviewResources.vue'
 import { useReviewEditForm } from '../../shared/composables/useReviewEditForm.js'
 import { formatReviewDate, resultOptions } from '../../shared/lib/reviewFormUtils.js'
@@ -10,20 +10,61 @@ import ResultEngineBadges from './ResultEngineBadges.vue'
 import StatusBadge from './StatusBadge.vue'
 import StatusButton from './StatusButton.vue'
 
+const props = defineProps({
+  // Review data
+  currentReview: {
+    type: Object,
+    default: null,
+  },
+  selectedRuleId: {
+    type: String,
+    default: null,
+  },
+  collectionId: {
+    type: String,
+    default: null,
+  },
+  assetId: {
+    type: [String, Number],
+    default: null,
+  },
+  // Field/form config
+  fieldSettings: {
+    type: Object,
+    default: null,
+  },
+  accessMode: {
+    type: String,
+    default: 'r',
+  },
+  canAccept: {
+    type: Boolean,
+    default: false,
+  },
+  // Save state
+  isSaving: {
+    type: Boolean,
+    default: false,
+  },
+  saveError: {
+    type: String,
+    default: null,
+  },
+  clearSaveError: {
+    type: Function,
+    default: () => {},
+  },
+  // Tab config
+  enabledTabs: {
+    type: Array,
+    default: () => ['history', 'statusText', 'otherAssets', 'attachments'],
+  },
+})
 
-const emit = defineEmits(['save', 'status-action', 'close', 'clear-save-error'])
+const emit = defineEmits(['save', 'status-action', 'close'])
 
-// Inject feature-level context
-const {
-  fieldSettings,
-  accessMode,
-  canAccept,
-  isSaving,
-  saveError,
-  clearSaveError,
-  currentReview,
-  selectedRuleId,
-} = inject('assetReviewContext')
+// Expose props as refs so all .value access in the component body is unchanged
+const { currentReview, selectedRuleId, collectionId, assetId, fieldSettings, accessMode, canAccept, isSaving, saveError } = toRefs(props)
 
 const popover = ref()
 const lastAnchorEvent = ref(null)
@@ -455,6 +496,12 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
       <Transition name="expand" @after-enter="alignPopover" @after-leave="alignPopover">
         <div v-if="showResources" class="review-edit-popover__resources-container">
           <ReviewResources
+            :rule-id="selectedRuleId"
+            :collection-id="collectionId"
+            :asset-id="assetId"
+            :access-mode="accessMode"
+            :current-review="currentReview"
+            :enabled-tabs="props.enabledTabs"
             @apply-review="applyReviewData"
           />
         </div>
@@ -469,6 +516,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
   flex-direction: column;
   gap: 0.4rem;
   min-width: 650px;
+  max-width: 850px;
   position: relative;
 }
 
@@ -806,6 +854,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 0;
 }
 
 .expand-enter-active,

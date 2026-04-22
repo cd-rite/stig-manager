@@ -38,23 +38,29 @@ src/features/AssetReview/
 
 ## State Architecture
 
-`AssetReview.vue` is the **feature root**. It is the single source of truth — it initializes all composables, wires their outputs together, and distributes state downward via Vue's `provide`/`inject`.
+`AssetReview.vue` is the **feature root**. It is the single source of truth — it initializes all composables and passes state downward via **explicit props**.
 
 ```
-AssetReview.vue  (provide → 'assetReviewContext')
-├── ChecklistGrid.vue              (inject assetReviewContext)
-│   ├── ChecklistGridHeader.vue
-│   ├── ChecklistGridTable.vue
-│   └── ReviewEditPopover.vue      (inject assetReviewContext, provide → 'reviewEditForm')
-│       ├── ReviewHistoryTab.vue   (inject assetReviewContext, inject reviewEditForm)
-│       ├── ReviewOtherAssetsTab.vue
-│       └── ReviewResources.vue
-└── RuleInfo.vue
+AssetReview.vue  (maintains feature state)
+├── ChecklistGrid.vue              (props: gridData, selectedRuleId, asset, revisionInfo, fieldSettings, canAccept, isSaving, saveError, currentReview)
+│   ├── ChecklistGridHeader.vue    (props: asset, revisionInfo, accessMode)
+│   ├── ChecklistGridTable.vue     (props: gridData, selectedRow)
+│   └── ReviewEditPopover.vue      (props: currentReview, selectedRuleId, collectionId, assetId, fieldSettings, accessMode, canAccept, isSaving, saveError; provide → 'reviewEditForm')
+│       ├── ReviewHistoryTab.vue   (props: ruleId, collectionId, assetId, accessMode, currentReview; inject: reviewEditForm)
+│       ├── ReviewOtherAssetsTab.vue (props: ruleId, collectionId, assetId, accessMode, currentReview; inject: reviewEditForm)
+│       ├── ReviewResources.vue    (props: ruleId, collectionId, assetId, accessMode, currentReview)
+│       └── ReviewStatusTextTab.vue (props: currentReview)
+└── RuleInfo.vue                   (props: ruleContent, selectedChecklistItem)
 ```
 
-### Why `provide`/`inject` instead of props?
+### Why Props-Down instead of `provide`/`inject`?
 
-The page uses a `<Splitter>` which adds non-feature-aware wrapper components between the root and the children. Threading 15+ reactive values through opaque wrappers as props would be unworkable. `provide`/`inject` creates a **feature-scoped context** that is destroyed with the component tree when the user navigates away — giving us the cleanup benefits of local state without prop drilling.
+We transitioned the UI children to use **explicit props** instead of the "magic" `assetReviewContext` injection to improve:
+1. **Portability**: Components like `ReviewEditPopover` can now be reused in other features (e.g., `CollectionReview`) by simply passing the required data.
+2. **Explicitness**: Component dependencies are now clear from their interfaces.
+3. **Testability**: Easier isolation for unit tests.
+
+`ReviewEditPopover` still uses `provide('reviewEditForm')` for its local form state, as this state is purely internal to the popover and its tabs.
 
 ---
 

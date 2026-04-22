@@ -3,13 +3,19 @@ import { FilterMatchMode } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import { computed, ref, watch } from 'vue'
+import assessmentIcon from '../../../assets/assessment.svg'
+import shieldGreenCheck from '../../../assets/shield-green-check.svg'
+import targetIcon from '../../../assets/target.svg'
 import CatBadge from '../../../components/common/CatBadge.vue'
 import ColumnFilter from '../../../components/common/ColumnFilter.vue'
+import LongTextPopover from '../../../components/common/LongTextPopover.vue'
+import ResultBadge from '../../../components/common/ResultBadge.vue'
+import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
+import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 import { durationToNow } from '../../../shared/lib.js'
 import { severityMap } from '../../../shared/lib/checklistUtils.js'
 import { fieldMatches, highlightText } from '../../../shared/lib/searchUtils.js'
-import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 
 const props = defineProps({
   gridData: {
@@ -32,6 +38,10 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  visibleFields: {
+    type: Set,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:selectedRow'])
@@ -43,7 +53,12 @@ const filters = ref({
 
 const { itemSize } = useGridDensity('collection-checklist', 1, 12, 24)
 
-const globalFilterFields = ['groupId', 'version', 'ruleTitle']
+const longTextPopover = ref(null)
+const showLongText = (event, label, text) => {
+  longTextPopover.value?.show(event, label, text)
+}
+
+const globalFilterFields = ['groupId', 'groupTitle', 'version', 'ruleId', 'ruleTitle']
 
 watch(() => props.searchFilter, (val) => {
   filters.value.global.value = val || null
@@ -86,20 +101,10 @@ const footerStats = computed(() => sumCounts(visibleData.value))
 
 const requiredAssessments = computed(() => visibleData.value.length * props.assetCount)
 
-const footerMetrics = computed(() => {
-  const s = footerStats.value
-  return [
-    { key: 'assets', value: props.assetCount, label: 'assets', icon: 'pi pi-desktop' },
-    { key: 'assessments', value: requiredAssessments.value, label: 'assessments', icon: 'pi pi-file-edit' },
-    { key: 'nf', value: s.results.pass, label: 'NF', class: 'metric-nf' },
-    { key: 'open', value: s.results.fail, label: 'O', class: 'metric-open' },
-    { key: 'na', value: s.results.notapplicable, label: 'NA', class: 'metric-na' },
-    { key: 'nrPlus', value: s.results.other, label: 'NR+', class: 'metric-nr' },
-    { key: 'submitted', value: s.statuses.submitted, icon: 'pi pi-arrow-right', class: 'metric-submitted' },
-    { key: 'rejected', value: s.statuses.rejected, icon: 'pi pi-ban', class: 'metric-rejected' },
-    { key: 'accepted', value: s.statuses.accepted, icon: 'pi pi-star-fill', class: 'metric-accepted' },
-  ].filter(m => m.value > 0)
-})
+const footerMetrics = computed(() => [
+  { key: 'assets', value: props.assetCount, label: 'assets', iconSrc: targetIcon },
+  { key: 'assessments', value: requiredAssessments.value, label: 'assessments', iconSrc: assessmentIcon },
+])
 
 const catOptions = computed(() => {
   const severities = new Set(props.gridData.map(item => item.severity).filter(Boolean))
@@ -194,12 +199,26 @@ const dataTablePt = {
         </div>
       </template>
     </Column>
-    <Column field="groupId" header="Group" sortable :style="{ width: '7rem', minWidth: '7rem' }" :pt="columnPt.left">
+    <Column v-if="visibleFields.has('groupId')" field="groupId" header="Group" sortable :style="{ width: '7rem', minWidth: '7rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <span class="cell-text" :class="{ 'cell--match': searchFilter && fieldMatches(data.groupId, searchFilter) }">
           <span v-if="searchFilter" v-html="highlightText(data.groupId, searchFilter)" />
           <template v-else>{{ data.groupId }}</template>
         </span>
+      </template>
+    </Column>
+    <Column v-if="visibleFields.has('groupTitle')" field="groupTitle" header="Group Title" sortable :style="{ width: '25%', minWidth: '16rem' }" :pt="columnPt.left">
+      <template #body="{ data }">
+        <div class="cell-text-field">
+          <span
+            class="cell-text cell-text--clamped"
+            :class="{ 'cell--match': searchFilter && fieldMatches(data.groupTitle, searchFilter) }"
+            :title="data.groupTitle"
+          >
+            <span v-if="searchFilter" v-html="highlightText(data.groupTitle, searchFilter)" />
+            <template v-else>{{ data.groupTitle }}</template>
+          </span>
+        </div>
       </template>
     </Column>
     <Column field="version" header="STIG Id" sortable :style="{ width: '12rem', minWidth: '10rem' }" :pt="columnPt.left">
@@ -210,13 +229,22 @@ const dataTablePt = {
         </span>
       </template>
     </Column>
-    <Column field="ruleTitle" header="Rule Title" sortable :style="{ width: '25%', minWidth: '18rem' }" :pt="columnPt.left">
+    <Column v-if="visibleFields.has('ruleId')" field="ruleId" header="Rule Id" sortable :style="{ width: '13rem', minWidth: '10rem' }" :pt="columnPt.left">
+      <template #body="{ data }">
+        <span class="cell-text" :class="{ 'cell--match': searchFilter && fieldMatches(data.ruleId, searchFilter) }">
+          <span v-if="searchFilter" v-html="highlightText(data.ruleId, searchFilter)" />
+          <template v-else>{{ data.ruleId }}</template>
+        </span>
+      </template>
+    </Column>
+    <Column v-if="visibleFields.has('ruleTitle')" field="ruleTitle" header="Rule Title" sortable :style="{ width: '25%', minWidth: '18rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <div class="cell-text-field">
           <span
-            class="cell-text cell-text--clamped"
+            class="cell-text cell-text--clamped cell-text--clickable"
             :class="{ 'cell--match': searchFilter && fieldMatches(data.ruleTitle, searchFilter) }"
-            :title="data.ruleTitle"
+            title="Click to view full rule title"
+            @click.stop="showLongText($event, 'Rule Title', data.ruleTitle)"
           >
             <span v-if="searchFilter" v-html="highlightText(data.ruleTitle, searchFilter)" />
             <template v-else>{{ data.ruleTitle }}</template>
@@ -226,33 +254,33 @@ const dataTablePt = {
     </Column>
 
     <!-- Count Columns -->
-    <Column field="counts.results.fail" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('fail')" field="counts.results.fail" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
       <template #header>
-        <span style="color: #e74c3c; font-weight: 600;">O</span>
+        <ResultBadge status="O" />
       </template>
       <template #body="{ data }">
         <span class="cell-text">{{ data.counts?.results?.fail ?? 0 }}</span>
       </template>
     </Column>
-    <Column field="counts.results.pass" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('pass')" field="counts.results.pass" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
       <template #header>
-        <span style="color: #2ecc71; font-weight: 600;">NF</span>
+        <ResultBadge status="NF" />
       </template>
       <template #body="{ data }">
         <span class="cell-text">{{ data.counts?.results?.pass ?? 0 }}</span>
       </template>
     </Column>
-    <Column field="counts.results.notapplicable" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('notapplicable')" field="counts.results.notapplicable" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
       <template #header>
-        <span style="color: #64748b; font-weight: 600;">NA</span>
+        <ResultBadge status="NA" />
       </template>
       <template #body="{ data }">
         <span class="cell-text">{{ data.counts?.results?.notapplicable ?? 0 }}</span>
       </template>
     </Column>
-    <Column field="counts.results.other" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('other')" field="counts.results.other" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
       <template #header>
-        <span style="color: var(--color-text-dim); font-weight: 600;">NR+</span>
+        <ResultBadge status="NR+" />
       </template>
       <template #body="{ data }">
         <span class="cell-text">{{ data.counts?.results?.other ?? 0 }}</span>
@@ -260,25 +288,25 @@ const dataTablePt = {
     </Column>
 
     <!-- Status Icons -->
-    <Column field="counts.statuses.submitted" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('submitted')" field="counts.statuses.submitted" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
       <template #header>
-        <i class="pi pi-arrow-right" style="color: #2ecc71; font-size: 1.1rem; font-weight: bold;" title="Submitted" />
+        <StatusBadge status="submitted" />
       </template>
       <template #body="{ data }">
         <span class="cell-text">{{ data.counts?.statuses?.submitted ?? 0 }}</span>
       </template>
     </Column>
-    <Column field="counts.statuses.rejected" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('rejected')" field="counts.statuses.rejected" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
       <template #header>
-        <i class="pi pi-ban" style="color: #e74c3c; font-size: 1.1rem;" title="Rejected" />
+        <StatusBadge status="rejected" />
       </template>
       <template #body="{ data }">
         <span class="cell-text">{{ data.counts?.statuses?.rejected ?? 0 }}</span>
       </template>
     </Column>
-    <Column field="counts.statuses.accepted" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('accepted')" field="counts.statuses.accepted" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
       <template #header>
-        <i class="pi pi-star-fill" style="color: #f1c40f; font-size: 1.1rem;" title="Accepted" />
+        <StatusBadge status="accepted" />
       </template>
       <template #body="{ data }">
         <span class="cell-text">{{ data.counts?.statuses?.accepted ?? 0 }}</span>
@@ -286,12 +314,12 @@ const dataTablePt = {
     </Column>
 
     <!-- Timestamp Columns -->
-    <Column field="timestamps.ts.min" header="Oldest" sortable :style="{ width: '6rem', minWidth: '6rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('oldest')" field="timestamps.ts.min" header="Oldest" sortable :style="{ width: '6rem', minWidth: '6rem' }" :pt="columnPt.center">
       <template #body="{ data }">
         <span v-if="data.timestamps?.ts?.min" class="cell-text" :title="data.timestamps.ts.min">{{ durationToNow(data.timestamps.ts.min) }}</span>
       </template>
     </Column>
-    <Column field="timestamps.ts.max" header="Newest" sortable :style="{ width: '6rem', minWidth: '6rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('newest')" field="timestamps.ts.max" header="Newest" sortable :style="{ width: '6rem', minWidth: '6rem' }" :pt="columnPt.center">
       <template #body="{ data }">
         <span v-if="data.timestamps?.ts?.max" class="cell-text" :title="data.timestamps.ts.max">{{ durationToNow(data.timestamps.ts.max) }}</span>
       </template>
@@ -309,11 +337,26 @@ const dataTablePt = {
         :metrics="footerMetrics"
         :total-count="gridData.length"
         :filtered-count="isFiltered ? visibleData.length : null"
+        total-label="rules"
+        :total-icon-src="shieldGreenCheck"
         :show-refresh="true"
         :show-export="true"
-      />
+      >
+        <template #right-extra>
+          <ResultBadge status="O" :count="footerStats.results.fail" />
+          <ResultBadge status="NF" :count="footerStats.results.pass" />
+          <ResultBadge status="NA" :count="footerStats.results.notapplicable" />
+          <ResultBadge status="NR+" :count="footerStats.results.other" />
+          <span class="footer-divider">|</span>
+          <StatusBadge status="submitted" :count="footerStats.statuses.submitted" />
+          <StatusBadge status="rejected" :count="footerStats.statuses.rejected" />
+          <StatusBadge status="accepted" :count="footerStats.statuses.accepted" />
+        </template>
+      </StatusFooter>
     </template>
   </DataTable>
+
+  <LongTextPopover ref="longTextPopover" />
 </template>
 
 <style scoped>
@@ -364,6 +407,14 @@ const dataTablePt = {
 .cell-text-field .cell-text--clamped {
   flex: 1;
   min-width: 0;
+}
+
+.cell-text--clickable {
+  cursor: pointer;
+}
+
+.cell-text--clickable:hover {
+  color: var(--color-text-dim);
 }
 
 :deep(.p-datatable-thead > tr > th:last-child) {
@@ -425,47 +476,8 @@ const dataTablePt = {
   color: var(--color-text-dim);
 }
 
-/* Footer metric styles */
-:deep(.metric-nf) {
-  border-color: rgba(46, 204, 113, 0.4) !important;
-}
-:deep(.metric-nf .status-footer__info-label) {
-  color: #2ecc71 !important;
-  font-weight: bold;
-  order: -1;
-  margin-right: 4px;
-}
-
-:deep(.metric-open .status-footer__info-label) {
-  color: #e74c3c !important;
-  font-weight: bold;
-  order: -1;
-  margin-right: 4px;
-}
-
-:deep(.metric-na .status-footer__info-label) {
-  color: #64748b !important;
-  font-weight: bold;
-  order: -1;
-  margin-right: 4px;
-}
-
-:deep(.metric-nr .status-footer__info-label) {
-  color: var(--color-text-dim) !important;
-  font-weight: bold;
-  order: -1;
-  margin-right: 4px;
-}
-
-:deep(.metric-submitted .status-footer__info-icon) {
-  color: #2ecc71 !important;
-}
-
-:deep(.metric-rejected .status-footer__info-icon) {
-  color: #e74c3c !important;
-}
-
-:deep(.metric-accepted .status-footer__info-icon) {
-  color: #f1c40f !important;
+.footer-divider {
+  color: var(--color-border-default);
+  padding: 0 0.25rem;
 }
 </style>

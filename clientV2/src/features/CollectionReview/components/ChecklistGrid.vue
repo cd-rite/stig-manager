@@ -27,6 +27,35 @@ const emit = defineEmits(['select-rule'])
 
 const searchFilter = ref('')
 
+const TOGGLEABLE_COLUMNS = [
+  { field: 'fail', header: 'O' },
+  { field: 'pass', header: 'NF' },
+  { field: 'notapplicable', header: 'NA' },
+  { field: 'other', header: 'NR+' },
+  { field: 'submitted', header: 'Submitted' },
+  { field: 'rejected', header: 'Rejected' },
+  { field: 'accepted', header: 'Accepted' },
+  { field: 'oldest', header: 'Oldest' },
+  { field: 'newest', header: 'Newest' },
+]
+
+const DISPLAY_MODE_FIELDS = {
+  groupRule: ['groupId', 'ruleTitle'],
+  groupGroup: ['groupId', 'groupTitle'],
+  ruleRule: ['ruleId', 'ruleTitle'],
+}
+
+const selectedColumns = ref([...TOGGLEABLE_COLUMNS])
+const displayMode = ref('groupRule')
+
+const visibleFields = computed(() => {
+  const fields = new Set(selectedColumns.value.map(c => c.field))
+  for (const f of DISPLAY_MODE_FIELDS[displayMode.value]) {
+    fields.add(f)
+  }
+  return fields
+})
+
 const selectedRow = computed(() => {
   if (!props.selectedRuleId) {
     return null
@@ -48,13 +77,19 @@ const { lineClamp, itemSize } = useGridDensity('collection-checklist', 1, 12, 24
     class="checklist-grid relative flex h-full flex-col bg-[var(--color-background-dark)]"
     :style="{ '--line-clamp': lineClamp, '--item-size': `${itemSize}px` }"
   >
-    <ChecklistGridHeader v-model:search-filter="searchFilter" />
+    <ChecklistGridHeader
+      v-model:search-filter="searchFilter"
+      v-model:selected-columns="selectedColumns"
+      v-model:display-mode="displayMode"
+      :toggleable-columns="TOGGLEABLE_COLUMNS"
+    />
     <ChecklistGridTable
       :grid-data="gridData"
       :is-loading="isLoading"
       :selected-row="selectedRow"
       :search-filter="searchFilter"
       :asset-count="assetCount"
+      :visible-fields="visibleFields"
       @update:selected-row="onSelectionChange"
     />
   </div>

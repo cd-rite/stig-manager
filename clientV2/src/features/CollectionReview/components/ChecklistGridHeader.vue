@@ -17,9 +17,16 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  toggleableColumns: {
+    type: Array,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:searchFilter'])
+
+const selectedColumns = defineModel('selectedColumns', { type: Array, required: true })
+const displayMode = defineModel('displayMode', { type: String, required: true })
 
 const route = useRoute()
 const benchmarkId = computed(() => route.params.benchmarkId)
@@ -52,18 +59,39 @@ const headerTitle = computed(() => {
   return benchmarkId.value || 'Collection Checklist'
 })
 const accessMode = 'rw'
-const dummyColumns = ref([
-  { field: 'ruleId', header: 'Rule', permanent: true },
-  { field: 'status', header: 'Status' },
-])
-const selectedDummyColumns = ref([
-  { field: 'status', header: 'Status' },
-])
 
 const checklistMenu = ref()
-const checklistMenuItems = ref([
-  { label: 'Option 1' },
-  { label: 'Option 2' },
+const checklistMenuItems = computed(() => [
+  {
+    label: 'Group/Rule Display',
+    icon: 'pi pi-list',
+    items: [
+      {
+        label: 'Group ID and Rule Title',
+        icon: displayMode.value === 'groupRule' ? 'pi pi-circle-fill' : 'pi pi-circle',
+        command: () => { displayMode.value = 'groupRule' },
+      },
+      {
+        label: 'Group ID and Group Title',
+        icon: displayMode.value === 'groupGroup' ? 'pi pi-circle-fill' : 'pi pi-circle',
+        command: () => { displayMode.value = 'groupGroup' },
+      },
+      {
+        label: 'Rule ID and Rule Title',
+        icon: displayMode.value === 'ruleRule' ? 'pi pi-circle-fill' : 'pi pi-circle',
+        command: () => { displayMode.value = 'ruleRule' },
+      },
+    ],
+  },
+  {
+    label: 'Export Result Archive',
+    icon: 'pi pi-download',
+    items: [
+      { label: 'CKL (STIG Viewer v2)', icon: 'pi pi-download' },
+      { label: 'CKLB (STIG Viewer v3)', icon: 'pi pi-download' },
+      { label: 'XCCDF', icon: 'pi pi-download' },
+    ],
+  },
 ])
 
 const checklistMenuPT = {
@@ -106,7 +134,7 @@ function clearSearch() {
         <i class="pi pi-search checklist-grid__search-icon" />
         <input
           v-model="localSearch" type="text" class="checklist-grid__search-input"
-          placeholder="Search reviews..."
+          placeholder="Search..."
         >
         <button
           v-if="localSearch" type="button" class="checklist-grid__search-clear"
@@ -117,7 +145,7 @@ function clearSearch() {
       </div>
 
       <div class="checklist-grid__header-controls">
-        <ColumnToggle v-model="selectedDummyColumns" :columns="dummyColumns.filter(c => !c.permanent)" />
+        <ColumnToggle v-model="selectedColumns" :columns="toggleableColumns" />
         <button
           type="button" class="checklist-grid__menu-btn checklist-grid__menu-btn--checklist"
           aria-haspopup="true" aria-controls="checklist_menu" @click="toggleChecklistMenu"
