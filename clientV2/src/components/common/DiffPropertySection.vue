@@ -64,12 +64,12 @@ const rendered = computed(() => {
   padding: 0.35rem 0.75rem;
   background-color: var(--color-background-subtle);
   border-bottom: 1px solid var(--color-border-default);
-  font: 700 0.95rem monospace;
+  font: 700 1.1rem monospace;
   color: var(--color-text-primary);
 }
 
 .diff-property-section__body {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .diff-property-section__error {
@@ -87,13 +87,86 @@ const rendered = computed(() => {
 
 /* Hide diff2html's own file-header (filename + "Viewed" checkbox) and hunk info
    (the `@@ -1,5 +1,5 @@` line). Our <header class="diff-property-section__head">
-   already labels the property; those internals are redundant. */
+   already labels the property; those internals are redundant.
+   `.d2h-info` is applied to the TD cells only, so we also collapse the
+   containing <tr> so the row leaves zero vertical space. */
 .d2h-wrapper :deep(.d2h-file-header) {
   display: none;
 }
 
-.d2h-wrapper :deep(.d2h-info) {
+.d2h-wrapper :deep(tr:has(.d2h-info)) {
   display: none;
+}
+
+/* Make the line-number gutter a real table cell instead of diff2html's default
+   `position: absolute` overlay. The overlay scheme assumes fixed (single-line)
+   row heights — it breaks when we wrap content (variable row heights +
+   line numbers anchored to an ancestor positioning context instead of the
+   current row). With `display: table-cell` the gutter participates in normal
+   table layout: the row height = max(gutter, content) and the gutter stretches
+   to match. `.line-num1` / `.line-num2` remain floated so the two revision
+   numbers sit side-by-side within the gutter cell. */
+.d2h-wrapper :deep(.d2h-code-linenumber) {
+  position: static;
+  display: table-cell;
+  box-sizing: border-box;
+  width: 4.5rem;
+  padding: 0;
+  text-align: right;
+  vertical-align: top;
+}
+
+.d2h-wrapper :deep(.line-num1) {
+  float: left;
+  box-sizing: border-box;
+  width: 2.25rem;
+  padding: 0 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.d2h-wrapper :deep(.line-num2) {
+  float: right;
+  box-sizing: border-box;
+  width: 2.25rem;
+  padding: 0 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Content cell — gutter is its own column now, so no left-padding reservation.
+   `white-space: normal` on the outer .d2h-code-line collapses the literal
+   newline+indent diff2html leaves between the prefix and content spans in its
+   HTML source; otherwise pre-wrap would turn that source whitespace into a
+   real line break, pushing every line's content onto a row of its own and
+   doubling row heights. The inner .d2h-code-line-ctn still uses pre-wrap
+   (below) to preserve meaningful whitespace inside the actual content. */
+.d2h-wrapper :deep(.d2h-code-line) {
+  display: block;
+  padding: 0 0.5rem;
+  width: auto;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Default diff2html CSS sets `.d2h-code-line-ctn { display: inline-block; width: 100% }`,
+   which — combined with our `.d2h-code-line { display: block }` wrap change —
+   forces the content span to consume the full row width, bumping it onto a line
+   below the `-` / `+` prefix. Flip to inline so the prefix and content flow
+   together and the row is as tall as its wrapped content. */
+.d2h-wrapper :deep(.d2h-code-line-prefix) {
+  display: inline;
+  padding-right: 0.3rem;
+  white-space: pre;
+}
+
+.d2h-wrapper :deep(.d2h-code-line-ctn) {
+  display: inline;
+  width: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .d2h-wrapper :deep(.d2h-file-diff) {
