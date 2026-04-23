@@ -12,7 +12,6 @@ import LongTextPopover from '../../../components/common/LongTextPopover.vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
-import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 import { durationToNow } from '../../../shared/lib.js'
 import { severityMap } from '../../../shared/lib/checklistUtils.js'
 import { fieldMatches, highlightText } from '../../../shared/lib/searchUtils.js'
@@ -42,6 +41,10 @@ const props = defineProps({
     type: Set,
     required: true,
   },
+  itemSize: {
+    type: Number,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:selectedRow'])
@@ -50,13 +53,6 @@ const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   severity: { value: null, matchMode: FilterMatchMode.IN },
 })
-
-const { itemSize } = useGridDensity('collection-checklist', 1, 12, 24)
-
-const longTextPopover = ref(null)
-const showLongText = (event, label, text) => {
-  longTextPopover.value?.show(event, label, text)
-}
 
 const globalFilterFields = ['groupId', 'groupTitle', 'version', 'ruleId', 'ruleTitle']
 
@@ -156,7 +152,7 @@ const columnPt = {
 
 const dataTablePt = {
   tableContainer: { style: { height: '100%' } },
-  table: { style: { tableLayout: 'auto', minWidth: '100%' } },
+  table: { style: { tableLayout: 'fixed', minWidth: '100%' } },
   bodyRow: { style: { cursor: 'pointer', height: 'var(--item-size)', overflow: 'hidden' } },
   footer: { style: { padding: '0', border: 'none' } },
   emptyMessageCell: { class: 'agg-grid-empty-cell' },
@@ -182,7 +178,7 @@ const dataTablePt = {
     @update:selection="(val) => emit('update:selectedRow', val)"
     @filter="onFilter"
   >
-    <Column field="severity" filter-field="severity" sortable :style="{ width: '6.5rem', minWidth: '6.5rem' }" :pt="columnPt.center">
+    <Column field="severity" filter-field="severity" sortable :style="{ width: '3rem', minWidth: '3rem' }" :pt="columnPt.center">
       <template #header>
         <div class="column-header-with-filter">
           Cat
@@ -199,7 +195,7 @@ const dataTablePt = {
         </div>
       </template>
     </Column>
-    <Column v-if="visibleFields.has('groupId')" field="groupId" header="Group" sortable :style="{ width: '7rem', minWidth: '7rem' }" :pt="columnPt.left">
+    <Column v-if="visibleFields.has('groupId')" field="groupId" header="Group" sortable :style="{ width: '5rem', minWidth: '5rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <span class="cell-text" :class="{ 'cell--match': searchFilter && fieldMatches(data.groupId, searchFilter) }">
           <span v-if="searchFilter" v-html="highlightText(data.groupId, searchFilter)" />
@@ -207,7 +203,7 @@ const dataTablePt = {
         </span>
       </template>
     </Column>
-    <Column v-if="visibleFields.has('groupTitle')" field="groupTitle" header="Group Title" sortable :style="{ width: '25%', minWidth: '16rem' }" :pt="columnPt.left">
+    <Column v-if="visibleFields.has('groupTitle')" field="groupTitle" header="Group Title" sortable :style="{ width: '14rem', minWidth: '14rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <div class="cell-text-field">
           <span
@@ -221,7 +217,7 @@ const dataTablePt = {
         </div>
       </template>
     </Column>
-    <Column field="version" header="STIG Id" sortable :style="{ width: '12rem', minWidth: '10rem' }" :pt="columnPt.left">
+    <Column v-if="visibleFields.has('version')" field="version" header="STIG Id" sortable :style="{ width: '6rem', minWidth: '6rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <span class="cell-text" :class="{ 'cell--match': searchFilter && fieldMatches(data.version, searchFilter) }">
           <span v-if="searchFilter" v-html="highlightText(data.version, searchFilter)" />
@@ -237,14 +233,13 @@ const dataTablePt = {
         </span>
       </template>
     </Column>
-    <Column v-if="visibleFields.has('ruleTitle')" field="ruleTitle" header="Rule Title" sortable :style="{ width: '25%', minWidth: '18rem' }" :pt="columnPt.left">
+    <Column v-if="visibleFields.has('ruleTitle')" field="ruleTitle" header="Rule Title" sortable :style="{ width: '40%', minWidth: '18rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <div class="cell-text-field">
           <span
             class="cell-text cell-text--clamped cell-text--clickable"
             :class="{ 'cell--match': searchFilter && fieldMatches(data.ruleTitle, searchFilter) }"
-            title="Click to view full rule title"
-            @click.stop="showLongText($event, 'Rule Title', data.ruleTitle)"
+            :title="data.ruleTitle"
           >
             <span v-if="searchFilter" v-html="highlightText(data.ruleTitle, searchFilter)" />
             <template v-else>{{ data.ruleTitle }}</template>
@@ -254,7 +249,7 @@ const dataTablePt = {
     </Column>
 
     <!-- Count Columns -->
-    <Column v-if="visibleFields.has('fail')" field="counts.results.fail" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('fail')" field="counts.results.fail" sortable :style="{ width: '2.5rem', minWidth: '2.5rem' }" :pt="columnPt.center">
       <template #header>
         <ResultBadge status="O" />
       </template>
@@ -262,7 +257,7 @@ const dataTablePt = {
         <span class="cell-text">{{ data.counts?.results?.fail ?? 0 }}</span>
       </template>
     </Column>
-    <Column v-if="visibleFields.has('pass')" field="counts.results.pass" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('pass')" field="counts.results.pass" sortable :style="{ width: '2.5rem', minWidth: '2.5rem' }" :pt="columnPt.center">
       <template #header>
         <ResultBadge status="NF" />
       </template>
@@ -270,7 +265,7 @@ const dataTablePt = {
         <span class="cell-text">{{ data.counts?.results?.pass ?? 0 }}</span>
       </template>
     </Column>
-    <Column v-if="visibleFields.has('notapplicable')" field="counts.results.notapplicable" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('notapplicable')" field="counts.results.notapplicable" sortable :style="{ width: '2.5rem', minWidth: '2.5rem' }" :pt="columnPt.center">
       <template #header>
         <ResultBadge status="NA" />
       </template>
@@ -278,7 +273,7 @@ const dataTablePt = {
         <span class="cell-text">{{ data.counts?.results?.notapplicable ?? 0 }}</span>
       </template>
     </Column>
-    <Column v-if="visibleFields.has('other')" field="counts.results.other" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('other')" field="counts.results.other" sortable :style="{ width: '2.5rem', minWidth: '2.5rem' }" :pt="columnPt.center">
       <template #header>
         <ResultBadge status="NR+" />
       </template>
@@ -288,7 +283,7 @@ const dataTablePt = {
     </Column>
 
     <!-- Status Icons -->
-    <Column v-if="visibleFields.has('submitted')" field="counts.statuses.submitted" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('submitted')" field="counts.statuses.submitted" sortable :style="{ width: '3rem', minWidth: '3rem' }" :pt="columnPt.center">
       <template #header>
         <StatusBadge status="submitted" />
       </template>
@@ -296,7 +291,7 @@ const dataTablePt = {
         <span class="cell-text">{{ data.counts?.statuses?.submitted ?? 0 }}</span>
       </template>
     </Column>
-    <Column v-if="visibleFields.has('rejected')" field="counts.statuses.rejected" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('rejected')" field="counts.statuses.rejected" sortable :style="{ width: '3rem', minWidth: '3rem' }" :pt="columnPt.center">
       <template #header>
         <StatusBadge status="rejected" />
       </template>
@@ -304,7 +299,7 @@ const dataTablePt = {
         <span class="cell-text">{{ data.counts?.statuses?.rejected ?? 0 }}</span>
       </template>
     </Column>
-    <Column v-if="visibleFields.has('accepted')" field="counts.statuses.accepted" sortable :style="{ width: '4.5rem', minWidth: '4.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('accepted')" field="counts.statuses.accepted" sortable :style="{ width: '3rem', minWidth: '3rem' }" :pt="columnPt.center">
       <template #header>
         <StatusBadge status="accepted" />
       </template>
@@ -314,12 +309,12 @@ const dataTablePt = {
     </Column>
 
     <!-- Timestamp Columns -->
-    <Column v-if="visibleFields.has('oldest')" field="timestamps.ts.min" header="Oldest" sortable :style="{ width: '6rem', minWidth: '6rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('oldest')" field="timestamps.ts.min" header="Oldest" sortable :style="{ width: '3rem', minWidth: '3rem' }" :pt="columnPt.center">
       <template #body="{ data }">
         <span v-if="data.timestamps?.ts?.min" class="cell-text" :title="data.timestamps.ts.min">{{ durationToNow(data.timestamps.ts.min) }}</span>
       </template>
     </Column>
-    <Column v-if="visibleFields.has('newest')" field="timestamps.ts.max" header="Newest" sortable :style="{ width: '6rem', minWidth: '6rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('newest')" field="timestamps.ts.max" header="Newest" sortable :style="{ width: '3rem', minWidth: '3rem' }" :pt="columnPt.center">
       <template #body="{ data }">
         <span v-if="data.timestamps?.ts?.max" class="cell-text" :title="data.timestamps.ts.max">{{ durationToNow(data.timestamps.ts.max) }}</span>
       </template>
@@ -407,14 +402,6 @@ const dataTablePt = {
 .cell-text-field .cell-text--clamped {
   flex: 1;
   min-width: 0;
-}
-
-.cell-text--clickable {
-  cursor: pointer;
-}
-
-.cell-text--clickable:hover {
-  color: var(--color-text-dim);
 }
 
 :deep(.p-datatable-thead > tr > th:last-child) {

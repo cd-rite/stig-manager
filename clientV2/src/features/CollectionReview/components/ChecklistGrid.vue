@@ -28,6 +28,7 @@ const emit = defineEmits(['select-rule'])
 const searchFilter = ref('')
 
 const TOGGLEABLE_COLUMNS = [
+  { field: 'version', header: 'STIG Id' },
   { field: 'fail', header: 'O' },
   { field: 'pass', header: 'NF' },
   { field: 'notapplicable', header: 'NA' },
@@ -45,7 +46,7 @@ const DISPLAY_MODE_FIELDS = {
   ruleRule: ['ruleId', 'ruleTitle'],
 }
 
-const selectedColumns = ref([...TOGGLEABLE_COLUMNS])
+const selectedColumns = ref(TOGGLEABLE_COLUMNS.filter(c => c.field !== 'version'))
 const displayMode = ref('groupRule')
 
 const visibleFields = computed(() => {
@@ -69,7 +70,7 @@ function onSelectionChange(row) {
   }
 }
 
-const { lineClamp, itemSize } = useGridDensity('collection-checklist', 1, 12, 24)
+const { lineClamp, itemSize } = useGridDensity('collection-checklist', 2, 10, 18)
 </script>
 
 <template>
@@ -90,6 +91,7 @@ const { lineClamp, itemSize } = useGridDensity('collection-checklist', 1, 12, 24
       :search-filter="searchFilter"
       :asset-count="assetCount"
       :visible-fields="visibleFields"
+      :item-size="itemSize"
       @update:selected-row="onSelectionChange"
     />
   </div>

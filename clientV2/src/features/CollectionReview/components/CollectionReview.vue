@@ -2,12 +2,14 @@
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 import { computed, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import RuleInfo from '../../../components/common/RuleInfo.vue'
+import { getHttpStatus } from '../../../shared/api/apiClient.js'
 import { fetchCollection } from '../../../shared/api/collectionsApi.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { useCurrentUser } from '../../../shared/composables/useCurrentUser.js'
 import { defaultFieldSettings } from '../../../shared/lib/reviewFormUtils.js'
+import { useRecentViews } from '../../NavRail/composables/useRecentViews.js'
 import { fetchAssetsByCollectionStig, fetchCollectionChecklist, fetchReviewsByRule, fetchRule } from '../api/collectionReviewApi.js'
 import { useBulkActionStates } from '../composables/useBulkActionStates.js'
 import { useRuleReviewActions } from '../composables/useRuleReviewActions.js'
@@ -17,15 +19,36 @@ import RejectReasonModal from './RejectReasonModal.vue'
 import RuleTable from './RuleTable.vue'
 
 const route = useRoute()
+const router = useRouter()
+const { addView, removeView } = useRecentViews()
 const { getCollectionRoleId } = useCurrentUser()
 
 const collectionId = computed(() => route.params.collectionId)
 const benchmarkId = computed(() => route.params.benchmarkId)
 const revisionStr = computed(() => route.params.revisionStr)
 
+function recentViewKey(cId = collectionId.value, bId = benchmarkId.value) {
+  return `collection-review:${cId}:${bId}`
+}
+
+// Fatal route-level error handler.
+// Any error on it → redirect.
+function handleRouteError(err) {
+  const status = getHttpStatus(err)
+  const isPrivilegeError = err.body?.error === 'User has insufficient privilege to complete this request.'
+  if (status === 404 || status === 403 || status === 400 || isPrivilegeError) {
+    removeView(recentViewKey())
+    router.push({ name: 'not-found', params: { pathMatch: route.path.substring(1).split('/') } })
+  }
+  else {
+    removeView(recentViewKey())
+    router.push({ name: 'not-found', params: { pathMatch: route.path.substring(1).split('/') } })
+  }
+}
+
 const { state: collection, execute: loadCollection } = useAsyncState(
   () => fetchCollection(collectionId.value),
-  { immediate: false, initialState: null, onError: null },
+  { immediate: false, initialState: null, onError: handleRouteError },
 )
 
 const fieldSettings = computed(() => collection.value?.settings?.fields ?? defaultFieldSettings)
@@ -39,7 +62,7 @@ const canAccept = computed(() =>
   statusSettings.value.canAccept && roleId.value >= statusSettings.value.minAcceptGrant,
 )
 
-const { state: gridData, isLoading: isChecklistLoading, execute: loadChecklist } = useAsyncState(
+const { state: gridData, isLoading: isChecklistLoading, error: checklistError, execute: loadChecklist } = useAsyncState(
   () => fetchCollectionChecklist(collectionId.value, benchmarkId.value, revisionStr.value),
   { immediate: false, initialState: [] },
 )
@@ -91,6 +114,28 @@ watch([collectionId, benchmarkId, revisionStr], () => {
     loadAssets()
   }
 }, { immediate: true })
+
+watch(
+  [collection, () => route.params.benchmarkId, () => route.params.revisionStr],
+  ([c]) => {
+    if (c?.name && route.params.benchmarkId) {
+      addView({
+        key: recentViewKey(collectionId.value, route.params.benchmarkId),
+        url: route.fullPath,
+        label: `${c.name} / ${route.params.benchmarkId}`,
+        type: 'collection-review',
+      })
+    }
+  },
+)
+
+// If the checklist fetch fails (e.g. bad benchmarkId/revisionStr), remove the
+// recent view entry so the nav rail doesn't pin a broken route.
+watch(checklistError, (err) => {
+  if (err) {
+    removeView(recentViewKey())
+  }
+})
 
 watch(gridData, (data) => {
   if (!data?.length) {

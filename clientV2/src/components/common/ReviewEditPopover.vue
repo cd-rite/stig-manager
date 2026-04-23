@@ -59,6 +59,13 @@ const props = defineProps({
     type: Array,
     default: () => ['history', 'statusText', 'otherAssets', 'attachments'],
   },
+  // Optional label identifying what is being edited (e.g. asset or rule name).
+  // When provided, shown in a header strip so the user knows which row the
+  // popover targets — useful when multiple rows are also checkbox-selected.
+  subjectLabel: {
+    type: String,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['save', 'status-action', 'close'])
@@ -237,6 +244,52 @@ function alignPopover() {
   }
 }
 
+function alignPopoverAnimated() {
+  const pv = popover.value
+  if (!pv?.container || !lastAnchorEvent.value) return
+  const el = pv.container
+  const prevTop = el.style.top
+
+  pv.alignOverlay()
+  nextTick(clampPopoverPosition)
+
+  const newTop = el.style.top
+  if (!prevTop || !newTop || prevTop === newTop) return
+
+  // Slide transition: snap back to old top, then animate to new top
+  el.style.transition = 'none'
+  el.style.top = prevTop
+  void el.offsetHeight // flush
+  el.style.transition = 'top 0.3s ease'
+  requestAnimationFrame(() => {
+    el.style.top = newTop
+    el.addEventListener('transitionend', () => { el.style.transition = '' }, { once: true })
+  })
+}
+
+function onResourceTransitionStart() {
+  const el = popover.value?.container
+  if (!el || !el.classList.contains('p-popover-flipped')) return
+
+  // Anchor to bottom so expansion pushes the box UP naturally
+  const rect = el.getBoundingClientRect()
+  el.style.bottom = `${window.innerHeight - rect.bottom}px`
+  el.style.top = 'auto'
+}
+
+function onResourceTransitionEnd() {
+  const el = popover.value?.container
+  if (!el) return
+
+  // Reset to top-based positioning for PrimeVue
+  el.style.top = `${el.getBoundingClientRect().top}px`
+  el.style.bottom = 'auto'
+
+  if (showResources.value) {
+    alignPopoverAnimated()
+  }
+}
+
 function reposition(event) {
   lastAnchorEvent.value = event
   const pv = popover.value
@@ -248,12 +301,6 @@ function reposition(event) {
     clampPopoverPosition()
   })
 }
-
-watch(showResources, () => {
-  nextTick(() => {
-    alignPopover()
-  })
-})
 
 let outsideHandler = null
 let outsideBindTimer = null
@@ -356,6 +403,9 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
       <button class="review-edit-popover__close" :title="isDirty ? 'Close (discards unsaved changes)' : 'Close'" @click="dismiss">
         <i class="pi pi-times" />
       </button>
+      <div v-if="subjectLabel" class="review-edit-popover__subject">
+        <span class="review-edit-popover__subject-value" :title="subjectLabel">{{ subjectLabel }}</span>
+      </div>
       <div class="review-edit-popover__main">
         <div class="review-edit-popover__result" :class="{ 'review-edit-popover__result--emphasis': showResultEmphasis }">
           <label class="review-edit-popover__label">
@@ -493,7 +543,13 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
         <div class="review-edit-popover__resources-toggle-line" />
       </div>
 
-      <Transition name="expand" @after-enter="alignPopover" @after-leave="alignPopover">
+      <Transition 
+        name="expand" 
+        @before-enter="onResourceTransitionStart"
+        @after-enter="onResourceTransitionEnd"
+        @before-leave="onResourceTransitionStart"
+        @after-leave="onResourceTransitionEnd"
+      >
         <div v-if="showResources" class="review-edit-popover__resources-container">
           <ReviewResources
             :rule-id="selectedRuleId"
@@ -549,6 +605,21 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
   gap: 0.5rem;
   align-items: stretch;
   min-height: 16rem;
+}
+
+.review-edit-popover__subject {
+  padding: 0.4rem 0.6rem;
+  margin: -0.4rem -0.4rem 0.2rem -0.4rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent);
+}
+
+.review-edit-popover__subject-value {
+  font-weight: 600;
+  color: var(--color-text-bright);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .review-edit-popover__label {
@@ -742,6 +813,7 @@ defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUns
   border: 1px solid var(--p-primary-color);
   box-shadow: 0 0 10px 2px color-mix(in srgb, var(--p-primary-color) 30%, transparent);
 }
+
 
 :global(.review-popover:not(.p-popover-flipped)::before) {
   border-bottom-color: var(--p-primary-color) !important;

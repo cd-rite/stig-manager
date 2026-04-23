@@ -1,4 +1,5 @@
 <script setup>
+import Checkbox from 'primevue/checkbox'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import { computed, ref } from 'vue'
@@ -6,6 +7,7 @@ import { computed, ref } from 'vue'
 import assessmentIcon from '../../../assets/assessment.svg'
 import engineIcon from '../../../assets/bot2.svg'
 import overrideIcon from '../../../assets/override2.svg'
+import readOnlyIcon from '../../../assets/read-only.svg'
 import manualIcon from '../../../assets/user.svg'
 import LabelsRow from '../../../components/columns/LabelsRow.vue'
 import ColumnFilter from '../../../components/common/ColumnFilter.vue'
@@ -82,29 +84,39 @@ const isDataSelectable = (data) => {
   return data?.access === 'rw'
 }
 
-function onSelectionChange(val) {
-  const filtered = val.filter(row => row.access === 'rw')
-  emit('update:selection', filtered)
-}
-
-const isAllSelected = computed(() => {
-  const selectable = filteredData.value.filter(isDataSelectable)
-  if (selectable.length === 0) { return false }
-  return selectable.every(row => props.selection.some(s => s.assetId === row.assetId))
+const selectedIdSet = computed(() => {
+  const s = new Set()
+  for (const row of props.selection) {
+    s.add(row.assetId)
+  }
+  return s
 })
 
-function onSelectAllChange(event) {
-  if (event.checked) {
-    const selectable = filteredData.value.filter(isDataSelectable)
-    emit('update:selection', selectable)
+function onSelectionChange(val) {
+  emit('update:selection', val)
+}
+
+function onToggleSelectRow(data) {
+  const ids = selectedIdSet.value
+  let newSelection
+  if (ids.has(data.assetId)) {
+    newSelection = props.selection.filter(s => s.assetId !== data.assetId)
   }
   else {
-    emit('update:selection', [])
+    newSelection = [...props.selection, data]
   }
+  emit('update:selection', newSelection)
 }
 
 const getRowClass = (data) => {
-  return data.access !== 'rw' ? 'row-non-writable' : ''
+  const classes = []
+  if (data.access !== 'rw') {
+    classes.push('row-non-writable')
+  }
+  if (editingAssetId.value === data.assetId) {
+    classes.push('row-editing')
+  }
+  return classes.join(' ')
 }
 
 function onFooterAction(key) {
@@ -115,6 +127,7 @@ function onFooterAction(key) {
 const reviewEditPopover = ref(null)
 const popoverAnchor = ref(null)
 const editingRow = ref(null)
+const editingAssetId = computed(() => editingRow.value?.assetId ?? null)
 const enabledTabs = ['history', 'attachments', 'statusText']
 
 function openRowEditor(event, rowData) {
@@ -128,13 +141,16 @@ function openRowEditor(event, rowData) {
   emit('edit-asset', rowData.assetId)
 
   const row = event.target?.closest ? event.target.closest('tr') : null
-  const rowRect = row ? row.getBoundingClientRect() : { top: 0, height: 0 }
+  const rowRect = row ? row.getBoundingClientRect() : { top: 0, bottom: 0 }
   const clickX = event.clientX ?? 0
+  const openAbove = rowRect.top > window.innerHeight / 2
 
   if (popoverAnchor.value) {
     popoverAnchor.value.style.left = `${clickX}px`
-    popoverAnchor.value.style.top = `${rowRect.top}px`
-    popoverAnchor.value.style.height = `${rowRect.height}px`
+    popoverAnchor.value.style.height = '0px'
+    popoverAnchor.value.style.top = openAbove
+      ? `${rowRect.top + 6}px`
+      : `${rowRect.bottom + 4}px`
   }
 
   const anchorEvent = {
@@ -179,6 +195,21 @@ function onPopoverStatusAction(payload) {
 function onPopoverClose() {
   editingRow.value = null
   emit('edit-close')
+}
+
+const scrollLocked = computed(() => !!editingRow.value && !!reviewEditPopover.value?.isDirty)
+
+function onGridWheel(event) {
+  if (scrollLocked.value) {
+    event.preventDefault()
+  }
+}
+
+function onGridScroll() {
+  if (!editingRow.value) {
+    return
+  }
+  reviewEditPopover.value?.hide()
 }
 
 const filters = ref({
@@ -242,6 +273,32 @@ const filteredData = computed(() => {
   return data
 })
 
+const isAllSelected = computed(() => {
+  const data = filteredData.value
+  if (!data.length) { return false }
+  const ids = selectedIdSet.value
+  let hasSelectable = false
+  for (const row of data) {
+    if (!isDataSelectable(row)) { continue }
+    hasSelectable = true
+    if (!ids.has(row.assetId)) { return false }
+  }
+  return hasSelectable
+})
+
+function onSelectAllChange(event) {
+  if (event.checked) {
+    const selectable = []
+    for (const row of filteredData.value) {
+      if (isDataSelectable(row)) { selectable.push(row) }
+    }
+    emit('update:selection', selectable)
+  }
+  else {
+    emit('update:selection', [])
+  }
+}
+
 const stats = computed(() => calculateChecklistStats(filteredData.value) ?? {
   results: { pass: 0, fail: 0, notapplicable: 0, other: 0 },
   engine: { manual: 0, engine: 0, override: 0 },
@@ -292,11 +349,12 @@ const columnPt = {
 const dataTablePt = {
   tableContainer: { style: { height: '100%' } },
   table: { style: { tableLayout: 'auto', minWidth: '100%' } },
-  bodyRow: ({ props, index }) => {
-    const rowData = props.value[index]
+  bodyRow: ({ props }) => {
+    const access = props.rowData.access
     return {
       style: { cursor: 'pointer', height: 'var(--item-size, 36px)', overflow: 'hidden' },
-      title: rowData?.access !== 'rw' ? 'Read only' : '',
+      title: access !== 'rw' ? 'Read only' : '',
+
     }
   },
   footer: { style: { padding: '0', border: 'none' } },
@@ -323,9 +381,36 @@ const dataTablePt = {
     @select-all-change="onSelectAllChange"
     @row-click="onRowClick"
     @update:selection="onSelectionChange"
+    @scroll.capture="onGridScroll"
+    @wheel.capture="onGridWheel"
   >
     <!-- Selection -->
-    <Column selection-mode="multiple" header-style="width: 2.5rem" :pt="columnPt.center" />
+    <Column header-style="width: 2.5rem" :pt="columnPt.center">
+      <template #header>
+        <Checkbox
+          v-if="filteredData.length > 0"
+          :model-value="isAllSelected"
+          :binary="true"
+          @update:model-value="onSelectAllChange({ checked: $event })"
+        />
+      </template>
+      <template #body="{ data }">
+        <img
+          v-if="data.access !== 'rw'"
+          :src="readOnlyIcon"
+          class="read-only-icon"
+          alt="Read only"
+          title="Read only"
+        >
+        <Checkbox
+          v-else
+          :model-value="selectedIdSet.has(data.assetId)"
+          :binary="true"
+          @update:model-value="onToggleSelectRow(data)"
+          @click.stop
+        />
+      </template>
+    </Column>
 
     <!-- Engine -->
     <Column field="resultEngine" sort-field="resultEngine.product" sortable :style="{ width: '4rem', minWidth: '4rem' }" :pt="columnPt.center">
@@ -493,6 +578,7 @@ const dataTablePt = {
     :save-error="props.saveError"
     :clear-save-error="props.clearSaveError"
     :enabled-tabs="enabledTabs"
+    :subject-label="editingRow?.assetName"
     @save="onPopoverSave"
     @status-action="onPopoverStatusAction"
     @close="onPopoverClose"
@@ -572,6 +658,11 @@ const dataTablePt = {
   opacity: 0.7;
 }
 
+.read-only-icon {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
 :deep(.p-datatable-thead > tr > th) {
   background: var(--color-background-dark);
   color: var(--color-text-dim);
@@ -612,8 +703,23 @@ const dataTablePt = {
   transition: opacity 0.2s;
 }
 
+:deep(.p-datatable-tbody > tr:hover) {
+  background: var(--color-background-light) !important;
+}
+
 :deep(.p-datatable-tbody > tr.row-non-writable:hover) {
   background: inherit !important;
+}
+
+:deep(.p-datatable-tbody > tr.row-editing > td) {
+  background: color-mix(in srgb, var(--p-primary-color) 32%, var(--color-background-dark)) !important;
+  color: var(--color-text-bright, var(--color-text-primary)) !important;
+  border-top: 1px solid var(--p-primary-color) !important;
+  border-bottom: 1px solid var(--p-primary-color) !important;
+}
+
+:deep(.p-datatable-tbody > tr.row-editing .cell-text) {
+  color: var(--color-text-bright, var(--color-text-primary)) !important;
 }
 
 :deep(.row-non-writable .p-checkbox) {
