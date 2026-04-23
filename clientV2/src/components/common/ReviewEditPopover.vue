@@ -10,9 +10,6 @@ import ResultEngineBadges from './ResultEngineBadges.vue'
 import StatusBadge from './StatusBadge.vue'
 import StatusButton from './StatusButton.vue'
 
-
-const emit = defineEmits(['save', 'status-action', 'close', 'clear-save-error'])
-
 const props = defineProps({
   fieldSettings: { type: Object, required: true },
   accessMode: { type: String, required: true },
@@ -22,6 +19,8 @@ const props = defineProps({
   currentReview: { type: Object, default: null },
   selectedRuleId: { type: String, default: null },
 })
+
+const emit = defineEmits(['save', 'status-action', 'close', 'clear-save-error'])
 
 defineSlots()
 

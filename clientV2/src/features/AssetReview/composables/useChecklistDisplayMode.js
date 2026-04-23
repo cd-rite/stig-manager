@@ -125,18 +125,6 @@ export function useChecklistDisplayMode() {
 
   const itemSize = computed(() => (15 * lineClamp.value) + 6)
 
-  function increaseRowHeight() {
-    if (lineClamp.value < 10) {
-      lineClamp.value++
-    }
-  }
-
-  function decreaseRowHeight() {
-    if (lineClamp.value > 1) {
-      lineClamp.value--
-    }
-  }
-
   return {
     checklistColumns,
     selectedChecklistColumns,
@@ -144,7 +132,5 @@ export function useChecklistDisplayMode() {
     displayModeItems,
     lineClamp,
     itemSize,
-    increaseRowHeight,
-    decreaseRowHeight,
   }
 }
