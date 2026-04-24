@@ -3,6 +3,9 @@ import Checkbox from 'primevue/checkbox'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import { computed, ref } from 'vue'
+import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
+import { statusPayloadForAction } from '../../../shared/lib/reviewFormUtils.js'
+import { patchReview, putReview } from '../../AssetReview/api/assetReviewApi.js'
 
 import assessmentIcon from '../../../assets/assessment.svg'
 import engineIcon from '../../../assets/bot2.svg'
@@ -54,29 +57,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  isSaving: {
-    type: Boolean,
-    default: false,
-  },
-  saveError: {
-    type: String,
-    default: null,
-  },
-  clearSaveError: {
-    type: Function,
-    default: () => {},
-  },
-  currentReview: {
-    type: Object,
-    default: null,
-  },
   selection: {
     type: Array,
     default: () => [],
   },
 })
 
-const emit = defineEmits(['action', 'row-save', 'status-action', 'edit-asset', 'edit-close', 'update:selection'])
+const emit = defineEmits(['action', 'review-saved', 'update:selection'])
 
 const { itemSize } = useGridDensity('collection-rule-table', 1, 12, 24)
 
@@ -130,6 +117,45 @@ const editingRow = ref(null)
 const editingAssetId = computed(() => editingRow.value?.assetId ?? null)
 const enabledTabs = ['history', 'attachments', 'statusText']
 
+const currentReview = computed(() => props.gridData.find(r => r.assetId === editingRow.value?.assetId) ?? null)
+
+// --- Save logic ---
+const saveError = ref(null)
+function clearSaveError() { saveError.value = null }
+
+const { isLoading: isSavingReview, execute: executeSaveReview } = useAsyncState(
+  async ({ assetId, ruleId, result, detail, comment, status }) => {
+    saveError.value = null
+    const row = props.gridData.find(r => r.assetId === assetId)
+    const resultChanged = row ? result !== row.result : true
+    const body = {
+      result,
+      detail: detail ?? '',
+      comment: comment ?? '',
+      resultEngine: resultChanged ? null : (row?.resultEngine ?? null),
+      status: status || 'saved',
+    }
+    const saved = await putReview(props.collectionId, assetId, ruleId, body)
+    emit('review-saved', { ...saved, assetId })
+    return saved
+  },
+  { immediate: false, onError: err => { saveError.value = err?.message ?? 'Failed to save review.' } },
+)
+
+const { isLoading: isSavingStatus, execute: executeSaveStatus } = useAsyncState(
+  async ({ assetId, ruleId, actionType }) => {
+    saveError.value = null
+    const status = statusPayloadForAction(actionType)
+    if (status === null) return null
+    const saved = await patchReview(props.collectionId, assetId, ruleId, { status })
+    emit('review-saved', { ...saved, assetId })
+    return saved
+  },
+  { immediate: false, onError: err => { saveError.value = err?.message ?? 'Failed to save review.' } },
+)
+
+const isSaving = computed(() => isSavingReview.value || isSavingStatus.value)
+
 function openRowEditor(event, rowData) {
   if (!rowData || rowData.access !== 'rw') {
     return
@@ -138,7 +164,6 @@ function openRowEditor(event, rowData) {
   const wasOpen = !!editingRow.value
 
   editingRow.value = rowData
-  emit('edit-asset', rowData.assetId)
 
   const row = event.target?.closest ? event.target.closest('tr') : null
   const rowRect = row ? row.getBoundingClientRect() : { top: 0, bottom: 0 }
@@ -179,22 +204,28 @@ function onRowClick(event) {
 }
 
 function onPopoverSave(payload) {
-  if (!editingRow.value) {
-    return
-  }
-  emit('row-save', { ...payload, assetId: editingRow.value.assetId })
+  if (!editingRow.value) return
+  executeSaveReview({
+    assetId: editingRow.value.assetId,
+    ruleId: payload.ruleId,
+    result: payload.result,
+    detail: payload.detail,
+    comment: payload.comment,
+    status: payload.status,
+  })
 }
 
 function onPopoverStatusAction(payload) {
-  if (!editingRow.value) {
-    return
-  }
-  emit('status-action', { ...payload, assetId: editingRow.value.assetId })
+  if (!editingRow.value) return
+  executeSaveStatus({
+    assetId: editingRow.value.assetId,
+    ruleId: payload.ruleId,
+    actionType: payload.actionType,
+  })
 }
 
 function onPopoverClose() {
   editingRow.value = null
-  emit('edit-close')
 }
 
 const scrollLocked = computed(() => !!editingRow.value && !!reviewEditPopover.value?.isDirty)
@@ -360,6 +391,13 @@ const dataTablePt = {
   footer: { style: { padding: '0', border: 'none' } },
   emptyMessageCell: { class: 'agg-grid-empty-cell' },
 }
+
+const checkboxPt = {
+  root: { style: { width: '2rem', height: '2rem' } },
+  box: { style: { width: '1.75rem', height: '1.75rem' } },
+  input: { style: { width: '1.75rem', height: '1.75rem' } },
+  icon: { style: { fontSize: '1.5rem' } },
+}
 </script>
 
 <template>
@@ -385,12 +423,13 @@ const dataTablePt = {
     @wheel.capture="onGridWheel"
   >
     <!-- Selection -->
-    <Column header-style="width: 2.5rem" :pt="columnPt.center">
+    <Column header-style="width: 3rem" :pt="columnPt.center">
       <template #header>
         <Checkbox
           v-if="filteredData.length > 0"
           :model-value="isAllSelected"
           :binary="true"
+          :pt="checkboxPt"
           @update:model-value="onSelectAllChange({ checked: $event })"
         />
       </template>
@@ -406,6 +445,7 @@ const dataTablePt = {
           v-else
           :model-value="selectedIdSet.has(data.assetId)"
           :binary="true"
+          :pt="checkboxPt"
           @update:model-value="onToggleSelectRow(data)"
           @click.stop
         />
@@ -567,22 +607,26 @@ const dataTablePt = {
 
   <ReviewEditPopover
     ref="reviewEditPopover"
-    :current-review="props.currentReview"
+    :current-review="currentReview"
     :selected-rule-id="props.selectedRuleId"
     :collection-id="props.collectionId"
     :asset-id="editingRow?.assetId"
     :field-settings="props.fieldSettings"
     :access-mode="editingRow?.access"
     :can-accept="props.canAccept"
-    :is-saving="props.isSaving"
-    :save-error="props.saveError"
-    :clear-save-error="props.clearSaveError"
+    :is-saving="isSaving"
+    :save-error="saveError"
+    :clear-save-error="clearSaveError"
     :enabled-tabs="enabledTabs"
     :subject-label="editingRow?.assetName"
     @save="onPopoverSave"
     @status-action="onPopoverStatusAction"
     @close="onPopoverClose"
   />
+
+  <div v-if="isSaving" class="rule-table-grid__mask" aria-busy="true">
+    <i class="pi pi-spin pi-spinner rule-table-grid__mask-spinner" />
+  </div>
 
   <div
     ref="popoverAnchor"
@@ -592,6 +636,23 @@ const dataTablePt = {
 </template>
 
 <style scoped>
+.rule-table-grid__mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--color-background-darkest) 25%, transparent);
+  backdrop-filter: blur(1px);
+  z-index: 10;
+  cursor: wait;
+}
+
+.rule-table-grid__mask-spinner {
+  font-size: 2rem;
+  color: var(--color-text-bright);
+}
+
 .column-header-with-filter {
   display: flex;
   align-items: center;

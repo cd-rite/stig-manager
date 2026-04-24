@@ -8,11 +8,10 @@ import { getHttpStatus } from '../../../shared/api/apiClient.js'
 import { fetchCollection } from '../../../shared/api/collectionsApi.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { useCurrentUser } from '../../../shared/composables/useCurrentUser.js'
-import { defaultFieldSettings } from '../../../shared/lib/reviewFormUtils.js'
+import { defaultFieldSettings, statusPayloadForAction } from '../../../shared/lib/reviewFormUtils.js'
 import { useRecentViews } from '../../NavRail/composables/useRecentViews.js'
-import { fetchAssetsByCollectionStig, fetchCollectionChecklist, fetchReviewsByRule, fetchRule } from '../api/collectionReviewApi.js'
+import { fetchAssetsByCollectionStig, fetchCollectionChecklist, fetchReviewsByRule, fetchRule, postReviewBatch } from '../api/collectionReviewApi.js'
 import { useBulkActionStates } from '../composables/useBulkActionStates.js'
-import { useRuleReviewActions } from '../composables/useRuleReviewActions.js'
 import BatchEditModal from './BatchEditModal.vue'
 import ChecklistGrid from './ChecklistGrid.vue'
 import RejectReasonModal from './RejectReasonModal.vue'
@@ -52,14 +51,13 @@ const { state: collection, execute: loadCollection } = useAsyncState(
 )
 
 const fieldSettings = computed(() => collection.value?.settings?.fields ?? defaultFieldSettings)
-const statusSettings = computed(() => collection.value?.settings?.status ?? {
-  canAccept: false,
-  minAcceptGrant: 4,
-})
+const statusSettings = computed(() => collection.value?.settings?.status)
 
 const roleId = computed(() => getCollectionRoleId(collectionId.value))
 const canAccept = computed(() =>
-  statusSettings.value.canAccept && roleId.value >= statusSettings.value.minAcceptGrant,
+  statusSettings.value?.canAccept
+  && statusSettings.value?.minAcceptGrant !== undefined
+  && roleId.value >= statusSettings.value.minAcceptGrant,
 )
 
 const { state: gridData, isLoading: isChecklistLoading, error: checklistError, execute: loadChecklist } = useAsyncState(
@@ -75,13 +73,6 @@ const { state: assets, execute: loadAssets } = useAsyncState(
 const assetCount = computed(() => assets.value?.length ?? 0)
 
 const selectedRuleId = ref(null)
-
-const selectedChecklistItem = computed(() => {
-  if (!selectedRuleId.value || !gridData.value?.length) {
-    return null
-  }
-  return gridData.value.find(r => r.ruleId === selectedRuleId.value) ?? null
-})
 
 const {
   state: ruleContent,
@@ -137,6 +128,7 @@ watch(checklistError, (err) => {
   }
 })
 
+// makes sure selectged is always valid or we pick first item
 watch(gridData, (data) => {
   if (!data?.length) {
     selectedRuleId.value = null
@@ -164,17 +156,9 @@ function onSelectRule(ruleId) {
   selectedRuleId.value = ruleId
 }
 
-function onRetryRule() {
-  if (selectedRuleId.value) {
-    loadRuleContent(selectedRuleId.value)
-  }
-}
-
 const showRuleLoading = computed(() => isRuleLoading.value && !ruleContent.value)
 const showReviewsLoading = computed(() => isReviewsLoading.value)
 
-const editingAssetId = ref(null)
-const accessMode = ref('rw')
 const selectedAssetIds = ref(new Set())
 
 const selectedRows = computed({
@@ -196,13 +180,6 @@ watch(selectedRuleId, () => {
   selectedAssetIds.value = new Set()
 })
 
-const currentReview = computed(() => {
-  if (!editingAssetId.value || !reviewsData.value?.length) {
-    return null
-  }
-  return reviewsData.value.find(r => r.assetId === editingAssetId.value) ?? null
-})
-
 function upsertReview(assetId, updated) {
   if (!reviewsData.value) {
     return
@@ -221,67 +198,37 @@ function upsertReview(assetId, updated) {
   }
 }
 
-const {
-  isSaving,
-  saveError,
-  clearSaveError,
-  saveFullReview,
-  saveStatusAction,
-  performBulkAction,
-  performBatchEdit,
-} = useRuleReviewActions(
-  { collectionId, assetId: editingAssetId, ruleId: selectedRuleId },
-  {
-    reviewsData,
-    upsertReview,
-    currentReview,
-    refreshReviews: () => selectedRuleId.value ? loadReviews(selectedRuleId.value) : null,
-  },
-)
-
-function onRowSave(payload) {
-  if (payload?.assetId) {
-    editingAssetId.value = payload.assetId
-  }
-  saveFullReview({
-    result: payload.result,
-    detail: payload.detail,
-    comment: payload.comment,
-    status: payload.status,
-  })
+function onReviewSaved(review) {
+  upsertReview(review.assetId, review)
 }
 
-function onStatusAction(payload) {
-  if (payload?.assetId) {
-    editingAssetId.value = payload.assetId
-  }
-  saveStatusAction(payload.actionType)
-}
-
-function onEditAsset(assetId) {
-  editingAssetId.value = assetId
-}
-
-function onEditClose() {
-  editingAssetId.value = null
-}
+const isBulkSaving = ref(false)
 
 const rejectModalVisible = ref(false)
 const batchEditModalVisible = ref(false)
 const pendingRejectRows = ref([])
 
-function runAction(actionType, rows, rejectText) {
-  if (rows.length === 1) {
-    editingAssetId.value = rows[0].assetId
+async function runBulkAction(actionType, rows, rejectText) {
+  if (!rows?.length) { return }
+  const status = statusPayloadForAction(actionType, rejectText)
+  if (status === null) { return }
+  isBulkSaving.value = true
+  try {
+    await postReviewBatch(collectionId.value, {
+      source: { review: { status } },
+      assets: { assetIds: rows.map(r => r.assetId) },
+      rules: { ruleIds: [selectedRuleId.value] },
+    })
+    if (selectedRuleId.value) { await loadReviews(selectedRuleId.value) }
   }
-  performBulkAction({ actionType, rows, rejectText })
+  finally {
+    isBulkSaving.value = false
+  }
 }
 
 function onBulkAction(actionType) {
   const rows = selectedRows.value
-  if (!rows?.length) {
-    return
-  }
+  if (!rows?.length) { return }
   if (actionType === 'batchEdit') {
     batchEditModalVisible.value = true
     return
@@ -291,31 +238,36 @@ function onBulkAction(actionType) {
     rejectModalVisible.value = true
     return
   }
-  runAction(actionType, rows)
+  runBulkAction(actionType, rows)
 }
 
 function onRejectConfirm(text) {
   const rows = pendingRejectRows.value
   pendingRejectRows.value = []
-  if (!rows.length) {
-    return
-  }
-  runAction('reject', rows, text)
+  if (!rows.length) { return }
+  runBulkAction('reject', rows, text)
 }
 
 function onRejectCancel() {
   pendingRejectRows.value = []
 }
 
-function onBatchEditConfirm(payload) {
+async function onBatchEditConfirm(payload) {
   const rows = selectedRows.value
-  if (!rows?.length) {
-    return
+  if (!rows?.length) { return }
+  isBulkSaving.value = true
+  try {
+    await postReviewBatch(collectionId.value, {
+      source: { review: payload },
+      assets: { assetIds: rows.map(r => r.assetId) },
+      rules: { ruleIds: [selectedRuleId.value] },
+    })
+    if (selectedRuleId.value) { await loadReviews(selectedRuleId.value) }
   }
-  performBatchEdit({ rows, payload })
+  finally {
+    isBulkSaving.value = false
+  }
 }
-
-// No more provide. Everything passed via props.
 </script>
 
 <template>
@@ -355,15 +307,9 @@ function onBatchEditConfirm(payload) {
                 :collection-id="collectionId"
                 :field-settings="fieldSettings"
                 :can-accept="canAccept"
-                :is-saving="isSaving"
-                :save-error="saveError"
-                :clear-save-error="clearSaveError"
-                :current-review="currentReview"
+                :is-saving="isBulkSaving"
                 :action-states="actionStates"
-                @row-save="onRowSave"
-                @status-action="onStatusAction"
-                @edit-asset="onEditAsset"
-                @edit-close="onEditClose"
+                @review-saved="onReviewSaved"
                 @bulk-action="onBulkAction"
               />
             </SplitterPanel>
@@ -375,8 +321,6 @@ function onBatchEditConfirm(payload) {
             :rule-content="ruleContent"
             :is-loading="showRuleLoading"
             :rule-content-error="ruleContentError"
-            :selected-checklist-item="selectedChecklistItem"
-            @retry="onRetryRule"
           />
         </SplitterPanel>
       </Splitter>

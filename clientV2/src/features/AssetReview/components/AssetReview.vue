@@ -17,7 +17,6 @@ import {
   fetchStigRevisions,
 } from '../api/assetReviewApi.js'
 import { useChecklistData } from '../composables/useChecklistData.js'
-import { useReviewActions } from '../composables/useReviewActions.js'
 import { useRuleDetail } from '../composables/useRuleDetail.js'
 import ChecklistGrid from './ChecklistGrid.vue'
 
@@ -105,20 +104,9 @@ const {
   ruleContent,
   isRuleLoading,
   ruleContentError,
-  currentReview,
   selectRule,
   clearSelectedRule,
 } = useRuleDetail({ ruleLookupMap, collectionId, assetId, benchmarkId, revisionStr })
-
-const {
-  isSaving,
-  saveError,
-  clearSaveError,
-  saveFullReview,
-  saveStatusAction,
-} = useReviewActions({ collectionId, assetId }, { gridData, upsertReview, selectedRuleId, currentReview })
-
-// No more provide. Everything passed via props.
 
 watch([benchmarkId, revisionStr], () => {
   clearSelectedRule()
@@ -152,12 +140,8 @@ watch(checklistError, (err) => {
   }
 })
 
-function onRowSave({ ruleId, result, detail, comment, status }) {
-  saveFullReview(ruleId, { result, detail, comment, status })
-}
-
-function onStatusAction({ ruleId, actionType }) {
-  saveStatusAction(ruleId, actionType)
+function onReviewSaved(review) {
+  upsertReview(review.ruleId, review)
 }
 
 function onGridRefresh() {
@@ -202,18 +186,13 @@ const searchFilter = useDebouncedRef('', 220)
             :revision-info="revisionInfo"
             :access-mode="accessMode"
             :select-rule="selectRule"
-            :clear-save-error="clearSaveError"
             :rule-lookup-map="ruleLookupMap"
             :field-settings="fieldSettings"
             :can-accept="canAccept"
-            :is-saving="isSaving"
-            :save-error="saveError"
-            :current-review="currentReview"
             :collection-id="collectionId"
             :asset-id="assetId"
             @update:search-filter="searchFilter = $event"
-            @row-save="onRowSave"
-            @status-action="onStatusAction"
+            @review-saved="onReviewSaved"
             @refresh="onGridRefresh"
           />
         </SplitterPanel>
@@ -222,7 +201,6 @@ const searchFilter = useDebouncedRef('', 220)
             :rule-content="ruleContent"
             :is-loading="isRuleLoading"
             :rule-content-error="ruleContentError"
-            :selected-checklist-item="selectedChecklistItem"
             @retry="selectRule(selectedRuleId)"
           />
         </SplitterPanel>

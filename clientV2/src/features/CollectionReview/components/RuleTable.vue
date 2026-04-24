@@ -33,18 +33,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  saveError: {
-    type: String,
-    default: null,
-  },
-  clearSaveError: {
-    type: Function,
-    default: () => {},
-  },
-  currentReview: {
-    type: Object,
-    default: null,
-  },
   selection: {
     type: Array,
     default: () => [],
@@ -61,7 +49,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['row-save', 'status-action', 'edit-asset', 'edit-close', 'update:selection', 'bulk-action'])
+const emit = defineEmits(['review-saved', 'update:selection', 'bulk-action'])
 
 const { lineClamp, itemSize } = useGridDensity('collection-rule-table', 1, 12, 24)
 
@@ -98,15 +86,8 @@ const visibleFields = computed(() => new Set(selectedColumns.value.map(c => c.fi
       :selected-rule-id="selectedRuleId"
       :field-settings="fieldSettings"
       :can-accept="canAccept"
-      :is-saving="isSaving"
-      :save-error="saveError"
-      :clear-save-error="clearSaveError"
-      :current-review="currentReview"
       :selection="props.selection"
-      @row-save="(p) => emit('row-save', p)"
-      @status-action="(p) => emit('status-action', p)"
-      @edit-asset="(id) => emit('edit-asset', id)"
-      @edit-close="() => emit('edit-close')"
+      @review-saved="(r) => emit('review-saved', r)"
       @update:selection="(val) => emit('update:selection', val)"
     />
 

@@ -16,10 +16,6 @@ defineProps({
     type: Object,
     default: null,
   },
-  selectedChecklistItem: {
-    type: Object,
-    default: null,
-  },
   currentReview: {
     type: Object,
     default: null,
@@ -47,7 +43,6 @@ const emit = defineEmits(['retry-rule-content'])
         :rule-content="ruleContent"
         :is-loading="isRuleLoading"
         :rule-content-error="ruleContentError"
-        :selected-checklist-item="selectedChecklistItem"
         @retry="emit('retry-rule-content')"
       />
     </SplitterPanel>

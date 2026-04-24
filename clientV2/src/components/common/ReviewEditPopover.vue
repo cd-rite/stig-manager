@@ -236,13 +236,6 @@ function clampPopoverPosition() {
   container.style.setProperty('--p-popover-arrow-left', `${arrowLeftEdge}px`)
 }
 
-function alignPopover() {
-  const pv = popover.value
-  if (pv && pv.container && lastAnchorEvent.value) {
-    pv.alignOverlay()
-    nextTick(clampPopoverPosition)
-  }
-}
 
 function alignPopoverAnimated() {
   const pv = popover.value
@@ -376,7 +369,7 @@ onBeforeUnmount(() => {
   unbindOutsideHandler()
 })
 
-defineExpose({ toggle, show, hide, reposition, alignPopover, isDirty, triggerUnsavedWarning })
+defineExpose({ toggle, show, hide, reposition, isDirty, triggerUnsavedWarning })
 </script>
 
 <template>

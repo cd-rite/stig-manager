@@ -3,6 +3,9 @@ import { computed, inject, onMounted, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import ReviewEditPopover from '../../../components/common/ReviewEditPopover.vue'
+import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
+import { statusPayloadForAction } from '../../../shared/lib/reviewFormUtils.js'
+import { patchReview, putReview } from '../api/assetReviewApi.js'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
 import ChecklistGridHeader from './ChecklistGridHeader.vue'
 import ChecklistGridTable from './ChecklistGridTable.vue'
@@ -40,10 +43,6 @@ const props = defineProps({
     type: Function,
     required: true,
   },
-  clearSaveError: {
-    type: Function,
-    required: true,
-  },
   ruleLookupMap: {
     type: Object,
     default: () => new Map(),
@@ -56,18 +55,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  isSaving: {
-    type: Boolean,
-    default: false,
-  },
-  saveError: {
-    type: String,
-    default: null,
-  },
-  currentReview: {
-    type: Object,
-    default: null,
-  },
   collectionId: {
     type: String,
     default: null,
@@ -78,9 +65,9 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:searchFilter', 'row-save', 'status-action', 'refresh'])
+const emit = defineEmits(['update:searchFilter', 'review-saved', 'refresh'])
 
-const { selectRule, clearSaveError } = props
+const { selectRule } = props
 
 const {
   gridData,
@@ -92,9 +79,6 @@ const {
   ruleLookupMap,
   fieldSettings,
   canAccept,
-  isSaving,
-  saveError,
-  currentReview,
   collectionId,
   assetId,
 } = toRefs(props)
@@ -108,6 +92,60 @@ const selectedRow = computed(() => {
 const reviewEditPopover = ref()
 const popoverAnchor = ref(null)
 const editingRow = ref(null)
+
+const currentReview = computed(() => gridData.value.find(r => r.ruleId === editingRow.value?.ruleId) ?? null)
+
+const saveError = ref(null)
+function clearSaveError() { saveError.value = null }
+
+const { isLoading: isSavingReview, execute: executeSaveReview } = useAsyncState(
+  async ({ ruleId, result, detail, comment, status }) => {
+    saveError.value = null
+    const row = gridData.value.find(r => r.ruleId === ruleId)
+    const resultChanged = row ? result !== row.result : true
+    const body = {
+      result,
+      detail: detail ?? '',
+      comment: comment ?? '',
+      resultEngine: resultChanged ? null : (row?.resultEngine ?? null),
+      status: status || 'saved',
+    }
+    const saved = await putReview(collectionId.value, assetId.value, ruleId, body)
+    emit('review-saved', { ...saved, ruleId })
+    return saved
+  },
+  { immediate: false, onError: err => { saveError.value = err?.message ?? 'Failed to save review.' } },
+)
+
+const { isLoading: isSavingStatus, execute: executeSaveStatus } = useAsyncState(
+  async ({ ruleId, actionType }) => {
+    saveError.value = null
+    const status = statusPayloadForAction(actionType)
+    if (status === null) return null
+    const saved = await patchReview(collectionId.value, assetId.value, ruleId, { status })
+    emit('review-saved', { ...saved, ruleId })
+    return saved
+  },
+  { immediate: false, onError: err => { saveError.value = err?.message ?? 'Failed to save review.' } },
+)
+
+const isSaving = computed(() => isSavingReview.value || isSavingStatus.value)
+
+function onPopoverSave(payload) {
+  if (!editingRow.value) return
+  executeSaveReview({
+    ruleId: payload.ruleId,
+    result: payload.result,
+    detail: payload.detail,
+    comment: payload.comment,
+    status: payload.status,
+  })
+}
+
+function onPopoverStatusAction(payload) {
+  if (!editingRow.value) return
+  executeSaveStatus({ ruleId: payload.ruleId, actionType: payload.actionType })
+}
 
 const route = useRoute()
 
@@ -260,8 +298,8 @@ function onRowClick(event) {
       :is-saving="isSaving"
       :save-error="saveError"
       :clear-save-error="clearSaveError"
-      @save="(payload) => $emit('row-save', payload)"
-      @status-action="(payload) => $emit('status-action', payload)"
+      @save="onPopoverSave"
+      @status-action="onPopoverStatusAction"
       @close="editingRow = null"
     />
 
