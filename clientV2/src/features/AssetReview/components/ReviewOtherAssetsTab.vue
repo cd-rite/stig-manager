@@ -79,6 +79,14 @@ FilterService.register('labelContainsAny', (value, filter) => {
 
 const ROW_HEIGHT = 36
 
+const dataTableRef = ref(null)
+
+function onFooterAction(key) {
+  if (key === 'export') {
+    dataTableRef.value?.exportCSV()
+  }
+}
+
 const longTextPopover = ref(null)
 const showLongText = (event, label, text) => {
   longTextPopover.value?.show(event, label, text)
@@ -278,6 +286,7 @@ const otherTablePt = {
 <template>
   <div class="other-assets-wrapper">
     <DataTable
+      ref="dataTableRef"
       v-model:filters="filters"
       :value="processedOtherReviews"
       :loading="isLoading"
@@ -470,7 +479,9 @@ const otherTablePt = {
       <template v-if="otherAssetsStats" #footer>
         <StatusFooter
           :show-refresh="false"
+          :show-export="true"
           :total-count="otherAssetsStats.total"
+          @action="onFooterAction"
         >
           <template #right-extra>
             <ResultBadge status="O" :count="otherAssetsStats.results.fail" />

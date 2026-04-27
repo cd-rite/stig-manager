@@ -21,10 +21,6 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  accessMode: {
-    type: String,
-    default: 'r',
-  },
 })
 
 const emit = defineEmits(['update:searchFilter'])
@@ -138,12 +134,6 @@ function clearSearch() {
       <div class="checklist-grid__title-row">
         <span class="checklist-grid__title">{{ headerTitle }}</span>
       </div>
-      <div class="checklist-grid__header-summary">
-        <span class="checklist-grid__access-badge" :class="accessMode === 'rw' ? 'access-rw' : 'access-r'">
-          <i :class="accessMode === 'rw' ? 'pi pi-pencil' : 'pi pi-lock'" />
-          {{ accessMode === 'rw' ? 'Writable' : 'Read only' }}
-        </span>
-      </div>
     </div>
 
     <div class="checklist-grid__header-bottom">
@@ -217,7 +207,6 @@ function clearSearch() {
   gap: 0.75rem;
 }
 
-.checklist-grid__header-summary,
 .checklist-grid__header-controls {
   display: flex;
   align-items: center;
@@ -334,30 +323,6 @@ function clearSearch() {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-}
-
-.checklist-grid__access-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-weight: 600;
-  font-size: 0.82rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  flex-shrink: 0;
-  height: var(--checklist-control-height);
-}
-
-.access-rw {
-  background-color: var(--color-access-rw-bg, #22c55e20);
-  color: var(--color-access-rw-text, #4ade80);
-  border: 1px solid #22c55e40;
-}
-
-.access-r {
-  background-color: var(--color-access-r-bg, #94a3b820);
-  color: var(--color-access-r-text, #94a3b8);
-  border: 1px solid #94a3b840;
 }
 
 .checklist-grid__density-controls {

@@ -21,13 +21,9 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
-  accessMode: {
-    type: String,
-    default: 'r',
-  },
 })
 
-const emit = defineEmits(['select-rule'])
+const emit = defineEmits(['select-rule', 'refresh'])
 
 const searchFilter = ref('')
 
@@ -87,7 +83,6 @@ const { lineClamp, itemSize } = useGridDensity('collection-checklist', 2, 10, 18
       v-model:selected-columns="selectedColumns"
       v-model:display-mode="displayMode"
       :toggleable-columns="TOGGLEABLE_COLUMNS"
-      :access-mode="accessMode"
     />
     <ChecklistGridTable
       :grid-data="gridData"
@@ -98,6 +93,7 @@ const { lineClamp, itemSize } = useGridDensity('collection-checklist', 2, 10, 18
       :visible-fields="visibleFields"
       :item-size="itemSize"
       @update:selected-row="onSelectionChange"
+      @refresh="emit('refresh')"
     />
   </div>
 </template>

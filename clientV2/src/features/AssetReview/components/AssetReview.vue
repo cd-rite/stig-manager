@@ -40,11 +40,6 @@ function handleRouteError(err) {
     removeView(key => key.includes(`:${collectionId.value}:${assetId.value}`))
     router.push({ name: 'not-found', params: { pathMatch: route.path.substring(1).split('/') } })
   }
-  else {
-    // Unexpected error on a critical resource → also treat as inaccessible
-    removeView(key => key.includes(`:${collectionId.value}:${assetId.value}`))
-    router.push({ name: 'not-found', params: { pathMatch: route.path.substring(1).split('/') } })
-  }
 }
 
 const { state: asset, isLoading, error, execute: loadAsset } = useAsyncState(

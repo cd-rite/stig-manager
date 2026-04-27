@@ -4,7 +4,6 @@ import SplitterPanel from 'primevue/splitterpanel'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import RuleInfo from '../../../components/common/RuleInfo.vue'
-import { getHttpStatus } from '../../../shared/api/apiClient.js'
 import { fetchCollection } from '../../../shared/api/collectionsApi.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { useCurrentUser } from '../../../shared/composables/useCurrentUser.js'
@@ -30,21 +29,14 @@ function recentViewKey(cId = collectionId.value, bId = benchmarkId.value) {
   return `collection-review:${cId}:${bId}`
 }
 
-// Fatal route-level error handler.
-// Any error on it → redirect.
 function handleRouteError(err) {
   const status = getHttpStatus(err)
   const isPrivilegeError = err.body?.error === 'User has insufficient privilege to complete this request.'
   if (status === 404 || status === 403 || status === 400 || isPrivilegeError) {
-    removeView(recentViewKey())
-    router.push({ name: 'not-found', params: { pathMatch: route.path.substring(1).split('/') } })
-  }
-  else {
-    removeView(recentViewKey())
+    removeView(key => key.includes(`:${collectionId.value}:${assetId.value}`))
     router.push({ name: 'not-found', params: { pathMatch: route.path.substring(1).split('/') } })
   }
 }
-
 const { state: collection, execute: loadCollection } = useAsyncState(
   () => fetchCollection(collectionId.value),
   { immediate: false, initialState: null, onError: handleRouteError },
@@ -71,7 +63,6 @@ const { state: assets, execute: loadAssets } = useAsyncState(
 )
 
 const assetCount = computed(() => assets.value?.length ?? 0)
-const accessMode = computed(() => assets.value?.[0]?.access ?? 'r')
 
 const selectedRuleId = ref(null)
 
@@ -93,6 +84,24 @@ const {
   ruleId => fetchReviewsByRule(collectionId.value, ruleId),
   { immediate: false, initialState: [], onError: null },
 )
+
+const mergedReviewsData = computed(() => {
+  const allAssets = assets.value || []
+  const reviews = reviewsData.value || []
+  const ruleId = selectedRuleId.value
+  const reviewLookup = new Map(reviews.map(r => [r.assetId, r]))
+  return allAssets.map((asset) => {
+    const base = {
+      assetId: asset.assetId,
+      assetName: asset.name,
+      assetLabels: asset.assetLabels ?? [],
+      access: asset.access,
+      ruleId,
+    }
+    const review = reviewLookup.get(asset.assetId)
+    return review ? { ...base, ...review } : base
+  })
+})
 
 watch(collectionId, () => {
   if (collectionId.value) {
@@ -168,7 +177,7 @@ const selectedRows = computed({
     if (!ids.size) {
       return []
     }
-    return (reviewsData.value || []).filter(r => ids.has(r.assetId))
+    return mergedReviewsData.value.filter(r => ids.has(r.assetId))
   },
   set: (rows) => {
     selectedAssetIds.value = new Set((rows || []).map(r => r.assetId))
@@ -297,14 +306,14 @@ async function onBatchEditConfirm(payload) {
                 :is-loading="isChecklistLoading"
                 :selected-rule-id="selectedRuleId"
                 :asset-count="assetCount"
-                :access-mode="accessMode"
                 @select-rule="onSelectRule"
+                @refresh="loadChecklist"
               />
             </SplitterPanel>
             <SplitterPanel :size="50" :min-size="20">
               <RuleTable
                 v-model:selection="selectedRows"
-                :grid-data="reviewsData ?? []"
+                :grid-data="mergedReviewsData"
                 :is-loading="showReviewsLoading"
                 :selected-rule-id="selectedRuleId"
                 :collection-id="collectionId"

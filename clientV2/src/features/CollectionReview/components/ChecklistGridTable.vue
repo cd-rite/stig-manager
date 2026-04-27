@@ -8,7 +8,6 @@ import shieldGreenCheck from '../../../assets/shield-green-check.svg'
 import targetIcon from '../../../assets/target.svg'
 import CatBadge from '../../../components/common/CatBadge.vue'
 import ColumnFilter from '../../../components/common/ColumnFilter.vue'
-import LongTextPopover from '../../../components/common/LongTextPopover.vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
@@ -47,7 +46,18 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:selectedRow'])
+const emit = defineEmits(['update:selectedRow', 'refresh'])
+
+const dataTableRef = ref(null)
+
+function onFooterAction(key) {
+  if (key === 'export') {
+    dataTableRef.value?.exportCSV()
+  }
+  else if (key === 'refresh') {
+    emit('refresh')
+  }
+}
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -161,6 +171,7 @@ const dataTablePt = {
 
 <template>
   <DataTable
+    ref="dataTableRef"
     v-model:filters="filters"
     :global-filter-fields="globalFilterFields"
     :value="gridData"
@@ -336,6 +347,7 @@ const dataTablePt = {
         :total-icon-src="shieldGreenCheck"
         :show-refresh="true"
         :show-export="true"
+        @action="onFooterAction"
       >
         <template #right-extra>
           <ResultBadge status="O" :count="footerStats.results.fail" />
@@ -350,8 +362,6 @@ const dataTablePt = {
       </StatusFooter>
     </template>
   </DataTable>
-
-  <LongTextPopover ref="longTextPopover" />
 </template>
 
 <style scoped>

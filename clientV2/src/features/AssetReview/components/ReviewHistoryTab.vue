@@ -134,6 +134,14 @@ const getApplyTooltip = (data) => {
   return 'Apply this review'
 }
 
+const dataTableRef = ref(null)
+
+function onFooterAction(key) {
+  if (key === 'export') {
+    dataTableRef.value?.exportCSV()
+  }
+}
+
 const longTextPopover = ref(null)
 const showLongText = (event, label, text) => {
   longTextPopover.value?.show(event, label, text)
@@ -263,6 +271,7 @@ const historyTablePt = {
 <template>
   <div class="history-wrapper">
     <DataTable
+      ref="dataTableRef"
       v-model:filters="filters"
       :value="processedHistory"
       :loading="isInternalHistoryLoading"
@@ -467,7 +476,9 @@ const historyTablePt = {
       <template #footer>
         <StatusFooter
           :show-refresh="false"
+          :show-export="true"
           :total-count="historyStats.total"
+          @action="onFooterAction"
         >
           <template #right-extra>
             <ResultBadge status="O" :count="historyStats.results.fail" />

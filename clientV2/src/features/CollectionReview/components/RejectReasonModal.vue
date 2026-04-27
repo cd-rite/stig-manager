@@ -58,7 +58,7 @@ const textareaPt = {
 
 const cancelBtnPt = {
   root: {
-    style: 'background-color: #3f3f46; border: none; color: #fff; padding: 0.5rem 1.5rem; border-radius: 6px;',
+    style: `border: none; padding: 0.5rem 1.5rem; border-radius: 6px;`,
   },
 }
 
@@ -66,7 +66,7 @@ const confirmBtnPt = {
   root: ({ context }) => ({
     style: `
       background-color: ${context.disabled ? '#27272a' : '#452121'};
-      border: 1px solid ${context.disabled ? '#3f3f46' : '#991b1b'};
+      border: 1px solid ${context.disabled ? 'var(--color-border-default)' : '#991b1b'};
       color: ${context.disabled ? '#71717a' : '#f87171'};
       padding: 0.5rem 1.5rem;
       border-radius: 6px;
@@ -129,7 +129,6 @@ function onCancel() {
   </Dialog>
 </template>
 
-<style scoped>
 <style scoped>
 .reject-modal__body {
   display: flex;

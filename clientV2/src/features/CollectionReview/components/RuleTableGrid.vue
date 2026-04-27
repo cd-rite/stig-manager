@@ -3,13 +3,10 @@ import Checkbox from 'primevue/checkbox'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import { computed, ref } from 'vue'
-import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
-import { statusPayloadForAction } from '../../../shared/lib/reviewFormUtils.js'
-import { patchReview, putReview } from '../../AssetReview/api/assetReviewApi.js'
-
 import assessmentIcon from '../../../assets/assessment.svg'
 import engineIcon from '../../../assets/bot2.svg'
 import overrideIcon from '../../../assets/override2.svg'
+
 import readOnlyIcon from '../../../assets/read-only.svg'
 import manualIcon from '../../../assets/user.svg'
 import LabelsRow from '../../../components/columns/LabelsRow.vue'
@@ -22,11 +19,13 @@ import ResultBadge from '../../../components/common/ResultBadge.vue'
 import ReviewEditPopover from '../../../components/common/ReviewEditPopover.vue'
 import StatusBadge from '../../../components/common/StatusBadge.vue'
 import StatusFooter from '../../../components/common/StatusFooter.vue'
+import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 import { durationToNow } from '../../../shared/lib.js'
 import { calculateChecklistStats, getEngineDisplay, getResultDisplay } from '../../../shared/lib/checklistUtils.js'
 import { normalizeColor } from '../../../shared/lib/colorUtils.js'
-import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
+import { formatReviewDate, statusPayloadForAction } from '../../../shared/lib/reviewFormUtils.js'
+import { patchReview, putReview } from '../../AssetReview/api/assetReviewApi.js'
 
 const props = defineProps({
   gridData: {
@@ -63,7 +62,9 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['action', 'review-saved', 'update:selection'])
+const emit = defineEmits(['review-saved', 'update:selection'])
+
+const dataTableRef = ref(null)
 
 const { itemSize } = useGridDensity('collection-rule-table', 1, 12, 24)
 
@@ -107,7 +108,9 @@ const getRowClass = (data) => {
 }
 
 function onFooterAction(key) {
-  emit('action', key)
+  if (key === 'export') {
+    dataTableRef.value?.exportCSV()
+  }
 }
 
 // --- Popover wiring ---
@@ -139,19 +142,19 @@ const { isLoading: isSavingReview, execute: executeSaveReview } = useAsyncState(
     emit('review-saved', { ...saved, assetId })
     return saved
   },
-  { immediate: false, onError: err => { saveError.value = err?.message ?? 'Failed to save review.' } },
+  { immediate: false, onError: (err) => { saveError.value = err?.message ?? 'Failed to save review.' } },
 )
 
 const { isLoading: isSavingStatus, execute: executeSaveStatus } = useAsyncState(
   async ({ assetId, ruleId, actionType }) => {
     saveError.value = null
     const status = statusPayloadForAction(actionType)
-    if (status === null) return null
+    if (status === null) { return null }
     const saved = await patchReview(props.collectionId, assetId, ruleId, { status })
     emit('review-saved', { ...saved, assetId })
     return saved
   },
-  { immediate: false, onError: err => { saveError.value = err?.message ?? 'Failed to save review.' } },
+  { immediate: false, onError: (err) => { saveError.value = err?.message ?? 'Failed to save review.' } },
 )
 
 const isSaving = computed(() => isSavingReview.value || isSavingStatus.value)
@@ -204,7 +207,7 @@ function onRowClick(event) {
 }
 
 function onPopoverSave(payload) {
-  if (!editingRow.value) return
+  if (!editingRow.value) { return }
   executeSaveReview({
     assetId: editingRow.value.assetId,
     ruleId: payload.ruleId,
@@ -216,7 +219,7 @@ function onPopoverSave(payload) {
 }
 
 function onPopoverStatusAction(payload) {
-  if (!editingRow.value) return
+  if (!editingRow.value) { return }
   executeSaveStatus({
     assetId: editingRow.value.assetId,
     ruleId: payload.ruleId,
@@ -402,6 +405,7 @@ const checkboxPt = {
 
 <template>
   <DataTable
+    ref="dataTableRef"
     :selection="props.selection"
     :select-all="isAllSelected"
     :value="filteredData"

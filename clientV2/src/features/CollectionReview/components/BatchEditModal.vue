@@ -8,8 +8,6 @@ import { computed, ref, watch } from 'vue'
 import ResultBadge from '../../../components/common/ResultBadge.vue'
 import { resultOptions } from '../../../shared/lib/reviewFormUtils.js'
 
-const vTooltip = Tooltip
-
 const props = defineProps({
   visible: {
     type: Boolean,
@@ -26,6 +24,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:visible', 'confirm', 'cancel'])
+
+const vTooltip = Tooltip
 
 const visibleModel = computed({
   get: () => props.visible,
@@ -147,16 +147,15 @@ const textareaPt = {
 
 const cancelBtnPt = {
   root: {
-    style: 'background-color: #3f3f46; border: none; color: #fff; padding: 0.5rem 1.5rem; border-radius: 6px;',
+    style: `border: none; padding: 0.5rem 1.5rem; border-radius: 6px;`,
   },
 }
 
 const confirmBtnPt = {
   root: ({ context }) => ({
     style: `
-      background-color: ${context.disabled ? '#27272a' : '#1e3a8a'};
-      border: 1px solid ${context.disabled ? '#3f3f46' : '#2563eb'};
-      color: ${context.disabled ? '#71717a' : '#bfdbfe'};
+    
+      border: 1px solid ${context.disabled ? 'var(--color-border-default)' : '#2563eb'};
       padding: 0.5rem 1.5rem;
       border-radius: 6px;
       display: flex;
@@ -165,12 +164,6 @@ const confirmBtnPt = {
     `,
   }),
 }
-
-const resultOptionsWithUnchanged = computed(() => {
-  return [
-    ...resultOptions,
-  ]
-})
 
 function onConfirm() {
   if (!isMeaningfulChange.value) {
@@ -215,7 +208,7 @@ function onCancel() {
         </label>
         <Dropdown
           v-model="result"
-          :options="resultOptionsWithUnchanged"
+          :options="resultOptions"
           option-label="label"
           option-value="value"
           placeholder="Leave Unchanged"
@@ -225,8 +218,8 @@ function onCancel() {
         >
           <template #value="slotProps">
             <div v-if="slotProps.value" class="batch-modal__dropdown-item">
-              <ResultBadge :status="resultOptionsWithUnchanged.find(o => o.value === slotProps.value)?.display" />
-              <span>{{ resultOptionsWithUnchanged.find(o => o.value === slotProps.value)?.label }}</span>
+              <ResultBadge :status="resultOptions.find(o => o.value === slotProps.value)?.display" />
+              <span>{{ resultOptions.find(o => o.value === slotProps.value)?.label }}</span>
             </div>
             <span v-else>{{ slotProps.placeholder }}</span>
           </template>
