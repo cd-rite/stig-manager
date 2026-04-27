@@ -11,7 +11,7 @@ import { useCurrentUser } from '../../../shared/composables/useCurrentUser.js'
 import { defaultFieldSettings, statusPayloadForAction } from '../../../shared/lib/reviewFormUtils.js'
 import { useRecentViews } from '../../NavRail/composables/useRecentViews.js'
 import { fetchAssetsByCollectionStig, fetchCollectionChecklist, fetchReviewsByRule, fetchRule, postReviewBatch } from '../api/collectionReviewApi.js'
-import { useBulkActionStates } from '../composables/useBulkActionStates.js'
+import { useReviewActionAvailability } from '../composables/useReviewActionAvailability.js'
 import BatchEditModal from './BatchEditModal.vue'
 import ChecklistGrid from './ChecklistGrid.vue'
 import RejectReasonModal from './RejectReasonModal.vue'
@@ -71,6 +71,7 @@ const { state: assets, execute: loadAssets } = useAsyncState(
 )
 
 const assetCount = computed(() => assets.value?.length ?? 0)
+const accessMode = computed(() => assets.value?.[0]?.access ?? 'r')
 
 const selectedRuleId = ref(null)
 
@@ -139,7 +140,7 @@ watch(gridData, (data) => {
     selectedRuleId.value = data[0].ruleId
   }
 })
-
+// load data when we have a selected rule and collection/benchmarkid/revisionstr
 watch(selectedRuleId, (ruleId) => {
   if (!ruleId) {
     return
@@ -174,8 +175,9 @@ const selectedRows = computed({
   },
 })
 
-const { actionStates } = useBulkActionStates(selectedRows, fieldSettings)
+const { actionStates } = useReviewActionAvailability(selectedRows, fieldSettings)
 
+// clearing selected rows when we change ruleid
 watch(selectedRuleId, () => {
   selectedAssetIds.value = new Set()
 })
@@ -295,6 +297,7 @@ async function onBatchEditConfirm(payload) {
                 :is-loading="isChecklistLoading"
                 :selected-rule-id="selectedRuleId"
                 :asset-count="assetCount"
+                :access-mode="accessMode"
                 @select-rule="onSelectRule"
               />
             </SplitterPanel>

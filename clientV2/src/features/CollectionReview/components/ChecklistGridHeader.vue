@@ -21,6 +21,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  accessMode: {
+    type: String,
+    default: 'r',
+  },
 })
 
 const emit = defineEmits(['update:searchFilter'])
@@ -73,7 +77,6 @@ const headerTitle = computed(() => {
   }
   return benchmarkId.value || 'Collection Checklist'
 })
-const accessMode = 'rw'
 
 const checklistMenu = ref()
 const checklistMenuItems = computed(() => [

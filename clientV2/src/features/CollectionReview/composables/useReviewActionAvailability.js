@@ -1,7 +1,26 @@
 import { computed } from 'vue'
 import { isReviewComplete } from '../../../shared/lib/reviewFormUtils.js'
 
-export function useBulkActionStates(selection, fieldSettings) {
+/**
+ * Determines which bulk review actions are available for the current row selection.
+ *
+ * Counts each row's status (unsaved, saved-complete, saved-incomplete, submitted,
+ * accepted, rejected) and applies per-action eligibility rules. Single-row
+ * selections follow the legacy single-row rules; multi-row selections use the
+ * broader bulk rules.
+ *
+ * @param {import('vue').Ref<Array>} selection - Reactive array of selected review rows.
+ * @param {import('vue').Ref<Object>} fieldSettings - Reactive collection field settings used to
+ *   determine whether a saved review is considered complete.
+ * @returns {{ actionStates: import('vue').ComputedRef<{
+ *   accept: boolean,
+ *   reject: boolean,
+ *   submit: boolean,
+ *   unsubmit: boolean,
+ *   batchEdit: boolean,
+ * }> }} Object whose `actionStates` ref contains a boolean flag for each action.
+ */
+export function useReviewActionAvailability(selection, fieldSettings) {
   const counts = computed(() => {
     const s = selection.value || []
     const res = {
