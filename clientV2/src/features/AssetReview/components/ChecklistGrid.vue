@@ -6,7 +6,7 @@ import ReviewEditPopover from '../../../components/common/ReviewEditPopover.vue'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { statusPayloadForAction } from '../../../shared/lib/reviewFormUtils.js'
 import { patchReview, putReview } from '../api/assetReviewApi.js'
-import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
+import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 import ChecklistGridHeader from './ChecklistGridHeader.vue'
 import ChecklistGridTable from './ChecklistGridTable.vue'
 
@@ -149,7 +149,46 @@ function onPopoverStatusAction(payload) {
 
 const route = useRoute()
 
-const { lineClamp, itemSize } = useChecklistDisplayMode()
+const TOGGLEABLE_COLUMNS = [
+  { field: 'groupTitle', header: 'Group Title' },
+  { field: 'ruleTitle', header: 'Rule Title' },
+  { field: 'detail', header: 'Detail' },
+  { field: 'comment', header: 'Comment' },
+  { field: 'touchTs', icon: 'pi pi-clock' },
+]
+
+const DISPLAY_MODE_ID_FIELD = {
+  groupRule: 'groupId',
+  groupGroup: 'groupId',
+  ruleRule: 'ruleId',
+}
+
+const DISPLAY_MODE_TITLE_FIELD = {
+  groupRule: 'ruleTitle',
+  groupGroup: 'groupTitle',
+  ruleRule: 'ruleTitle',
+}
+
+const selectedColumns = ref(TOGGLEABLE_COLUMNS.filter(c => c.field !== 'groupTitle'))
+const displayMode = ref('groupRule')
+
+watch(displayMode, (mode) => {
+  const titleField = DISPLAY_MODE_TITLE_FIELD[mode]
+  selectedColumns.value = TOGGLEABLE_COLUMNS.filter(c => {
+    if (c.field === 'groupTitle' || c.field === 'ruleTitle') return c.field === titleField
+    return selectedColumns.value.some(s => s.field === c.field)
+  })
+})
+
+const visibleFields = computed(() => {
+  const fields = new Set(['severity', 'result', 'resultEngine', 'status'])
+  const idField = DISPLAY_MODE_ID_FIELD[displayMode.value]
+  if (idField) fields.add(idField)
+  for (const col of selectedColumns.value) fields.add(col.field)
+  return fields
+})
+
+const { lineClamp, itemSize } = useGridDensity('asset-review-checklist', 3, 6, 15)
 
 const localSearchFilter = computed({
   get: () => props.searchFilter,
@@ -275,6 +314,9 @@ function onRowClick(event) {
   >
     <ChecklistGridHeader
       v-model:search-filter="localSearchFilter"
+      v-model:display-mode="displayMode"
+      v-model:selected-columns="selectedColumns"
+      :toggleable-columns="TOGGLEABLE_COLUMNS"
       :asset="asset" :revision-info="revisionInfo" :is-loading="isLoading"
       :access-mode="accessMode" @refresh="emit('refresh')"
     />
@@ -282,6 +324,8 @@ function onRowClick(event) {
     <ChecklistGridTable
       :selected-row="selectedRow" :grid-data="gridData" :is-loading="isLoading"
       :search-filter="localSearchFilter"
+      :visible-fields="visibleFields"
+      :item-size="itemSize"
       @update:selected-row="onSelectionChange" @row-click="onRowClick"
       @refresh="emit('refresh')"
     />

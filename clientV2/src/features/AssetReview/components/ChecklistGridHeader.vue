@@ -7,7 +7,7 @@ import lineHeightUp from '../../../assets/line-height-up.svg'
 import shieldGreenCheck from '../../../assets/shield-green-check.svg'
 import LabelsRow from '../../../components/columns/LabelsRow.vue'
 import ColumnToggle from '../../../components/common/ColumnToggle.vue'
-import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
+import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
 const props = defineProps({
   asset: {
     type: Object,
@@ -21,6 +21,10 @@ const props = defineProps({
     type: String,
     default: 'r',
   },
+  toggleableColumns: {
+    type: Array,
+    required: true,
+  },
 })
 
 const {
@@ -29,14 +33,10 @@ const {
   accessMode,
 } = toRefs(props)
 
-const {
-  checklistColumns,
-  selectedChecklistColumns,
-  displayModeItems,
-  lineClamp,
-  increaseRowHeight,
-  decreaseRowHeight,
-} = useChecklistDisplayMode()
+const displayMode = defineModel('displayMode', { type: String, required: true })
+const selectedColumns = defineModel('selectedColumns', { type: Array, required: true })
+
+const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('asset-review-checklist', 3, 6, 15)
 
 const searchFilter = defineModel('searchFilter', { type: String, default: '' })
 
@@ -54,7 +54,27 @@ const headerTitle = computed(() => {
 })
 
 const checklistMenuItems = computed(() => [
-  displayModeItems.value[0],
+  {
+    label: 'Group/Rule Display',
+    icon: 'pi pi-list',
+    items: [
+      {
+        label: 'Group ID and Rule Title',
+        icon: displayMode.value === 'groupRule' ? 'pi pi-circle-fill' : 'pi pi-circle',
+        command: () => { displayMode.value = 'groupRule' },
+      },
+      {
+        label: 'Group ID and Group Title',
+        icon: displayMode.value === 'groupGroup' ? 'pi pi-circle-fill' : 'pi pi-circle',
+        command: () => { displayMode.value = 'groupGroup' },
+      },
+      {
+        label: 'Rule ID and Rule Title',
+        icon: displayMode.value === 'ruleRule' ? 'pi pi-circle-fill' : 'pi pi-circle',
+        command: () => { displayMode.value = 'ruleRule' },
+      },
+    ],
+  },
   {
     label: 'Export to file',
     icon: 'pi pi-download',
@@ -92,14 +112,6 @@ function toggleChecklistMenu(event) {
   checklistMenu.value.toggle(event)
 }
 
-const toggleableColumns = computed(() => checklistColumns.value.filter(col => !col.permanent))
-const selectedToggleableColumns = computed({
-  get: () => selectedChecklistColumns.value.filter(col => !col.permanent),
-  set: (val) => {
-    const permanent = selectedChecklistColumns.value.filter(col => col.permanent)
-    selectedChecklistColumns.value = [...permanent, ...val]
-  },
-})
 </script>
 
 <template>
@@ -139,7 +151,7 @@ const selectedToggleableColumns = computed({
         </button>
       </div>
       <div class="checklist-grid__header-controls">
-        <ColumnToggle v-model="selectedToggleableColumns" :columns="toggleableColumns" />
+        <ColumnToggle v-model="selectedColumns" :columns="toggleableColumns" />
         <button
           type="button" class="checklist-grid__menu-btn checklist-grid__menu-btn--checklist"
           aria-haspopup="true" aria-controls="checklist_menu" @click="toggleChecklistMenu"

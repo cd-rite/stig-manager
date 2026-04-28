@@ -18,7 +18,6 @@ import { durationToNow } from '../../../shared/lib.js'
 import { calculateChecklistStats, getEngineDisplay, getResultDisplay, severityMap } from '../../../shared/lib/checklistUtils.js'
 import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fieldMatches, highlightText } from '../../../shared/lib/searchUtils.js'
-import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
 
 const props = defineProps({
   gridData: {
@@ -37,14 +36,18 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  visibleFields: {
+    type: Object,
+    required: true,
+  },
+  itemSize: {
+    type: Number,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:selectedRow', 'row-click', 'refresh'])
 
-const {
-  isColVisible,
-  itemSize,
-} = useChecklistDisplayMode()
 
 const dsFilterFields = [
   'ruleId',
@@ -133,7 +136,7 @@ function onFilter(event) {
   filteredData.value = event.filteredValue
 }
 
-const defaultSortField = computed(() => isColVisible('groupId') ? 'groupId' : 'ruleId')
+const defaultSortField = computed(() => props.visibleFields.has('groupId') ? 'groupId' : 'ruleId')
 
 function getColumnPt(alignment = 'left') {
   const isCenter = alignment === 'center'
@@ -194,7 +197,7 @@ const dataTablePt = {
     :sort-order="1" class="checklist-grid__table" :pt="dataTablePt" @update:selection="(val) => $emit('update:selectedRow', val)"
     @row-click="$emit('row-click', $event)" @filter="onFilter" @pointerdown.stop
   >
-    <Column v-if="isColVisible('severity')" field="severity" filter-field="severity" sortable :style="{ width: '6.5rem', minWidth: '6.5rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('severity')" field="severity" filter-field="severity" sortable :style="{ width: '6.5rem', minWidth: '6.5rem' }" :pt="columnPt.center">
       <template #header>
         <div class="column-header-with-filter">
           Cat
@@ -212,7 +215,7 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column v-if="isColVisible('groupId')" header="Group" field="groupId" sortable :style="{ width: '7rem', minWidth: '7rem' }" :pt="columnPt.left">
+    <Column v-if="visibleFields.has('groupId')" header="Group" field="groupId" sortable :style="{ width: '7rem', minWidth: '7rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <span class="cell-text" :class="{ 'cell--match': searchFilter && fieldMatches(data.groupId, searchFilter) }">
           <span v-if="searchFilter" v-html="highlightText(data.groupId, searchFilter)" />
@@ -222,7 +225,7 @@ const dataTablePt = {
     </Column>
 
     <Column
-      v-if="isColVisible('ruleId')" header="Rule Id" field="ruleId" sortable :style="{ width: '15rem', minWidth: '12rem' }"
+      v-if="visibleFields.has('ruleId')" header="Rule Id" field="ruleId" sortable :style="{ width: '15rem', minWidth: '12rem' }"
       :pt="columnPt.left"
     >
       <template #body="{ data }">
@@ -234,7 +237,7 @@ const dataTablePt = {
     </Column>
 
     <Column
-      v-if="isColVisible('ruleTitle')" header="Rule Title" field="ruleTitle" sortable :style="{ width: '25%', minWidth: '16rem' }"
+      v-if="visibleFields.has('ruleTitle')" header="Rule Title" field="ruleTitle" sortable :style="{ width: '25%', minWidth: '16rem' }"
       :pt="columnPt.left"
     >
       <template #body="{ data }">
@@ -252,7 +255,7 @@ const dataTablePt = {
     </Column>
 
     <Column
-      v-if="isColVisible('groupTitle')" header="Group Title" field="groupTitle" sortable :style="{ width: '25%', minWidth: '16rem' }"
+      v-if="visibleFields.has('groupTitle')" header="Group Title" field="groupTitle" sortable :style="{ width: '25%', minWidth: '16rem' }"
       :pt="columnPt.left"
     >
       <template #body="{ data }">
@@ -267,7 +270,7 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column v-if="isColVisible('result')" field="result" filter-field="result" sortable :style="{ width: '8%', minWidth: '6rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('result')" field="result" filter-field="result" sortable :style="{ width: '8%', minWidth: '6rem' }" :pt="columnPt.center">
       <template #header>
         <div class="column-header-with-filter">
           Result
@@ -286,7 +289,7 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column v-if="isColVisible('detail')" header="Detail" field="detail" sortable :style="{ width: '25%', minWidth: '14rem' }" :pt="columnPt.left">
+    <Column v-if="visibleFields.has('detail')" header="Detail" field="detail" sortable :style="{ width: '25%', minWidth: '14rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <div class="cell-text-field">
           <span
@@ -301,7 +304,7 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column v-if="isColVisible('comment')" header="Comment" field="comment" sortable :style="{ width: '25%', minWidth: '14rem' }" :pt="columnPt.left">
+    <Column v-if="visibleFields.has('comment')" header="Comment" field="comment" sortable :style="{ width: '25%', minWidth: '14rem' }" :pt="columnPt.left">
       <template #body="{ data }">
         <div class="cell-text-field">
           <span
@@ -317,7 +320,7 @@ const dataTablePt = {
     </Column>
 
     <Column
-      v-if="isColVisible('resultEngine')"
+      v-if="visibleFields.has('resultEngine')"
       field="resultEngine" sortable filter-field="_engineDisplay" sort-field="resultEngine.product" :style="{ width: '5.5rem', minWidth: '5.5rem' }"
       :pt="columnPt.center"
     >
@@ -344,7 +347,7 @@ const dataTablePt = {
     </Column>
 
     <Column
-      v-if="isColVisible('status')"
+      v-if="visibleFields.has('status')"
       field="status" filter-field="_statusText" sortable sort-field="status.label" :style="{ width: '9rem', minWidth: '9rem' }"
       :pt="columnPt.center"
     >
@@ -363,7 +366,7 @@ const dataTablePt = {
       </template>
     </Column>
 
-    <Column v-if="isColVisible('touchTs')" field="touchTs" sortable :style="{ width: '4rem', minWidth: '4rem' }" :pt="columnPt.center">
+    <Column v-if="visibleFields.has('touchTs')" field="touchTs" sortable :style="{ width: '4rem', minWidth: '4rem' }" :pt="columnPt.center">
       <template #header>
         <i class="pi pi-clock" title="Last action" />
       </template>

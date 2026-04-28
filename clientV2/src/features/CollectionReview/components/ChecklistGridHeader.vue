@@ -185,7 +185,7 @@ function clearSearch() {
 
 <style scoped>
 .checklist-grid__header {
-  --checklist-header-height: 5.75rem;
+  --checklist-header-height: 7.3rem;
   --checklist-control-height: 2.42rem;
   display: flex;
   flex-direction: column;
