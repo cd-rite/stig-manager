@@ -21,41 +21,15 @@ const props = defineProps({
     type: String,
     default: null,
   },
-  rowCount: {
-    type: Number,
-    default: 0,
-  },
-  rowCountLabel: {
-    type: String,
-    default: 'rules',
-  },
-  lineClamp: {
-    type: Number,
-    default: 2,
-  },
-  lineClampMin: {
-    type: Number,
-    default: 1,
-  },
-  lineClampMax: {
-    type: Number,
-    default: 10,
-  },
 })
 
 const emit = defineEmits([
   'change-view-rev',
   'change-compare-rev',
-  'update:lineClamp',
 ])
 
 const diffMode = computed(() => !!props.compareRev)
 const hasOtherRevisions = computed(() => (props.revisions ?? []).length > 1)
-
-const lineClampProxy = computed({
-  get: () => props.lineClamp,
-  set: value => emit('update:lineClamp', value),
-})
 
 function onChangeViewRev(rev) {
   emit('change-view-rev', rev)
@@ -97,14 +71,7 @@ function onChangeCompareRev(rev) {
       />
     </template>
     <div class="rule-pane-toolbar__spacer" />
-    <DensityControls
-      v-model="lineClampProxy"
-      :min="lineClampMin"
-      :max="lineClampMax"
-    />
-    <span class="rule-pane-toolbar__count">
-      {{ rowCount }} {{ rowCountLabel }}
-    </span>
+    <DensityControls grid-key="stig-library-rules" />
   </div>
 </template>
 
@@ -121,10 +88,5 @@ function onChangeCompareRev(rev) {
 
 .rule-pane-toolbar__spacer {
   flex: 1;
-}
-
-.rule-pane-toolbar__count {
-  color: var(--color-text-dim);
-  font-size: 1.1rem;
 }
 </style>

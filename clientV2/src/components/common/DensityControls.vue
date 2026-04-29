@@ -1,10 +1,11 @@
 <script setup>
 import lineHeightDown from '../../assets/line-height-down.svg'
 import lineHeightUp from '../../assets/line-height-up.svg'
+import { useGridDensity } from '../../shared/composables/useGridDensity.js'
 
 const props = defineProps({
-  modelValue: {
-    type: Number,
+  gridKey: {
+    type: String,
     required: true,
   },
   min: {
@@ -21,19 +22,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
-
-function decrease() {
-  if (props.modelValue > props.min) {
-    emit('update:modelValue', props.modelValue - 1)
-  }
-}
-
-function increase() {
-  if (props.modelValue < props.max) {
-    emit('update:modelValue', props.modelValue + 1)
-  }
-}
+const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity(props.gridKey, 1, 12, 24)
 </script>
 
 <template>
@@ -42,18 +31,18 @@ function increase() {
     <button
       type="button"
       class="density-controls__btn"
-      :disabled="modelValue <= min"
+      :disabled="lineClamp <= min"
       title="Decrease row height"
-      @click="decrease"
+      @click="decreaseRowHeight"
     >
       <img :src="lineHeightDown" alt="Decrease row height">
     </button>
     <button
       type="button"
       class="density-controls__btn"
-      :disabled="modelValue >= max"
+      :disabled="lineClamp >= max"
       title="Increase row height"
-      @click="increase"
+      @click="increaseRowHeight"
     >
       <img :src="lineHeightUp" alt="Increase row height">
     </button>
@@ -106,7 +95,7 @@ function increase() {
 }
 
 .density-controls__btn img {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
 }
 </style>

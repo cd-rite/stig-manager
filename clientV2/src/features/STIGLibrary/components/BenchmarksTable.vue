@@ -1,8 +1,9 @@
 <script setup>
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import ClassificationBadge from '../../../components/common/ClassificationBadge.vue'
+import StatusFooter from '../../../components/common/StatusFooter.vue'
 import EarlierRevisionsPills from './EarlierRevisionsPills.vue'
 
 const props = defineProps({
@@ -26,54 +27,55 @@ const props = defineProps({
     type: Number,
     default: 2,
   },
+  totalCount: {
+    type: Number,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['select'])
 
-const tablePt = computed(() => ({
-  root: { class: 'sm-scrollbar-thin', style: { backgroundColor: 'var(--color-background-dark)' } },
-  table: { style: { borderCollapse: 'separate', borderSpacing: '0', background: 'var(--color-background-darkest)' } },
-  thead: {
-    style: {
-      background: 'var(--color-background-dark)',
-      position: 'sticky',
-      top: '0',
-      zIndex: '1',
-    },
-  },
-  headerCell: {
-    style: {
-      background: 'var(--color-background-dark)',
-      borderBottom: '1px solid var(--color-border-default)',
-      color: 'var(--color-text-dim)',
-      fontWeight: '700',
-      fontSize: '0.95rem',
-      textTransform: 'uppercase',
-      letterSpacing: '0.04em',
-      padding: '0.4rem 0.55rem',
-    },
-  },
+const filter = defineModel('filter', { type: String, default: '' })
+
+const dataTableRef = ref(null)
+
+const dataTablePt = {
+  tableContainer: { style: { height: '100%' } },
+  table: { style: { tableLayout: 'auto', minWidth: '100%' } },
   bodyRow: {
-    style: {
-      cursor: 'pointer',
-      background: 'var(--color-background-dark)',
-      height: `${props.itemSize}px`,
-      transition: 'background-color 0.1s ease',
-    },
+    style: { cursor: 'pointer', height: 'var(--item-size, 72px)', overflow: 'hidden' },
   },
-}))
+  footer: { style: { padding: '0', border: 'none' } },
+  emptyMessageCell: { class: 'agg-grid-empty-cell' },
+}
 
 const selectedRow = computed(() =>
   props.selectedId ? props.benchmarks.find(b => b.benchmarkId === props.selectedId) ?? null : null,
 )
 
+const total = computed(() => props.totalCount ?? props.benchmarks.length)
+const filteredCount = computed(() =>
+  filter.value && total.value !== props.benchmarks.length ? props.benchmarks.length : null,
+)
+
 function onRowClick(event) {
   emit('select', event.data)
+}
+
+function onFooterAction(key) {
+  if (key === 'export') {
+    dataTableRef.value?.exportCSV()
+  }
+}
+
+function clearFilter() {
+  filter.value = ''
 }
 </script>
 
 <template>
   <DataTable
+    ref="dataTableRef"
     :value="benchmarks"
     :selection="selectedRow"
     selection-mode="single"
@@ -83,10 +85,31 @@ function onRowClick(event) {
     :virtual-scroller-options="{ itemSize, showLoader: true }"
     striped-rows
     class="benchmarks-table"
-    :style="{ '--bm-line-clamp': lineClamp }"
-    :pt="tablePt"
+    :style="{ '--bm-line-clamp': lineClamp, '--item-size': `${itemSize}px` }"
+    :pt="dataTablePt"
     @row-click="onRowClick"
   >
+    <template #header>
+      <div class="benchmarks-table__filter">
+        <i class="pi pi-search benchmarks-table__filter-icon" />
+        <input
+          v-model="filter"
+          type="text"
+          class="benchmarks-table__filter-input"
+          placeholder="Filter benchmarks by title or ID…"
+        >
+        <button
+          v-if="filter"
+          type="button"
+          class="benchmarks-table__filter-clear"
+          aria-label="Clear filter"
+          @click="clearFilter"
+        >
+          <i class="pi pi-times" />
+        </button>
+      </div>
+    </template>
+
     <Column
       header="Benchmark"
       field="title"
@@ -120,7 +143,7 @@ function onRowClick(event) {
       :style="{ width: '7rem' }"
     >
       <template #body="{ data }">
-        <span class="bm-cell__mono">{{ data.lastRevisionStr }}</span>
+        <span class="bm-cell__value">{{ data.lastRevisionStr }}</span>
       </template>
     </Column>
 
@@ -132,7 +155,7 @@ function onRowClick(event) {
       :style="{ width: '9rem' }"
     >
       <template #body="{ data }">
-        <span class="bm-cell__mono bm-cell__dim">{{ data.lastRevisionDate }}</span>
+        <span class="bm-cell__value bm-cell__value--dim">{{ data.lastRevisionDate }}</span>
       </template>
     </Column>
 
@@ -144,7 +167,7 @@ function onRowClick(event) {
       :style="{ width: '6rem', textAlign: 'right' }"
     >
       <template #body="{ data }">
-        <span class="bm-cell__mono">{{ data.ruleCount }}</span>
+        <span class="bm-cell__value">{{ data.ruleCount }}</span>
       </template>
     </Column>
 
@@ -157,12 +180,87 @@ function onRowClick(event) {
         <EarlierRevisionsPills :revisions="data.revisionStrs" />
       </template>
     </Column>
+
+    <template #empty>
+      <div class="agg-grid-empty-state">
+        {{ filter ? 'No benchmarks match this filter.' : 'No benchmarks available.' }}
+      </div>
+    </template>
+
+    <template #footer>
+      <StatusFooter
+        :total-count="total"
+        :filtered-count="filteredCount"
+        total-label="benchmarks"
+        :show-refresh="false"
+        :show-export="true"
+        @action="onFooterAction"
+      />
+    </template>
   </DataTable>
 </template>
 
 <style scoped>
 .benchmarks-table {
   height: 100%;
+}
+
+.benchmarks-table__filter {
+  position: relative;
+  padding: 0.45rem 0.6rem;
+  background: var(--color-background-dark);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.benchmarks-table__filter-icon {
+  position: absolute;
+  left: 1.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-dim);
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+.benchmarks-table__filter-input {
+  width: 100%;
+  height: 2.42rem;
+  padding: 0.32rem 2rem 0.32rem 2.35rem;
+  border: 1px solid var(--color-border-default);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-background-light) 75%, transparent);
+  color: var(--color-text-primary);
+  font-size: 1.2rem;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.benchmarks-table__filter-input:focus {
+  border-color: var(--color-primary-highlight);
+  background-color: var(--color-background-darkest);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary-highlight) 25%, transparent);
+}
+
+.benchmarks-table__filter-clear {
+  position: absolute;
+  right: 1.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.1s;
+}
+
+.benchmarks-table__filter-clear:hover {
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-text-dim) 15%, transparent);
 }
 
 .bm-cell {
@@ -174,7 +272,7 @@ function onRowClick(event) {
 }
 
 .bm-cell__title {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 600;
   line-height: 1.3;
   color: var(--color-text-primary);
@@ -195,8 +293,7 @@ function onRowClick(event) {
 }
 
 .bm-cell__id {
-  font-family: monospace;
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: var(--color-text-dim);
 }
 
@@ -209,18 +306,66 @@ function onRowClick(event) {
 }
 
 .bm-cell__meta {
-  font-family: monospace;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--color-text-dim);
 }
 
-.bm-cell__mono {
-  font-family: monospace;
-  font-size: 1.1rem;
+.bm-cell__value {
+  font-size: 1rem;
   color: var(--color-text-primary);
 }
 
-.bm-cell__dim {
+.bm-cell__value--dim {
   color: var(--color-text-dim);
+}
+
+:deep(.p-datatable-thead > tr > th) {
+  background: var(--color-background-dark);
+  color: var(--color-text-dim);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--color-border-default);
+  transition: background 0.15s;
+}
+
+:deep(.p-datatable-thead > tr > th:hover) {
+  background: color-mix(in srgb, var(--color-background-light) 10%, var(--color-background-dark));
+}
+
+:deep(.p-datatable-thead > tr > th:last-child) {
+  border-right: none;
+}
+
+:deep(.p-datatable-tbody > tr.p-highlight) {
+  background: color-mix(in srgb, var(--color-primary, #3b82f6) 12%, var(--color-background-light)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary, #3b82f6) 25%, transparent);
+  outline: 1px inset color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+:deep(.p-datatable-tbody > tr:hover) {
+  background: var(--color-background-light) !important;
+}
+
+:deep(.p-datatable-footer) {
+  padding: 0;
+  border: none;
+  background: var(--color-background-dark);
+}
+
+:deep(.agg-grid-empty-cell) {
+  padding: 4rem 1rem !important;
+  text-align: center;
+  background: var(--color-background-soft);
+}
+
+.agg-grid-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-dim);
+  font-size: 1.1rem;
 }
 </style>

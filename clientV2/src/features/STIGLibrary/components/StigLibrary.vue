@@ -1,18 +1,14 @@
 <script setup>
 import Button from 'primevue/button'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
-import InputText from 'primevue/inputtext'
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import RuleInfo from '../../../components/common/RuleInfo.vue'
 import { getHttpStatus } from '../../../shared/api/apiClient.js'
 import { fetchStigRevisions } from '../../../shared/api/stigsApi.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
-import RuleInfo from '../../../components/common/RuleInfo.vue'
 import { useBenchmarkList } from '../composables/useBenchmarkList.js'
-import { useLineClamp } from '../composables/useLineClamp.js'
 import { useRevisionDiff } from '../composables/useRevisionDiff.js'
 import { useRevisionRules } from '../composables/useRevisionRules.js'
 import { useRuleSelection } from '../composables/useRuleSelection.js'
@@ -43,7 +39,6 @@ const {
   benchmarks,
   filter,
   filtered,
-  filteredCount,
   totalCount,
   isLoading: benchmarksLoading,
   error: benchmarksError,
@@ -85,18 +80,6 @@ watch(
 const { getRulesForRev, watchCurrent, invalidate: invalidateRules } = useRevisionRules()
 const revState = watchCurrent(benchmarkIdParam, effectiveViewRev)
 
-// Row-height density for the rule/diff tables in the middle pane. `ruleLineClamp`
-// is writable — v-model flows from the orchestrator through RulePane/RulePaneToolbar
-// into the shared <DensityControls>.
-const {
-  lineClamp: ruleLineClamp,
-  itemSize: ruleItemSize,
-  min: ruleLineClampMin,
-  max: ruleLineClampMax,
-} = useLineClamp(2)
-
-// Fixed row heights for the benchmark list — title can wrap to 2 lines plus id-row
-// and (in compact mode) a meta row with earlier revisions.
 const bmLineClamp = 2
 const bmItemSize = computed(() => hasSelection.value ? 92 : 76)
 
@@ -278,16 +261,7 @@ function onRetryDiff() {
     </header>
 
     <div class="stig-library__bar">
-      <IconField icon-position="left" class="stig-library__filter">
-        <InputIcon class="pi pi-search" />
-        <InputText
-          v-model="filter"
-          placeholder="Filter benchmarks by title or ID…"
-        />
-      </IconField>
-      <!-- STIG content search placeholder. The app does not yet have a backend
-           endpoint for searching STIG content (check/fix/discussion text across
-           benchmarks). Wire this up when that endpoint exists. -->
+      <div class="stig-library__bar-spacer" />
       <Button
         v-tooltip="'STIG content search — coming soon'"
         icon="pi pi-search-plus"
@@ -296,10 +270,6 @@ function onRetryDiff() {
         size="small"
         disabled
       />
-      <div class="stig-library__bar-spacer" />
-      <span class="stig-library__count">
-        {{ filteredCount }} of {{ totalCount }}
-      </span>
     </div>
 
     <div v-if="benchmarksLoading" class="stig-library__state">
@@ -324,17 +294,18 @@ function onRetryDiff() {
     >
       <SplitterPanel :size="16" :min-size="8">
         <BenchmarksTable
+          v-model:filter="filter"
           :benchmarks="filtered"
           :selected-id="benchmarkIdParam"
           compact
           :item-size="bmItemSize"
           :line-clamp="bmLineClamp"
+          :total-count="totalCount"
           @select="goToBenchmark"
         />
       </SplitterPanel>
       <SplitterPanel :size="40" :min-size="15">
         <RulePane
-          v-model:line-clamp="ruleLineClamp"
           :benchmark="selectedBenchmark"
           :view-rev="effectiveViewRev"
           :compare-rev="compareRev"
@@ -348,9 +319,6 @@ function onRetryDiff() {
           :diff-error="diffError"
           :selected-rule-id="selectedRuleId"
           :selected-diff-row-key="selectedDiffRowKey"
-          :item-size="ruleItemSize"
-          :line-clamp-min="ruleLineClampMin"
-          :line-clamp-max="ruleLineClampMax"
           @change-view-rev="setViewRev"
           @change-compare-rev="setCompareRev"
           @select-rule="r => setSelectedRule(r.ruleId)"
@@ -385,11 +353,13 @@ function onRetryDiff() {
 
     <div v-else class="stig-library__list">
       <BenchmarksTable
+        v-model:filter="filter"
         :benchmarks="filtered"
         :selected-id="null"
         :compact="false"
         :item-size="bmItemSize"
         :line-clamp="bmLineClamp"
+        :total-count="totalCount"
         @select="goToBenchmark"
       />
     </div>
@@ -434,19 +404,8 @@ function onRetryDiff() {
   border-bottom: 1px solid var(--color-border-default);
 }
 
-.stig-library__filter {
-  min-width: 20rem;
-  max-width: 32rem;
-  flex: 1;
-}
-
 .stig-library__bar-spacer {
   flex: 1;
-}
-
-.stig-library__count {
-  color: var(--color-text-dim);
-  font-size: 0.95rem;
 }
 
 .stig-library__tri {

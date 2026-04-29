@@ -58,22 +58,6 @@ const props = defineProps({
     type: String,
     default: null,
   },
-  lineClamp: {
-    type: Number,
-    default: 2,
-  },
-  itemSize: {
-    type: Number,
-    default: 48,
-  },
-  lineClampMin: {
-    type: Number,
-    default: 1,
-  },
-  lineClampMax: {
-    type: Number,
-    default: 10,
-  },
 })
 
 const emit = defineEmits([
@@ -84,12 +68,9 @@ const emit = defineEmits([
   'close',
   'retry-rules',
   'retry-diff',
-  'update:lineClamp',
 ])
 
 const diffMode = computed(() => !!props.compareRev)
-const rowCount = computed(() => (diffMode.value ? props.diffRows.length : props.rules.length))
-const rowCountLabel = computed(() => (diffMode.value ? 'changed rules' : 'rules'))
 
 const bodyState = computed(() => {
   if (diffMode.value) {
@@ -127,14 +108,8 @@ const bodyError = computed(() => (diffMode.value ? props.diffError : props.rules
       :revisions-loading="revisionsLoading"
       :view-rev="viewRev"
       :compare-rev="compareRev"
-      :row-count="rowCount"
-      :row-count-label="rowCountLabel"
-      :line-clamp="lineClamp"
-      :line-clamp-min="lineClampMin"
-      :line-clamp-max="lineClampMax"
       @change-view-rev="rev => emit('change-view-rev', rev)"
       @change-compare-rev="rev => emit('change-compare-rev', rev)"
-      @update:line-clamp="v => emit('update:lineClamp', v)"
     />
     <div class="rule-pane__body">
       <div v-if="bodyState === 'loading'" class="rule-pane__state">
@@ -160,15 +135,12 @@ const bodyError = computed(() => (diffMode.value ? props.diffError : props.rules
           v-if="diffMode"
           :rows="diffRows"
           :selected-key="selectedDiffRowKey"
-          :item-size="itemSize"
           @select-row="row => emit('select-diff-row', row)"
         />
         <ViewRuleTable
           v-else
           :rules="rules"
           :selected-rule-id="selectedRuleId"
-          :item-size="itemSize"
-          :line-clamp="lineClamp"
           @select-rule="rule => emit('select-rule', rule)"
         />
       </template>
