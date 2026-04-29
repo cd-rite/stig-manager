@@ -24,7 +24,7 @@ const emit = defineEmits(['select-row'])
 const SEVERITY_TO_CAT = { high: 1, medium: 2, low: 3 }
 
 const dataTableRef = ref(null)
-const { itemSize } = useGridDensity('stig-library-rules', 2, 12, 24)
+const { itemSize } = useGridDensity('stig-library-rules-v2', 2, 6, 15)
 
 const selectedRow = computed(() =>
   props.selectedKey ? props.rows.find(r => r.key === props.selectedKey) ?? null : null,

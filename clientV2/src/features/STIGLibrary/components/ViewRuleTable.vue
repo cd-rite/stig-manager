@@ -22,7 +22,7 @@ const emit = defineEmits(['select-rule'])
 const SEVERITY_TO_CAT = { high: 1, medium: 2, low: 3 }
 
 const dataTableRef = ref(null)
-const { lineClamp, itemSize } = useGridDensity('stig-library-rules', 2, 12, 24)
+const { lineClamp, itemSize } = useGridDensity('stig-library-rules-v2', 2, 6, 15)
 
 const selectedRow = computed(() =>
   props.selectedRuleId ? props.rules.find(r => r.ruleId === props.selectedRuleId) ?? null : null,
@@ -156,7 +156,7 @@ function onFooterAction(key) {
 }
 
 .cell-text {
-  font-size: 1rem;
+  font-size: 1.1rem;
   line-height: 1.3;
   color: var(--color-text-primary);
 }
