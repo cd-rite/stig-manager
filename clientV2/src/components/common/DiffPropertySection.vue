@@ -68,8 +68,21 @@ const rendered = computed(() => {
   color: var(--color-text-primary);
 }
 
+/* Force monospace on the diff body so the legacy d2h CSS doesn't depend on
+   the scoped @import of diff2html.min.css making it through PostCSS to the
+   v-html'd nodes. Diff text aligns much better in a fixed-width font. */
 .diff-property-section__body {
   overflow-x: hidden;
+  font-family: Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+.d2h-wrapper :deep(.d2h-code-line),
+.d2h-wrapper :deep(.d2h-code-line-prefix),
+.d2h-wrapper :deep(.d2h-code-line-ctn),
+.d2h-wrapper :deep(.d2h-code-linenumber),
+.d2h-wrapper :deep(.line-num1),
+.d2h-wrapper :deep(.line-num2) {
+  font-family: Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
 .diff-property-section__error {

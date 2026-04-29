@@ -20,9 +20,13 @@ const props = defineProps({
     type: String,
     default: 'Density',
   },
+  defaultLineClamp: {
+    type: Number,
+    default: 1,
+  },
 })
 
-const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity(props.gridKey, 1, 12, 24)
+const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity(props.gridKey, props.defaultLineClamp, 12, 24)
 </script>
 
 <template>

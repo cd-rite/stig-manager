@@ -22,7 +22,7 @@ const emit = defineEmits(['select-rule'])
 const SEVERITY_TO_CAT = { high: 1, medium: 2, low: 3 }
 
 const dataTableRef = ref(null)
-const { lineClamp, itemSize } = useGridDensity('stig-library-rules', 1, 12, 24)
+const { lineClamp, itemSize } = useGridDensity('stig-library-rules', 2, 12, 24)
 
 const selectedRow = computed(() =>
   props.selectedRuleId ? props.rules.find(r => r.ruleId === props.selectedRuleId) ?? null : null,

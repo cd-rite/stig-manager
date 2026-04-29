@@ -427,6 +427,16 @@ function onRetryDiff() {
   background-color: var(--color-background-dark);
 }
 
+/* The shared RuleInfo component hard-codes a tall panel header sized for the
+   Asset/Collection Review headers (height: 7.28rem). Inside STIG Library's
+   detail pane it's just a single-row label, so collapse it to a normal
+   panel-header height. */
+.stig-library__detail :deep(.rule-info__panel-header) {
+  height: auto;
+  min-height: 0;
+  padding: 0.5rem 0.9rem;
+}
+
 .stig-library__state {
   display: flex;
   align-items: center;

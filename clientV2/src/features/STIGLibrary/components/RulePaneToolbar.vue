@@ -71,7 +71,7 @@ function onChangeCompareRev(rev) {
       />
     </template>
     <div class="rule-pane-toolbar__spacer" />
-    <DensityControls grid-key="stig-library-rules" />
+    <DensityControls grid-key="stig-library-rules" :default-line-clamp="2" />
   </div>
 </template>
 

@@ -89,33 +89,32 @@ function clearFilter() {
     :pt="dataTablePt"
     @row-click="onRowClick"
   >
-    <template #header>
-      <div class="benchmarks-table__filter">
-        <i class="pi pi-search benchmarks-table__filter-icon" />
-        <input
-          v-model="filter"
-          type="text"
-          class="benchmarks-table__filter-input"
-          placeholder="Filter benchmarks by title or ID…"
-        >
-        <button
-          v-if="filter"
-          type="button"
-          class="benchmarks-table__filter-clear"
-          aria-label="Clear filter"
-          @click="clearFilter"
-        >
-          <i class="pi pi-times" />
-        </button>
-      </div>
-    </template>
-
     <Column
-      header="Benchmark"
       field="title"
       :sortable="!compact"
       :style="{ minWidth: compact ? '11rem' : '22rem' }"
     >
+      <template #header>
+        <div class="benchmarks-table__filter">
+          <i class="pi pi-search benchmarks-table__filter-icon" />
+          <input
+            v-model="filter"
+            type="text"
+            class="benchmarks-table__filter-input"
+            :placeholder="compact ? 'Filter…' : 'Filter benchmarks by title or ID…'"
+            @click.stop
+          >
+          <button
+            v-if="filter"
+            type="button"
+            class="benchmarks-table__filter-clear"
+            aria-label="Clear filter"
+            @click.stop="clearFilter"
+          >
+            <i class="pi pi-times" />
+          </button>
+        </div>
+      </template>
       <template #body="{ data }">
         <div class="bm-cell">
           <div class="bm-cell__title" :title="data.title">
@@ -207,14 +206,14 @@ function clearFilter() {
 
 .benchmarks-table__filter {
   position: relative;
-  padding: 0.45rem 0.6rem;
-  background: var(--color-background-dark);
-  border-bottom: 1px solid var(--color-border-default);
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .benchmarks-table__filter-icon {
   position: absolute;
-  left: 1.4rem;
+  left: 0.6rem;
   top: 50%;
   transform: translateY(-50%);
   color: var(--color-text-dim);
@@ -224,13 +223,13 @@ function clearFilter() {
 
 .benchmarks-table__filter-input {
   width: 100%;
-  height: 2.42rem;
-  padding: 0.32rem 2rem 0.32rem 2.35rem;
+  height: 2rem;
+  padding: 0.25rem 1.7rem 0.25rem 1.95rem;
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
   background: color-mix(in srgb, var(--color-background-light) 75%, transparent);
   color: var(--color-text-primary);
-  font-size: 1.2rem;
+  font-size: 1rem;
   outline: none;
   transition: all 0.15s ease;
 }
@@ -243,14 +242,14 @@ function clearFilter() {
 
 .benchmarks-table__filter-clear {
   position: absolute;
-  right: 1.35rem;
+  right: 0.45rem;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   color: var(--color-text-dim);
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 0.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
