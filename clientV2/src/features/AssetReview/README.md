@@ -12,15 +12,10 @@ src/features/AssetReview/
 │   └── assetReviewApi.js         # All API calls for this feature
 ├── components/
 │   ├── AssetReview.vue            # Feature root / "store" component
-│   ├── ChecklistGrid.vue          # Left pane: grid + popover controller
-│   ├── ChecklistGridHeader.vue    # Toolbar above the grid
-│   ├── ChecklistGridTable.vue     # Pure PrimeVue DataTable wrapper
-│   ├── ReviewEditPopover.vue      # (shared) Floating form for editing a review
-│   ├── ReviewHistoryTab.vue       # Popover tab: history of this rule's reviews
-│   ├── ReviewOtherAssetsTab.vue   # Popover tab: same rule across other assets
-│   ├── ReviewResources.vue        # Popover tab: attachments / resources
-│   ├── ReviewStatusTextTab.vue    # Popover tab: status text detail
-│   └── RuleInfo.vue               # Right pane: rule content / detail panel
+│   ├── assetChecklistGrid.vue          # Left pane: grid + popover controller
+│   ├── AssetChecklistGridHeader.vue    # Toolbar above the grid
+│   ├── AssetChecklistGridTable.vue     # Pure PrimeVue DataTable wrapper
+│   └── RuleDetailPanel.vue        # Right pane: rule content / detail panel
 ├── composables/
 │   ├── useChecklistData.js        # Fetches and caches the checklist array
 │   ├── useChecklistDisplayMode.js # Controls column visibility and row height
@@ -42,14 +37,15 @@ src/features/AssetReview/
 
 ```
 AssetReview.vue  (maintains feature state)
-├── ChecklistGrid.vue              (props: gridData, selectedRuleId, asset, revisionInfo, fieldSettings, canAccept, isSaving, saveError, currentReview)
-│   ├── ChecklistGridHeader.vue    (props: asset, revisionInfo, accessMode)
-│   ├── ChecklistGridTable.vue     (props: gridData, selectedRow)
+├── assetChecklistGrid.vue              (props: gridData, selectedRuleId, asset, revisionInfo, fieldSettings, canAccept, isSaving, saveError, currentReview)
+│   ├── AssetChecklistGridHeader.vue    (props: asset, revisionInfo, accessMode)
+│   ├── AssetChecklistGridTable.vue     (props: gridData, selectedRow)
 │   └── ReviewEditPopover.vue      (props: currentReview, selectedRuleId, collectionId, assetId, fieldSettings, accessMode, canAccept, isSaving, saveError; provide → 'reviewEditForm')
-│       ├── ReviewHistoryTab.vue   (props: ruleId, collectionId, assetId, accessMode, currentReview; inject: reviewEditForm)
-│       ├── ReviewOtherAssetsTab.vue (props: ruleId, collectionId, assetId, accessMode, currentReview; inject: reviewEditForm)
-│       ├── ReviewResources.vue    (props: ruleId, collectionId, assetId, accessMode, currentReview)
-│       └── ReviewStatusTextTab.vue (props: currentReview)
+│       └── ReviewResources.vue    (common)
+│           ├── ReviewHistoryTab.vue
+│           ├── ReviewOtherAssetsTab.vue
+│           ├── ReviewStatusTextTab.vue
+│           └── ReviewAttachmentsTab.vue
 └── RuleInfo.vue                   (props: ruleContent, selectedChecklistItem)
 ```
 
@@ -144,13 +140,13 @@ accepted
 - **Unsubmit** → `PATCH /reviews` with `status: 'saved'` (resets to editable)
 - **Accept** → `PATCH /reviews` with `status: 'accepted'`
 
-All saves flow: `ReviewEditPopover` → emits `save`/`status-action` → `ChecklistGrid` re-emits up → `AssetReview` calls `saveFullReview` or `saveStatusAction` → optimistic `upsertReview` updates the grid row in place without a re-fetch.
+All saves flow: `ReviewEditPopover` → emits `save`/`status-action` → `assetChecklistGrid` re-emits up → `AssetReview` calls `saveFullReview` or `saveStatusAction` → optimistic `upsertReview` updates the grid row in place without a re-fetch.
 
 ---
 
 ## The Popover Anchoring System
 
-The `ReviewEditPopover` is anchored to a hidden `<div class="popover-anchor">` inside `ChecklistGrid`. When a row is clicked:
+The `ReviewEditPopover` is anchored to a hidden `<div class="popover-anchor">` inside `assetChecklistGrid`. When a row is clicked:
 
 1. The anchor `div` is repositioned to `{ left: clickX, top: rowTop, height: rowHeight }` using inline styles.
 2. A synthetic event object (`{ currentTarget: anchor, clientX }`) is passed to the popover's `show` / `reposition` method.
@@ -162,13 +158,13 @@ This approach avoids conflicts with PrimeVue's internal scroll/target tracking b
 
 ## Unsaved Changes Guard
 
-`ReviewEditPopover` exposes `isDirty` and `triggerUnsavedWarning()` via `defineExpose`. `ChecklistGrid` uses these to:
+`ReviewEditPopover` exposes `isDirty` and `triggerUnsavedWarning()` via `defineExpose`. `assetChecklistGrid` uses these to:
 
 - **Block row switching** if the user clicks a different row while `isDirty` is `true`.
 - **Show a warning banner** inside the popover by calling `triggerUnsavedWarning()`.
 - **Lock grid scroll** via the `scrollLocked` computed when the form is dirty.
 
-All "guard" checks in `ChecklistGrid` go through the shared `guardUnsaved(targetRuleId)` helper to avoid duplication.
+All "guard" checks in `assetChecklistGrid` go through the shared `guardUnsaved(targetRuleId)` helper to avoid duplication.
 
 ---
 

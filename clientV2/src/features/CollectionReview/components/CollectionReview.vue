@@ -4,6 +4,7 @@ import SplitterPanel from 'primevue/splitterpanel'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import RuleInfo from '../../../components/common/RuleInfo.vue'
+import { getHttpStatus } from '../../../shared/api/apiClient.js'
 import { fetchCollection } from '../../../shared/api/collectionsApi.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { useCurrentUser } from '../../../shared/composables/useCurrentUser.js'
@@ -12,7 +13,7 @@ import { useRecentViews } from '../../NavRail/composables/useRecentViews.js'
 import { fetchAssetsByCollectionStig, fetchCollectionChecklist, fetchReviewsByRule, fetchRule, postReviewBatch } from '../api/collectionReviewApi.js'
 import { useReviewActionAvailability } from '../composables/useReviewActionAvailability.js'
 import BatchEditModal from './BatchEditModal.vue'
-import ChecklistGrid from './ChecklistGrid.vue'
+import CollectionChecklistGrid from './CollectionChecklistGrid.vue'
 import RejectReasonModal from './RejectReasonModal.vue'
 import RuleTable from './RuleTable.vue'
 
@@ -33,7 +34,7 @@ function handleRouteError(err) {
   const status = getHttpStatus(err)
   const isPrivilegeError = err.body?.error === 'User has insufficient privilege to complete this request.'
   if (status === 404 || status === 403 || status === 400 || isPrivilegeError) {
-    removeView(key => key.includes(`:${collectionId.value}:${assetId.value}`))
+    removeView(key => key.includes(`:${collectionId.value}:${benchmarkId.value}`))
     router.push({ name: 'not-found', params: { pathMatch: route.path.substring(1).split('/') } })
   }
 }
@@ -301,7 +302,7 @@ async function onBatchEditConfirm(payload) {
             style="height: 100%"
           >
             <SplitterPanel :size="50" :min-size="20">
-              <ChecklistGrid
+              <CollectionChecklistGrid
                 :grid-data="gridData ?? []"
                 :is-loading="isChecklistLoading"
                 :selected-rule-id="selectedRuleId"

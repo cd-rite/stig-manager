@@ -1,5 +1,5 @@
 <script setup>
-import { FilterMatchMode, FilterService } from '@primevue/core/api'
+import { FilterMatchMode } from '@primevue/core/api'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import { computed, inject, ref, toRefs, watch } from 'vue'
@@ -8,24 +8,21 @@ import { useRoute } from 'vue-router'
 import engineIcon from '../../../assets/bot2.svg'
 import overrideIcon from '../../../assets/override2.svg'
 import manualIcon from '../../../assets/user.svg'
-
-import LabelsRow from '../../../components/columns/LabelsRow.vue'
-import ColumnFilter from '../../../components/common/ColumnFilter.vue'
-import ColumnSearchFilter from '../../../components/common/ColumnSearchFilter.vue'
-import EngineBadge from '../../../components/common/EngineBadge.vue'
-import LongTextPopover from '../../../components/common/LongTextPopover.vue'
-import ManualBadge from '../../../components/common/ManualBadge.vue'
-import OverrideBadge from '../../../components/common/OverrideBadge.vue'
-import ResultBadge from '../../../components/common/ResultBadge.vue'
-import StatusBadge from '../../../components/common/StatusBadge.vue'
-import StatusFooter from '../../../components/common/StatusFooter.vue'
-
+import { fetchReview } from '../../../shared/api/reviewsApi.js'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
+
 import { durationToNow } from '../../../shared/lib.js'
-import { normalizeColor } from '../../../shared/lib/colorUtils.js'
-import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
-import { fetchOtherReviews } from '../api/assetReviewApi.js'
 import { getEngineDisplay, getResultDisplay } from '../../../shared/lib/checklistUtils.js'
+import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
+import ColumnFilter from '../ColumnFilter.vue'
+import ColumnSearchFilter from '../ColumnSearchFilter.vue'
+import EngineBadge from '../EngineBadge.vue'
+import LongTextPopover from '../LongTextPopover.vue'
+import ManualBadge from '../ManualBadge.vue'
+import OverrideBadge from '../OverrideBadge.vue'
+import ResultBadge from '../ResultBadge.vue'
+import StatusBadge from '../StatusBadge.vue'
+import StatusFooter from '../StatusFooter.vue'
 
 const props = defineProps({
   active: {
@@ -65,43 +62,61 @@ const {
   formDetail,
   formComment,
 } = reviewEditForm
+
 const editable = computed(() => accessMode.value === 'rw' && (!currentReview.value?.status?.label || currentReview.value.status.label === 'saved' || currentReview.value.status.label === 'rejected'))
 
-FilterService.register('labelContainsAny', (value, filter) => {
-  if (!filter || filter.length === 0) {
-    return true
+const { state: fullReviewHistory, isLoading: isInternalHistoryLoading, execute: loadHistory } = useAsyncState(
+  async () => {
+    const result = await fetchReview(collectionId.value, assetId.value, ruleId.value, { projection: 'history' })
+    return result?.history || []
+  },
+  { immediate: false, initialState: [] },
+)
+
+watch([() => props.active, () => ruleId.value, () => assetId.value], ([active, rid, aid], [_oldActive, oldRid, oldAid]) => {
+  if (!active || !ruleId.value || !assetId.value || !collectionId.value) {
+    return
   }
-  if (!value || value.length === 0) {
-    return false
+  if (rid !== oldRid || aid !== oldAid) {
+    fullReviewHistory.value = []
   }
-  return value.some(label => filter.includes(label.name))
+  loadHistory()
+}, { immediate: true })
+
+const processedHistory = computed(() => {
+  return (fullReviewHistory.value || []).map(item => ({
+    ...item,
+    _engineDisplay: getEngineDisplay(item),
+    _statusLabel: item.status?.label ?? '',
+  }))
 })
 
-const ROW_HEIGHT = 36
-
-const dataTableRef = ref(null)
-
-function onFooterAction(key) {
-  if (key === 'export') {
-    dataTableRef.value?.exportCSV()
-  }
-}
-
-const longTextPopover = ref(null)
-const showLongText = (event, label, text) => {
-  longTextPopover.value?.show(event, label, text)
-}
-
-const filters = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  assetName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  detail: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  comment: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  username: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  result: { value: null, matchMode: FilterMatchMode.IN },
-  _engineDisplay: { value: null, matchMode: FilterMatchMode.IN },
-  assetLabels: { value: null, matchMode: 'labelContainsAny' },
+const resultOptions = computed(() => {
+  const results = new Set((fullReviewHistory.value || []).map(item => item.result).filter(Boolean))
+  return Array.from(results).map(val => ({
+    value: val,
+    label: getResultDisplay(val),
+  })).sort((a, b) => a.label.localeCompare(b.label))
 })
+
+const engineOptions = computed(() => {
+  const engines = new Set((fullReviewHistory.value || []).map(item => getEngineDisplay(item)).filter(Boolean))
+  return Array.from(engines).map(val => ({
+    value: val,
+    label: val === 'engine' ? 'Engine' : val === 'override' ? 'Override' : 'Manual',
+    image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
+  }))
+})
+
+const statusOptions = computed(() => {
+  const statuses = new Set((fullReviewHistory.value || []).map(item => item.status?.label).filter(Boolean))
+  return Array.from(statuses).map(val => ({
+    value: val,
+    label: val,
+  })).sort((a, b) => a.label.localeCompare(b.label))
+})
+
+const ROW_HEIGHT = 40
 
 const isAlreadyApplied = (data) => {
   return data.result === formResult.value
@@ -119,58 +134,56 @@ const getApplyTooltip = (data) => {
   return 'Apply this review'
 }
 
-const { state: otherReviews, isLoading, execute: loadOtherReviews } = useAsyncState(
-  () => fetchOtherReviews(collectionId.value, ruleId.value),
-  { immediate: false, initialState: [] },
-)
+const dataTableRef = ref(null)
 
-const filteredOtherReviews = computed(() => {
-  if (!assetId.value) {
-    return otherReviews.value
+function onFooterAction(key) {
+  if (key === 'export') {
+    dataTableRef.value?.exportCSV()
   }
-  return otherReviews.value.filter(review => review.assetId !== assetId.value)
+}
+
+const longTextPopover = ref(null)
+const showLongText = (event, label, text) => {
+  longTextPopover.value?.show(event, label, text)
+}
+
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  ruleId: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  detail: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  comment: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  statusText: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  username: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  result: { value: null, matchMode: FilterMatchMode.IN },
+  _engineDisplay: { value: null, matchMode: FilterMatchMode.IN },
+  _statusLabel: { value: null, matchMode: FilterMatchMode.IN },
 })
 
-const processedOtherReviews = computed(() => {
-  return filteredOtherReviews.value.map(item => ({
-    ...item,
-    _engineDisplay: getEngineDisplay(item),
-  }))
+const route = useRoute()
+
+const resetFilters = () => {
+  filters.value.global.value = null
+  filters.value.ruleId.value = null
+  filters.value.detail.value = null
+  filters.value.comment.value = null
+  filters.value.statusText.value = null
+  filters.value.username.value = null
+  filters.value.result.value = null
+  filters.value._engineDisplay.value = null
+  filters.value._statusLabel.value = null
+}
+
+watch([
+  () => route.params.collectionId,
+  () => route.params.assetId,
+  () => route.params.benchmarkId,
+  () => route.params.revisionStr,
+], () => {
+  resetFilters()
 })
 
-const resultOptions = computed(() => {
-  const results = new Set(filteredOtherReviews.value.map(item => item.result).filter(Boolean))
-  return Array.from(results).map(val => ({
-    value: val,
-    label: getResultDisplay(val),
-  })).sort((a, b) => a.label.localeCompare(b.label))
-})
-
-const engineOptions = computed(() => {
-  const engines = new Set(filteredOtherReviews.value.map(item => getEngineDisplay(item)).filter(Boolean))
-  return Array.from(engines).map(val => ({
-    value: val,
-    label: val === 'engine' ? 'Engine' : val === 'override' ? 'Override' : 'Manual',
-    image: val === 'engine' ? engineIcon : val === 'override' ? overrideIcon : manualIcon,
-  }))
-})
-
-const labelOptions = computed(() => {
-  const seen = new Map()
-  for (const item of filteredOtherReviews.value) {
-    for (const label of (item.assetLabels || [])) {
-      if (!seen.has(label.name)) {
-        seen.set(label.name, label)
-      }
-    }
-  }
-  return Array.from(seen.values())
-    .map(label => ({ value: label.name, label: label.name, color: label.color }))
-    .sort((a, b) => a.label.localeCompare(b.label))
-})
-
-const otherAssetsStats = computed(() => {
-  const reviews = filteredOtherReviews.value || []
+const historyStats = computed(() => {
+  const reviews = fullReviewHistory.value || []
   const stats = {
     total: reviews.length,
     results: { fail: 0, pass: 0, notapplicable: 0, other: 0 },
@@ -221,35 +234,7 @@ const otherAssetsStats = computed(() => {
   return stats
 })
 
-watch([() => ruleId.value, () => collectionId.value], () => {
-  if (ruleId.value && collectionId.value) {
-    loadOtherReviews()
-  }
-}, { immediate: true })
-
-const route = useRoute()
-
-const resetFilters = () => {
-  filters.value.global.value = null
-  filters.value.assetName.value = null
-  filters.value.detail.value = null
-  filters.value.comment.value = null
-  filters.value.username.value = null
-  filters.value.result.value = null
-  filters.value._engineDisplay.value = null
-  filters.value.assetLabels.value = null
-}
-
-watch([
-  () => route.params.collectionId,
-  () => route.params.assetId,
-  () => route.params.benchmarkId,
-  () => route.params.revisionStr,
-], () => {
-  resetFilters()
-})
-
-const otherTablePt = {
+const historyTablePt = {
   root: { class: 'sm-scrollbar-thin', style: { backgroundColor: 'var(--color-background-dark)' } },
   header: { style: { background: 'transparent', border: 'none', padding: '0' } },
   table: { style: { borderCollapse: 'separate', borderSpacing: '0', background: 'var(--color-background-darkest)' } },
@@ -284,56 +269,45 @@ const otherTablePt = {
 </script>
 
 <template>
-  <div class="other-assets-wrapper">
+  <div class="history-wrapper">
     <DataTable
       ref="dataTableRef"
       v-model:filters="filters"
-      :value="processedOtherReviews"
-      :loading="isLoading"
-      data-key="assetId"
+      :value="processedHistory"
+      :loading="isInternalHistoryLoading"
+      data-key="touchTs"
       scrollable
       scroll-height="flex"
       :virtual-scroller-options="{ itemSize: ROW_HEIGHT, showLoader: true }"
       striped-rows
-      class="other-assets-table"
-      :pt="otherTablePt"
+      :resizable-columns="true"
+      column-resize-mode="fit"
+      class="history-table"
+      :pt="historyTablePt"
     >
-      <Column field="assetName" sortable :style="{ width: '100px' }">
+      <Column header="Time" field="touchTs" sortable :style="{ width: '65px' }">
+        <template #body="{ data }">
+          <span class="cell-text--mono" :title="formatReviewDate(data.touchTs)">{{ durationToNow(data.touchTs) }}</span>
+        </template>
+      </Column>
+
+      <Column field="ruleId" :style="{ width: '150px' }">
         <template #header>
           <div class="column-header-with-filter">
-            Asset
-            <ColumnSearchFilter v-model="filters.assetName.value" placeholder="Search asset..." />
+            Rule
+            <ColumnSearchFilter v-model="filters.ruleId.value" placeholder="Search rule..." />
           </div>
         </template>
         <template #body="{ data }">
           <span
-            class="cell-text--ellipsis"
-            :title="data.assetId"
-            @click="showLongText($event, 'Asset', data.assetName)"
-          >{{ data.assetName }}</span>
+            class="cell-text--mono cell-text--ellipsis"
+            title="Click to view full rule ID"
+            @click="showLongText($event, 'Rule', data.ruleId)"
+          >{{ data.ruleId }}</span>
         </template>
       </Column>
 
-      <Column field="assetLabels" filter-field="assetLabels" :style="{ width: '100px' }">
-        <template #header>
-          <div class="column-header-with-filter">
-            Labels
-            <ColumnFilter v-model="filters.assetLabels.value" :options="labelOptions">
-              <template #option="{ option }">
-                <span
-                  class="label-filter-chip"
-                  :style="{ backgroundColor: normalizeColor(option.color, '#cccccc') }"
-                >{{ option.label }}</span>
-              </template>
-            </ColumnFilter>
-          </div>
-        </template>
-        <template #body="{ data }">
-          <LabelsRow :labels="data.assetLabels" compact />
-        </template>
-      </Column>
-
-      <Column field="result" :style="{ width: '65px', textAlign: 'center' }">
+      <Column field="result" :style="{ width: '70px', textAlign: 'center' }">
         <template #header>
           <div class="column-header-with-filter">
             Result
@@ -386,7 +360,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="detail" :style="{ width: '150px' }">
+      <Column field="detail" :style="{ width: '130px' }">
         <template #header>
           <div class="column-header-with-filter">
             Detail
@@ -406,7 +380,7 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column field="comment" :style="{ width: '150px' }">
+      <Column field="comment" :style="{ width: '130px' }">
         <template #header>
           <div class="column-header-with-filter">
             Comment
@@ -426,20 +400,43 @@ const otherTablePt = {
         </template>
       </Column>
 
-      <Column header="Evaluated" field="ts" sortable :style="{ width: '80px' }">
-        <template #body="{ data }">
-          <span class="cell-text--mono" :title="formatReviewDate(data.ts)">{{ durationToNow(data.ts) }}</span>
+      <Column field="statusText" :style="{ width: '100px' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            Status Text
+            <ColumnSearchFilter v-model="filters.statusText.value" placeholder="Search status text..." />
+          </div>
         </template>
-      </Column>
-
-      <Column header="Statused" field="touchTs" sortable :style="{ width: '80px' }">
         <template #body="{ data }">
-          <span v-if="data.touchTs" class="cell-text--mono" :title="formatReviewDate(data.touchTs)">{{ durationToNow(data.touchTs) }}</span>
+          <span
+            v-if="data.status?.text"
+            class="cell-text--ellipsis"
+            title="Click to view full text"
+            @click="showLongText($event, 'Status Text', data.status.text)"
+          >
+            {{ data.status.text }}
+          </span>
           <span v-else class="cell-text--empty">---</span>
         </template>
       </Column>
 
-      <Column field="username" :style="{ width: '80px' }">
+      <Column filter-field="_statusLabel" :style="{ width: '70px', textAlign: 'center' }">
+        <template #header>
+          <div class="column-header-with-filter">
+            Status
+            <ColumnFilter v-model="filters._statusLabel.value" :options="statusOptions">
+              <template #option="{ option }">
+                <StatusBadge :status="option.value" />
+              </template>
+            </ColumnFilter>
+          </div>
+        </template>
+        <template #body="{ data }">
+          <StatusBadge v-if="data.status?.label" :status="data.status.label" />
+        </template>
+      </Column>
+
+      <Column field="username" :style="{ width: '100px' }">
         <template #header>
           <div class="column-header-with-filter">
             User
@@ -471,32 +468,32 @@ const otherTablePt = {
       </Column>
 
       <template #empty>
-        <div class="other-table__empty">
-          {{ isLoading ? 'Loading...' : 'No reviews found for this rule on other assets.' }}
+        <div class="history-table__empty">
+          No review history found for this rule.
         </div>
       </template>
 
-      <template v-if="otherAssetsStats" #footer>
+      <template #footer>
         <StatusFooter
           :show-refresh="false"
           :show-export="true"
-          :total-count="otherAssetsStats.total"
+          :total-count="historyStats.total"
           @action="onFooterAction"
         >
           <template #right-extra>
-            <ResultBadge status="O" :count="otherAssetsStats.results.fail" />
-            <ResultBadge status="NF" :count="otherAssetsStats.results.pass" />
-            <ResultBadge status="NA" :count="otherAssetsStats.results.notapplicable" />
-            <ResultBadge status="NR+" :count="otherAssetsStats.results.other" />
+            <ResultBadge status="O" :count="historyStats.results.fail" />
+            <ResultBadge status="NF" :count="historyStats.results.pass" />
+            <ResultBadge status="NA" :count="historyStats.results.notapplicable" />
+            <ResultBadge status="NR+" :count="historyStats.results.other" />
             <span class="footer-divider">|</span>
-            <ManualBadge :count="otherAssetsStats.engine.manual" />
-            <EngineBadge :count="otherAssetsStats.engine.engine" />
-            <OverrideBadge :count="otherAssetsStats.engine.override" />
+            <ManualBadge :count="historyStats.engine.manual" />
+            <EngineBadge :count="historyStats.engine.engine" />
+            <OverrideBadge :count="historyStats.engine.override" />
             <span class="footer-divider">|</span>
-            <StatusBadge status="saved" :count="otherAssetsStats.statuses.saved" />
-            <StatusBadge status="submitted" :count="otherAssetsStats.statuses.submitted" />
-            <StatusBadge status="accepted" :count="otherAssetsStats.statuses.accepted" />
-            <StatusBadge status="rejected" :count="otherAssetsStats.statuses.rejected" />
+            <StatusBadge status="saved" :count="historyStats.statuses.saved" />
+            <StatusBadge status="submitted" :count="historyStats.statuses.submitted" />
+            <StatusBadge status="accepted" :count="historyStats.statuses.accepted" />
+            <StatusBadge status="rejected" :count="historyStats.statuses.rejected" />
           </template>
         </StatusFooter>
       </template>
@@ -507,7 +504,7 @@ const otherTablePt = {
 </template>
 
 <style scoped>
-.other-assets-wrapper {
+.history-wrapper {
   flex: 1;
   min-height: 0;
   display: flex;
@@ -515,16 +512,10 @@ const otherTablePt = {
   overflow: hidden;
 }
 
-.other-assets-table {
+.history-table {
   flex: 1;
   min-height: 0;
   border-top: none;
-}
-
-.column-header-with-filter {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
 }
 
 /* Allow table to expand and scroll horizontally if needed. */
@@ -538,7 +529,7 @@ const otherTablePt = {
 }
 
 :deep(.p-datatable-tbody > tr > td) {
-  padding: 0.2rem 0.4rem;
+  padding: 0.4rem 0.4rem;
   vertical-align: middle;
   font-size: 1.1rem;
   border-bottom: 1px solid var(--color-border-light);
@@ -554,9 +545,14 @@ const otherTablePt = {
   border-right: none !important;
 }
 
+.column-header-with-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .cell-text--mono {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  color: var(--color-text-dim);
+  color: var(--color-text-primary);
   font-size: 1rem;
 }
 
@@ -597,20 +593,6 @@ const otherTablePt = {
   opacity: 0.9;
 }
 
-.other-table__empty {
-  font-style: italic;
-  color: var(--color-text-dim);
-}
-
-.label-filter-chip {
-  display: inline-block;
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 6px;
-  white-space: nowrap;
-}
-
 .apply-review-icon-btn {
   display: inline-flex;
   align-items: center;
@@ -644,8 +626,16 @@ const otherTablePt = {
 }
 
 .footer-divider {
+  color: var(--color-border-default);
+  margin: 0 0.5rem;
+  opacity: 0.5;
+}
+
+.history-table__empty {
+  padding: 3rem 1rem;
+  text-align: center;
   color: var(--color-text-dim);
-  opacity: 0.4;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  font-style: italic;
 }
 </style>

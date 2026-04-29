@@ -1,8 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
-import ChecklistGridHeader from './ChecklistGridHeader.vue'
-import ChecklistGridTable from './ChecklistGridTable.vue'
+import CollectionChecklistGridHeader from './CollectionChecklistGridHeader.vue'
+import CollectionChecklistGridTable from './CollectionChecklistGridTable.vue'
 
 const props = defineProps({
   gridData: {
@@ -78,13 +78,13 @@ const { lineClamp, itemSize } = useGridDensity('collection-checklist', 2, 10, 18
     class="checklist-grid relative flex h-full flex-col bg-[var(--color-background-dark)]"
     :style="{ '--line-clamp': lineClamp, '--item-size': `${itemSize}px` }"
   >
-    <ChecklistGridHeader
+    <CollectionChecklistGridHeader
       v-model:search-filter="searchFilter"
       v-model:selected-columns="selectedColumns"
       v-model:display-mode="displayMode"
       :toggleable-columns="TOGGLEABLE_COLUMNS"
     />
-    <ChecklistGridTable
+    <CollectionChecklistGridTable
       :grid-data="gridData"
       :is-loading="isLoading"
       :selected-row="selectedRow"

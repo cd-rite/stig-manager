@@ -204,7 +204,6 @@ function onCancel() {
         <label class="batch-modal__label">
           Result
           <i v-tooltip="{ value: resultTooltipHtml, ...tooltipOpts }" class="pi pi-question-circle batch-modal__help-icon" />
-          <span class="batch-modal__muted">(required to apply changes)</span>
         </label>
         <Dropdown
           v-model="result"

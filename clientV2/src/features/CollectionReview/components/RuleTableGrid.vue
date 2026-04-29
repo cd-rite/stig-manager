@@ -122,13 +122,8 @@ const enabledTabs = ['history', 'attachments', 'statusText']
 
 const currentReview = computed(() => props.gridData.find(r => r.assetId === editingRow.value?.assetId) ?? null)
 
-// --- Save logic ---
-const saveError = ref(null)
-function clearSaveError() { saveError.value = null }
-
 const { isLoading: isSavingReview, execute: executeSaveReview } = useAsyncState(
   async ({ assetId, ruleId, result, detail, comment, status }) => {
-    saveError.value = null
     const row = props.gridData.find(r => r.assetId === assetId)
     const resultChanged = row ? result !== row.result : true
     const body = {
@@ -142,19 +137,18 @@ const { isLoading: isSavingReview, execute: executeSaveReview } = useAsyncState(
     emit('review-saved', { ...saved, assetId })
     return saved
   },
-  { immediate: false, onError: (err) => { saveError.value = err?.message ?? 'Failed to save review.' } },
+  { immediate: false },
 )
 
 const { isLoading: isSavingStatus, execute: executeSaveStatus } = useAsyncState(
   async ({ assetId, ruleId, actionType }) => {
-    saveError.value = null
     const status = statusPayloadForAction(actionType)
     if (status === null) { return null }
     const saved = await patchReview(props.collectionId, assetId, ruleId, { status })
     emit('review-saved', { ...saved, assetId })
     return saved
   },
-  { immediate: false, onError: (err) => { saveError.value = err?.message ?? 'Failed to save review.' } },
+  { immediate: false },
 )
 
 const isSaving = computed(() => isSavingReview.value || isSavingStatus.value)
@@ -619,8 +613,6 @@ const checkboxPt = {
     :access-mode="editingRow?.access"
     :can-accept="props.canAccept"
     :is-saving="isSaving"
-    :save-error="saveError"
-    :clear-save-error="clearSaveError"
     :enabled-tabs="enabledTabs"
     :subject-label="editingRow?.assetName"
     @save="onPopoverSave"

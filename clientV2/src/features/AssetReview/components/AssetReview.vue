@@ -18,7 +18,7 @@ import {
 } from '../api/assetReviewApi.js'
 import { useChecklistData } from '../composables/useChecklistData.js'
 import { useRuleDetail } from '../composables/useRuleDetail.js'
-import ChecklistGrid from './ChecklistGrid.vue'
+import AssetChecklistGrid from './AssetChecklistGrid.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -172,7 +172,7 @@ const searchFilter = useDebouncedRef('', 220)
         style="height: 100%"
       >
         <SplitterPanel :size="75" :min-size="40">
-          <ChecklistGrid
+          <AssetChecklistGrid
             :search-filter="searchFilter"
             :grid-data="gridData"
             :is-checklist-loading="isChecklistLoading"

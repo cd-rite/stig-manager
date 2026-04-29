@@ -216,7 +216,7 @@ const { lineClamp, increaseRowHeight, decreaseRowHeight } = useGridDensity('coll
   margin: 0 0.25rem;
 }
 
-/* Density Controls modeled directly after ChecklistGridHeader */
+/* Density Controls modeled directly after CollectionChecklistGridHeader */
 .rule-table__density-controls {
   display: inline-flex;
   align-items: center;

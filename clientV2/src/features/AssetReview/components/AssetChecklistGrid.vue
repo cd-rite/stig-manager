@@ -5,10 +5,10 @@ import { useRoute } from 'vue-router'
 import ReviewEditPopover from '../../../components/common/ReviewEditPopover.vue'
 import { useAsyncState } from '../../../shared/composables/useAsyncState.js'
 import { statusPayloadForAction } from '../../../shared/lib/reviewFormUtils.js'
-import { patchReview, putReview } from '../api/assetReviewApi.js'
+import { patchReview, putReview } from '../../../shared/api/reviewsApi.js'
 import { useGridDensity } from '../../../shared/composables/useGridDensity.js'
-import ChecklistGridHeader from './ChecklistGridHeader.vue'
-import ChecklistGridTable from './ChecklistGridTable.vue'
+import AssetChecklistGridHeader from './AssetChecklistGridHeader.vue'
+import AssetChecklistGridTable from './AssetChecklistGridTable.vue'
 
 const props = defineProps({
   searchFilter: {
@@ -95,12 +95,8 @@ const editingRow = ref(null)
 
 const currentReview = computed(() => gridData.value.find(r => r.ruleId === editingRow.value?.ruleId) ?? null)
 
-const saveError = ref(null)
-function clearSaveError() { saveError.value = null }
-
 const { isLoading: isSavingReview, execute: executeSaveReview } = useAsyncState(
   async ({ ruleId, result, detail, comment, status }) => {
-    saveError.value = null
     const row = gridData.value.find(r => r.ruleId === ruleId)
     const resultChanged = row ? result !== row.result : true
     const body = {
@@ -114,19 +110,18 @@ const { isLoading: isSavingReview, execute: executeSaveReview } = useAsyncState(
     emit('review-saved', { ...saved, ruleId })
     return saved
   },
-  { immediate: false, onError: err => { saveError.value = err?.message ?? 'Failed to save review.' } },
+  { immediate: false },
 )
 
 const { isLoading: isSavingStatus, execute: executeSaveStatus } = useAsyncState(
   async ({ ruleId, actionType }) => {
-    saveError.value = null
     const status = statusPayloadForAction(actionType)
     if (status === null) return null
     const saved = await patchReview(collectionId.value, assetId.value, ruleId, { status })
     emit('review-saved', { ...saved, ruleId })
     return saved
   },
-  { immediate: false, onError: err => { saveError.value = err?.message ?? 'Failed to save review.' } },
+  { immediate: false },
 )
 
 const isSaving = computed(() => isSavingReview.value || isSavingStatus.value)
@@ -312,7 +307,7 @@ function onRowClick(event) {
     class="checklist-grid" :style="{ '--line-clamp': lineClamp, '--item-size': `${itemSize}px` }"
     @scroll.capture="onGridScroll" @wheel.capture="onGridWheel"
   >
-    <ChecklistGridHeader
+    <AssetChecklistGridHeader
       v-model:search-filter="localSearchFilter"
       v-model:display-mode="displayMode"
       v-model:selected-columns="selectedColumns"
@@ -321,7 +316,7 @@ function onRowClick(event) {
       :access-mode="accessMode" @refresh="emit('refresh')"
     />
 
-    <ChecklistGridTable
+    <AssetChecklistGridTable
       :selected-row="selectedRow" :grid-data="gridData" :is-loading="isLoading"
       :search-filter="localSearchFilter"
       :visible-fields="visibleFields"
@@ -340,8 +335,6 @@ function onRowClick(event) {
       :access-mode="accessMode"
       :can-accept="canAccept"
       :is-saving="isSaving"
-      :save-error="saveError"
-      :clear-save-error="clearSaveError"
       @save="onPopoverSave"
       @status-action="onPopoverStatusAction"
       @close="editingRow = null"

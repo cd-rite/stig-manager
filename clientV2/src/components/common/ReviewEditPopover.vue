@@ -2,7 +2,7 @@
 import Popover from 'primevue/popover'
 import Textarea from 'primevue/textarea'
 import { nextTick, onBeforeUnmount, provide, ref, toRefs, watch } from 'vue'
-import ReviewResources from '../../features/AssetReview/components/ReviewResources.vue'
+import ReviewResources from './ReviewResources/ReviewResources.vue'
 import { useReviewEditForm } from '../../shared/composables/useReviewEditForm.js'
 import { formatReviewDate, resultOptions } from '../../shared/lib/reviewFormUtils.js'
 import ResultBadge from './ResultBadge.vue'
@@ -41,18 +41,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  // Save state
   isSaving: {
     type: Boolean,
     default: false,
-  },
-  saveError: {
-    type: String,
-    default: null,
-  },
-  clearSaveError: {
-    type: Function,
-    default: () => {},
   },
   // Tab config
   enabledTabs: {
@@ -236,10 +227,9 @@ function clampPopoverPosition() {
   container.style.setProperty('--p-popover-arrow-left', `${arrowLeftEdge}px`)
 }
 
-
 function alignPopoverAnimated() {
   const pv = popover.value
-  if (!pv?.container || !lastAnchorEvent.value) return
+  if (!pv?.container || !lastAnchorEvent.value) { return }
   const el = pv.container
   const prevTop = el.style.top
 
@@ -247,7 +237,7 @@ function alignPopoverAnimated() {
   nextTick(clampPopoverPosition)
 
   const newTop = el.style.top
-  if (!prevTop || !newTop || prevTop === newTop) return
+  if (!prevTop || !newTop || prevTop === newTop) { return }
 
   // Slide transition: snap back to old top, then animate to new top
   el.style.transition = 'none'
@@ -262,7 +252,7 @@ function alignPopoverAnimated() {
 
 function onResourceTransitionStart() {
   const el = popover.value?.container
-  if (!el || !el.classList.contains('p-popover-flipped')) return
+  if (!el || !el.classList.contains('p-popover-flipped')) { return }
 
   // Anchor to bottom so expansion pushes the box UP naturally
   const rect = el.getBoundingClientRect()
@@ -272,7 +262,7 @@ function onResourceTransitionStart() {
 
 function onResourceTransitionEnd() {
   const el = popover.value?.container
-  if (!el) return
+  if (!el) { return }
 
   // Reset to top-based positioning for PrimeVue
   el.style.top = `${el.getBoundingClientRect().top}px`
@@ -491,14 +481,6 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerUnsavedWarning })
         <span>Please <strong>Save</strong> or <strong>Undo</strong> your changes to close.</span>
       </div>
 
-      <div v-if="saveError" class="review-edit-popover__save-error">
-        <i class="pi pi-exclamation-circle" />
-        <span>{{ saveError }}</span>
-        <button class="review-edit-popover__save-error-dismiss" @click="clearSaveError">
-          <i class="pi pi-times" />
-        </button>
-      </div>
-
       <div class="review-edit-popover__attributions">
         <ResultEngineBadges :result-engine="currentReview?.resultEngine" />
         <div class="review-edit-popover__attr-section">
@@ -536,8 +518,8 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerUnsavedWarning })
         <div class="review-edit-popover__resources-toggle-line" />
       </div>
 
-      <Transition 
-        name="expand" 
+      <Transition
+        name="expand"
         @before-enter="onResourceTransitionStart"
         @after-enter="onResourceTransitionEnd"
         @before-leave="onResourceTransitionStart"
@@ -757,42 +739,6 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerUnsavedWarning })
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Inline save error banner (Tier: Action Error) */
-.review-edit-popover__save-error {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.6rem;
-  background-color: color-mix(in srgb, var(--color-text-error, #e74c3c) 12%, var(--color-background-dark));
-  border: 1px solid color-mix(in srgb, var(--color-text-error, #e74c3c) 40%, transparent);
-  border-radius: 4px;
-  color: var(--color-text-error, #e74c3c);
-  font-size: 0.95rem;
-}
-
-.review-edit-popover__save-error .pi-exclamation-circle {
-  flex-shrink: 0;
-}
-
-.review-edit-popover__save-error span {
-  flex: 1;
-}
-
-.review-edit-popover__save-error-dismiss {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text-error, #e74c3c);
-  opacity: 0.7;
-  padding: 0;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.review-edit-popover__save-error-dismiss:hover {
-  opacity: 1;
-}
-
 .review-edit-popover__attributions {
   display: flex;
   column-gap: 3rem;
@@ -806,7 +752,6 @@ defineExpose({ toggle, show, hide, reposition, isDirty, triggerUnsavedWarning })
   border: 1px solid var(--p-primary-color);
   box-shadow: 0 0 10px 2px color-mix(in srgb, var(--p-primary-color) 30%, transparent);
 }
-
 
 :global(.review-popover:not(.p-popover-flipped)::before) {
   border-bottom-color: var(--p-primary-color) !important;
