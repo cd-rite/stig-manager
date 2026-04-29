@@ -1,4 +1,4 @@
-import { ENGINE_TYPE, REVIEW_STATUS } from '../../../shared/lib/reviewConstants.js'
+import { ENGINE_TYPE, REVIEW_STATUS } from './reviewConstants.js'
 
 export const severityMap = { high: 1, medium: 2, low: 3 }
 
