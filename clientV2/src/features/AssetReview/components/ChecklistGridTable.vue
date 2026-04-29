@@ -13,7 +13,7 @@ import { formatReviewDate } from '../../../shared/lib/reviewFormUtils.js'
 import { fieldMatches, highlightText } from '../../../shared/lib/searchUtils.js'
 import { useChecklistDisplayMode } from '../composables/useChecklistDisplayMode.js'
 import { useSearch } from '../composables/useSearch.js'
-import { getResultDisplay, severityMap } from '../lib/checklistUtils.js'
+import { getResultDisplay, severityMap } from '../../../shared/lib/checklistUtils.js'
 import { buildEngineOptions } from '../lib/reviewFilterOptions.js'
 
 const props = defineProps({
