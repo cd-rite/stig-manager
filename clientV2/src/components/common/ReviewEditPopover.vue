@@ -10,6 +10,9 @@ import ResultEngineBadges from './ResultEngineBadges.vue'
 import StatusBadge from './StatusBadge.vue'
 import StatusButton from './StatusButton.vue'
 
+
+const emit = defineEmits(['save', 'status-action', 'close', 'clear-save-error'])
+
 const props = defineProps({
   // Review data
   currentReview: {
@@ -59,7 +62,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['save', 'status-action', 'close'])
+defineSlots()
 
 // Expose props as refs so all .value access in the component body is unchanged
 const { currentReview, selectedRuleId, collectionId, assetId, fieldSettings, accessMode, canAccept, isSaving, saveError } = toRefs(props)
@@ -119,7 +122,7 @@ function onButtonClick(actionType) {
 
   let status = 'saved'
   if (actionType === 'save and submit') {
-    status = 'submitted'
+    status = REVIEW_STATUS.SUBMITTED
   }
 
   emit('save', {

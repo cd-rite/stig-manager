@@ -669,6 +669,7 @@ paths:
               unreviewedCommented: 'informational',
               emptyDetail: 'replace',
               emptyComment: 'ignore',
+              updateAssetProps: false,
               allowCustom: true
             }
         ```
@@ -6994,6 +6995,10 @@ components:
             - ignore
             - import
             - replace
+        updateAssetProps:
+          description: |
+            Flag indicating whether to update Asset information (IP, MAC, FQDN, noncomputing, and metadata including role and tech area) when Asset already exists in the Collection.
+          type: boolean
         allowCustom:
           description: |
             Flag indicating whether Clients may POST reviews that do not conform to importOptions specified.
@@ -7004,7 +7009,7 @@ components:
         - unreviewedCommented
         - emptyDetail
         - emptyComment
-        - allowCustom      
+        - allowCustom
     CollectionImportAutoStatus:
       type: object
       additionalProperties: false
