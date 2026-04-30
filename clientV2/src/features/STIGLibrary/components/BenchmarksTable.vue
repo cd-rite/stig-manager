@@ -92,27 +92,30 @@ function clearFilter() {
     <Column
       field="title"
       :sortable="!compact"
-      :style="{ minWidth: compact ? '11rem' : '22rem' }"
+      :style="{ width: compact ? undefined : '100rem', minWidth: compact ? '11rem' : '22rem' }"
     >
       <template #header>
-        <div class="benchmarks-table__filter">
-          <i class="pi pi-search benchmarks-table__filter-icon" />
-          <input
-            v-model="filter"
-            type="text"
-            class="benchmarks-table__filter-input"
-            :placeholder="compact ? 'Filter…' : 'Filter benchmarks by title or ID…'"
-            @click.stop
-          >
-          <button
-            v-if="filter"
-            type="button"
-            class="benchmarks-table__filter-clear"
-            aria-label="Clear filter"
-            @click.stop="clearFilter"
-          >
-            <i class="pi pi-times" />
-          </button>
+        <div class="benchmarks-table__col-header">
+          <span v-if="!compact" class="benchmarks-table__col-header-label">Benchmark</span>
+          <div class="benchmarks-table__filter">
+            <i class="pi pi-search benchmarks-table__filter-icon" />
+            <input
+              v-model="filter"
+              type="text"
+              class="benchmarks-table__filter-input"
+              placeholder="Filter benchmarks by title or ID…"
+              @click.stop
+            >
+            <button
+              v-if="filter"
+              type="button"
+              class="benchmarks-table__filter-clear"
+              aria-label="Clear filter"
+              @click.stop="clearFilter"
+            >
+              <i class="pi pi-times" />
+            </button>
+          </div>
         </div>
       </template>
       <template #body="{ data }">
@@ -204,9 +207,27 @@ function clearFilter() {
   height: 100%;
 }
 
+.benchmarks-table__col-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.benchmarks-table__col-header-label {
+  flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--color-text-dim);
+  text-transform: none;
+}
+
 .benchmarks-table__filter {
   position: relative;
-  width: 100%;
+  flex: 0 1 24rem;
+  min-width: 0;
   display: flex;
   align-items: center;
 }
@@ -223,8 +244,8 @@ function clearFilter() {
 
 .benchmarks-table__filter-input {
   width: 100%;
-  height: 2rem;
-  padding: 0.25rem 1.7rem 0.25rem 1.95rem;
+  height: 1.7rem;
+  padding: 0.2rem 1.7rem 0.2rem 1.95rem;
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
   background: color-mix(in srgb, var(--color-background-light) 75%, transparent);
@@ -238,6 +259,11 @@ function clearFilter() {
   border-color: var(--color-primary-highlight);
   background-color: var(--color-background-darkest);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary-highlight) 25%, transparent);
+}
+
+.benchmarks-table__filter-input::placeholder {
+  color: var(--color-text-dim);
+  opacity: 1;
 }
 
 .benchmarks-table__filter-clear {
@@ -321,7 +347,7 @@ function clearFilter() {
 :deep(.p-datatable-thead > tr > th) {
   background: var(--color-background-dark);
   color: var(--color-text-dim);
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 600;
   text-transform: none;
   letter-spacing: 0.03em;

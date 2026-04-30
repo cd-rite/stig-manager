@@ -82,7 +82,7 @@ const { getRulesForRev, watchCurrent, invalidate: invalidateRules } = useRevisio
 const revState = watchCurrent(benchmarkIdParam, effectiveViewRev)
 
 const bmLineClamp = 2
-const bmItemSize = computed(() => hasSelection.value ? 92 : 76)
+const bmItemSize = computed(() => hasSelection.value ? 92 : 50)
 
 const {
   diffRows,
