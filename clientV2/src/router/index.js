@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
+import { getLastStigLibraryUrl } from '../features/STIGLibrary/lastVisited.js'
 import { navigationGuard } from './navigationGuards.js'
 
 // Lazy load components
@@ -141,6 +142,12 @@ const routes = [
     name: 'stig-library',
     component: StigLibrary,
     meta: { breadcrumbs: [{ label: 'STIG Library' }] },
+    beforeEnter: () => {
+      const last = getLastStigLibraryUrl()
+      if (last && last !== '/stig-library') {
+        return last
+      }
+    },
   },
   {
     path: '/stig-library/:benchmarkId/:revisionStr?',

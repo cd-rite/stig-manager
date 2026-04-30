@@ -12,6 +12,7 @@ import { useBenchmarkList } from '../composables/useBenchmarkList.js'
 import { useRevisionDiff } from '../composables/useRevisionDiff.js'
 import { useRevisionRules } from '../composables/useRevisionRules.js'
 import { useRuleSelection } from '../composables/useRuleSelection.js'
+import { setLastStigLibraryUrl } from '../lastVisited.js'
 import BenchmarksTable from './BenchmarksTable.vue'
 import DiffDetailPanel from './DiffDetailPanel.vue'
 import RulePane from './RulePane.vue'
@@ -138,8 +139,11 @@ watch([benchmarks, benchmarkIdParam], ([list, bm]) => {
 
 // Auto-select first rule (view mode). router.replace so it doesn't add history.
 watch(
-  () => [revState.rules, diffMode.value, selectedRuleId.value, selectedBenchmark.value],
-  () => {
+  () => revState.rules,
+  (rules) => {
+    if (!rules?.length) {
+      return
+    }
     if (diffMode.value) {
       return
     }
@@ -149,12 +153,9 @@ watch(
     if (!selectedBenchmark.value) {
       return
     }
-    const first = revState.rules?.[0]
-    if (!first) {
-      return
-    }
-    replaceQuery({ ruleId: first.ruleId })
+    replaceQuery({ ruleId: rules[0].ruleId })
   },
+  { immediate: true },
 )
 
 // Auto-select first diff row when diffRows lands.
@@ -183,17 +184,37 @@ watch(benchmarkRevisions, (revs) => {
   }
 })
 
+// Remember the most-recent STIG Library URL so the navrail (and any other
+// external entry point) can land back on it instead of the bare list.
+watch(
+  () => route.fullPath,
+  (path) => {
+    if (route.name === 'stig-library' || route.name === 'stig-library-benchmark') {
+      setLastStigLibraryUrl(path)
+    }
+  },
+  { immediate: true },
+)
+
 function goToList() {
-  router.push({ name: 'stig-library' })
+  // The page-header title is the user's explicit "back to the list" gesture.
+  // Clear the cached deep URL so the navrail's beforeEnter doesn't bounce us
+  // straight back to it; the route-watch above will reseed lastVisited as the
+  // bare list path on the next tick.
+  setLastStigLibraryUrl(null)
+  router.replace({ name: 'stig-library' })
 }
 function goToBenchmark(benchmark) {
-  router.push({
+  router.replace({
     name: 'stig-library-benchmark',
-    params: { benchmarkId: benchmark.benchmarkId },
+    params: {
+      benchmarkId: benchmark.benchmarkId,
+      revisionStr: benchmark.lastRevisionStr,
+    },
   })
 }
 function setViewRev(rev) {
-  router.push({
+  router.replace({
     name: 'stig-library-benchmark',
     params: { benchmarkId: benchmarkIdParam.value, revisionStr: rev },
     query: compareRev.value ? { compareRev: compareRev.value } : {},
@@ -209,7 +230,7 @@ function setCompareRev(rev) {
   }
   delete query.ruleId
   delete query.diffKey
-  router.push({ name: route.name, params: route.params, query })
+  router.replace({ name: route.name, params: route.params, query })
 }
 function setSelectedRule(ruleId) {
   const query = { ...route.query }
@@ -219,7 +240,7 @@ function setSelectedRule(ruleId) {
   else {
     delete query.ruleId
   }
-  router.push({ name: route.name, params: route.params, query })
+  router.replace({ name: route.name, params: route.params, query })
 }
 function setSelectedDiffRow(key) {
   const query = { ...route.query }
@@ -229,7 +250,7 @@ function setSelectedDiffRow(key) {
   else {
     delete query.diffKey
   }
-  router.push({ name: route.name, params: route.params, query })
+  router.replace({ name: route.name, params: route.params, query })
 }
 function replaceQuery(patch) {
   const query = { ...route.query, ...patch }
