@@ -1,3 +1,12 @@
+1.6.11
+-------
+
+Changes:
+
+  - (API) **Behavior change:** Default value of ``STIGMAN_CLIENT_RESPONSE_MODE`` is now ``query`` (previously ``fragment``). Deployments that did not set this variable explicitly will see the web client request authorization codes via the URL query string rather than the URL fragment. Most OIDC providers and reverse-proxy configurations require no changes, but operators should verify their OIDC client's allowed redirect URIs and any URL-rewriting middleware handle ``?code=...&state=...`` callbacks correctly.
+  - (Deprecation) ``STIGMAN_CLIENT_RESPONSE_MODE=fragment`` is deprecated and will be removed in a future release alongside the new web client. ``fragment`` mode is incompatible with the routed architecture of the upcoming client and is no longer the recommended response mode for OAuth 2.0 Authorization Code flow with PKCE (see OAuth 2.0 Security Best Current Practice, RFC 9700). Deployments still relying on ``fragment`` should plan migration to ``query``.
+  - (Docs) Updated ``STIGMAN_CLIENT_RESPONSE_MODE`` documentation to reflect the new default and deprecation status.
+
 1.6.10
 -------
 
